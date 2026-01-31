@@ -27,11 +27,11 @@ Status: ✅ Complete
 - [x] Add branch protection on main (PR required, approvals 0)
 - [x] Create /ops/STACK.md
 - [x] Create /ops/TODO.md
-- [ ] Create Vercel account (sign up with GitHub)
-- [ ] Import repo into Vercel
-- [ ] Confirm preview deployments working
+- [x] Create Vercel account (sign up with GitHub)
+- [x] Import repo into Vercel
+- [x] Confirm preview deployments working
 
-Status: ⏳ In progress
+Status: ✅ Complete
 
 ---
 
