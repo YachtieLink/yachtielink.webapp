@@ -37,9 +37,9 @@ Status: ✅ Complete
 
 ## Phase C — Backend & Auth (NEXT)
 
-- [ ] Create Supabase project: yachtielink-staging (EU)
-- [ ] Create Supabase project: yachtielink-prod (EU)
-- [ ] Enable Supabase Auth (Google, Apple, email/password)
+- [x] Create Supabase project: yachtielink-staging (EU)
+- [x] Create Supabase project: yachtielink-prod (EU)
+- [x] Enable Supabase Auth (Google, Apple, email/password)
 - [ ] Enforce RLS on all tables
 - [ ] Connect Supabase env vars to Vercel (staging)
 
