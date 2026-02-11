@@ -1,0 +1,426 @@
+{
+  "phase_1": {
+    "objective": "Free crew identity infrastructure with paid presentation upgrades and recruiter access monetisation.",
+    "identity_layer": {
+      "monetisation": false,
+      "includes": [
+        "Profile",
+        "Employment history",
+        "Certifications",
+        "Endorsements",
+        "Public profile page",
+        "PDF snapshot",
+        "CV import (auto-populate profile)"
+      ]
+    },
+    "onboarding": {
+      "goal": "Minimise time-to-first-endorsement",
+      "cv_import": {
+        "description": "Upload CV to auto-populate profile fields",
+        "accepted_formats": [
+          "PDF",
+          "DOCX"
+        ],
+        "fields_extracted": [
+          "Full name",
+          "Employment history (yacht, role, dates)",
+          "Certifications",
+          "Languages",
+          "Location"
+        ],
+        "implementation": "LLM-based extraction (Claude API)",
+        "cost_target": "<€0.05 per parse",
+        "user_flow": [
+          "Upload CV (optional step in onboarding)",
+          "System extracts structured data",
+          "User reviews and corrects extracted data",
+          "User confirms and saves to profile"
+        ],
+        "fallback": "If parsing fails, skip silently to manual entry",
+        "monetisation": false
+      },
+      "manual_entry": {
+        "description": "Always available as alternative to CV import",
+        "note": "CV import is convenience, not requirement"
+      }
+    },
+    "presentation_layer": {
+      "monetisation": true,
+      "constraints": "Cosmetic only. Never alters trust outcomes.",
+      "includes": [
+        "Premium templates",
+        "Watermark removal",
+        "Custom subdomain",
+        "Endorsement pinning"
+      ]
+    },
+    "crew_pro": {
+      "price": "€12/month",
+      "description": "Enhanced features for active crew, especially those who hire",
+      "features": {
+        "search": {
+          "free": false,
+          "pro": "Unlimited database search with full profile access"
+        },
+        "job_posts": {
+          "free": "1/month",
+          "pro": "3/month"
+        },
+        "availability_broadcast": {
+          "free": "Network only, 14 days",
+          "pro": "Network + 2nd degree network, 30 days"
+        },
+        "profile_analytics": {
+          "free": "View count only",
+          "pro": "Full: who viewed, when, which yacht"
+        },
+        "recruiter_visibility": {
+          "free": false,
+          "pro": "See which recruiters unlocked your profile"
+        },
+        "cert_expiry_alerts": {
+          "free": false,
+          "pro": "Email/push at 90/60/30 days before expiry"
+        },
+        "endorsement_requests": {
+          "free": "5/month",
+          "pro": "20/month"
+        },
+        "templates": {
+          "free": "Standard",
+          "pro": "Premium library"
+        },
+        "subdomain": {
+          "free": false,
+          "pro": "Custom subdomain"
+        },
+        "watermark": {
+          "free": "Yachtielink branding",
+          "pro": "Clean (no watermark)"
+        }
+      }
+    },
+    "yacht_graph": {
+      "status": "Phase 1 infrastructure",
+      "entity_model": {
+        "identification": "Immutable internal UUID",
+        "display": "Human-readable name (not unique, not identity)",
+        "note": "Users attach to yacht entities, not name strings"
+      },
+      "behaviour": [
+        "Users may select an existing yacht or create a new one",
+        "Yachts display number of attached crew",
+        "Renamed yachts are separate entities (no merging in Phase 1)",
+        "Duplicate names are tolerated (multiple 'Lady M' entries acceptable)",
+        "No reviews, ratings, comments, or interaction on yacht entities"
+      ],
+      "critical_rule": "Endorsements require shared yacht attachment",
+      "future_use": "Permanent infrastructure for Phase 2 yacht dashboards and Phase 3 diagnostics"
+    },
+    "endorsements": {
+      "gating": {
+        "requirement": "Shared yacht attachment",
+        "note": "Contacts alone do not permit endorsements"
+      },
+      "structure": {
+        "components": [
+          "Free-text content",
+          "Structured metadata (role, yacht, dates worked together)"
+        ],
+        "limit": "One endorsement per engagement per yacht"
+      },
+      "editing": {
+        "allowed": true,
+        "deletion_allowed": true,
+        "backend_tracking": "Retractions tracked internally, affect endorser weighting"
+      },
+      "visibility": {
+        "retractions_in_ui": false,
+        "absence_interpretation": "neutral"
+      },
+      "forbidden": [
+        "Numeric ratings",
+        "Star scores",
+        "Auto-summary language ('well endorsed', etc.)"
+      ]
+    },
+    "availability_toggle": {
+      "description": "Crew opt into being discoverable via search",
+      "expiry": "7 days, must re-toggle",
+      "reminder": "Push/email at day 6",
+      "contact_preferences": [
+        "Platform message only",
+        "Show email",
+        "Show phone",
+        "Show WhatsApp"
+      ],
+      "recruiter_visibility": "Can hide from recruiters while visible to other crew"
+    },
+    "employment_records": {
+      "fields": [
+        "Yacht (entity reference)",
+        "Role/position",
+        "Start date",
+        "End date (or ongoing)",
+        "Notes (optional, private)"
+      ],
+      "deletion": {
+        "allowed": true,
+        "effect_on_endorsements": "Endorsements from that engagement remain unless separately deleted"
+      },
+      "verification": {
+        "phase_1": "None (self-reported)",
+        "mitigation": "False claims don't accumulate reinforcing signals"
+      }
+    },
+    "peer_hiring": {
+      "status": "Phase 1 feature",
+      "description": "Crew find crew — job postings with graph-aware applications",
+      "monetisation": false,
+      "poster_requirements": {
+        "must_have_full_profile": true,
+        "must_have_yacht_attachment": true,
+        "note": "No employer-only accounts. Captains and HODs are crew."
+      },
+      "job_posting": {
+        "fields": [
+          "Role/position",
+          "Yacht (entity reference)",
+          "Contract type (permanent, rotational, temp)",
+          "Start date",
+          "Location/itinerary",
+          "Salary range (optional)",
+          "Description"
+        ],
+        "limits": {
+          "free": "1/month",
+          "pro": "3/month",
+          "bundle_request": "Manual request for >3 (e.g., new yacht build)"
+        },
+        "visibility": "All users",
+        "expiry": "60 days, renewable"
+      },
+      "application_flow": {
+        "apply_with": "Profile link (full profile visible to poster)",
+        "graph_visibility": {
+          "to_poster": "Mutual colleagues/IRL connections, shared yachts, endorsement paths",
+          "to_applicant": "Poster's full profile, endorsements, employment history"
+        },
+        "messaging": "Direct message between poster and applicant"
+      },
+      "forbidden": [
+        "Paid listings or promotion",
+        "Algorithmic job matching or ranking",
+        "Placement fees",
+        "Employer-only accounts"
+      ],
+      "phase_1_constraints_note": "Phase 1 hiring surfaces are constrained by design. Future phases may leverage the graph for hiring workflows. No Phase 1 constraint should be interpreted as a permanent prohibition.",
+      "rationale": "Both parties are nodes in the trust graph. Hiring is a use case for the graph, not a separate product."
+    },
+    "recruiter_access": {
+      "status": "Phase 1 feature",
+      "description": "Paid read-only access for recruitment agencies to search crew pool",
+      "account_type": "Separate from crew accounts",
+      "pricing": {
+        "subscription": {
+          "price": "€29/month",
+          "includes": "Dashboard access, search, filter, sort",
+          "required": "Must have active subscription to use credits"
+        },
+        "credits": {
+          "purpose": "Unlock profile name and contact details from search results",
+          "bundles": [
+            {
+              "name": "Starter",
+              "credits": 10,
+              "price": "€75",
+              "per_unlock": "€7.50"
+            },
+            {
+              "name": "Standard",
+              "credits": 30,
+              "price": "€180",
+              "per_unlock": "€6.00"
+            },
+            {
+              "name": "Pro",
+              "credits": 100,
+              "price": "€500",
+              "per_unlock": "€5.00"
+            },
+            {
+              "name": "Agency",
+              "credits": 300,
+              "price": "€1,200",
+              "per_unlock": "€4.00"
+            }
+          ],
+          "expiry": "1 year from purchase",
+          "minimum_purchase": "€75 (Starter)"
+        }
+      },
+      "capabilities": {
+        "can_do": [
+          "Search available crew pool",
+          "Filter by role, certs, experience, availability",
+          "Sort by endorsement count, experience, recency",
+          "Unlock profiles with credits",
+          "Message unlocked crew",
+          "View full profiles via direct link"
+        ],
+        "cannot_do": [
+          "Post jobs",
+          "Give or receive endorsements",
+          "Influence graph in any way",
+          "See crew who opted out of recruiter visibility"
+        ]
+      },
+      "profile_visibility": {
+        "search_results_locked": {
+          "visible": [
+            "Photo",
+            "Headline",
+            "Role",
+            "Yacht history summary",
+            "Endorsement count",
+            "Availability window"
+          ],
+          "locked": [
+            "Name",
+            "Contact details",
+            "Full endorsement text"
+          ]
+        },
+        "after_unlock": "Full profile access, permanent for that recruiter-crew pair",
+        "direct_link": "Full profile visible (no credit required)"
+      },
+      "search_filters": [
+        "Role/department",
+        "Certifications held",
+        "Yacht size experience",
+        "Years of experience",
+        "Availability window",
+        "Location preference",
+        "Visa/work permits"
+      ],
+      "search_sort_options": [
+        "Endorsement count (highest first)",
+        "Endorsement depth (unique endorsers × unique yachts)",
+        "Years of experience",
+        "Availability recency (most recently toggled)",
+        "Graph proximity (mutual colleagues/IRL connections)"
+      ],
+      "anti_gaming": [
+        "Recruiter accounts cannot be crew accounts",
+        "Concurrent session limit (2)",
+        "Profile view rate limit (100/day)",
+        "Contact limit per day (20)",
+        "No bulk export"
+      ],
+      "crew_protection": [
+        "Block specific recruiter",
+        "Block all recruiters",
+        "Report recruiter for spam/inappropriate contact",
+        "Toggle visibility to recruiters independently of crew visibility"
+      ],
+      "rationale": "Monetises recruiter access without corrupting trust. Recruiters pay for efficient discovery, not influence. Crew control their visibility."
+    },
+    "profile_visibility_rules": {
+      "description": "Contextual access based on how profile is accessed",
+      "access_methods": {
+        "direct_link_or_qr": {
+          "viewer": "Anyone",
+          "sees": "Full profile including contact details (per crew settings)"
+        },
+        "graph_browsing": {
+          "viewer": "Anyone logged in",
+          "sees": "Full profile (clicking yacht → crew → profile)"
+        },
+        "search_crew": {
+          "viewer": "Pro crew",
+          "sees": "Full profile"
+        },
+        "search_recruiter": {
+          "viewer": "Recruiter with subscription",
+          "sees": "Locked profile until credit spent"
+        }
+      },
+      "rationale": "Direct sharing preserves linktr.ee use case. Search is monetised because it's the efficient discovery path."
+    },
+    "contacts_and_messaging": {
+      "contacts": {
+        "type": "Private, opt-in",
+        "acceptance_required": true,
+        "graph_impact": "None"
+      },
+      "messaging": {
+        "allowed_between": [
+          "Contacts",
+          "Colleagues (shared employment)",
+          "IRL connections"
+        ],
+        "features_excluded": [
+          "Group chats",
+          "Broadcast to non-contacts",
+          "Read receipts",
+          "Typing indicators"
+        ]
+      },
+      "availability_broadcast": {
+        "scope": "Private broadcast to network only (free) or 2nd degree network (Pro)",
+        "trust_impact": "None"
+      }
+    },
+    "timeline": {
+      "status": "Phase 1 feature",
+      "description": "Graph-bounded, chronological timeline built around real-world interaction",
+      "contents": [
+        "Posts",
+        "Interactions",
+        "Milestones"
+      ],
+      "ordering": "Chronological only (no algorithm)",
+      "visibility_rules": {
+        "network_definition": "Colleagues + IRL connections + Contacts",
+        "posts": {
+          "visibility": [
+            "only_me",
+            "network"
+          ],
+          "note": "Posts are visible to network, including Contacts. Posts never create graph edges."
+        },
+        "interactions": {
+          "visibility": [
+            "public",
+            "private"
+          ],
+          "public_rule": "Visible to colleagues and IRL connections only (not Contacts)",
+          "private_rule": "Visible only to confirmed participants and self"
+        },
+        "milestones": {
+          "default_visibility": "network",
+          "optional_visibility": "only_me",
+          "phase_1_source": "Derived from major certifications and employment events (joining/leaving a yacht or company)",
+          "phase_1_note": "No standalone milestones table in Phase 1; career milestones deferred"
+        },
+        "self_view": "Always full for self"
+      },
+      "tagging": {
+        "default": "accepted",
+        "require_approval_setting": "profiles.require_tag_approval (default false)",
+        "states": [
+          "accepted",
+          "pending",
+          "removed"
+        ],
+        "eligibility": "Only users in network can be tagged"
+      },
+      "comments": {
+        "posts": "Network only",
+        "interactions": "Participants only"
+      },
+      "reactions": "None in Phase 1",
+      "right_of_exit": "Participants or tagged users can remove themselves at any time; association, comments, and media are removed from other viewers"
+    }
+  }
+}

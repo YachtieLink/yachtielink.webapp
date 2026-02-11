@@ -2,6 +2,16 @@
 
 This file tracks execution state.
 Completed items are never deleted, only checked off.
+All meaningful changes must be recorded in `/Users/ari/yachtielink.webapp/ops/LOG.md`.
+
+---
+
+## Change Control (Multi-Contributor)
+
+- When updating any checklist status, add a matching log entry ID in `/Users/ari/yachtielink.webapp/ops/LOG.md`.
+- Use log IDs in format: `LOG-YYYYMMDD-###`.
+- Never remove old checklist items or old log entries.
+- If a task changes scope, update text in this file and log the reason.
 
 ---
 
@@ -79,4 +89,4 @@ Status: ⏳ Not started
 
 ---
 
-Last updated: 2026-01-31
+Last updated: 2026-02-11
