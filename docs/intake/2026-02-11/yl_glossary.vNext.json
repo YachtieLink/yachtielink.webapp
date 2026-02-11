@@ -1,0 +1,287 @@
+{
+  "identity_layer": {
+    "definition": "Free, permanent infrastructure representing who a crew member is.",
+    "includes": [
+      "Profile",
+      "Employment history",
+      "Certifications",
+      "Endorsements",
+      "Public profile page",
+      "PDF snapshot",
+      "CV import"
+    ],
+    "monetised": false
+  },
+  "cv_import": {
+    "definition": "LLM-based extraction of profile data from uploaded CV files.",
+    "purpose": "Reduce onboarding friction by auto-populating profile from existing CV",
+    "accepted_formats": [
+      "PDF",
+      "DOCX"
+    ],
+    "fields_extracted": [
+      "Name",
+      "Employment history",
+      "Certifications",
+      "Languages",
+      "Location"
+    ],
+    "note": "Not verification — extracted data is still self-reported. User must review and confirm.",
+    "monetised": false
+  },
+  "presentation_layer": {
+    "definition": "Paid, cosmetic layer controlling how identity is presented.",
+    "includes": [
+      "Premium templates",
+      "Custom subdomains",
+      "Watermark removal",
+      "Endorsement pinning"
+    ],
+    "monetised": true,
+    "constraint": "Never alters trust outcomes"
+  },
+  "canonical_monetisation_rule": {
+    "definition": "You can't pay to be more trusted. You can only pay to present yourself better.",
+    "status": "Absolute and non-negotiable"
+  },
+  "yacht_graph": {
+    "definition": "A permanent entity graph linking crew via shared employment on yachts.",
+    "purpose": "Provides the verification substrate for endorsement gating and future trust signals"
+  },
+  "yacht_entity": {
+    "definition": "A database record representing a yacht, identified by immutable internal UUID.",
+    "note": "Human-readable names are display labels, not identity. Duplicates are tolerated in Phase 1."
+  },
+  "attachment": {
+    "definition": "A crew member's claimed employment relationship with a yacht entity.",
+    "also_called": "Yacht attachment",
+    "verification": "Self-reported in Phase 1. Gating mechanism for endorsements."
+  },
+  "colleague_coworker": {
+    "definition": "A person you worked with on the same yacht or within the same company during an overlapping time period. Colleague relationships are graph edges created via verified employment overlap and represent the strongest form of professional relationship on Yachtielink."
+  },
+  "irl_connection": {
+    "definition": "A person you have met in real life and verified through an in-person interaction using the Yachtielink app. IRL connections are graph edges that confirm real-world contact but do not imply a working relationship."
+  },
+  "contact": {
+    "definition": "A messaging-only relationship that allows professional communication without creating a graph edge. Contacts do not affect trust, endorsements, or graph structure and exist to support coordination and future real-world interaction."
+  },
+  "graph_edge": {
+    "definition": "A relationship that contributes to the Yachtielink graph. Only Colleague and IRL Connection relationships create graph edges."
+  },
+  "network": {
+    "definition": "The set of people who can see a user's timeline posts. A user's network includes Colleagues, IRL Connections, and Contacts. Only Colleagues and IRL Connections contribute to the graph."
+  },
+  "interaction": {
+    "definition": "A verified in-person encounter between two or more users. Interactions create IRL Connections between participants and may be public or private."
+  },
+  "right_of_exit": {
+    "definition": "The ability for any user to remove themselves from an interaction or tagged post at any time, instantly removing their association from all other viewers."
+  },
+  "timeline": {
+    "definition": "A chronological profile stream containing posts, interactions, and milestones shared within a user's network."
+  },
+  "post": {
+    "definition": "A user-authored timeline entry containing text and optional photos, visible based on network visibility rules."
+  },
+  "milestone": {
+    "definition": "A timeline entry derived from major certifications or career changes (joining or leaving a yacht or company)."
+  },
+  "endorsement": {
+    "definition": "A positive, contextual signal from one crew member about another.",
+    "gating": "Requires shared yacht attachment",
+    "structure": "Free-text plus structured metadata (role, yacht, dates)",
+    "limit": "One per engagement per yacht"
+  },
+  "retraction": {
+    "definition": "The removal or deletion of a previously given endorsement.",
+    "visibility": "Never shown in UI",
+    "backend_effect": "Affects endorser's future signal weight; feeds into Phase 2 trust calculations"
+  },
+  "peer_hiring": {
+    "definition": "Job posting and application system where crew hire crew.",
+    "key_feature": "Graph visibility — both parties see mutual colleagues/IRL connections, shared yachts, endorsement paths",
+    "limits": {
+      "free": "1 job post/month",
+      "pro": "3 job posts/month"
+    },
+    "constraints": [
+      "No paid listings",
+      "No placement fees",
+      "No employer-only accounts",
+      "Poster must have full profile"
+    ],
+    "rationale": "Hiring incentives align when both parties are nodes in the trust graph with visible reputations"
+  },
+  "signal": {
+    "definition": "Any data point that contributes to a user's trust profile.",
+    "examples": [
+      "Endorsements",
+      "Retraction patterns",
+      "Consensus flags (Phase 2)"
+    ]
+  },
+  "signal_weight": {
+    "definition": "The relative strength or influence of a signal in trust calculations.",
+    "factors": [
+      "Recency",
+      "Consensus",
+      "Endorser history",
+      "Retraction frequency"
+    ]
+  },
+  "trust_outcome": {
+    "definition": "Any system-derived signal affecting credibility or safety assessment.",
+    "rule": "Never monetised, never purchasable"
+  },
+  "tripwire": {
+    "definition": "A metric threshold that triggers a predefined action when crossed.",
+    "examples": [
+      "Endorsement-to-profile ratio below 0.3",
+      "Organic share rate below 10%"
+    ],
+    "purpose": "Early warning system to protect trust before damage compounds"
+  },
+  "growth_pause": {
+    "definition": "Switching from public signup to invite-only mode.",
+    "trigger": "Tripwire breach or founder/PM decision",
+    "execution": "Same-day via single config flag"
+  },
+  "crew_pro": {
+    "definition": "The paid subscription tier for crew members.",
+    "price": "€12/month",
+    "includes": [
+      "Database search access",
+      "3 job posts/month (vs 1 free)",
+      "Extended availability reach (2nd degree network)",
+      "Full profile analytics (who viewed)",
+      "Recruiter unlock visibility",
+      "Cert expiry alerts",
+      "20 endorsement requests/month (vs 5 free)",
+      "Premium templates",
+      "Custom subdomain",
+      "Watermark removal"
+    ],
+    "constraint": "Never includes trust-affecting features"
+  },
+  "availability_toggle": {
+    "definition": "Crew opt-in to being discoverable via search.",
+    "expiry": "7 days, must re-toggle",
+    "reminder": "Notification at day 6",
+    "purpose": "Active opt-in protects crew from unwanted contact. Weekly expiry prevents stale profiles."
+  },
+  "recruiter_account": {
+    "definition": "Separate account type for recruitment agencies to access crew search.",
+    "capabilities": [
+      "Search",
+      "Filter",
+      "Sort",
+      "Unlock profiles",
+      "Message unlocked crew"
+    ],
+    "limitations": [
+      "Cannot post jobs",
+      "Cannot give/receive endorsements",
+      "Cannot influence graph"
+    ],
+    "note": "Read-only access to the graph"
+  },
+  "recruiter_subscription": {
+    "definition": "Monthly fee for recruiter dashboard access.",
+    "price": "€29/month",
+    "required_for": "Using credits to unlock profiles"
+  },
+  "credits": {
+    "definition": "Recruiter currency for unlocking crew profiles from search results.",
+    "usage": "1 credit = 1 profile unlock (name + contact details)",
+    "persistence": "Unlock is permanent per recruiter-crew pair",
+    "expiry": "Credits expire 1 year from purchase",
+    "bundles": [
+      {
+        "name": "Starter",
+        "credits": 10,
+        "price": "€75"
+      },
+      {
+        "name": "Standard",
+        "credits": 30,
+        "price": "€180"
+      },
+      {
+        "name": "Pro",
+        "credits": 100,
+        "price": "€500"
+      },
+      {
+        "name": "Agency",
+        "credits": 300,
+        "price": "€1,200"
+      }
+    ]
+  },
+  "profile_unlock": {
+    "definition": "Recruiter action to reveal name and contact details from search results.",
+    "cost": "1 credit",
+    "reveals": [
+      "Name",
+      "Contact details",
+      "Full endorsement text",
+      "Messaging access"
+    ],
+    "permanent": "Once unlocked, always accessible to that recruiter"
+  },
+  "contextual_visibility": {
+    "definition": "Profile visibility varies based on how it's accessed.",
+    "direct_link": "Full profile visible to anyone",
+    "graph_browsing": "Full profile visible to logged-in users",
+    "search_results": "Locked for recruiters (credit to unlock), full for Pro crew"
+  },
+  "phase_1": {
+    "definition": "Identity Anchors + Revenue MVP phase.",
+    "goal": "Ship free identity infrastructure, paid presentation upgrades, and recruiter access monetisation",
+    "completion": "Cash-flow neutral, organic sharing, endorsement density thresholds met"
+  },
+  "phase_2": {
+    "definition": "Trust Layer phase.",
+    "goal": "Introduce validated trust signals and protection mechanisms",
+    "prerequisite": "Phase 1 complete, legal review done"
+  },
+  "phase_3": {
+    "definition": "Industry Diagnostics phase.",
+    "goal": "Aggregate signals into higher-order insights without exposing individuals",
+    "prerequisite": "Phase 2 stable, sufficient graph density"
+  },
+  "constitutional_decision": {
+    "definition": "A decision that is irreversible and foundational to system integrity.",
+    "examples": [
+      "No monetising trust outcomes",
+      "Crew-first orientation",
+      "No ratings or reviews"
+    ]
+  },
+  "architectural_decision": {
+    "definition": "A decision about system structure that is hard to reverse but not impossible.",
+    "examples": [
+      "Yacht graph in Phase 1",
+      "Retraction visibility rules",
+      "Recruiter access model"
+    ]
+  },
+  "operational_decision": {
+    "definition": "A decision about execution that can be adjusted based on learning.",
+    "examples": [
+      "Endorsement structure details",
+      "Tripwire thresholds",
+      "Credit pricing"
+    ]
+  },
+  "shadow_constrain": {
+    "definition": "Rate-limiting or restricting a user's capabilities without notification.",
+    "purpose": "Slow potential abuse while gathering evidence, without public accusation",
+    "visibility": "Founder + PM only"
+  },
+  "freeze": {
+    "definition": "Suspending a user's endorsement activity pending investigation.",
+    "trigger": "Three or more independent reports, or concrete evidence of abuse"
+  }
+}
