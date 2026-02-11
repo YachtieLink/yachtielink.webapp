@@ -1,0 +1,211 @@
+{
+  "project": {
+    "name": "Yachtielink",
+    "primary_domain": "yachtie.link",
+    "alt_domains": [
+      "yachtielink.com"
+    ],
+    "one_line": "A crew-first identity and trust layer for yachting, built to survive incentive pressure.",
+    "status": "Pre-build",
+    "current_phase": "Phase 1 — Identity Anchors + Revenue MVP",
+    "north_star": "Build durable free identity infrastructure first, fund it via paid presentation upgrades and recruiter access, and activate trust only once incentives are stable."
+  },
+  "handoff": {
+    "version": "v2.0",
+    "date_created": "2025-11-15",
+    "date_updated": "2026-02-01",
+    "version_history": [
+      {
+        "version": "v1.0",
+        "date": "2025-11-15",
+        "summary": "Initial system documentation"
+      },
+      {
+        "version": "v1.2",
+        "date": "2026-01-20",
+        "summary": "Added phase execution spec, refined yacht graph rules"
+      },
+      {
+        "version": "v1.3",
+        "date": "2026-01-27",
+        "summary": "PM handover: added actionables, handover notes, expanded decisions and glossary"
+      },
+      {
+        "version": "v1.4",
+        "date": "2026-01-28",
+        "summary": "Added tech stack documentation"
+      },
+      {
+        "version": "v1.5",
+        "date": "2026-01-28",
+        "summary": "Added security protocols documentation"
+      },
+      {
+        "version": "v1.6",
+        "date": "2026-01-28",
+        "summary": "Added database schema documentation"
+      },
+      {
+        "version": "v1.7",
+        "date": "2026-01-28",
+        "summary": "Added moderation and consensus mechanics documentation"
+      },
+      {
+        "version": "v1.8",
+        "date": "2026-01-31",
+        "summary": "Added CV import feature for onboarding (D-021)"
+      },
+      {
+        "version": "v1.9",
+        "date": "2026-01-31",
+        "summary": "Added peer hiring feature - free job posts with graph-aware applications (D-022). Revised non-goal from 'not a job marketplace' to 'not an employer-pays hiring platform'."
+      },
+      {
+        "version": "v2.0",
+        "date": "2026-02-01",
+        "summary": "Major monetisation update: Crew Pro tier with search (D-023), recruiter access model with subscription + credits (D-024), contextual profile visibility (D-025), endorsement sorting for recruiters (D-026), availability toggle with expiry (D-027). Three revenue streams: Crew Pro €12/mo, Recruiter subscription €29/mo, Recruiter credits €75-1200."
+      }
+    ],
+    "files": [
+      "yl_system_state.vNext.json",
+      "yl_principles.md",
+      "yl_non_goals.vNext.md",
+      "yl_phase_history.md",
+      "yl_phase_scope.vNext.json",
+      "yl_decisions.vNext.json",
+      "yl_phase1_execution.vNext.md",
+      "yl_phase1_actionables.vNext.json",
+      "yl_handover_notes.md",
+      "yl_glossary.vNext.json",
+      "yl_tech_stack.vNext.md",
+      "yl_security.vNext.md",
+      "yl_schema.vNext.md",
+      "yl_moderation.vNext.md",
+      "yl_mobile_first_ux_spec_for_pm_v1.vNext.md"
+    ],
+    "reading_order": [
+      "yl_system_state.vNext.json",
+      "yl_principles.md",
+      "yl_non_goals.vNext.md",
+      "yl_phase_history.md",
+      "yl_phase_scope.vNext.json",
+      "yl_decisions.vNext.json",
+      "yl_phase1_execution.vNext.md",
+      "yl_phase1_actionables.vNext.json",
+      "yl_handover_notes.md",
+      "yl_glossary.vNext.json",
+      "yl_tech_stack.vNext.md",
+      "yl_security.vNext.md",
+      "yl_schema.vNext.md",
+      "yl_moderation.vNext.md",
+      "yl_mobile_first_ux_spec_for_pm_v1.vNext.md"
+    ],
+    "update_rule": "Append-only updates after v1.0; do not silently rewrite history. New decisions require new entries in yl_decisions.vNext.json."
+  },
+  "problem_definition": {
+    "observed_failures": [
+      "Crew trust signals exist informally (dock talk, WhatsApp, Facebook) and decay quickly",
+      "Bad actors can move between yachts with little persistent signal",
+      "Strong crew lack portable, verifiable proof beyond CVs and references",
+      "Agencies and management have incentive conflicts with truth-seeking",
+      "Sharing negative information is risky and coercion-prone"
+    ],
+    "root_issue": "The industry lacks a neutral system where identity and trust signals can accumulate safely over time with aligned incentives."
+  },
+  "canonical_rules": {
+    "monetisation": "You can't pay to be more trusted. You can only pay to present yourself better.",
+    "interpretation": [
+      "Trust outcomes are never purchasable",
+      "Credibility is never gated by payment",
+      "Verification is never monetised",
+      "Presentation polish may be monetised",
+      "Access to search may be monetised (recruiters pay for discovery, not influence)"
+    ]
+  },
+  "identity_vs_presentation": {
+    "identity_layer": {
+      "description": "Free, permanent identity infrastructure",
+      "includes": [
+        "Profile",
+        "Employment history",
+        "Certifications",
+        "Endorsements",
+        "Public profile page",
+        "PDF snapshot",
+        "CV import",
+        "Timeline posts",
+        "Interactions (IRL encounters)",
+        "Milestones"
+      ],
+      "monetised": false
+    },
+    "presentation_layer": {
+      "description": "Paid, cosmetic presentation upgrades",
+      "includes": [
+        "Premium templates",
+        "Watermark removal",
+        "Custom domains",
+        "Endorsement pinning"
+      ],
+      "constraints": "Never alters trust outcomes",
+      "monetised": true
+    }
+  },
+  "revenue_streams": {
+    "crew_pro": {
+      "price": "€12/month",
+      "target": "Active crew, especially those who hire (captains, HODs)",
+      "key_features": [
+        "Database search",
+        "Extended availability reach",
+        "Profile analytics",
+        "Cert expiry alerts",
+        "3 job posts/month"
+      ]
+    },
+    "recruiter_subscription": {
+      "price": "€29/month",
+      "target": "Recruitment agencies",
+      "includes": "Dashboard access, required for credit usage"
+    },
+    "recruiter_credits": {
+      "price_range": "€75-1,200 per bundle",
+      "target": "Recruitment agencies",
+      "usage": "1 credit = 1 profile unlock from search"
+    }
+  },
+  "phase_invariants": [
+    "Identity is free and permanent",
+    "Presentation is paid and cosmetic",
+    "Trust outcomes are never monetised",
+    "Phase 1 schemas persist into Phases 2 and 3",
+    "If incentives threaten trust, the system freezes rather than bends",
+    "Recruiters have read-only access — they cannot influence the graph",
+    "Graph edges are created only by colleagues and IRL connections",
+    "Contacts never affect graph or trust",
+    "Timeline ordering is chronological only (no algorithmic surfacing)"
+  ],
+  "relationship_model": {
+    "colleague": "Graph edge created by overlapping yacht or company employment",
+    "irl_connection": "Graph edge created by verified in-person interaction",
+    "contact": "Messaging + timeline post visibility only; no graph impact",
+    "graph_invariant": "Graph edges = colleagues + IRL connections only"
+  },
+  "timeline_system": {
+    "enabled": true,
+    "contents": [
+      "Posts",
+      "Interactions",
+      "Milestones"
+    ],
+    "ordering": "Chronological only (no algorithm)",
+    "visibility": {
+      "posts": "only_me or network",
+      "interactions_public": "Visible to colleagues and IRL connections only",
+      "interactions_private": "Visible to confirmed participants only",
+      "milestones": "Network by default, hideable per item",
+      "self_view": "Always full for self"
+    },
+    "network_definition": "Colleagues + IRL connections + contacts"
+  }
+}
