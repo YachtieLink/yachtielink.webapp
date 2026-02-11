@@ -45,15 +45,54 @@ Status: ✅ Complete
 
 ---
 
-## Phase C — Backend & Auth (NEXT)
+## Phase C — Backend & Auth (IN PROGRESS)
 
+### Infrastructure (done)
 - [x] Create Supabase project: yachtielink-staging (EU)
 - [x] Create Supabase project: yachtielink-prod (EU)
 - [x] Enable Supabase Auth (Google, Apple, email/password)
-- [ ] Enforce RLS on all tables
-- [ ] Connect Supabase env vars to Vercel (staging)
 
-Status: ⏳ Not started
+### Planning (done)
+- [x] Phase C implementation plan created (see `docs/scaffolding.md`)
+- [x] Founder decisions captured: incremental schema, pricing deferred, PDF stays free
+
+### Dependencies & Config
+- [ ] Install deps: @supabase/supabase-js, @supabase/ssr, zod
+- [ ] Create .env.local.example with required var names
+- [ ] Connect Supabase env vars to Vercel (staging)
+- [ ] Configure Supabase Auth providers in dashboard (Google, Apple, redirect URLs)
+
+### Schema & Database
+- [ ] Deploy initial migration: templates, roles, users tables
+- [ ] Enforce RLS on all deployed tables
+- [ ] Deploy handle_new_user() trigger
+- [ ] Seed roles (16 crew positions) and templates (3)
+- [ ] Enable pg_trgm extension
+
+### Auth Implementation
+- [ ] Create Supabase client utilities (browser, server, middleware, admin)
+- [ ] Create root middleware (session refresh + route protection)
+- [ ] Create auth callback route (OAuth code exchange)
+- [ ] Create auth server actions (login, signup, signout, OAuth)
+- [ ] Create Zod validation schemas for auth inputs
+- [ ] Create login page
+- [ ] Create signup page
+
+### Profile & Config
+- [ ] Create profile page (authenticated user views own data)
+- [ ] Add security headers to next.config.ts
+- [ ] Update layout metadata (title, viewport)
+- [ ] Replace boilerplate landing page
+- [ ] Create TypeScript types for database entities
+
+### Verification
+- [ ] npm run build succeeds
+- [ ] Email signup + login works end-to-end
+- [ ] Google OAuth flow works
+- [ ] Protected route redirects unauthenticated users
+- [ ] RLS policies tested
+
+Status: ⏳ Planning complete, implementation next
 
 ---
 
@@ -89,4 +128,4 @@ Status: ⏳ Not started
 
 ---
 
-Last updated: 2026-02-11
+Last updated: 2026-02-11 (Phase C plan added)
