@@ -38,6 +38,35 @@ Every meaningful change should be logged here and linked from `/Users/ari/yachti
 
 ## Entries
 
+### LOG-20260211-005
+- Date: 2026-02-11
+- Author: Claude (Opus 4.6)
+- Area: planning
+- Summary: Created Phase C (Database + Auth) implementation plan. Explored full codebase, read all canonical docs, captured founder decisions on pricing (defer), PDF export (free), schema approach (incremental). Produced detailed plan covering 16 new files and 4 modified files.
+- Files changed:
+  - /Users/ari/yachtielink.webapp/docs/scaffolding.md (new — implementation checklist)
+  - /Users/ari/yachtielink.webapp/ops/TODO.md (expanded Phase C tasks)
+  - /Users/ari/yachtielink.webapp/ops/LOG.md (this entry)
+  - /Users/ari/.claude/plans/peppy-churning-pebble.md (new — full detailed plan)
+- Decisions:
+  - Schema deployment: incremental (users, roles, templates only for Phase C; other tables added with their features)
+  - Crew Pro pricing: deferred, build with placeholder
+  - PDF export: confirmed free (identity layer)
+  - Migration method: manual via Supabase SQL Editor (not CLI)
+  - Apple OAuth: can be deferred if setup blocks progress
+  - User adds Supabase env vars to Vercel themselves
+- TODO impact:
+  - Phase: C
+  - Item: Phase C expanded from 5 items to full implementation checklist
+  - Status change: Planning items checked off; implementation items added as unchecked
+- Verification:
+  - Plan reviewed against yl_schema.md, yl_security.md, yl_tech_stack.md for consistency
+  - Coherence audit findings accounted for (TBD limits deferred to later phases)
+- Follow-ups:
+  - Implement Phase C per docs/scaffolding.md
+  - User to configure Supabase Auth providers in dashboard before testing
+  - User to add env vars to Vercel
+
 ### LOG-20260211-004
 - Date: 2026-02-11
 - Author: Codex
