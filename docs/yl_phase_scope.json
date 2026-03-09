@@ -1,0 +1,56 @@
+{
+  "phase_1a": {
+    "objective": "Portable profile + yacht graph + endorsements.",
+    "status": "current_build_target",
+    "includes": [
+      "Profile",
+      "CV import",
+      "Employment history",
+      "Yacht entities",
+      "Employment attachments",
+      "Colleague graph",
+      "Endorsement requests",
+      "Endorsements",
+      "Public profile page",
+      "PDF snapshot",
+      "Paid presentation upgrades"
+    ],
+    "excludes": [
+      "Timeline",
+      "Messaging",
+      "Contacts",
+      "IRL interactions",
+      "Peer hiring",
+      "Recruiter access",
+      "Broad search/discovery"
+    ]
+  },
+  "phase_1b": {
+    "objective": "Discovery and convenience after graph health is proven.",
+    "status": "planned",
+    "includes": [
+      "Availability toggle",
+      "Limited crew search",
+      "Expanded analytics and convenience"
+    ]
+  },
+  "phase_1c": {
+    "objective": "Commercial adjacency after the crew-side graph stands on its own.",
+    "status": "planned",
+    "includes": [
+      "Peer hiring",
+      "Recruiter access",
+      "Additional discovery tooling"
+    ]
+  },
+  "phase_2": {
+    "objective": "Deferred social and industry layers.",
+    "status": "deferred",
+    "includes": [
+      "Timeline / posts / interactions",
+      "Messaging / contacts",
+      "IRL connection system",
+      "Later diagnostic surfaces"
+    ]
+  }
+}

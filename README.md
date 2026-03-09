@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# YachtieLink
 
-## Getting Started
+Trust-based professional identity platform for the superyacht crew industry. Crew own their profile, employment history, certifications, and endorsements. The trust graph is the product.
 
-First, run the development server:
+## For Coding Agents
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+**Read these before doing anything:**
+
+1. `CLAUDE.md` — Operating manual: principles, tech stack, terminology, anti-patterns
+2. `CHANGELOG.md` — Cross-agent handover log: what was done, what's next, what to watch out for
+3. Relevant docs from `docs/` based on your task
+
+**Update `CHANGELOG.md` at the end of every session.**
+
+## Current Focus
+
+**Phase 1A: portable profile + yacht graph + endorsements** — crew build a profile, attach real yacht history, find colleagues, and collect trusted references. Paid presentation upgrades fund the product, but the yacht-backed graph is the primary long-term asset.
+
+## Tech Stack
+
+Next.js (App Router) / Supabase (Postgres, Auth, Storage, Realtime) / Stripe / Resend / Claude API / PostHog / Cloudflare
+
+## Repository Structure
+
+```
+├── app/                 # Next.js App Router pages and API routes
+├── lib/                 # Shared utilities (Supabase clients, etc.)
+├── public/              # Static assets
+├── docs/                # Planning docs — decisions, schemas, specs
+├── ops/                 # Operational docs
+├── CLAUDE.md            # Agent operating manual
+├── CHANGELOG.md         # Cross-agent handover log
+└── package.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Docs
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+All planning and architectural docs live in `docs/`. See `CLAUDE.md` for the full file map.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Setup
 
-## Learn More
+```bash
+npm install
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Requires `.env.local` with Supabase credentials. See `docs/yl_tech_stack.md` for full stack details.

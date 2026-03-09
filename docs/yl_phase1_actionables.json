@@ -1,0 +1,139 @@
+{
+  "version": "v1.2",
+  "created": "2026-01-27",
+  "updated": "2026-03-08",
+  "source": "PM handover conversation + founder scope reset",
+  "metrics_and_tripwires": {
+    "attachment_creation_rate": {
+      "description": "Percentage of active users who add at least one yacht attachment",
+      "target": "High enough to form a usable colleague graph",
+      "action_if_breached": "Review onboarding, yacht creation UX, and attachment friction",
+      "status": "not_implemented"
+    },
+    "users_with_valid_attachment": {
+      "description": "Percentage of active users with at least one usable yacht attachment",
+      "target": "Primary graph formation metric",
+      "action_if_breached": "Pause adjacent feature work and focus on graph formation",
+      "status": "not_implemented"
+    },
+    "endorsement_request_send_rate": {
+      "description": "Percentage of active users who send at least one endorsement request",
+      "target": "Proves users understand the graph loop",
+      "action_if_breached": "Improve colleague discovery and request prompts",
+      "status": "not_implemented"
+    },
+    "endorsement_request_completion_rate": {
+      "description": "Percentage of endorsement requests that become completed endorsements",
+      "target": "Core wedge validation metric",
+      "action_if_breached": "Review request UX, notification strategy, and trust friction",
+      "status": "not_implemented"
+    },
+    "endorsement_to_profile_ratio": {
+      "description": "Ratio of users who have given or received an endorsement",
+      "tripwire": 0.3,
+      "trigger_point": "500 active profiles",
+      "action_if_breached": "Pause growth, diagnose graph formation failure",
+      "status": "not_implemented"
+    },
+    "organic_share_rate": {
+      "description": "Percentage of active users sharing their profile or PDF unprompted per month",
+      "tripwire": 0.1,
+      "action_if_breached": "Pause growth, investigate standalone value proposition",
+      "status": "not_implemented"
+    },
+    "repeat_flag_rate": {
+      "description": "Percentage of endorsements being flagged or disputed",
+      "tripwire": 0.05,
+      "action_if_breached": "Investigate coercion, gaming, or UX issues",
+      "status": "not_implemented"
+    },
+    "time_to_first_endorsement": {
+      "description": "Median days from signup to first endorsement given or received",
+      "target_range_days": [
+        21,
+        30
+      ],
+      "action_if_exceeded": "Review onboarding and endorsement prompts",
+      "status": "not_implemented"
+    },
+    "false_attachment_dispute_rate": {
+      "description": "Percentage of attachments that trigger dispute or rejection signals",
+      "tripwire": 0.05,
+      "action_if_breached": "Tighten attachment controls and audit yacht quality",
+      "status": "not_implemented"
+    }
+  },
+  "growth_controls": {
+    "pause_mechanism": {
+      "description": "Single config flag to switch from public signup to invite-only",
+      "execution_time": "same day",
+      "decision_owner": "Ari",
+      "recommendation_owner": "PM",
+      "emergency_protocol": "PM can pause first, explain after if Ari unavailable",
+      "status": "not_implemented"
+    }
+  },
+  "retraction_mechanics": {
+    "ui_visibility": {
+      "rule": "Retractions are never visible in UI",
+      "rationale": "Prevents scarlet letter effect, preserves ambiguity"
+    },
+    "backend_effects": [
+      "Retraction frequency affects endorser's future signal weight",
+      "Feeds into later trust calculations as soft negative",
+      "Triggers internal review if patterns cluster around a single person"
+    ]
+  },
+  "abuse_escalation_protocol": {
+    "tiers": [
+      {
+        "level": 1,
+        "name": "monitor",
+        "trigger": "Single suspicion, no corroboration",
+        "action": "Flag internally, watch for patterns, no intervention"
+      },
+      {
+        "level": 2,
+        "name": "shadow_constrain",
+        "trigger": "Second independent signal pointing to the same person or yacht",
+        "action": "Rate-limit endorsement requests, no notification to user",
+        "visibility": "Founder + PM only"
+      },
+      {
+        "level": 3,
+        "name": "freeze",
+        "trigger": "Three or more independent reports, or concrete evidence",
+        "action": "Freeze account endorsement activity, escalate to Ari"
+      }
+    ],
+    "status": "not_implemented"
+  },
+  "monetisation_boundaries": {
+    "allowed_under_pressure": [
+      "Crew Pro price increase",
+      "Additional presentation features in Crew Pro",
+      "Prepaid annual plans at discount"
+    ],
+    "forbidden": [
+      "Payment affecting endorsement visibility, ordering, or weight",
+      "Charging for verification or credentialing",
+      "Payment granting moderation or verification power",
+      "Yacht payments before crew monetisation stabilises",
+      "Priority dispute resolution for paying users",
+      "Any feature interpretable as pay to look more trustworthy"
+    ]
+  },
+  "constitutional_guardrails": {
+    "forbidden_features": [
+      "Auto-summary language",
+      "Any UI that labels absence of endorsements as negative",
+      "Contextual benchmarking that feels like scoring"
+    ],
+    "resignation_triggers": [
+      "Monetising trust outcomes",
+      "Payment influencing endorsement visibility, weight, or eligibility",
+      "Payment granting moderation power",
+      "Any move that makes canonical monetisation rule a lie"
+    ]
+  }
+}
