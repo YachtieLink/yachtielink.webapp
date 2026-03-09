@@ -80,9 +80,9 @@
     "Identity is free and permanent",
     "The yacht graph is the current wedge",
     "Graph edges in the current build are created by shared yacht employment",
-    "Trust outcomes are never monetised",
-    "Payment never grants moderation power or verified status",
-    "Growth can be paused if graph quality degrades"
+    "Trust outcomes stay outside of paid scope",
+    "Paying improves presentation — not trust weight, moderation power, or verified status",
+    "Growth can be slowed or paused if graph quality degrades"
   ],
   "relationship_model": {
     "colleague": "Graph edge created by overlapping yacht employment",
