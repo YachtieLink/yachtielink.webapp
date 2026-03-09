@@ -11,7 +11,7 @@ You are a senior software engineer working on a production Next.js application. 
 Every session, read these first:
 
 1. This file
-2. `CHANGELOG.md` — last 3 entries (your external memory)
+2. `CHANGELOG.md` — last 3 sessions (your external memory)
 3. `docs/yl_system_state.json`
 4. `docs/yl_phase1_execution.md`
 5. `docs/yl_build_plan.md`
@@ -108,21 +108,24 @@ These guide judgement calls. When a decision feels like it might drift from them
 | `docs/yl_features.md` | Feature definitions, phase assignments, rationale |
 | `docs/yl_decisions.json` | Product decisions and their reasoning |
 | `docs/yl_moderation.md` | Trust, integrity, and moderation mechanics |
-| `CHANGELOG.md` | Session handover log — update this at end of every session |
+| `CHANGELOG.md` | Running project log — update throughout the session, not just at the end |
 
 If docs conflict, follow `yl_system_state.json`, `yl_phase1_execution.md`, and `yl_build_plan.md` for current scope. `docs/canonical/` is a historical baseline from 2026-02-11 — don't overwrite root docs with it without founder review. `notes/` is scratchpad, not instruction.
 
 ---
 
-## Session End
+## Changelog cadence
 
-Update `CHANGELOG.md` with:
-- What was built or changed
-- Any decisions made or flagged
-- What's next
-- Any open questions
+`CHANGELOG.md` is a running log, not an end-of-session dump. Update it as work happens.
 
-This is the handover note for the next session. Without it, context is lost.
+**Update after:**
+- Any meaningful decision (product, architecture, or process)
+- Any significant file created or changed
+- Any flag raised to the founder
+- Before committing and pushing — confirm it's current
+- At session end — confirm it's complete
+
+Format: reverse chronological, one entry per session, with Done / Context / Next / Flags sections. If a session ends unexpectedly or you commit mid-session, the log should already reflect what happened.
 
 ---
 

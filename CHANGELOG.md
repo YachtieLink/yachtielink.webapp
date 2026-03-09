@@ -1,15 +1,19 @@
 # CHANGELOG.md — Cross-Agent Handover Log
 
-All coding agents (Claude Code, Codex, etc.) must read this file at session start and update it at session end.
+All coding agents (Claude Code, Codex, etc.) must read this file at session start and update it throughout the session.
 
-**Format:** Reverse chronological. Most recent entry first. One entry per session.
+**Format:** Reverse chronological. One entry per session. Heading: `## YYYY-MM-DD — Agent Name`. Two sessions on the same day get separate entries with the same date. Sections: Done / Context / Next / Flags.
 
-**Rules:**
-- Read the latest 3 entries before doing any work
-- Read older entries only if the current task needs deeper historical context
-- Add an entry when your session ends or when you complete meaningful work
-- Be concise but specific — the next agent (which may not be you) needs to understand what happened and what's next
-- Flag anything the next agent should watch out for
+**Reading rules:**
+- Read the last 3 sessions before doing any work
+- Read older sessions only if the current task needs deeper historical context
+
+**Writing rules:**
+- This is a running log — update it as work happens, not just at session end
+- Update after any meaningful decision, significant file change, or flag raised to the founder
+- Confirm it's current before committing and pushing
+- Confirm it's complete at session end
+- Be concise but specific — the next agent needs to understand what happened and what's next
 
 ---
 
@@ -27,6 +31,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - Discovered and resolved branch staleness — our branch was behind by 4 PRs. Merged origin/main, no manual conflicts.
 - Switched GitHub remote from SSH to HTTPS — SSH keys weren't configured, GitHub CLI now handles auth.
 - Opened PR #11 — all session work pushed to `feat/project-setup`.
+- Clarified changelog format: one entry per session (not per day, not per alteration), reading rule is "last 3 sessions", updated both `AGENTS.md` and `CHANGELOG.md` header to reflect this.
 
 ### Context
 - `docs/canonical/` (from PR #9) is a historical baseline from 2026-02-11. Root-level `docs/` is the working set. Do not overwrite root docs with canonical versions without founder review.
