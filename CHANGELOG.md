@@ -1,15 +1,52 @@
 # CHANGELOG.md — Cross-Agent Handover Log
 
-All coding agents (Claude Code, Codex, etc.) must read this file at session start and update it at session end.
+All coding agents (Claude Code, Codex, etc.) must read this file at session start and update it throughout the session.
 
-**Format:** Reverse chronological. Most recent entry first. One entry per session.
+**Format:** Reverse chronological. One entry per session. Heading: `## YYYY-MM-DD — Agent Name`. Two sessions on the same day get separate entries with the same date. Sections: Done / Context / Next / Flags.
 
-**Rules:**
-- Read the latest 3 entries before doing any work
-- Read older entries only if the current task needs deeper historical context
-- Add an entry when your session ends or when you complete meaningful work
-- Be concise but specific — the next agent (which may not be you) needs to understand what happened and what's next
-- Flag anything the next agent should watch out for
+**Reading rules:**
+- Read the last 3 sessions before doing any work
+- Read older sessions only if the current task needs deeper historical context
+
+**Writing rules:**
+- This is a running log — update it as work happens, not just at session end
+- Update after any meaningful decision, significant file change, or flag raised to the founder
+- Confirm it's current before committing and pushing
+- Confirm it's complete at session end
+- Be concise but specific — the next agent needs to understand what happened and what's next
+
+---
+
+## 2026-03-10 — Claude Code (Codex GUI session)
+
+### Done
+- Created `docs/yl_features.md` — feature registry covering all 25 features across Phase 1A/1B/1C/2+ with what, why, phase assignment, and crew-first notes. New canonical reference doc.
+- Restructured `AGENTS.md` — now the primary instruction set for all coding agents (Claude Code, Cursor, Codex, Copilot). Includes persona, workflow, code standards, and decision principles.
+- Restructured `CLAUDE.md` — now a thin Claude Code-specific wrapper that defers to `AGENTS.md`.
+- Softened language across all agent-facing docs — replaced hard prohibitions ("never", "irreversible", "constitutional", "rejected/never-build") with crew-first principles and flag-and-ask behaviour. Agents surface concerns to founder rather than blocking unilaterally.
+- Updated `yl_phase1_execution.md` — "Hard Constraints" → "Guiding Principles", language softened throughout.
+- Updated `yl_system_state.json` — `phase_invariants` softened.
+- Created `notes/delta_canonical_vs_root_2026-03-09.md` — full diff of docs/canonical/ (from PR #9) vs root-level docs. Documents all meaningful differences for founder review before any content is merged.
+- Added `.claude/worktrees/` to `.gitignore`.
+- Discovered and resolved branch staleness — our branch was behind by 4 PRs. Merged origin/main, no manual conflicts.
+- Switched GitHub remote from SSH to HTTPS — SSH keys weren't configured, GitHub CLI now handles auth.
+- Opened PR #11 — all session work pushed to `feat/project-setup`.
+- Clarified changelog format: one entry per session (not per day, not per alteration), reading rule is "last 3 sessions", updated both `AGENTS.md` and `CHANGELOG.md` header to reflect this.
+
+### Context
+- `docs/canonical/` (from PR #9) is a historical baseline from 2026-02-11. Root-level `docs/` is the working set. Do not overwrite root docs with canonical versions without founder review.
+- The delta notes doc flags specific conflicts to resolve — notably D-016 (paid verified status path exists in canonical, removed in root as crew-first violation), recruiter pricing detail, and bootstrapping plan missing from root.
+- `yl_features.md` was built from the root docs. Some Phase 1C details (recruiter pricing, full Crew Pro feature list) are more complete in `docs/canonical/` — pending founder review of delta notes before incorporating.
+
+### Next
+- Founder to review `notes/delta_canonical_vs_root_2026-03-09.md` and decide what to adopt
+- Merge PR #11 once reviewed
+- Set up git global user.name and user.email (commits currently attributed to ari@MacBookAir.net)
+- Begin Sprint 1: database migrations, RLS policies, app shell, base components
+
+### Flags
+- `yl_features.md` is a good working doc but Phase 1C descriptions (recruiter access, Crew Pro full feature list) should be reconciled against `docs/canonical/yl_phase_scope.json` once delta review is done
+- The 2026-03-08 warning about constitutional principles being non-negotiable has been intentionally softened — principles are now guidelines with flag-and-ask behaviour, founder makes final calls
 
 ---
 

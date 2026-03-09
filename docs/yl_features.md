@@ -1,6 +1,6 @@
 # YachtieLink Feature Registry
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-03-09
 **Status:** Active — working document, refined iteratively with founder
 
@@ -14,7 +14,7 @@ This is the source of truth for what features exist, why they exist, and which p
 
 ## Status values
 
-`proposed` | `specced` | `building` | `shipped` | `deferred` | `rejected`
+`proposed` | `specced` | `building` | `shipped` | `deferred` | `not planned`
 
 ---
 
@@ -30,7 +30,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **Why:** The portable identity layer every other feature builds on. A crew member should be able to hand someone a URL and have it represent them professionally, permanently, and for free.
 **Sprint:** 3
 **Status:** specced
-**Constitutional notes:** Identity is free infrastructure. Never monetised.
+**Crew-first note:** Core identity stays free. Paying improves presentation of the profile, not access to it.
 
 ---
 
@@ -40,18 +40,17 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **Why:** Crew already have CVs. Making them re-type employment history creates unnecessary friction that delays graph formation. The goal is time-to-first-endorsement under 30 days (D-021).
 **Sprint:** 6
 **Status:** specced
-**Key constraints:** Extracted data is still self-reported — this is not verification. Cost target <€0.05/parse. Fallback to manual entry on parse failure. Rate-limited to 3 parses/user/day.
-**Constitutional notes:** Part of free identity layer.
+**Key notes:** Extracted data is still self-reported — this is not verification. Cost target <€0.05/parse. Fallback to manual entry on parse failure. Rate-limited to 3 parses/user/day. Part of the free identity layer.
 
 ---
 
 ### Employment History
 
 **What:** A structured record of a crew member's past and current roles — yacht name, role, department, start and end dates.
-**Why:** Employment history is the raw material for the yacht graph. Without it, colleague discovery and endorsement gating are impossible.
+**Why:** Employment history is the raw material for the yacht graph. Without it, colleague discovery and endorsement gating have nothing to work from.
 **Sprint:** 2–3
 **Status:** specced
-**Key constraints:** Role and date range required on every attachment. Soft-deletes preserve endorsement links (D-006).
+**Key notes:** Role and date range required on every attachment. Soft-deletes preserve endorsement links (D-006).
 
 ---
 
@@ -61,7 +60,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **Why:** Making yachts entities (not just text fields) is what allows the graph to form. Two crew who both attach "Lady M" are connected because they referenced the same object.
 **Sprint:** 4
 **Status:** specced
-**Key constraints:** Duplicate names tolerated. Renamed yachts are separate entities — no merging in Phase 1 (D-006). No ratings, reviews, or interactions on yacht entities.
+**Key notes:** Duplicate names tolerated. Renamed yachts are separate entities — merging deferred to Phase 2 (D-006). Ratings, reviews, or interactions on yacht entities aren't planned — yachts are graph infrastructure, not review targets.
 
 ---
 
@@ -71,47 +70,53 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **Why:** Attachments are the edges that make the graph. Every other graph feature (colleagues, endorsement gating) derives from overlapping attachments.
 **Sprint:** 2–4
 **Status:** specced
-**Key constraints:** Fresh yachts are open to attach. Established yachts (60 days + crew threshold) require confirmation (deferred to 1B). Soft delete preserves existing endorsements.
+**Key notes:** Fresh yachts are open to attach. Established yachts (60 days + crew threshold) move to confirmation flow in Phase 1B. Soft delete preserves existing endorsements.
 
 ---
 
 ### Colleague Graph
 
 **What:** An automatically derived view of who you've worked with — computed from users who share ≥1 yacht attachment, not stored as explicit relationships.
-**Why:** This is the wedge. The colleague graph is the moat — it compounds as more crew claim their history. It makes the platform useful the moment you add a second yacht.
+**Why:** This is the wedge. The colleague graph compounds as more crew claim their history. It makes the platform useful the moment you add a second yacht.
 **Sprint:** 4
 **Status:** specced
-**Key constraints:** Graph edges are reality-bound (D-028). Computed on access — not a stored relationship table. Display: name, shared yacht(s), relationship label.
+**Key notes:** Graph edges come from shared real employment — not from follows, contacts, or payments (D-028). Computed on access, not stored as a relationship table. Display: name, shared yacht(s), relationship label.
 
 ---
 
 ### Endorsement Requests
 
 **What:** A tool for crew to request endorsements from colleagues identified via shared yacht history, sent via deep link (email or phone).
-**Why:** Increases the response rate on the endorsement loop — the growth mechanic that compounds the graph. The request tooling increases response rate; it does not change who is eligible to endorse (D-009).
+**Why:** Increases the response rate on the endorsement loop. The tooling improves response rate — it doesn't change who is eligible to endorse (D-009).
 **Sprint:** 5
 **Status:** specced
-**Key constraints:** Rate-limited (10/day free, 20/day Pro). Suggestions drawn from colleague graph only. Manual add (phone/email) also allowed. Requests expire.
+**Key notes:** Rate-limited (10/day free, 20/day Pro). Suggestions drawn from colleague graph. Manual add (phone/email) also allowed. Requests expire.
 
 ---
 
 ### Endorsements
 
 **What:** A written endorsement from one crew member to another, requiring shared yacht attachment, containing free-text and structured metadata (role, dates, yacht).
-**Why:** Endorsements are the trust signal. They are the thing that makes the profile more than a self-authored CV — they are attestation from real coworkers with verifiable shared history.
+**Why:** Endorsements are the trust signal — attestation from real coworkers with verifiable shared history. They're what makes the profile more than a self-authored CV.
 **Sprint:** 5
 **Status:** specced
-**Key constraints:** Requires shared yacht attachment — no exceptions (D-009). One endorsement per (endorser, recipient, yacht). No star ratings or scores (D-002). Editing allowed. Deletion allowed but retractions tracked in backend only (D-005). Absence of endorsements is neutral — never labelled as a negative (D-011). No auto-summary language ("well endorsed", etc.) ever (D-013).
+**Key notes:**
+- Shared yacht attachment required to endorse (D-009) — this keeps endorsements grounded in real experience
+- One endorsement per (endorser, recipient, yacht)
+- Star ratings and numeric scores aren't planned — they create false precision and gaming incentives (D-002)
+- Editing allowed. Deletion allowed — retractions tracked in backend only, not shown in UI (D-005)
+- Absence of endorsements is neutral — the platform shouldn't label it as a negative (D-011)
+- Auto-summary language ("well endorsed", "lightly endorsed") isn't planned — it collapses nuance into judgment (D-013)
 
 ---
 
 ### Endorsement Signals
 
 **What:** A lightweight agree/disagree signal on an endorsement, available to users with overlapping attachment to the same yacht.
-**Why:** Allows the community to express opinion on an endorsement without triggering moderation. Signals are social proof — they never remove an endorsement, but feed trust weighting in Phase 2+.
+**Why:** Allows the community to express opinion on an endorsement without triggering moderation. Signals are social proof — they feed trust weighting in Phase 2+ but don't act on endorsements directly.
 **Sprint:** TBD (display in Phase 1, trust weight in Phase 2+)
 **Status:** specced (D-019)
-**Key constraints:** Only users with shared yacht attachment can signal. Signals alone never remove an endorsement.
+**Key notes:** Only users with shared yacht attachment can signal. Signals alone don't remove an endorsement — they inform future trust calculations.
 
 ---
 
@@ -121,24 +126,24 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **Why:** The portable profile is useless if it can't be shared. This is the linktr.ee use case — crew hand someone this URL on a dock, in a port, or via a QR code.
 **Sprint:** 6
 **Status:** specced
-**Key constraints:** No discovery rails, no "browse similar profiles," no search from this page. Open Graph meta tags for link sharing. QR code generation included. Direct link shows full profile including contact details (D-025).
+**Key notes:** No discovery rails or browse-similar on this page — it's a direct profile, not a feed. Open Graph tags for link sharing. QR code generation included. Direct link shows full profile (D-025).
 
 ---
 
 ### PDF Snapshot
 
 **What:** A downloadable PDF of the crew member's profile — clean, professional layout, generated on demand.
-**Why:** Crew need a physical/email-ready CV for situations where a URL isn't enough. PDF export is core portable identity — it must be free forever (D-014).
+**Why:** Crew need a physical/email-ready CV for situations where a URL isn't enough. PDF export is core portable identity and should stay free (D-014).
 **Sprint:** 6
 **Status:** specced
-**Constitutional notes:** Free infrastructure. Never monetised. Paid scope is limited to premium templates and watermark removal only.
+**Crew-first note:** The ability to export your profile as a PDF stays free. Paid scope covers premium templates and watermark removal only — not the export itself.
 
 ---
 
 ### Crew Pro — Paid Presentation Upgrades
 
 **What:** A €12/month subscription that unlocks presentation polish and workflow convenience — premium PDF templates, watermark removal, custom subdomain, profile analytics, and higher endorsement request allowance.
-**Why:** Funds operations without corrupting trust. Paid features improve how a profile looks and how efficiently it can be worked — they never affect trust creation, endorsement eligibility, or graph weight (D-003, D-007).
+**Why:** Funds operations without affecting trust. Paid features improve how a profile looks and how efficiently it can be worked — not how trustworthy it appears.
 **Sprint:** 7
 **Status:** specced
 **Includes:**
@@ -148,7 +153,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 - Profile analytics (view count, PDF downloads, link shares)
 - Higher endorsement request allowance (20/day vs 10/day free)
 
-**Constitutional notes:** Payment never affects trust outcomes. Verified status, moderation power, endorsement eligibility, and attachment confirmation power are permanently excluded from paid scope.
+**Crew-first note:** If a Pro feature starts to look like it affects trust weight, endorsement visibility, or graph behaviour — flag it before building. Verified status, moderation power, and endorsement eligibility sit outside paid scope.
 
 ---
 
@@ -160,160 +165,152 @@ Gate: Phase 1A graph loop is healthy (endorsement-to-profile ratio >0.3 at 500 p
 
 ### Availability Toggle
 
-**What:** A crew member can signal they are available for work, with an expiry date (auto-expires after 7 days, re-confirm to stay visible).
-**Why:** The toggle is how crew opt into being findable. Without active opt-in, crew get spammed with stale contact attempts. Weekly expiry keeps the pool fresh and keeps crew in control (D-027).
+**What:** A crew member can signal they are available for work, with an expiry (auto-expires after 7 days, re-confirm to stay visible).
+**Why:** The toggle is how crew opt into being findable. Without active opt-in, crew get contacted based on stale availability. Weekly expiry keeps the pool current and crew in control (D-027).
 **Sprint:** 9
 **Status:** specced
-**Key constraints:** Active opt-in only — never on by default. 7-day auto-expiry. Day-6 reminder. Crew can hide from recruiters entirely while remaining visible to other crew.
+**Key notes:** Active opt-in only — off by default. 7-day auto-expiry with day-6 reminder. Crew can hide from recruiters while remaining visible to other crew.
 
 ---
 
 ### Limited Crew Search
 
 **What:** Pro users can search the crew database by role, yacht name, location, and availability status.
-**Why:** Search is recruiter behaviour — if you're searching to find candidates, you're recruiting, so pay for it (D-023). Makes Pro valuable for captains and HODs who hire, while free tier remains useful for junior crew.
+**Why:** Search is recruiter behaviour — if you're searching to find candidates, you're recruiting, so pay for it (D-023). Makes Pro valuable for captains and HODs who hire, while the free tier stays useful for junior crew.
 **Sprint:** 9
 **Status:** specced
-**Key constraints:** Search results show locked profiles (name and contact hidden). Full profile unlocked via Pro access or recruiter credits. Graph browsing (yacht → crew) remains open but intentionally doesn't support filtering — it doesn't scale for harvesting (D-025).
+**Key notes:** Search results show profile summaries — name and contact require Pro access or recruiter credits. Graph browsing (yacht → crew) stays open but isn't filterable, so it doesn't support harvesting at scale (D-025).
 
 ---
 
 ### Attachment Confirmation (Established Yachts)
 
-**What:** When a yacht is established (60+ days, crew threshold met), new attachment requests require confirmation from existing verified crew on that yacht.
-**Why:** Protects against late-stage graph infiltration. Fresh yachts are open to encourage graph formation; established yachts get lightweight integrity controls (D-017).
+**What:** When a yacht is established (60+ days, crew threshold met), new attachment requests move through a lightweight confirmation step from existing crew.
+**Why:** Balances open graph formation (fresh yachts) with integrity protection as yachts grow (D-017).
 **Sprint:** 11
 **Status:** specced
-**Key constraints:** Confirmation by simple majority. Dispute flow: flag attachment as incorrect → escalates to abuse protocol. False dispute rate tripwire at 5%.
+**Key notes:** Simple majority confirmation. Dispute flow escalates to moderation if flagged. Worth monitoring false dispute rate — if it spikes, the friction may need tuning.
 
 ---
 
 ### Expanded Analytics & Convenience
 
 **What:** Enhanced Insights tab for Pro users — who viewed your profile (anonymised by role/location), trend lines, endorsement pinning, notification preferences.
-**Why:** Gives Pro users more signal about how their profile is performing and more control over how it's presented.
+**Why:** Gives Pro users more signal on how their profile is performing and more control over presentation.
 **Sprint:** 10
 **Status:** specced
-**Key constraints:** Viewer identity is always anonymised in aggregate. Endorsement pinning is presentation order only — never alters trust weight.
+**Key notes:** Viewer identity is always anonymised in aggregate. Endorsement pinning is display order only — it doesn't affect trust weight.
 
 ---
 
 ## Phase 1C — Commercial Adjacency
 
-Gate: 10,000+ crew, 3,000+ yachts, recruiter demand signal (inbound inquiries or waitlist).
+Gate: 10,000+ crew, 3,000+ yachts, recruiter demand signal confirmed.
 
 ---
 
 ### Peer Hiring
 
 **What:** Crew with full profiles can post open positions on yachts they're attached to. Other crew can apply with their profile. Graph proximity is visible to both parties.
-**Why:** Hiring is a use case for the graph, not a separate product. When both parties are nodes in the trust graph with visible profiles, incentives align — both want accurate signals. Captains are crew too (D-022).
+**Why:** Hiring is a use case for the graph, not a separate product. When both parties are nodes in the trust graph with visible profiles, incentives align. Captains are crew too (D-022).
 **Sprint:** 12
 **Status:** specced
-**Key constraints:** Free for all crew — no paid listings, no placement fees. Poster must have a full profile. Positions visible to graph-adjacent crew. 30-day expiry, renewable. Free: 1 post/month. Pro: 3 posts/month (D-023). Express interest only in Phase 1C — no platform intermediation.
-**Constitutional notes:** This is peer-to-peer hiring, not employer-pays. The distinction is fundamental.
+**Key notes:** Free for all crew — no paid listings or placement fees. Poster must have a full profile. Positions visible to graph-adjacent crew. 30-day expiry, renewable. Free: 1 post/month. Pro: 3 posts/month (D-023). This is peer-to-peer hiring — the moment it starts looking like employer-pays, flag it.
 
 ---
 
 ### Recruiter Access
 
-**What:** External recruiters (not crew) pay €29/month + credits to search and unlock crew profiles. Credits (€75–1200 bundles) reveal name and contact details from search results. Crew must opt in.
-**Why:** Monetises the demand side without corrupting crew-side trust. Recruiters get read-only access — they cannot affect the graph (D-024).
+**What:** External recruiters pay €29/month + credits to search and unlock crew profiles. Credits (€75–1200 bundles) reveal name and contact from search results. Crew must opt in.
+**Why:** Monetises the demand side without touching crew-side trust. Recruiters get read-only access — they can't affect the graph (D-024).
 **Sprints:** 13–14
 **Status:** specced
-**Key constraints:** Crew opt-in required ("Visible to recruiters" — default off). Direct link/QR always shows full profile regardless of recruiter paywall (D-025). Recruiters can sort by endorsement count (D-026) — this is presentation order, not trust weight. 1 credit = 1 profile unlock (permanent per recruiter-crew pair). Credits expire 1 year from purchase.
-**Constitutional notes:** Recruiter access is read-only. Recruiters cannot create graph edges, affect endorsements, or influence trust.
+**Key notes:** Crew opt-in required, default off. Direct link/QR always shows full profile regardless of recruiter paywall (D-025). Recruiters can sort by endorsement count — this is ordering, not trust weighting (D-026). 1 credit = 1 profile unlock, permanent per pair. Credits expire after 1 year.
 
 ---
 
 ### Agency Plans
 
 **What:** Multi-seat recruiter accounts for crewing agencies — shared shortlists, bulk search, CSV export of unlocked profiles, agency-level analytics.
-**Why:** Agencies are the high-volume demand-side user. Multi-seat plans capture significantly more revenue per customer than individual recruiter subscriptions.
+**Why:** Agencies are the high-volume demand-side user. Multi-seat plans capture more revenue per customer than individual subscriptions.
 **Sprint:** 15
 **Status:** specced
-**Key constraints:** All recruiter access rules apply equally per seat. No agency gets moderation power or trust influence.
+**Key notes:** Same access rules as individual recruiters, per seat. No moderation power or trust influence at any tier.
 
 ---
 
-## Phase 2+ — Deferred Social Layer
+## Phase 2+ — Deferred
 
-These features are real and intended. They are deferred until the crew-side product stands on its own and the graph has integrity. No Phase 1 constraint is a permanent prohibition — they are sequencing decisions (D-035, D-036).
+These are real features with real value. They're deferred until the crew-side product and graph have integrity. Nothing here is permanently off the table — they're sequencing decisions (D-035, D-036).
 
 ---
 
 ### Timeline / Posts
 
 **What:** A chronological feed of posts, career milestones, and interactions — visible only within a user's network.
-**Why:** Crew have real career memory worth capturing — season completions, certifications, notable voyages. A graph-bounded timeline surfaces this without creating a public engagement loop.
+**Why:** Crew have real career memory worth capturing. A graph-bounded timeline surfaces it without creating a public engagement loop.
 **Status:** deferred
-**Key constraints:** Strictly chronological — no algorithmic surfacing, no trending, no engagement weighting ever (D-031). Visibility bounded to network only (D-030). Posts are not public. No boost or promote mechanics.
+**Key notes:** Chronological ordering is the right default — algorithmic surfacing creates incentives that tend to corrupt truthful behaviour (D-031). Visibility bounded to network (D-030). Worth revisiting the ordering question when the time comes.
 
 ---
 
 ### Messaging / Direct Messages
 
 **What:** Direct messaging between users who have a contact relationship.
-**Why:** Communication between crew who know each other. Contacts exist for messaging convenience — they never create graph edges or endorsement eligibility (D-029).
+**Why:** Communication convenience for crew who know each other. Contacts exist for messaging — they don't create graph edges or endorsement eligibility (D-029).
 **Status:** deferred
-**Key constraints:** Contacts relationship is non-graph. Messaging does not imply professional proximity. No spam vector — contact relationship required first.
 
 ---
 
 ### IRL Connections
 
 **What:** In-person encounters as first-class objects — verified by mutual confirmation. Creates a graph edge without shared yacht history.
-**Why:** Crew meet in marinas, bars, industry events. An IRL connection verified by both parties is a reality-bound edge (D-028). Extends the graph beyond shared employment without breaking graph integrity.
+**Why:** Crew meet in marinas, ports, industry events. A verified IRL connection is a reality-bound graph edge (D-028) that extends the network beyond employment.
 **Status:** deferred
-**Key constraints:** Mutual confirmation required — one party cannot unilaterally create an IRL edge. Public or private visibility (D-032). Absolute right of exit — any participant can remove themselves from an interaction at any time, everywhere (D-033).
+**Key notes:** Mutual confirmation required — one party can't unilaterally create an IRL edge. Users can always remove themselves from an interaction, removing their association everywhere (D-033).
 
 ---
 
 ### Yacht Merging
 
 **What:** Admin-mediated or community-proposed merge of duplicate or renamed yacht entities into a single canonical entity.
-**Why:** Over time, the same physical yacht will accumulate multiple entries (renamed yachts, typos, regional name variants). Merging restores graph integrity at scale.
+**Why:** Over time the same physical yacht accumulates multiple entries. Merging restores graph integrity at scale.
 **Status:** deferred
-**Key constraints:** Merging is irreversible — wrong merges corrupt trust. Requires quorum approval. Not in Phase 1 because premature merging is worse than fragmentation (D-006).
+**Key notes:** Wrong merges are hard to reverse and corrupt trust — worth being careful when this gets built. Quorum approval is the right model (D-006).
 
 ---
 
 ### Verified Status & Community Moderation
 
-**What:** An earned status level that grants expanded moderation power — earned through tenure, endorsement density from verified users, or seed-set membership. Not purchasable.
-**Why:** As the graph scales, community-based moderation scales better than admin intervention. Verified status creates a trusted inner ring that can confirm attachments and vote on abuse cases (D-015, D-016).
+**What:** An earned status level that grants expanded moderation power — earned through tenure, endorsement density from verified users, or seed-set membership.
+**Why:** Community-based moderation scales better than admin intervention as the graph grows (D-015, D-016).
 **Status:** deferred
-**Constitutional notes:** Verified status is never purchasable. Not in paid scope, not in Pro, not in any tier ever. Earned through trust evidence only (D-016 updated 2026-03-08).
+**Crew-first note:** Verified status should stay earned through trust evidence — not purchasable. If there's ever pressure to make it a paid feature, flag it.
 
 ---
 
-## Rejected / Never-Build
+## Not planned
 
-These are features that have been considered and permanently excluded. They are not deferred — they are off the table.
+These have been considered and aren't on the roadmap based on current product direction. Worth revisiting if the product evolves significantly — but flag before building any of them.
 
 ---
 
 ### Star ratings or numeric scores
 
-**Decision:** D-002 — irreversible.
-**Why rejected:** False precision. Creates coercion dynamics, legal exposure, and gaming incentives.
+**Why not:** Creates false precision, coercion dynamics, legal exposure, and gaming incentives (D-002). Endorsements as free text are more nuanced and harder to game.
 
 ### Auto-summary language
 
-**Decision:** D-013 — irreversible.
-**Why rejected:** "Well endorsed" / "lightly endorsed" collapses nuance into judgment and quietly kills the "absence is neutral" principle.
+**Why not:** "Well endorsed" / "lightly endorsed" turns a nuanced signal into a judgment, and quietly undermines the principle that absence of endorsements is neutral (D-013).
 
 ### Algorithmic timeline surfacing
 
-**Decision:** D-031 — irreversible.
-**Why rejected:** Trending, boosting, and engagement weighting corrupt truth-seeking and encourage performative behavior.
+**Why not:** Trending, boosting, and engagement weighting create incentives for performative rather than truthful behaviour (D-031).
 
 ### Payment affecting trust outcomes
 
-**Decision:** D-003 — irreversible.
-**Why rejected:** If trust can be bought, trust is worthless. The entire value proposition collapses.
+**Why not:** If trust can be bought, the signal is worthless. The value proposition depends on this staying clean (D-003). Any feature that looks like it crosses this line should be flagged.
 
 ### Labelling absence of endorsements as negative
 
-**Decision:** D-011 — irreversible.
-**Why rejected:** Early users and private crew should not be penalised for having fewer endorsements. Only contradicted endorsements create negative weight.
+**Why not:** Penalises early users and private crew for having fewer endorsements. Only contradicted endorsements create negative signal (D-011).
