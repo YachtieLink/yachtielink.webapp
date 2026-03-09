@@ -1,0 +1,123 @@
+{
+  "project": {
+    "name": "Yachtielink",
+    "primary_domain": "yachtie.link",
+    "alt_domains": [
+      "yachtielink.com"
+    ],
+    "one_line": "A crew-owned professional identity network where yacht-backed work history creates the foundation for trusted references.",
+    "status": "Building",
+    "current_phase": "Phase 1A - Portable Profile + Yacht Graph + Endorsements",
+    "build_plan": "docs/yl_build_plan.md",
+    "north_star": "Build crew-owned profile infrastructure that turns yacht-backed work history into a living colleague graph and endorsement loop, then fund it with paid presentation upgrades."
+  },
+  "canonical_rules": {
+    "monetisation": "You can't pay to be more trusted. You can only pay to present yourself better.",
+    "interpretation": [
+      "Trust outcomes are never purchasable",
+      "Credibility is never gated by payment",
+      "Verification is never monetised",
+      "Payment may improve presentation quality and workflow convenience",
+      "Any later discovery monetisation must stay decoupled from trust outcomes"
+    ]
+  },
+  "identity_vs_presentation": {
+    "identity_layer": {
+      "description": "Free, permanent identity and graph infrastructure",
+      "includes": [
+        "Profile",
+        "Employment history",
+        "Certifications",
+        "CV import",
+        "Yacht entities",
+        "Employment attachments",
+        "Colleague graph from shared attachments",
+        "Endorsements",
+        "Public profile page",
+        "PDF snapshot"
+      ],
+      "monetised": false
+    },
+    "presentation_layer": {
+      "description": "Paid presentation polish and workflow convenience",
+      "includes": [
+        "Premium templates",
+        "Watermark removal",
+        "Custom domains",
+        "Basic analytics",
+        "Higher endorsement request allowance"
+      ],
+      "constraints": "May improve presentation quality, workflow convenience, and later discovery efficiency. Never alters trust outcomes or moderation power.",
+      "monetised": true
+    }
+  },
+  "current_build_target": {
+    "phase": "1A",
+    "ships_now": [
+      "Profile",
+      "CV import",
+      "Employment history",
+      "Yacht entities",
+      "Employment attachments",
+      "Colleague graph",
+      "Endorsement requests",
+      "Endorsements",
+      "Public profile page",
+      "PDF snapshot",
+      "Paid presentation upgrades"
+    ],
+    "deferred": [
+      "Timeline",
+      "Messaging",
+      "Contacts",
+      "IRL interactions",
+      "Peer hiring",
+      "Recruiter access",
+      "Broad search/discovery"
+    ]
+  },
+  "phase_invariants": [
+    "Identity is free and permanent",
+    "The yacht graph is the current wedge",
+    "Graph edges in the current build are created by shared yacht employment",
+    "Trust outcomes are never monetised",
+    "Payment never grants moderation power or verified status",
+    "Growth can be paused if graph quality degrades"
+  ],
+  "relationship_model": {
+    "colleague": "Graph edge created by overlapping yacht employment",
+    "graph_invariant": "Current build graph edges = colleagues only",
+    "future_extension": "IRL connections may be added later without changing the reality-bound rule"
+  },
+  "revenue_streams": {
+    "crew_pro": {
+      "price": "EUR12/month",
+      "target": "Active crew building profile polish and reference momentum",
+      "key_features": [
+        "Premium templates",
+        "Custom subdomain",
+        "Watermark removal",
+        "Profile analytics",
+        "Higher endorsement request allowance"
+      ]
+    }
+  },
+  "next_phases": {
+    "phase_1b": [
+      "Availability toggle",
+      "Limited crew search",
+      "Expanded analytics and convenience"
+    ],
+    "phase_1c": [
+      "Peer hiring",
+      "Recruiter access",
+      "Additional discovery tooling"
+    ],
+    "phase_2": [
+      "Timeline / posts / interactions",
+      "Messaging / contacts",
+      "IRL connection system",
+      "Later diagnostic surfaces"
+    ]
+  }
+}
