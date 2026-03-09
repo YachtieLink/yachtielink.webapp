@@ -1,0 +1,116 @@
+{
+  "schema_version": "1.0",
+  "generated_on": "2026-02-11",
+  "source_batch_date": "2026-02-11",
+  "naming_convention": "canonical filenames without .vNext suffix",
+  "canonical_documents": [
+    {
+      "canonical_path": "/Users/ari/yachtielink.webapp/docs/canonical/yl_decisions.json",
+      "source_intake_path": "/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/yl_decisions.vNext.json",
+      "source_version_tag": "vNext",
+      "checksum_sha256": "ee37bf628b422f51b2d1ddb869c9ee166bca2b41398c3a0f144ce9031a4711da",
+      "status": "active"
+    },
+    {
+      "canonical_path": "/Users/ari/yachtielink.webapp/docs/canonical/yl_glossary.json",
+      "source_intake_path": "/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/yl_glossary.vNext.json",
+      "source_version_tag": "vNext",
+      "checksum_sha256": "e031d9d7490759dd4d76845a550a10e8bd1107566b7d08c327a39f642af96357",
+      "status": "active"
+    },
+    {
+      "canonical_path": "/Users/ari/yachtielink.webapp/docs/canonical/yl_mobile_first_ux_spec_for_pm_v1.md",
+      "source_intake_path": "/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/yl_mobile_first_ux_spec_for_pm_v1.vNext.md",
+      "source_version_tag": "vNext",
+      "checksum_sha256": "c4df0692f17c7f578c5c824112c4c8bf0acb4073d5a80e14f209eb84cfaf4982",
+      "status": "active"
+    },
+    {
+      "canonical_path": "/Users/ari/yachtielink.webapp/docs/canonical/yl_moderation.md",
+      "source_intake_path": "/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/yl_moderation.vNext.md",
+      "source_version_tag": "vNext",
+      "checksum_sha256": "7a6f95eeb874688f87d26973f122faebb48b33738e1bc43655398e9cedf2f4f6",
+      "status": "active"
+    },
+    {
+      "canonical_path": "/Users/ari/yachtielink.webapp/docs/canonical/yl_non_goals.md",
+      "source_intake_path": "/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/yl_non_goals.vNext.md",
+      "source_version_tag": "vNext",
+      "checksum_sha256": "b1d450a3e852801220687039b58c9b9bcc3c6049bd15ccf79e024e15401cdf77",
+      "status": "active"
+    },
+    {
+      "canonical_path": "/Users/ari/yachtielink.webapp/docs/canonical/yl_phase1_actionables.json",
+      "source_intake_path": "/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/yl_phase1_actionables.vNext.json",
+      "source_version_tag": "vNext",
+      "checksum_sha256": "abd5d10c7471050db18eab1bde0c7cb4ab00b8c4391e1c50aada091f7cd1ab36",
+      "status": "active"
+    },
+    {
+      "canonical_path": "/Users/ari/yachtielink.webapp/docs/canonical/yl_phase1_execution.md",
+      "source_intake_path": "/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/yl_phase1_execution.vNext.md",
+      "source_version_tag": "vNext",
+      "checksum_sha256": "6dbe57edeb52892c4c9b949d1c87d48deee903b70f08cb87fb6fa3ab44a48858",
+      "status": "active"
+    },
+    {
+      "canonical_path": "/Users/ari/yachtielink.webapp/docs/canonical/yl_phase_scope.json",
+      "source_intake_path": "/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/yl_phase_scope.vNext.json",
+      "source_version_tag": "vNext",
+      "checksum_sha256": "794e5a9313a1919c8bbc24397fa8452205cf49be8f3278a0d5808febe5c89375",
+      "status": "active"
+    },
+    {
+      "canonical_path": "/Users/ari/yachtielink.webapp/docs/canonical/yl_schema.md",
+      "source_intake_path": "/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/yl_schema.vNext.md",
+      "source_version_tag": "vNext",
+      "checksum_sha256": "8c1396290b553dcfd1070c64ac81b1ed4c5d3c895247ca648cc91f77b3d84eba",
+      "status": "active"
+    },
+    {
+      "canonical_path": "/Users/ari/yachtielink.webapp/docs/canonical/yl_security.md",
+      "source_intake_path": "/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/yl_security.vNext.md",
+      "source_version_tag": "vNext",
+      "checksum_sha256": "1171d899fe4b78b19bd4f2c9de6037e99368c1a7c49ed60f16a0d5f0d63293ed",
+      "status": "active"
+    },
+    {
+      "canonical_path": "/Users/ari/yachtielink.webapp/docs/canonical/yl_system_state.json",
+      "source_intake_path": "/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/yl_system_state.vNext.json",
+      "source_version_tag": "vNext",
+      "checksum_sha256": "d121075dd34dcb8b668e2fc9ab51eb18f0855fa4f7c477046d36d48868cb36a6",
+      "status": "active"
+    },
+    {
+      "canonical_path": "/Users/ari/yachtielink.webapp/docs/canonical/yl_tech_stack.md",
+      "source_intake_path": "/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/yl_tech_stack.vNext.md",
+      "source_version_tag": "vNext",
+      "checksum_sha256": "4a89db3879410364df9958b7af5068b9ea52cc45f03be8351b8c5db33f8ec8c4",
+      "status": "active"
+    }
+  ],
+  "governance_files": [
+    {
+      "path": "/Users/ari/yachtielink.webapp/ops/TODO.md",
+      "role": "phase tracking",
+      "required_metadata": [
+        "last_updated",
+        "change_control"
+      ],
+      "status": "active"
+    },
+    {
+      "path": "/Users/ari/yachtielink.webapp/ops/LOG.md",
+      "role": "multi-contributor execution log",
+      "required_metadata": [
+        "entry_id",
+        "date",
+        "author",
+        "area",
+        "files_changed",
+        "todo_impact"
+      ],
+      "status": "active"
+    }
+  ]
+}

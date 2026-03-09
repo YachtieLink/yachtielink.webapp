@@ -1,0 +1,211 @@
+{
+  "version": "v1.1",
+  "created": "2026-01-27",
+  "updated": "2026-01-28",
+  "source": "PM handover conversation",
+  "metrics_and_tripwires": {
+    "endorsement_to_profile_ratio": {
+      "description": "Ratio of users who have given or received an endorsement",
+      "tripwire": 0.3,
+      "trigger_point": "500 active profiles",
+      "action_if_breached": "Pause growth, diagnose graph formation failure",
+      "status": "not_implemented"
+    },
+    "organic_share_rate": {
+      "description": "Percentage of active users sharing their profile unprompted per month",
+      "tripwire": 0.1,
+      "action_if_breached": "Pause growth, investigate value proposition",
+      "status": "not_implemented"
+    },
+    "repeat_flag_rate": {
+      "description": "Percentage of endorsements being flagged or disputed",
+      "tripwire": 0.05,
+      "action_if_breached": "Investigate coercion, gaming, or UX issues",
+      "status": "not_implemented"
+    },
+    "time_to_first_endorsement": {
+      "description": "Median days from signup to first endorsement given or received",
+      "target_range_days": [
+        21,
+        30
+      ],
+      "action_if_exceeded": "Review onboarding and endorsement prompts",
+      "status": "not_implemented"
+    },
+    "websocket_concurrent_sessions": {
+      "description": "Number of concurrent WebSocket sessions for messaging",
+      "tripwire": 150,
+      "hard_limit": 200,
+      "action_if_breached": "Begin migration planning to Cloudflare Durable Objects",
+      "tracking": "PostHog events (messaging.session.opened/closed)",
+      "status": "not_implemented"
+    },
+    "interaction_exit_rate": {
+      "description": "Percentage of interaction participants who exit after confirmation",
+      "tripwire": "TBD",
+      "action_if_breached": "Investigate coercion, abuse, or consent issues",
+      "status": "not_implemented"
+    },
+    "reports_per_1k_posts": {
+      "description": "Number of content reports per 1,000 timeline posts",
+      "tripwire": "TBD",
+      "action_if_breached": "Review content safety, tighten rate limits, update moderation flow",
+      "status": "not_implemented"
+    },
+    "median_time_to_first_irl_encounter": {
+      "description": "Median days from signup to first confirmed IRL interaction",
+      "tripwire": "TBD",
+      "action_if_breached": "Review encounter UX and contact-to-IRL conversion",
+      "status": "not_implemented"
+    },
+    "irl_encounters_per_active_user": {
+      "description": "Average number of confirmed IRL interactions per active user",
+      "tripwire": "TBD",
+      "action_if_breached": "Review encounter onboarding and reminders",
+      "status": "not_implemented"
+    }
+  },
+  "growth_controls": {
+    "pause_mechanism": {
+      "description": "Single config flag to switch from public signup to invite-only",
+      "execution_time": "same day",
+      "decision_owner": "Ari",
+      "recommendation_owner": "PM",
+      "emergency_protocol": "PM can pause first, explain after if Ari unavailable",
+      "status": "not_implemented"
+    }
+  },
+  "retraction_mechanics": {
+    "ui_visibility": {
+      "rule": "Retractions are never visible in UI",
+      "rationale": "Prevents scarlet letter effect, preserves ambiguity"
+    },
+    "backend_effects": [
+      "Retraction frequency affects endorser's future signal weight",
+      "Feeds into Phase 2 trust calculations as soft negative",
+      "Triggers internal review if patterns cluster around single person"
+    ],
+    "future_risk_flag": {
+      "trigger": "Any 'why did my visibility drop?' tooling",
+      "risk": "Users may infer hidden penalties",
+      "phase": "Monitor from Phase 2 onwards"
+    }
+  },
+  "abuse_escalation_protocol": {
+    "tiers": [
+      {
+        "level": 1,
+        "name": "monitor",
+        "trigger": "Single suspicion, no corroboration",
+        "action": "Flag internally, watch for patterns, no intervention"
+      },
+      {
+        "level": 2,
+        "name": "shadow_constrain",
+        "trigger": "Second independent signal pointing to same person/yacht",
+        "action": "Rate-limit endorsement requests, no notification to user",
+        "visibility": "Founder + PM only"
+      },
+      {
+        "level": 3,
+        "name": "freeze",
+        "trigger": "Three or more independent reports, or concrete evidence",
+        "action": "Freeze account endorsement activity, escalate to Ari"
+      }
+    ],
+    "high_reputation_handling": {
+      "ambiguous_violations": "One grace period with private warning",
+      "unambiguous_violations": "Immediate action, no grace period",
+      "examples_unambiguous": [
+        "harassment",
+        "fraud",
+        "provably false endorsement"
+      ]
+    },
+    "status": "not_implemented"
+  },
+  "monetisation_boundaries": {
+    "allowed_under_pressure": [
+      "Crew Pro price increase",
+      "Additional presentation features in Crew Pro",
+      "Prepaid annual plans at discount",
+      "Clearly labeled sponsorships (training providers, gear brands)"
+    ],
+    "forbidden": [
+      "Payment affecting endorsement visibility, ordering, or weight",
+      "Charging for verification or credentialing",
+      "Yacht payments before crew monetisation stabilises",
+      "Priority dispute resolution for paying users",
+      "Any feature interpretable as 'pay to look more trustworthy'"
+    ],
+    "grey_zone_requires_ari": [
+      "Charging for PDF exports"
+    ],
+    "deferred": [
+      {
+        "feature": "Profile boost for discovery",
+        "condition": "Only if discovery layer exists and is visibly decoupled from trust weighting",
+        "status": "theoretical_only"
+      }
+    ]
+  },
+  "constitutional_guardrails": {
+    "forbidden_features": [
+      "Auto-summary language ('well endorsed', 'lightly endorsed', etc.)",
+      "Any UI that labels absence of endorsements as negative",
+      "Contextual benchmarking that feels like scoring"
+    ],
+    "override_protocol": {
+      "steps": [
+        "PM makes case in writing, once",
+        "PM requests explicit decision from Ari",
+        "If overridden, PM documents objection in decision log and executes",
+        "If pattern of overrides on constitutional issues, PM escalates directly",
+        "If constitutional drift is confirmed and intentional, PM exits"
+      ]
+    },
+    "resignation_triggers": [
+      "Monetising trust outcomes",
+      "Payment influencing endorsement visibility, weight, or eligibility",
+      "Yacht payments to suppress or delay negative signals",
+      "Shipping 'reputation repair' product",
+      "Any move that makes canonical monetisation rule a lie"
+    ]
+  },
+  "operational_setup": {
+    "awaiting_handover": [
+      {
+        "item": "Asset inventory",
+        "includes": [
+          "domain registrar access",
+          "email accounts",
+          "cloud storage",
+          "design files",
+          "social handles"
+        ],
+        "status": "pending"
+      },
+      {
+        "item": "Contact list",
+        "includes": [
+          "crew",
+          "captains",
+          "agents",
+          "lawyers",
+          "developers"
+        ],
+        "notes": "With context and relationship warmth",
+        "status": "pending"
+      },
+      {
+        "item": "Prior art file",
+        "includes": [
+          "competitors",
+          "failed predecessors",
+          "failure mode notes"
+        ],
+        "status": "pending"
+      }
+    ]
+  }
+}

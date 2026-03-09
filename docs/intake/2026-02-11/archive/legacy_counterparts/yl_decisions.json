@@ -1,0 +1,290 @@
+[
+  {
+    "id": "D-001",
+    "date": "2025-11-15",
+    "decision_class": "constitutional",
+    "status": "closed",
+    "topic": "Crew-first power orientation",
+    "decision": "Crew are privileged in trust conflicts.",
+    "rationale": "Crew are the mobile, vulnerable party. Yachts have institutional power. Asymmetric protection prevents the system from becoming another tool for employer control.",
+    "notes": "Applies to trust asymmetry, not monetisation sequencing.",
+    "reversibility": "irreversible"
+  },
+  {
+    "id": "D-002",
+    "date": "2025-11-15",
+    "decision_class": "constitutional",
+    "status": "closed",
+    "topic": "No ratings or reviews",
+    "decision": "No star ratings or open free-text reviews.",
+    "rationale": "Star ratings create false precision. Free-text reviews create coercion dynamics and legal exposure. Both invite gaming.",
+    "reversibility": "irreversible"
+  },
+  {
+    "id": "D-003",
+    "date": "2025-11-15",
+    "decision_class": "constitutional",
+    "status": "closed",
+    "topic": "Monetisation boundaries",
+    "decision": "Never monetise influence over trust outcomes.",
+    "rationale": "If trust can be bought, trust is worthless. The entire value proposition collapses.",
+    "reversibility": "irreversible"
+  },
+  {
+    "id": "D-004",
+    "date": "2025-12-01",
+    "decision_class": "constitutional",
+    "status": "closed",
+    "topic": "Crew pay first, yachts pay later",
+    "decision": "Monetisation sequence: crew subscription revenue must stabilise before any yacht-side payments.",
+    "rationale": "Whoever pays first has implicit power. If yachts pay first, the system optimises for yacht satisfaction over crew truth.",
+    "reversibility": "irreversible"
+  },
+  {
+    "id": "D-005",
+    "date": "2025-12-10",
+    "decision_class": "architectural",
+    "status": "closed",
+    "topic": "Retraction visibility",
+    "decision": "Endorsement retractions are never visible in UI. Backend only.",
+    "rationale": "Visible retractions create scarlet letter effects. The person who retracted may have legitimate reasons. Viewers assume the worst.",
+    "notes": "Retraction frequency affects endorser weighting in backend. Feeds into Phase 2 trust calculations.",
+    "reversibility": "reversible_with_caution"
+  },
+  {
+    "id": "D-006",
+    "date": "2025-12-15",
+    "decision_class": "architectural",
+    "status": "closed",
+    "topic": "No yacht merging in Phase 1",
+    "decision": "Renamed or duplicate yachts remain separate entities in Phase 1. No merge functionality.",
+    "rationale": "Premature merging creates irreversible trust errors. Fragmentation is tolerable; incorrect consolidation is not.",
+    "notes": "Phase 2+ may introduce merge proposals with quorum approval.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-007",
+    "date": "2025-11-20",
+    "decision_class": "constitutional",
+    "status": "closed",
+    "topic": "Identity vs Presentation Separation",
+    "decision": "Identity is free infrastructure; presentation is paid and cosmetic only.",
+    "rationale": "Free identity removes barriers to graph formation. Paid presentation funds operations without corrupting trust.",
+    "reversibility": "irreversible"
+  },
+  {
+    "id": "D-008",
+    "date": "2026-01-05",
+    "decision_class": "architectural",
+    "status": "closed",
+    "topic": "Yacht Graph in Phase 1",
+    "decision": "Introduce yacht entities as verification infrastructure in Phase 1.",
+    "rationale": "Yacht attachment is the gating mechanism for endorsements. Without this, endorsements are meaningless.",
+    "reversibility": "irreversible"
+  },
+  {
+    "id": "D-009",
+    "date": "2026-01-05",
+    "decision_class": "architectural",
+    "status": "closed",
+    "topic": "Endorsement gating rule",
+    "decision": "Endorsements require shared yacht attachment. Connections alone do not permit endorsements.",
+    "rationale": "Endorsements must be grounded in verifiable shared experience. Social connections are not evidence of professional competence.",
+    "reversibility": "irreversible"
+  },
+  {
+    "id": "D-010",
+    "date": "2026-01-10",
+    "decision_class": "operational",
+    "status": "closed",
+    "topic": "Endorsement structure",
+    "decision": "Endorsements contain both structured metadata and free-text. One endorsement per engagement per yacht.",
+    "rationale": "Structure enables future analysis. Free-text enables nuance. One-per-engagement prevents inflation.",
+    "notes": "Editing allowed. Deletion allowed but tracked in backend.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-011",
+    "date": "2026-01-27",
+    "decision_class": "operational",
+    "status": "closed",
+    "topic": "Absence of endorsements is neutral",
+    "decision": "Zero endorsements is not a negative signal. The system never labels absence as meaningful.",
+    "rationale": "Early users and private people should not be penalised. Only contradicted endorsements create negative weight.",
+    "notes": "Role-relative context may be introduced in Phase 2 without scoring.",
+    "reversibility": "reversible_with_caution"
+  },
+  {
+    "id": "D-012",
+    "date": "2026-01-27",
+    "decision_class": "operational",
+    "status": "closed",
+    "topic": "Growth pause mechanism",
+    "decision": "Single config flag to switch from public signup to invite-only. PM can pause first, explain after if founder unavailable.",
+    "rationale": "Reversing a pause is easy. Reversing trust damage is not.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-013",
+    "date": "2026-01-27",
+    "decision_class": "constitutional",
+    "status": "closed",
+    "topic": "No auto-summary language",
+    "decision": "Forbidden: any UI that auto-summarises endorsement density ('well endorsed', 'lightly endorsed', etc.).",
+    "rationale": "Auto-summaries collapse nuance into judgment. They quietly kill the 'absence is neutral' principle.",
+    "reversibility": "irreversible"
+  },
+  {
+    "id": "D-014",
+    "date": "2026-01-28",
+    "decision_class": "constitutional",
+    "status": "closed",
+    "topic": "PDF snapshot is free",
+    "decision": "PDF snapshot/export is free identity infrastructure. Never monetised.",
+    "rationale": "PDF export is core to portable identity. Monetising it would gate a fundamental capability behind payment.",
+    "notes": "Paid scope is limited to templates, layout polish, and watermark removal.",
+    "reversibility": "irreversible"
+  },
+  {
+    "id": "D-015",
+    "date": "2026-01-28",
+    "decision_class": "architectural",
+    "status": "closed",
+    "topic": "Consensus-based moderation",
+    "decision": "Moderation decisions (fake accounts, attachment confirmation) resolved by community vote, not admin judgment.",
+    "rationale": "System-mediated moderation grounded in shared employment scales better and resists single points of failure. Admin intervention is last resort.",
+    "notes": "See yl_moderation.md for full mechanics.",
+    "reversibility": "reversible_with_caution"
+  },
+  {
+    "id": "D-016",
+    "date": "2026-01-28",
+    "decision_class": "architectural",
+    "status": "closed",
+    "topic": "Verified status chain of trust",
+    "decision": "Verified status grants expanded moderation power. Earned via seed set, endorsements from verified users, tenure+density, or paid subscription.",
+    "rationale": "Prevents sock puppet networks from gaining moderation power through self-endorsement. Only users vouched for by known-good users can confirm attachments or vote in expanded pools.",
+    "notes": "See yl_moderation.md Section 1.",
+    "reversibility": "reversible_with_caution"
+  },
+  {
+    "id": "D-017",
+    "date": "2026-01-28",
+    "decision_class": "architectural",
+    "status": "closed",
+    "topic": "Yacht establishment rule",
+    "decision": "Yachts become 'established' after 60 days AND reaching crew threshold. Established yachts require attachment confirmation from verified users.",
+    "rationale": "Balances open graph formation (fresh yachts) with protection against late-stage infiltration (established yachts).",
+    "notes": "Crew threshold varies by yacht size. See yl_moderation.md Section 2.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-018",
+    "date": "2026-01-28",
+    "decision_class": "operational",
+    "status": "closed",
+    "topic": "Account flag voting rules",
+    "decision": "67% supermajority for early resolution, simple majority after 7 days, minimum 3 votes required. Ossified accounts require 80%.",
+    "rationale": "Supermajority prevents marginal removals. Minimum vote threshold prevents 1v1 disputes. Ossification protects established legitimate users.",
+    "notes": "Accused cannot vote. See yl_moderation.md Sections 5-6.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-019",
+    "date": "2026-01-28",
+    "decision_class": "operational",
+    "status": "closed",
+    "topic": "Endorsement signals (thumbs up/down)",
+    "decision": "Users with overlapping attachment can signal agree/disagree on endorsements. Display only in Phase 1, feeds trust weight in Phase 2+.",
+    "rationale": "Lightweight social proof without removal power. Allows community to express opinion without triggering moderation.",
+    "notes": "Signals alone never remove an endorsement. See yl_moderation.md Section 7.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-020",
+    "date": "2026-01-28",
+    "decision_class": "operational",
+    "status": "closed",
+    "topic": "No caps on endorsements received",
+    "decision": "Receiving many endorsements is not suspicious and is never rate-limited or flagged.",
+    "rationale": "Senior crew with long careers can plausibly receive many endorsements in a short period. Only endorsements given may ever be constrained.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-021",
+    "date": "2026-01-31",
+    "decision_class": "operational",
+    "status": "closed",
+    "topic": "CV import for onboarding",
+    "decision": "Users can upload existing CV (PDF/DOCX) to auto-populate profile fields via LLM extraction. Part of free identity layer.",
+    "rationale": "Reduces onboarding friction. Crew already have CVs — don't make them re-type. Directly supports time-to-first-endorsement tripwire (<30 days median). Competitor parity (yacht.ee has this).",
+    "notes": "Not verification — extracted data is still self-reported. Implementation: Claude API. Cost target <€0.05/parse. Fallback to manual entry on failure.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-022",
+    "date": "2026-01-31",
+    "decision_class": "constitutional",
+    "status": "closed",
+    "topic": "Free peer hiring (crew find crew)",
+    "decision": "Users with full profiles can post jobs for free. Other users can apply with their profile. Graph proximity (mutual connections, shared yachts) is visible to both parties. No payment, no algorithmic matching, no employer-only accounts.",
+    "rationale": "Hiring incentives only corrupt trust when employers pay. When both parties are nodes in the trust graph with visible profiles and reputations, incentives align — both want accurate signals. Captains are crew too. This strengthens the value prop by making the graph immediately useful at the highest-stakes moment (hiring).",
+    "notes": "Replaces 'Not a job marketplace' non-goal with 'Not an employer-pays hiring platform'. Key constraints: no paid listings, no placement fees, no recruiter tools, poster must have full profile. Jobs are a use case for the graph, not a separate product.",
+    "reversibility": "reversible_with_caution"
+  },
+  {
+    "id": "D-023",
+    "date": "2026-01-31",
+    "decision_class": "operational",
+    "status": "closed",
+    "topic": "Pro tier with search access",
+    "decision": "Crew Pro (€12/month) includes database search, extended availability reach, cert expiry alerts, profile analytics, and increased job post limits.",
+    "rationale": "Search is recruiter behavior — if you're searching the database to find candidates, you're recruiting, so pay for it. Pro becomes valuable for captains/HODs who hire, while free tier remains useful for junior crew building profiles.",
+    "notes": "Free: 1 job post/month, connections-only availability. Pro: 3 job posts/month, 2nd-degree availability reach, full analytics.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-024",
+    "date": "2026-01-31",
+    "decision_class": "architectural",
+    "status": "closed",
+    "topic": "Recruiter access model",
+    "decision": "Recruiters pay €29/month subscription plus credits (€75-1200 bundles) to access crew search. Credits unlock profile name and contact details from search results. Direct profile links and graph browsing show full profiles to everyone.",
+    "rationale": "Monetises recruiter access without corrupting trust. Recruiters get read-only access — they cannot influence the graph. Crew profiles remain fully functional for direct sharing (linktr.ee use case preserved).",
+    "notes": "1 credit = 1 profile unlock. Unlock is permanent per recruiter-crew pair. Credits expire 1 year from purchase. Recruiters can sort by endorsement count — gating rule prevents gaming.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-025",
+    "date": "2026-01-31",
+    "decision_class": "architectural",
+    "status": "closed",
+    "topic": "Contextual profile visibility",
+    "decision": "Profile visibility varies by access method. Direct link/QR shows full profile including contact details. Search results show locked profiles — name and contact details require payment (Pro for crew, credits for recruiters).",
+    "rationale": "Preserves crew's ability to use profile as public linktr.ee while creating recruiter paywall on efficient discovery. Manual graph browsing remains open but doesn't scale for harvesting.",
+    "notes": "Graph browsing (click yacht → see crew) shows full profiles. This is intentional — it's slow and doesn't support filtering/sorting. Search is the efficient path; that's what's monetised.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-026",
+    "date": "2026-01-31",
+    "decision_class": "operational",
+    "status": "closed",
+    "topic": "Recruiter sorting by endorsements allowed",
+    "decision": "Recruiters can sort search results by endorsement count. This rewards active crew who use the platform.",
+    "rationale": "Endorsements require shared yacht attachment (D-009), so they cannot be gamed through fake accounts or endorsement trading. More endorsements = more real colleagues vouching = exactly what recruiters should want to see.",
+    "notes": "Display 'X endorsements from Y people across Z yachts' for richer signal. Endorsement begging may occur but begged endorsements are still from real coworkers with visible text.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-027",
+    "date": "2026-01-31",
+    "decision_class": "operational",
+    "status": "closed",
+    "topic": "Crew availability toggle with expiry",
+    "decision": "Crew opt into recruiter/search pool via availability toggle. Expires after 7 days, must re-toggle. Crew control contact method visibility.",
+    "rationale": "Active opt-in protects crew from unwanted contact. Weekly expiry prevents stale 'available' crew getting spammed. Crew remain in control.",
+    "notes": "Reminder sent at day 6. Crew can hide from recruiters entirely while remaining visible to other crew.",
+    "reversibility": "reversible"
+  }
+]
