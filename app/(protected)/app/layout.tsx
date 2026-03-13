@@ -16,6 +16,17 @@ export default async function AppLayout({
     redirect("/welcome");
   }
 
+  // Gate: must complete onboarding before accessing the main app
+  const { data: profile } = await supabase
+    .from("users")
+    .select("onboarding_complete")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile?.onboarding_complete) {
+    redirect("/onboarding");
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col bg-[var(--color-surface)]">
       {/* Page content — padded so it clears the tab bar */}
