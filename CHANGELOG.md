@@ -22,13 +22,14 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 ### Done
 - Created `feat/sprint-1` branch from main
 - Installed Supabase CLI v2.78.1 (via direct binary download to `~/bin/supabase`) + ran `supabase init`
-- Wrote 6 database migrations to `supabase/migrations/`:
+- Wrote 7 database migrations to `supabase/migrations/` and applied all to production (`xnslbbgfuuijgdfdtres`):
   - `000001_extensions.sql` — pg_trgm, unaccent, pgcrypto, uuid-ossp, internal schema
   - `000002_reference_tables.sql` — departments, roles, certification_types, templates, other_role_entries, other_cert_entries
-  - `000003_core_tables.sql` — users (with handle, onboarding_complete, departments[], subscription fields), yachts (yacht_type: 'Motor Yacht'/'Sailing Yacht'), attachments (role_label for "Other" entries), endorsements, endorsement_requests (with token + 30-day expiry), certifications (with custom_cert_name fallback), profile_analytics, internal.flags
+  - `000003_core_tables.sql` — users (handle, onboarding_complete, departments[], subscription fields), yachts (yacht_type: 'Motor Yacht'/'Sailing Yacht'), attachments (role_label for "Other" entries), endorsements, endorsement_requests (token + 30-day expiry), certifications (custom_cert_name fallback), profile_analytics, internal.flags. Fixed: schema-qualified `extensions.gen_random_bytes()` (Supabase puts pgcrypto in extensions schema, not public)
   - `000004_functions.sql` — handle_new_user trigger, set_updated_at triggers, are_coworkers, are_coworkers_on_yacht, yacht_crew_count, get_yacht_crew_threshold, check_yacht_established, get_colleagues, handle_available, suggest_handles
-  - `000005_rls.sql` — RLS policies on every table (reference tables: public read; users: public read + own update; yachts: public read + authenticated create; attachments/endorsements/endorsement_requests/certifications: owner-scoped writes; analytics: own read + public insert; internal.flags: no user access)
-  - `000006_seed_reference.sql` — Full department list (7), full role seed list (57 roles across 8 departments including Other), full cert type seed list (57 types across 8 categories), 3 templates
+  - `000005_rls.sql` — RLS on every table (reference tables: public read; users: public read + own update; yachts: public read + authenticated create; attachments/endorsements/endorsement_requests/certifications: owner-scoped writes; analytics: own read + public insert; internal.flags: no user access)
+  - `000006_seed_reference.sql` — 7 departments, 56 roles across 8 departments (Other entries tracked separately), 57 cert types across 8 categories, 3 templates. Note: "Purser" removed from Interior seed (kept in Admin/Purser only) pending constraint fix in 000007
+  - `000007_fix_roles_constraint.sql` — dropped unique constraint on `roles.name`, added unique on `(name, department)`, re-inserted Interior Purser (sort_order 205)
 - Updated `app/globals.css` — brand token system (navy, ocean, gold palettes), semantic CSS vars with dark overrides, dark mode via `.dark` class variant, tab bar helpers
 - Updated `app/layout.tsx` — YachtieLink metadata, viewport config, inline dark mode init script (reads localStorage, falls back to system preference, no FOUC)
 - Built app shell:
@@ -39,6 +40,8 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
   - `app/(auth)/welcome/page.tsx` — landing/auth method selection (email only; Google/Apple commented as placeholders)
   - `app/(auth)/login/page.tsx` — email/password sign-in form
   - `app/(auth)/signup/page.tsx` — email/password signup with email verification confirmation screen
+  - `app/(auth)/reset-password/page.tsx` — sends Supabase reset email with redirectTo `/auth/callback?next=/update-password`
+  - `app/(auth)/update-password/page.tsx` — new password form, calls `supabase.auth.updateUser({ password })`, redirects to /app/profile on success
 - Built auth infrastructure:
   - `lib/supabase/middleware.ts` — middleware Supabase client
   - `middleware.ts` — route protection (PROTECTED_PREFIXES → /welcome; AUTH_ONLY_PREFIXES → /app/profile)
@@ -53,30 +56,24 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
   - `index.ts` — barrel export
 - Built `components/nav/BottomTabBar.tsx` — 5 tabs (Profile, CV, Insights, Audience, More), active state, outline/filled icon pairs, safe-area aware
 - Built public route shells: `/u/[handle]` (public profile, Sprint 6) and `/r/[token]` (endorsement deep link, Sprint 5)
-- Confirmed build passes with correct route structure: `/app/profile`, `/app/cv`, etc.
+- Build passes cleanly. All routes correct: `/app/profile`, `/app/cv`, etc.
+- PR merged to main ✓
 
 ### Context
-- OAuth (Google, Apple) deliberately excluded — founder decision: email/password only until paying users justify the setup cost. OAuth is commented in welcome/page.tsx for easy re-activation
-- Supabase CLI needs `supabase login` before migrations can be pushed. Binary is at `~/bin/supabase`. Run: `~/bin/supabase login && ~/bin/supabase link --project-ref zsxmlcksbxlvbptnxiok && ~/bin/supabase db push`
-- `yl_schema.md` was written pre-clarification (v1.1, 2026-01-28) and includes many deferred tables (contacts, messages, posts, interactions etc.). Migration 003 only creates Phase 1A tables — deferred tables will be added in later sprints as needed
-- Key schema decisions made this session:
-  - `yacht_type` values updated to 'Motor Yacht' / 'Sailing Yacht' (schema had 'Motor'/'Sail'/'Explorer')
-  - Added `departments[]` array on users (multi-select, per clarification session)
-  - Added `role_label text` on attachments (stores display label for "Other" entries)
-  - Added `endorsement_requests` table (in Sprint 1 list but missing from schema doc)
-  - Added `handle` field on users with format constraint
-  - Added `subscription_status`/`subscription_plan`/`subscription_ends_at` on users (ready for Sprint 7)
-  - Added `other_role_entries` and `other_cert_entries` tables for "Other" tracking
+- OAuth (Google, Apple) deliberately excluded — founder decision: email/password only until paying users justify the setup cost. OAuth is commented in `welcome/page.tsx` for easy re-activation
+- Production Supabase project ref: `xnslbbgfuuijgdfdtres`. Staging: `zsxmlcksbxlvbptnxiok`. Both in `.env.local` (production active, staging commented)
+- Reset password redirect requires the app URL to be whitelisted in Supabase dashboard → Authentication → URL Configuration → Redirect URLs. Add: `http://localhost:3000/**` for local dev, production URL when deployed
+- `yl_schema.md` is out of date (v1.1, 2026-01-28) — migrations are the source of truth
+- Key schema decisions: `yacht_type` = 'Motor Yacht'/'Sailing Yacht'; `departments[]` array on users; `role_label` on attachments; `endorsement_requests` table added; `handle` field with format constraint; subscription fields on users (ready for Sprint 7); `other_role_entries`/`other_cert_entries` for "Other" tracking
 
 ### Next
-- Push migrations: `~/bin/supabase login && ~/bin/supabase link --project-ref zsxmlcksbxlvbptnxiok && ~/bin/supabase db push`
-- Merge this PR to main
-- Start Sprint 2: auth flows + onboarding (name → handle → role → yacht → endorsement requests → done)
-- Reset password flow (`/reset-password`) — not built yet, linked from login page
+- Start Sprint 2: onboarding flow (name → handle → department/role → yacht → endorsement requests → done)
+- Add production URL to Supabase redirect URLs whitelist once deployed (needed for reset password email link to work end-to-end)
 
 ### Flags
-- `yl_schema.md` is now out of date (v1.1) — should be updated to reflect the actual migrations. Low priority — migrations are the source of truth.
-- `~/bin/supabase` is not on PATH — either add `~/bin` to PATH or use full path
+- `yl_schema.md` is now out of date — low priority, migrations are source of truth
+- `~/bin/supabase` is not on PATH — use full path or add `~/bin` to PATH
+- Reset password flow UI is complete but email link will 404 until the app is deployed and the redirect URL is whitelisted in Supabase dashboard
 
 ---
 
