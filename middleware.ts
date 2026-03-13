@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { createMiddlewareClient } from "@/lib/supabase/middleware";
 
 // Routes that require authentication
-const PROTECTED_PREFIXES = ["/app"];
+const PROTECTED_PREFIXES = ["/app", "/onboarding"];
 
 // Routes only for unauthenticated users
 const AUTH_ONLY_PREFIXES = ["/welcome", "/login", "/signup", "/reset-password"];
