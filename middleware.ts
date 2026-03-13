@@ -5,7 +5,7 @@ import { createMiddlewareClient } from "@/lib/supabase/middleware";
 const PROTECTED_PREFIXES = ["/app"];
 
 // Routes only for unauthenticated users
-const AUTH_ONLY_PREFIXES = ["/welcome", "/login", "/signup"];
+const AUTH_ONLY_PREFIXES = ["/welcome", "/login", "/signup", "/reset-password"];
 
 export async function middleware(request: NextRequest) {
   const { supabase, response } = createMiddlewareClient(request);
