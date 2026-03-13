@@ -17,6 +17,69 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-13 — Claude Code (Sonnet 4.6) — Sprint 1
+
+### Done
+- Created `feat/sprint-1` branch from main
+- Installed Supabase CLI v2.78.1 (via direct binary download to `~/bin/supabase`) + ran `supabase init`
+- Wrote 6 database migrations to `supabase/migrations/`:
+  - `000001_extensions.sql` — pg_trgm, unaccent, pgcrypto, uuid-ossp, internal schema
+  - `000002_reference_tables.sql` — departments, roles, certification_types, templates, other_role_entries, other_cert_entries
+  - `000003_core_tables.sql` — users (with handle, onboarding_complete, departments[], subscription fields), yachts (yacht_type: 'Motor Yacht'/'Sailing Yacht'), attachments (role_label for "Other" entries), endorsements, endorsement_requests (with token + 30-day expiry), certifications (with custom_cert_name fallback), profile_analytics, internal.flags
+  - `000004_functions.sql` — handle_new_user trigger, set_updated_at triggers, are_coworkers, are_coworkers_on_yacht, yacht_crew_count, get_yacht_crew_threshold, check_yacht_established, get_colleagues, handle_available, suggest_handles
+  - `000005_rls.sql` — RLS policies on every table (reference tables: public read; users: public read + own update; yachts: public read + authenticated create; attachments/endorsements/endorsement_requests/certifications: owner-scoped writes; analytics: own read + public insert; internal.flags: no user access)
+  - `000006_seed_reference.sql` — Full department list (7), full role seed list (57 roles across 8 departments including Other), full cert type seed list (57 types across 8 categories), 3 templates
+- Updated `app/globals.css` — brand token system (navy, ocean, gold palettes), semantic CSS vars with dark overrides, dark mode via `.dark` class variant, tab bar helpers
+- Updated `app/layout.tsx` — YachtieLink metadata, viewport config, inline dark mode init script (reads localStorage, falls back to system preference, no FOUC)
+- Built app shell:
+  - `app/page.tsx` — root redirect (auth check → /app/profile or /welcome)
+  - `app/(protected)/app/layout.tsx` — authenticated layout with auth gate + BottomTabBar
+  - `app/(protected)/app/{profile,cv,insights,audience,more}/page.tsx` — placeholder pages
+  - `app/(auth)/layout.tsx` — auth layout (redirects signed-in users to /app/profile)
+  - `app/(auth)/welcome/page.tsx` — landing/auth method selection (email only; Google/Apple commented as placeholders)
+  - `app/(auth)/login/page.tsx` — email/password sign-in form
+  - `app/(auth)/signup/page.tsx` — email/password signup with email verification confirmation screen
+- Built auth infrastructure:
+  - `lib/supabase/middleware.ts` — middleware Supabase client
+  - `middleware.ts` — route protection (PROTECTED_PREFIXES → /welcome; AUTH_ONLY_PREFIXES → /app/profile)
+  - `app/auth/callback/route.ts` — PKCE code exchange, handles error params, safe redirect
+- Built base component library in `components/ui/`:
+  - `Button.tsx` — 4 variants (primary/secondary/ghost/destructive), 3 sizes, loading spinner
+  - `Card.tsx` — Card, CardHeader, CardTitle, CardBody; interactive prop for tappable cards
+  - `Input.tsx` — label, hint, error, suffix; accessible with aria-describedby/aria-invalid
+  - `Toast.tsx` — ToastProvider + useToast hook; 3 types; 4-second auto-dismiss
+  - `BottomSheet.tsx` — fixed bottom drawer with backdrop, drag handle, Escape key, body scroll lock
+  - `ProgressWheel.tsx` — SVG ring for profile completion (Wheel A) and endorsements (Wheel B)
+  - `index.ts` — barrel export
+- Built `components/nav/BottomTabBar.tsx` — 5 tabs (Profile, CV, Insights, Audience, More), active state, outline/filled icon pairs, safe-area aware
+- Built public route shells: `/u/[handle]` (public profile, Sprint 6) and `/r/[token]` (endorsement deep link, Sprint 5)
+- Confirmed build passes with correct route structure: `/app/profile`, `/app/cv`, etc.
+
+### Context
+- OAuth (Google, Apple) deliberately excluded — founder decision: email/password only until paying users justify the setup cost. OAuth is commented in welcome/page.tsx for easy re-activation
+- Supabase CLI needs `supabase login` before migrations can be pushed. Binary is at `~/bin/supabase`. Run: `~/bin/supabase login && ~/bin/supabase link --project-ref zsxmlcksbxlvbptnxiok && ~/bin/supabase db push`
+- `yl_schema.md` was written pre-clarification (v1.1, 2026-01-28) and includes many deferred tables (contacts, messages, posts, interactions etc.). Migration 003 only creates Phase 1A tables — deferred tables will be added in later sprints as needed
+- Key schema decisions made this session:
+  - `yacht_type` values updated to 'Motor Yacht' / 'Sailing Yacht' (schema had 'Motor'/'Sail'/'Explorer')
+  - Added `departments[]` array on users (multi-select, per clarification session)
+  - Added `role_label text` on attachments (stores display label for "Other" entries)
+  - Added `endorsement_requests` table (in Sprint 1 list but missing from schema doc)
+  - Added `handle` field on users with format constraint
+  - Added `subscription_status`/`subscription_plan`/`subscription_ends_at` on users (ready for Sprint 7)
+  - Added `other_role_entries` and `other_cert_entries` tables for "Other" tracking
+
+### Next
+- Push migrations: `~/bin/supabase login && ~/bin/supabase link --project-ref zsxmlcksbxlvbptnxiok && ~/bin/supabase db push`
+- Merge this PR to main
+- Start Sprint 2: auth flows + onboarding (name → handle → role → yacht → endorsement requests → done)
+- Reset password flow (`/reset-password`) — not built yet, linked from login page
+
+### Flags
+- `yl_schema.md` is now out of date (v1.1) — should be updated to reflect the actual migrations. Low priority — migrations are the source of truth.
+- `~/bin/supabase` is not on PATH — either add `~/bin` to PATH or use full path
+
+---
+
 ## 2026-03-13 — Claude Code (Opus 4.6)
 
 ### Done

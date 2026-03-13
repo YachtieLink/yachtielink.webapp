@@ -1,0 +1,12 @@
+export default function InsightsPage() {
+  return (
+    <div className="p-4">
+      <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">
+        Insights
+      </h1>
+      <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+        Sprint 7 — coming soon.
+      </p>
+    </div>
+  );
+}

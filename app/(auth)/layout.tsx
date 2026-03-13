@@ -1,15 +1,24 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export default async function RootPage() {
+export default async function AuthLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // Already signed in — go to app
   if (user) {
     redirect("/app/profile");
-  } else {
-    redirect("/welcome");
   }
+
+  return (
+    <div className="flex min-h-screen flex-col bg-[var(--color-surface)]">
+      {children}
+    </div>
+  );
 }
