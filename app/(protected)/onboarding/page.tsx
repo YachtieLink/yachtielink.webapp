@@ -6,7 +6,7 @@ import { Wizard } from "@/components/onboarding/Wizard";
 export const dynamic = "force-dynamic";
 
 export default async function OnboardingPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
