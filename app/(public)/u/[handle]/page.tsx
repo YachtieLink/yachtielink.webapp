@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function PublicProfilePage({ params }: Props) {
   const { handle } = await params;
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: user } = await supabase
     .from("users")
