@@ -17,6 +17,49 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-13 — Claude Code (Opus 4.6)
+
+### Done
+- Comprehensive feature clarification session with founder — 33 questions answered covering auth, onboarding, profile, yachts, endorsements, CV/PDF, payments, notifications, and UX
+- Rewrote `docs/yl_features.md` (v1.1 → v2.0) — all Phase 1A features now have detailed implementation specs including:
+  - Email verification required for email/password accounts
+  - Department multi-select (7 departments including Medical, Admin/Purser, Land-based)
+  - Full seeded role list by department with "Other" tracking mechanism
+  - Full seeded certification type list with hierarchical tree UI for selection
+  - Certifications: document upload for all users, document manager + expiry alerts for Pro
+  - Yacht type limited to Motor Yacht / Sailing Yacht, length in exact metres, flag state dropdown, year built optional
+  - Endorsement request expiry: 30 days
+  - Endorsement signals moved to Phase 1B
+  - Contacts import deferred to native app
+  - Pro pricing: EUR 12/month or EUR 9/month annual (no free trial — free tier is the trial)
+  - Custom subdomain is alias (both URLs active)
+  - Profile analytics as time-series (7d/30d/all time)
+  - PDF includes top 3 endorsements + QR code
+  - Dark mode from launch
+  - Notification strategy: email only for webapp, in-app deferred to native
+- Added Reference Data section to `yl_features.md` — departments, roles, cert types, yacht types, flag states
+- Rewrote `docs/yl_build_plan.md` (v1.0 → v2.0) — all sprints updated to reflect clarified features
+- Rewrote `docs/yl_mobile_first_ux_spec_for_pm_v1.md` (v1.0 → v2.0) — stripped deferred features (Timeline, Contacts, IRL), updated all screens with new details, added deferred section at bottom
+- Cleaned up parent folder: moved redundant `Project Files/`, `Config/`, `files/`, `files.zip` into `Archived/pre_webapp_cleanup_2026-03-13/`
+- Archived `yachtielink.webapp 2` (confirmed identical older snapshot of webapp)
+
+### Context
+- All three core docs (features, build plan, UX spec) are now at v2.0 and aligned with each other
+- Feature registry is now the definitive "what and why" — build plan is "how and when" — UX spec is "exact screens and flows"
+- Founder will provide PDF template reference sample during Sprint 6
+
+### Next
+- Start Sprint 1: database migrations (with full reference data seeding), RLS policies, auth setup (with email verification), app shell, dark mode, base components
+- Apple Developer Account setup still needed for Apple OAuth
+- Sonnet is sufficient for Sprint 1 (mechanical work). Reserve Opus for Sprint 5 (endorsement deep links), Sprint 6 (CV parsing prompts), Sprint 7 (Stripe webhooks)
+
+### Flags
+- Cert type seed list is large but non-exhaustive — "Other" tracking mechanism needed from day 1 to capture edge cases
+- Role seed list same — track "Other" entries for periodic promotion into seed list
+- Contacts import documented for future native app implementation
+
+---
+
 ## 2026-03-10 — Claude Code (Codex GUI session)
 
 ### Done

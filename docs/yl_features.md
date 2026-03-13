@@ -1,7 +1,7 @@
 # YachtieLink Feature Registry
 
-**Version:** 1.1
-**Date:** 2026-03-09
+**Version:** 2.0
+**Date:** 2026-03-13
 **Status:** Active — working document, refined iteratively with founder
 
 ## About this doc
@@ -24,23 +24,112 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 
 ---
 
+### Auth & Signup
+
+**What:** Account creation via Apple OAuth, Google OAuth, or email/password. Email accounts require email verification before the account becomes active.
+**Why:** Standard auth with verification to prevent mistyped emails locking users out of password recovery and endorsement notifications.
+**Sprint:** 1–2
+**Status:** specced
+**Details:**
+- Auth methods: Apple OAuth, Google OAuth, email/password
+- Email/password accounts: verification email sent immediately, account not active until confirmed
+- Password recovery: email-based reset flow
+- Session handling: HTTP-only cookies, 30-day duration
+
+---
+
+### Onboarding
+
+**What:** A guided flow after signup that collects the minimum information needed to create a useful profile: name, handle, department(s), role, first yacht, and optional endorsement requests.
+**Why:** Gets the user to a live public profile with one yacht attached as fast as possible. Every step feeds the graph.
+**Sprint:** 2
+**Status:** specced
+**Details:**
+
+**O1 — Name**
+- Full name (required)
+- Preferred display name (optional)
+
+**O2 — Handle claim**
+- Format: `yachtie.link/u/:handle`
+- Rules: `a-z 0-9 -`, 3–30 chars, no leading/trailing hyphen, reserved words blocked
+- When taken: show 3 suggestions — append birth year, first initial + last name, or logical variations of the requested handle
+- On claim: "Your page is live" + Continue / View public page
+
+**O3 — Department & Role**
+- Department: multi-select (user can pick more than one). Options: Deck, Interior, Engineering, Galley, Medical, Admin/Purser, Land-based
+- Role: typeahead from seeded list (see Reference Data below). If no match, free-text "Other" input — entered values are tracked for future addition to the seed list
+- Primary role selected if multiple departments chosen
+
+**O4 — First yacht**
+- Yacht name typeahead + "Create new"
+- If creating new: yacht type (Motor Yacht / Sailing Yacht), length in metres (optional), flag state dropdown (optional), year built (optional — can be skipped if unknown)
+- Role on yacht (defaults from O3)
+- Dates: start (required), end or "Currently"
+
+**O5 — Request endorsements**
+- Manual add: phone/email input, chips UI
+- Contacts import: deferred to native app (Phase 2+). Document for future: native contacts permission → multi-select list → send requests
+- Skip option always available
+
+**O6 — Done**
+- "Your page is live"
+- Progress wheels: Profile setup X/5, Endorsements 0/5
+- CTAs: Go to Profile / View public page
+
+**Rules:**
+- No upsell anywhere during onboarding
+- Entire flow should be completable in under 3 minutes
+
+---
+
 ### Profile
 
-**What:** A crew member's professional identity page — photo, display name, handle, department, role, bio, and a link they own.
+**What:** A crew member's professional identity page — photo, display name, handle, department(s), role, bio, contact info, location, and a link they own.
 **Why:** The portable identity layer every other feature builds on. A crew member should be able to hand someone a URL and have it represent them professionally, permanently, and for free.
 **Sprint:** 3
 **Status:** specced
 **Crew-first note:** Core identity stays free. Paying improves presentation of the profile, not access to it.
+**Details:**
 
----
+**Identity card (top of profile)**
+- Profile photo + edit button
+- Display name
+- Role + department(s)
+- Profile link (`yachtie.link/u/:handle`) + copy icon
+- QR code download button
 
-### CV Import
+**Profile photo**
+- Upload to Supabase Storage
+- Validation: image type whitelist (JPEG, PNG, WebP), 5MB max
+- Client-side crop/resize before upload
+- Crop ratio and display style: designer's choice during build
 
-**What:** Upload an existing CV (PDF or DOCX) to auto-populate profile fields via LLM extraction, with a review step before saving.
-**Why:** Crew already have CVs. Making them re-type employment history creates unnecessary friction that delays graph formation. The goal is time-to-first-endorsement under 30 days (D-021).
-**Sprint:** 6
-**Status:** specced
-**Key notes:** Extracted data is still self-reported — this is not verification. Cost target <€0.05/parse. Fallback to manual entry on parse failure. Rate-limited to 3 parses/user/day. Part of the free identity layer.
+**About section**
+- Free-text bio, 500 char max
+- Full-screen editor on edit
+
+**Contact info (in profile settings)**
+- Input fields: phone, WhatsApp, email, location
+- Location: country dropdown, then free-text city input
+- Visibility toggles per field: each can be shown/hidden on public profile independently
+- Defaults: all hidden — user explicitly chooses what to display
+
+**Progress Wheel A — Profile setup (5 milestones)**
+1. Role set
+2. At least 1 yacht attachment
+3. Bio set
+4. At least 1 certification record
+5. Profile photo set
+- "Complete next step" CTA links to first missing milestone
+
+**Sections (in order):**
+1. About
+2. Yachts (reverse chronological)
+3. Certifications
+4. Endorsements received
+
+**Dark mode:** Supported from launch. Light/dark toggle in settings, respects system preference by default.
 
 ---
 
@@ -56,11 +145,17 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 
 ### Yacht Entities
 
-**What:** Yachts as real database objects with a UUID, display name, type, size, and flag state — not free-text strings.
+**What:** Yachts as real database objects with a UUID, display name, type, length, flag state, and year built — not free-text strings. The yacht's "Wikipedia page" in the industry.
 **Why:** Making yachts entities (not just text fields) is what allows the graph to form. Two crew who both attach "Lady M" are connected because they referenced the same object.
 **Sprint:** 4
 **Status:** specced
-**Key notes:** Duplicate names tolerated. Renamed yachts are separate entities — merging deferred to Phase 2 (D-006). Ratings, reviews, or interactions on yacht entities aren't planned — yachts are graph infrastructure, not review targets.
+**Details:**
+- **Yacht type:** Motor Yacht or Sailing Yacht (two options only)
+- **Length:** Exact length in metres (numeric input). First creator should aim for accuracy since this becomes the reference record
+- **Flag state:** Country dropdown
+- **Year built:** Optional, can be skipped if unknown
+- Duplicate names tolerated. Renamed yachts are separate entities — merging deferred to Phase 2 (D-006)
+- Ratings, reviews, or interactions on yacht entities aren't planned — yachts are graph infrastructure, not review targets
 
 ---
 
@@ -76,7 +171,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 
 ### Colleague Graph
 
-**What:** An automatically derived view of who you've worked with — computed from users who share ≥1 yacht attachment, not stored as explicit relationships.
+**What:** An automatically derived view of who you've worked with — computed from users who share at least 1 yacht attachment, not stored as explicit relationships.
 **Why:** This is the wedge. The colleague graph compounds as more crew claim their history. It makes the platform useful the moment you add a second yacht.
 **Sprint:** 4
 **Status:** specced
@@ -84,13 +179,49 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 
 ---
 
+### Certifications
+
+**What:** A record of a crew member's professional certifications — type, issued date, expiry date, and optional document upload. Free tier allows document upload; Pro tier unlocks a document manager for organising and tracking cert documents.
+**Why:** Certifications are a core part of a yachtie's professional identity. Tracking expiry dates is genuinely useful — crew need to know when certs are expiring.
+**Sprint:** 3
+**Status:** specced
+**Details:**
+
+**Cert type selection**
+- Seeded list of all known certification types (see Reference Data below)
+- Hierarchical/tree UI that narrows by category first (e.g., Safety → STCW Basic, STCW Advanced; Medical → ENG1, PADI; Navigation → Yachtmaster Coastal, Yachtmaster Offshore, etc.) so users aren't scrolling hundreds of certs
+- "Other" free-text option — entered values tracked for future addition to seed list
+
+**Per certification record:**
+- Certification type (required)
+- Issued date (optional)
+- Expiry date (optional)
+- Document upload (optional) — PDF, JPEG, PNG. Stored in Supabase Storage
+
+**Document management:**
+- Free tier: upload cert documents, view them, basic list
+- Pro tier: document manager — organised view, expiry tracking dashboard, expiry reminders/alerts
+- Note: we are not verifying documents. Upload is for the user's convenience and future features
+
+**Expiry tracking:**
+- Display expiry status on cert list (valid / expiring soon / expired)
+- Pro users: email alerts before cert expiry (timing TBD — 30 days? 60 days?)
+
+---
+
 ### Endorsement Requests
 
-**What:** A tool for crew to request endorsements from colleagues identified via shared yacht history, sent via deep link (email or phone).
+**What:** A tool for crew to request endorsements from colleagues identified via shared yacht history, sent via deep link (email, and optionally WhatsApp if the user chooses to share as a message).
 **Why:** Increases the response rate on the endorsement loop. The tooling improves response rate — it doesn't change who is eligible to endorse (D-009).
 **Sprint:** 5
 **Status:** specced
-**Key notes:** Rate-limited (10/day free, 20/day Pro). Suggestions drawn from colleague graph. Manual add (phone/email) also allowed. Requests expire.
+**Details:**
+- Rate-limited: 10/day free, 20/day Pro
+- Suggestions drawn from colleague graph (shared-yacht list)
+- Manual add: phone/email input
+- Delivery: email via Resend. User can also copy the deep link to send via WhatsApp or other messaging
+- Request expiry: 30 days
+- Deep link format: `/r/:token`
 
 ---
 
@@ -100,33 +231,62 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **Why:** Endorsements are the trust signal — attestation from real coworkers with verifiable shared history. They're what makes the profile more than a self-authored CV.
 **Sprint:** 5
 **Status:** specced
-**Key notes:**
+**Details:**
 - Shared yacht attachment required to endorse (D-009) — this keeps endorsements grounded in real experience
 - One endorsement per (endorser, recipient, yacht)
-- Star ratings and numeric scores aren't planned — they create false precision and gaming incentives (D-002)
+- Text field: 10–2000 characters
+- Optional structured fields: your role, their role, dates worked together (prefill from attachment data)
 - Editing allowed. Deletion allowed — retractions tracked in backend only, not shown in UI (D-005)
+- Star ratings and numeric scores aren't planned — they create false precision and gaming incentives (D-002)
 - Absence of endorsements is neutral — the platform shouldn't label it as a negative (D-011)
 - Auto-summary language ("well endorsed", "lightly endorsed") isn't planned — it collapses nuance into judgment (D-013)
 
+**Notifications when someone endorses you:**
+- Email notification (webapp phase)
+- In-app notification (when native app ships)
+
 ---
 
-### Endorsement Signals
+### Endorsement Signals (agree/disagree)
 
 **What:** A lightweight agree/disagree signal on an endorsement, available to users with overlapping attachment to the same yacht.
 **Why:** Allows the community to express opinion on an endorsement without triggering moderation. Signals are social proof — they feed trust weighting in Phase 2+ but don't act on endorsements directly.
-**Sprint:** TBD (display in Phase 1, trust weight in Phase 2+)
-**Status:** specced (D-019)
+**Sprint:** Phase 1B
+**Status:** deferred from 1A (D-019)
 **Key notes:** Only users with shared yacht attachment can signal. Signals alone don't remove an endorsement — they inform future trust calculations.
 
 ---
 
 ### Public Profile Page
 
-**What:** A server-rendered public page at `/u/:handle` showing a crew member's identity, employment history, certifications, and endorsements — shareable and SEO-indexed.
+**What:** A server-rendered public page at `/u/:handle` (and `handle.yachtie.link` for Pro users) showing a crew member's identity, employment history, certifications, and endorsements — shareable and SEO-indexed.
 **Why:** The portable profile is useless if it can't be shared. This is the linktr.ee use case — crew hand someone this URL on a dock, in a port, or via a QR code.
 **Sprint:** 6
 **Status:** specced
-**Key notes:** No discovery rails or browse-similar on this page — it's a direct profile, not a feed. Open Graph tags for link sharing. QR code generation included. Direct link shows full profile (D-025).
+**Details:**
+- Sections: Name + role, about, employment history, certifications, endorsements received
+- Endorsement display: endorser name, yacht, date, truncated excerpt — collapsible to expand and read full text
+- No discovery rails or browse-similar on this page — it's a direct profile, not a feed
+- Open Graph meta tags for link sharing (name, role, photo)
+- QR code: bottom-left corner of page. Encodes `/u/:handle` URL (or custom subdomain if Pro)
+- Direct link shows full profile including contact details the user has made visible (D-025)
+
+---
+
+### CV Import
+
+**What:** Upload an existing CV (PDF or DOCX) to auto-populate profile fields via LLM extraction, with a review step before saving.
+**Why:** Crew already have CVs. Making them re-type employment history creates unnecessary friction that delays graph formation. The goal is time-to-first-endorsement under 30 days (D-021).
+**Sprint:** 6
+**Status:** specced
+**Details:**
+- Extraction via Claude Sonnet API
+- Review screen: pre-filled form the user can edit field by field before saving
+- Extracted data is still self-reported — this is not verification
+- Cost target: less than EUR 0.05 per parse
+- Fallback: if parsing fails, skip silently to manual entry
+- Rate-limited: 3 parses/user/day
+- Part of the free identity layer
 
 ---
 
@@ -136,30 +296,242 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **Why:** Crew need a physical/email-ready CV for situations where a URL isn't enough. PDF export is core portable identity and should stay free (D-014).
 **Sprint:** 6
 **Status:** specced
+**Details:**
+- **Sections on PDF:** Name, photo, role, about, employment history, certifications, top 3 endorsements (excerpt + endorser name + yacht), link to full endorsements on public profile
+- **Free template:** Clean, minimal design. Founder to provide reference sample during Sprint 6 build
+- **Pro templates:** 2 additional (Classic Navy, Modern Minimal) — locked for free users
+- **Watermark:** "Created with YachtieLink" on free tier. Removed for Pro
+- **QR code:** Included on generated PDF (bottom-left corner), links to public profile
+- Generate + download flow. Store generated PDF URL for re-download
+
 **Crew-first note:** The ability to export your profile as a PDF stays free. Paid scope covers premium templates and watermark removal only — not the export itself.
 
 ---
 
 ### Crew Pro — Paid Presentation Upgrades
 
-**What:** A €12/month subscription that unlocks presentation polish and workflow convenience — premium PDF templates, watermark removal, custom subdomain, profile analytics, and higher endorsement request allowance.
+**What:** A subscription that unlocks presentation polish and workflow convenience — premium PDF templates, watermark removal, custom subdomain, profile analytics, certification document manager, and higher endorsement request allowance.
 **Why:** Funds operations without affecting trust. Paid features improve how a profile looks and how efficiently it can be worked — not how trustworthy it appears.
 **Sprint:** 7
 **Status:** specced
+**Details:**
+
+**Pricing:**
+- Monthly: EUR 12/month
+- Annual: EUR 9/month billed annually (EUR 108/year — save 25%)
+- No free trial — the free tier is the trial
+
 **Includes:**
 - Premium PDF templates (2 additional: Classic Navy, Modern Minimal)
-- Watermark removal
-- Custom subdomain (`username.yachtie.link`)
-- Profile analytics (view count, PDF downloads, link shares)
+- Watermark removal on PDF exports
+- Custom subdomain (`handle.yachtie.link`) — works as an alias alongside the standard `/u/:handle` URL. Both URLs remain active
+- Profile analytics: view count, PDF downloads, link shares — displayed as time-series (last 7 days, 30 days, all time)
+- Certification document manager: organised document view, expiry tracking dashboard, expiry reminder alerts
 - Higher endorsement request allowance (20/day vs 10/day free)
 
+**Stripe integration:**
+- Stripe Customer creation on signup (or lazy on first billing interaction)
+- Stripe Checkout for subscription creation
+- Stripe Customer Portal for management (cancel, update payment, invoice history)
+- Webhook handler: subscription created, updated, deleted, payment failed
+
 **Crew-first note:** If a Pro feature starts to look like it affects trust weight, endorsement visibility, or graph behaviour — flag it before building. Verified status, moderation power, and endorsement eligibility sit outside paid scope.
+
+---
+
+### QR Code
+
+**What:** A downloadable QR code encoding the user's public profile URL, displayed on their profile page and embedded in generated PDFs.
+**Why:** Crew share profiles in person — on docks, in marinas, at crew agencies. A QR code is the fastest way to hand someone your profile.
+**Sprint:** 6
+**Status:** specced
+**Details:**
+- QR encodes `/u/:handle` (or `handle.yachtie.link` for Pro users)
+- Appears: bottom-left corner of public profile page, bottom-left corner of generated PDFs, downloadable from profile tab
+- Download as image (PNG)
+
+---
+
+### Notifications & Email
+
+**What:** Transactional email for key events, with a light touch — no spam, no marketing fluff.
+**Why:** Users need to know about endorsement requests, account events, and (for free tier) nudges when profile views spike.
+**Sprint:** 2 (auth emails), 5 (endorsement emails), 7 (analytics nudges), 8 (full set)
+**Status:** specced
+**Details:**
+
+**Email (via Resend):**
+- Welcome email on signup
+- Email verification (email/password accounts)
+- Password recovery
+- Endorsement request received (with deep link)
+- Endorsement written for you
+- Cert expiry reminders (Pro)
+- Free tier nudge: "Your profile views are above average this week" — prompt to upgrade to see full analytics (send sparingly, not weekly)
+
+**In-app notifications:**
+- Deferred to native app (Phase 2+). Webapp relies on email for now
+
+**Rules:**
+- No marketing emails in Phase 1A
+- Unsubscribe option on all non-essential emails
+- Keep copy concise and useful — no filler
+
+---
+
+### Dark Mode
+
+**What:** Full dark mode support, toggled in settings or following system preference.
+**Why:** Industry standard. Crew use phones in all lighting conditions.
+**Sprint:** 1 (built into Tailwind config from the start)
+**Status:** specced
+**Details:**
+- System preference respected by default
+- Manual override toggle in More > Settings
+- All components, pages, and PDF preview must support both themes
+
+---
+
+### Launch Prep
+
+**What:** Security hardening, instrumentation, legal pages, GDPR compliance, and QA.
+**Why:** Production readiness.
+**Sprint:** 8
+**Status:** specced
+**Details:**
+
+**Instrumentation:** PostHog + Sentry
+**Security:** Zod validation on all API routes, rate limiting via Vercel KV, CORS, security headers, CSRF protection
+**Growth controls:** Invite-only toggle (single config flag)
+**GDPR:** Data export (JSON), account deletion cascade, cookie consent (essential only)
+**Legal pages:** Terms of Service and Privacy Policy — founder-written placeholders, to be professionally redone when revenue allows
+**Language:** English only for 1A
+**Offline/PWA:** Not in scope — purely online web app
+
+---
+
+## Reference Data
+
+### Departments
+Multi-select. A user can belong to more than one.
+- Deck
+- Interior
+- Engineering
+- Galley
+- Medical
+- Admin/Purser
+- Land-based
+
+### Roles (seed list — non-exhaustive)
+Organised by department. Users pick from this list via typeahead. "Other" free-text option available — entered values are tracked for future addition.
+
+**Deck:** Captain, First Officer, Second Officer, Third Officer, Bosun, Lead Deckhand, Deckhand, Junior Deckhand, Navigator, Sailing Master
+**Interior:** Chief Stewardess, Second Stewardess, Third Stewardess, Stewardess, Junior Stewardess, Purser, Housekeeper, Laundress, Butler
+**Engineering:** Chief Engineer, Second Engineer, Third Engineer, ETO (Electro-Technical Officer), AV/IT Officer, Engineer
+**Galley:** Head Chef, Sous Chef, Chef, Cook, Crew Cook, Pastry Chef
+**Medical:** Ship's Doctor, Nurse, Medic, Paramedic
+**Admin/Purser:** Purser, Administrator, PA to Captain, Yacht Manager, Fleet Manager
+**Land-based:** Yacht Broker, Yacht Surveyor, Naval Architect, Marine Consultant, Crew Agent, Shore-based Manager, Dock Master, Marina Manager, Chandler, Sail Maker, Rigger
+**Other:** Nanny, Fitness Instructor, Spa Therapist, Dive Instructor, Water Sports Instructor, Security Officer, Videographer/Photographer
+
+*This list will grow as users enter custom roles via the "Other" input. Review analytics on "Other" entries periodically and promote common ones into the seed list.*
+
+### Certification Types (seed list — non-exhaustive)
+Organised in a hierarchical tree UI so users can narrow by category before selecting.
+
+**Safety & Sea Survival:**
+- STCW Basic Safety Training (BST)
+- STCW Advanced Fire Fighting
+- STCW Proficiency in Survival Craft (PSCRB)
+- STCW Medical First Aid
+- STCW Medical Care
+- STCW Security Awareness
+- STCW Crowd Management
+- Personal Survival Techniques (PST)
+- Sea Survival
+
+**Medical:**
+- ENG1 (UK Seafarer Medical)
+- ML5 (UK Medical Fitness)
+- PADI Rescue Diver
+- PADI Divemaster
+- First Aid at Work
+- Remote Emergency Medical Technician (REMT)
+- Automated External Defibrillator (AED)
+
+**Navigation & Watchkeeping:**
+- Yachtmaster Coastal
+- Yachtmaster Offshore
+- Yachtmaster Ocean
+- Officer of the Watch (OOW) 3000 GT
+- Chief Mate 3000 GT
+- Master 3000 GT
+- Master 500 GT
+- COLREGS
+- Radar/ARPA
+- GMDSS/GOC (General Operator Certificate)
+- GMDSS/ROC (Restricted Operator Certificate)
+- ECDIS
+
+**Engineering:**
+- AEC (Approved Engine Course)
+- Y4 Engineer
+- Y3 Engineer
+- Y2 Engineer
+- Y1 Engineer
+- Marine Engine Operator Licence (MEOL)
+
+**Hospitality & Service:**
+- WSET (Wine & Spirit Education Trust) Level 1/2/3
+- Food Safety / Food Hygiene Level 2/3
+- Barista Certification
+- Silver Service
+
+**Water Sports & Leisure:**
+- RYA Powerboat Level 2
+- RYA Jet Ski / PWC
+- RYA VHF/SRC
+- PADI Open Water
+- PADI Advanced Open Water
+- PADI Divemaster
+- PADI Instructor (IDC)
+- SSI equivalents
+- RYA Dinghy Instructor
+- Kitesurf Instructor (IKO)
+- Windsurf Instructor
+- Wakeboard / Waterski Instructor
+- Paddle Board Instructor
+
+**Regulatory & Flag State:**
+- ISPS Ship Security Officer (SSO)
+- Designated Person Ashore (DPA)
+- ISM Auditor
+- Flag State Registration Certificate
+- MCA Oral Exam
+
+**Other:**
+- Custom entry with free-text (tracked for future addition to seed list)
+
+*Same growth model as roles: track "Other" entries, promote common ones.*
+
+### Yacht Types
+- Motor Yacht
+- Sailing Yacht
+
+### Flag States
+Country dropdown — standard ISO country list.
 
 ---
 
 ## Phase 1B — Discovery + Convenience
 
 Gate: Phase 1A graph loop is healthy (endorsement-to-profile ratio >0.3 at 500 profiles, organic share rate >10%).
+
+---
+
+### Endorsement Signals (agree/disagree)
+
+Moved from 1A. See entry above in Phase 1A section (marked as deferred to 1B).
 
 ---
 
@@ -179,7 +551,7 @@ Gate: Phase 1A graph loop is healthy (endorsement-to-profile ratio >0.3 at 500 p
 **Why:** Search is recruiter behaviour — if you're searching to find candidates, you're recruiting, so pay for it (D-023). Makes Pro valuable for captains and HODs who hire, while the free tier stays useful for junior crew.
 **Sprint:** 9
 **Status:** specced
-**Key notes:** Search results show profile summaries — name and contact require Pro access or recruiter credits. Graph browsing (yacht → crew) stays open but isn't filterable, so it doesn't support harvesting at scale (D-025).
+**Key notes:** Search results show profile summaries — name and contact require Pro access or recruiter credits. Graph browsing (yacht to crew) stays open but isn't filterable, so it doesn't support harvesting at scale (D-025).
 
 ---
 
@@ -221,7 +593,7 @@ Gate: 10,000+ crew, 3,000+ yachts, recruiter demand signal confirmed.
 
 ### Recruiter Access
 
-**What:** External recruiters pay €29/month + credits to search and unlock crew profiles. Credits (€75–1200 bundles) reveal name and contact from search results. Crew must opt in.
+**What:** External recruiters pay EUR 29/month + credits to search and unlock crew profiles. Credits (EUR 75–1200 bundles) reveal name and contact from search results. Crew must opt in.
 **Why:** Monetises the demand side without touching crew-side trust. Recruiters get read-only access — they can't affect the graph (D-024).
 **Sprints:** 13–14
 **Status:** specced
@@ -242,6 +614,24 @@ Gate: 10,000+ crew, 3,000+ yachts, recruiter demand signal confirmed.
 ## Phase 2+ — Deferred
 
 These are real features with real value. They're deferred until the crew-side product and graph have integrity. Nothing here is permanently off the table — they're sequencing decisions (D-035, D-036).
+
+Build with future upgrades in mind — architecture should not make these harder to add later.
+
+---
+
+### Contacts Import (Native)
+
+**What:** Import contacts from phone's native contact list to send endorsement requests. Multi-select UI.
+**Why:** Reduces friction on endorsement request flow. Deferred because it requires native device API access.
+**Status:** deferred — awaiting native app (iOS/Android)
+
+---
+
+### In-App Notifications
+
+**What:** Real-time notification system with bell icon, notification list, and push notifications.
+**Why:** Essential for engagement but requires native app for push. Webapp relies on email.
+**Status:** deferred — awaiting native app
 
 ---
 
