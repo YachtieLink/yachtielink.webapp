@@ -200,7 +200,7 @@ create table public.endorsement_requests (
   recipient_email   text,
 
   -- Deep link token
-  token      text unique not null default encode(gen_random_bytes(32), 'hex'),
+  token      text unique not null default encode(extensions.gen_random_bytes(32), 'hex'),
 
   -- Lifecycle
   status     text not null default 'pending',  -- 'pending', 'accepted', 'expired', 'cancelled'
