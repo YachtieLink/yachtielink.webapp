@@ -228,3 +228,9 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - The relationship taxonomy changed: "connection" is now split into colleague (graph edge), IRL connection (graph edge), and contact (messaging only). Use current terminology.
 - Constitutional principles are non-negotiable. Read `docs/yl_principles.md` before touching anything trust-related.
 - `.env.local` exists with Supabase credentials — never commit this file.
+
+## Backlog notes (post Sprint 2 review)
+
+### Onboarding — Role step UX
+- **Cross-department roles**: When a user selects multiple departments (e.g. Deck + Interior), the role list should only show roles that *span* those departments (e.g. "Deck/Stew"). Currently shows all roles from all selected departments. Requires schema change — `roles.department` is a single text field; cross-department roles need either `departments text[]` or a separate join model.
+- **Role list too long**: Many secondary/specialist roles (Dive Instructor, Kitesurf Instructor, etc.) should be hidden behind an "Advanced / Show more" toggle or moved to a later profile-edit screen. The onboarding list should be trimmed to ~10–15 most common roles per department.
