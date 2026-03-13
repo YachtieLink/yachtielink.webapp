@@ -347,6 +347,34 @@ function StepHandle({
 
 // ─── Step 3: Role ─────────────────────────────────────────────────────────────
 
+function RoleRow({
+  role,
+  selected,
+  onSelect,
+}: {
+  role: Role;
+  selected: boolean;
+  onSelect: (name: string) => void;
+}) {
+  return (
+    <button
+      onClick={() => onSelect(role.name)}
+      className={`flex w-full items-center gap-3 border-b border-[var(--color-border)] px-4 py-3 text-left text-sm last:border-b-0 transition-colors ${
+        selected
+          ? "bg-[var(--color-navy-800)] text-white"
+          : "text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]"
+      }`}
+    >
+      <span className={role.is_senior ? "font-semibold" : ""}>{role.name}</span>
+      {role.is_senior && (
+        <span className={`ml-auto text-xs ${selected ? "text-white/60" : "text-[var(--color-text-tertiary)]"}`}>
+          Senior
+        </span>
+      )}
+    </button>
+  );
+}
+
 function StepRole({
   userId,
   initialDepartments,
@@ -360,11 +388,9 @@ function StepRole({
 }) {
   const [allDepartments, setAllDepartments] = useState<Department[]>([]);
   const [allRoles, setAllRoles] = useState<Role[]>([]);
-  const [selectedDepts, setSelectedDepts] = useState<string[]>(
-    initialDepartments
-  );
+  const [selectedDept, setSelectedDept] = useState<string>(initialDepartments[0] ?? "");
   const [selectedRole, setSelectedRole] = useState(initialPrimaryRole);
-  const [otherRole, setOtherRole] = useState("");
+  const [roleSearch, setRoleSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
@@ -381,41 +407,46 @@ function StepRole({
     load();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const filteredRoles =
-    selectedDepts.length > 0
-      ? allRoles.filter(
-          (r) =>
-            selectedDepts.includes(r.department) || r.department === "Other"
-        )
-      : allRoles;
+  const searchTerm = roleSearch.toLowerCase().trim();
+  // Default list: roles in selected dept only (sort_order = popular first).
+  // When searching: cast net across all roles so specialists surface too.
+  const displayRoles = searchTerm
+    ? allRoles.filter((r) => r.name.toLowerCase().includes(searchTerm))
+    : allRoles.filter((r) => r.department === selectedDept);
+  const noResults = searchTerm.length > 0 && displayRoles.length === 0;
 
-  function toggleDept(name: string) {
-    setSelectedDepts((prev) =>
-      prev.includes(name) ? prev.filter((d) => d !== name) : [...prev, name]
-    );
+  function selectDept(name: string) {
+    setSelectedDept(name);
     setSelectedRole("");
-    setOtherRole("");
+    setRoleSearch("");
   }
 
-  const primaryRoleFinal =
-    selectedRole === "__other__" ? otherRole.trim() : selectedRole;
+  function handleSelectRole(name: string) {
+    setSelectedRole(name);
+    setRoleSearch(""); // clear search so selected role is visible in full list
+  }
 
-  const canContinue =
-    selectedDepts.length > 0 && primaryRoleFinal.length > 0;
+  function handleUseCustom() {
+    setSelectedRole(roleSearch.trim());
+    // Keep roleSearch so the "Use X" row stays visible + highlighted
+  }
+
+  const canContinue = selectedDept.length > 0 && selectedRole.length > 0;
 
   async function handleNext() {
-    if (selectedRole === "__other__" && otherRole.trim()) {
+    const isCustom = !allRoles.some((r) => r.name === selectedRole);
+    if (isCustom) {
       try {
         await supabase.from("other_role_entries").insert({
-          value: otherRole.trim(),
-          department: selectedDepts[0] ?? "Other",
+          value: selectedRole,
+          department: selectedDept || "Other",
           submitted_by: userId,
         });
       } catch {
         // Non-critical — onboarding continues regardless
       }
     }
-    onNext({ departments: selectedDepts, primary_role: primaryRoleFinal });
+    onNext({ departments: [selectedDept], primary_role: selectedRole });
   }
 
   if (loading) {
@@ -431,21 +462,21 @@ function StepRole({
   return (
     <StepShell
       title="What's your role?"
-      subtitle="Select your department(s) and primary role on board."
+      subtitle="Select your department and primary role on board."
     >
       <div className="flex flex-col gap-5">
-        {/* Department chips */}
+        {/* Department chips — single select */}
         <div>
           <p className="mb-2.5 text-sm font-medium text-[var(--color-text-primary)]">
-            Department(s)
+            Department
           </p>
           <div className="flex flex-wrap gap-2">
             {allDepartments.map((d) => (
               <button
                 key={d.name}
-                onClick={() => toggleDept(d.name)}
+                onClick={() => selectDept(d.name)}
                 className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                  selectedDepts.includes(d.name)
+                  selectedDept === d.name
                     ? "border-[var(--color-navy-800)] bg-[var(--color-navy-800)] text-white"
                     : "border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]"
                 }`}
@@ -456,72 +487,46 @@ function StepRole({
           </div>
         </div>
 
-        {/* Role list — shown once at least one department is chosen */}
-        {selectedDepts.length > 0 && (
-          <div>
-            <p className="mb-2.5 text-sm font-medium text-[var(--color-text-primary)]">
+        {/* Role search + list — shown once a department is chosen */}
+        {selectedDept && (
+          <div className="flex flex-col gap-3">
+            <p className="text-sm font-medium text-[var(--color-text-primary)]">
               Primary role
             </p>
+
+            <Input
+              placeholder="Search for your role…"
+              value={roleSearch}
+              onChange={(e) => {
+                setRoleSearch(e.target.value);
+                setSelectedRole("");
+              }}
+            />
+
             <div className="overflow-hidden rounded-xl border border-[var(--color-border)]">
-              {filteredRoles.map((r) => (
+              {displayRoles.map((r) => (
+                <RoleRow key={r.id} role={r} selected={selectedRole === r.name} onSelect={handleSelectRole} />
+              ))}
+
+              {/* No matches — let them use whatever they typed */}
+              {noResults && (
                 <button
-                  key={r.id}
-                  onClick={() => setSelectedRole(r.name)}
-                  className={`flex w-full items-center gap-3 border-b border-[var(--color-border)] px-4 py-3 text-left text-sm last:border-b-0 transition-colors ${
-                    selectedRole === r.name
+                  onClick={handleUseCustom}
+                  className={`flex w-full items-center px-4 py-3 text-left text-sm transition-colors ${
+                    selectedRole === roleSearch.trim()
                       ? "bg-[var(--color-navy-800)] text-white"
                       : "text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]"
                   }`}
                 >
-                  <span className={r.is_senior ? "font-semibold" : ""}>
-                    {r.name}
-                  </span>
-                  {r.is_senior && (
-                    <span
-                      className={`ml-auto text-xs ${
-                        selectedRole === r.name
-                          ? "text-white/60"
-                          : "text-[var(--color-text-tertiary)]"
-                      }`}
-                    >
-                      Senior
-                    </span>
-                  )}
+                  Use &ldquo;{roleSearch.trim()}&rdquo; as my role
                 </button>
-              ))}
-              {/* Other option */}
-              <button
-                onClick={() => setSelectedRole("__other__")}
-                className={`flex w-full items-center px-4 py-3 text-left text-sm transition-colors ${
-                  selectedRole === "__other__"
-                    ? "bg-[var(--color-navy-800)] text-white"
-                    : "text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]"
-                }`}
-              >
-                Other…
-              </button>
+              )}
             </div>
-
-            {selectedRole === "__other__" && (
-              <div className="mt-3">
-                <Input
-                  placeholder="Enter your role"
-                  value={otherRole}
-                  onChange={(e) => setOtherRole(e.target.value)}
-                  autoFocus
-                />
-              </div>
-            )}
           </div>
         )}
       </div>
 
-      <Button
-        onClick={handleNext}
-        disabled={!canContinue}
-        className="w-full"
-        size="lg"
-      >
+      <Button onClick={handleNext} disabled={!canContinue} className="w-full" size="lg">
         Continue
       </Button>
     </StepShell>
@@ -848,10 +853,14 @@ function StepEndorsements({
     setSending(true);
     await Promise.allSettled(
       validEmails.map((email) =>
-        supabase.from("endorsement_requests").insert({
-          requester_id: userId,
-          yacht_id: yachtId,
-          recipient_email: email.trim(),
+        fetch("/api/endorsement-requests", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            yacht_id: yachtId,
+            recipient_email: email.trim(),
+            yacht_name: yachtName,
+          }),
         })
       )
     );
