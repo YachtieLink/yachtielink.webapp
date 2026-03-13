@@ -26,7 +26,7 @@
 | Component | Service | Tier | Cost (Phase 1) | Cost (10k paying) | Notes |
 |-----------|---------|------|----------------|-------------------|-------|
 | **Payments** | Stripe | Pay-per-transaction | 1.5% + â‚¬0.25 | ~â‚¬2,273/mo in fees | EU VAT handling included |
-| **Transactional Email** | Resend | Free â†’ Paid | Free | ~â‚¬20/mo | Account creation, notifications, password resets |
+| **Transactional Email** | Resend | Free â†’ Paid | Free | ~â‚¬20/mo | Two-pipeline: `login@mail.yachtie.link` (auth) + `notifications@mail.yachtie.link` (product). Sending domain `mail.yachtie.link` verified on Cloudflare. Supabase auth emails via Resend SMTP. See `docs/yl_email_setup.md`. Upgrade path: Postmark. |
 | **Founder Email** | Google Workspace | Business Starter | â‚¬5.75/mo | â‚¬5.75/mo + future hires | ari@yachtie.link mailbox |
 | **DNS** | Cloudflare | Free | Free | Free | DNS hosting + email routing |
 

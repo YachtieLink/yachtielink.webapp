@@ -17,6 +17,85 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-13 — Claude Code (Sonnet 4.6) — Sprint 2 close: endorsement request emails
+
+### Done
+- Created `app/api/endorsement-requests/route.ts` — POST endpoint that:
+  - Authenticates the caller via Supabase session cookie
+  - Inserts to `endorsement_requests` and reads back the auto-generated token
+  - Fetches the requester's display name from `users`
+  - Sends the notification email via `sendNotifyEmail` (non-fatal if email fails — token already saved)
+  - Handles duplicate requests gracefully (unique constraint → 200 `skipped: true`)
+- Updated `StepEndorsements` in `Wizard.tsx` to call the API route instead of direct DB inserts — recipients now actually receive an email
+- Added `NEXT_PUBLIC_APP_URL=https://yachtie.link` to `.env.local`
+- Sprint 2 deliverable now complete: new user can sign up, complete onboarding, have a profile with one yacht attached, and send endorsement requests that reach their colleagues
+
+### Context
+- Email is non-fatal by design — if Resend fails, the request token is already in DB and can be resurfaced later (Sprint 5 resend UI)
+- Deep link format: `https://yachtie.link/r/{token}` — `/r/[token]` route is a stub until Sprint 5
+- Welcome email is still unimplemented (lower priority, deferred to Sprint 3 or 8)
+
+### Next
+- Sprint 3: Profile (photo, about, certs, contact info, settings)
+
+### Flags
+- None
+
+---
+
+## 2026-03-13 — Claude Code (Sonnet 4.6) — Onboarding role step UX + email fix
+
+### Done
+- Migration `20260313000008_add_crossdept_roles.sql`: added `Deck/Stew` (Deck dept, sort_order 110) and `Stew/Deck` (Interior dept, sort_order 209) — applied to production
+- `StepRole` in `components/onboarding/Wizard.tsx` — full rewrite:
+  - Department selection is now **single-select** (was multi)
+  - Specialist roles (Nanny, Dive Instructor, etc.) moved behind a collapsible "Other" toggle — no longer mixed into the main list
+  - Multi-department grouped view removed (no longer needed)
+- Fixed `reply_to` → `replyTo` typo in `lib/email/notify.ts` (was causing a TypeScript error)
+
+### Context
+- Cross-department dual roles (Deck/Stew, Stew/Deck) are an explicit DB entry rather than a multi-select UI approach — cleaner and less common in practice now
+- Single-select department keeps onboarding fast; profile editing can expose more flexibility later if needed
+
+### Next
+- Wire first real notification email when endorsement feature ships (Sprint 5)
+
+### Flags
+- None
+
+---
+
+## 2026-03-13 — Claude Code (Sonnet 4.6) — Email infrastructure
+
+### Done
+- Installed `resend` npm package
+- Created `lib/email/` two-pipeline architecture:
+  - `client.ts` — shared Resend singleton, fails fast if `RESEND_API_KEY` not set
+  - `auth.ts` — auth pipeline, sender: `login@mail.yachtie.link` (magic links, password reset, verification, invitations)
+  - `notify.ts` — notification pipeline, sender: `notifications@mail.yachtie.link` (endorsements, profile views, alerts)
+  - `index.ts` — barrel export, only intended import point for app code
+- Added `RESEND_API_KEY` to `.env.local` (key active)
+- Created `docs/yl_email_setup.md` — full setup checklist covering DNS, Supabase SMTP config, Vercel env vars, code usage, and Postmark migration path
+- Updated `docs/yl_tech_stack.md` — Transactional Email row now reflects two-pipeline architecture and sending domain
+- DNS: `mail.yachtie.link` verified on Cloudflare with Resend SPF/DKIM records — domain ready to send
+
+### Context
+- Supabase auth emails (magic link, password reset, email confirmation) route through Resend SMTP — configured in Supabase dashboard, not in app code
+- `sendAuthEmail` in code is for auth emails sent directly from the app (e.g. invitations)
+- `RESEND_API_KEY` still needs to be added to Vercel env vars before production sends work
+- Supabase SMTP setting (dashboard: Auth → SMTP) still needs to be configured pointing at `smtp.resend.com` with the API key
+- Postmark is the documented upgrade path — only `lib/email/client.ts` would change
+
+### Next
+- Configure Supabase SMTP in dashboard (Auth → SMTP Settings → smtp.resend.com, port 465, user: resend, pass: API key, from: login@mail.yachtie.link)
+- Add `RESEND_API_KEY` to Vercel environment variables
+- Wire first real notification email when endorsement feature ships (Sprint 5)
+
+### Flags
+- None
+
+---
+
 ## 2026-03-13 — Claude Code (Sonnet 4.6) — Sprint 1
 
 ### Done
