@@ -35,7 +35,6 @@ insert into public.roles (name, department, is_senior, sort_order) values
   ('Third Stewardess',  'Interior', false, 202),
   ('Stewardess',        'Interior', false, 203),
   ('Junior Stewardess', 'Interior', false, 204),
-  ('Purser',            'Interior', false, 205),
   ('Housekeeper',       'Interior', false, 206),
   ('Laundress',         'Interior', false, 207),
   ('Butler',            'Interior', false, 208),
@@ -57,7 +56,7 @@ insert into public.roles (name, department, is_senior, sort_order) values
   ('Pastry Chef',  'Galley', false, 405),
 
   -- Medical
-  ('''s Doctor', 'Medical', true,  500),
+  ('Ship''s Doctor', 'Medical', true,  500),
   ('Nurse',        'Medical', false, 501),
   ('Medic',        'Medical', false, 502),
   ('Paramedic',    'Medical', false, 503),
