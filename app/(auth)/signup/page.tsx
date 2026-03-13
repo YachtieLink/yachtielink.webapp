@@ -1,0 +1,154 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+
+export default function SignupPage() {
+  const supabase = createClient();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    const { error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (signUpError) {
+      setError(signUpError.message);
+      setLoading(false);
+      return;
+    }
+
+    setDone(true);
+    setLoading(false);
+  }
+
+  if (done) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-12 bg-[var(--color-surface)]">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-navy-100)] dark:bg-[var(--color-navy-900)]">
+          <svg
+            className="h-8 w-8 text-[var(--color-navy-800)] dark:text-[var(--color-navy-200)]"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
+            />
+          </svg>
+        </div>
+        <div className="text-center">
+          <h1 className="text-xl font-bold text-[var(--color-text-primary)]">
+            Check your email
+          </h1>
+          <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+            We sent a confirmation link to{" "}
+            <strong className="text-[var(--color-text-primary)]">{email}</strong>
+            . Click it to activate your account.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-12 bg-[var(--color-surface)]">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
+          Create your account
+        </h1>
+        <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+          Build your portable yachting profile.
+        </p>
+      </div>
+
+      <form
+        onSubmit={handleSubmit}
+        className="flex w-full max-w-sm flex-col gap-4"
+      >
+        {error && (
+          <p
+            role="alert"
+            className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400"
+          >
+            {error}
+          </p>
+        )}
+
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="email"
+            className="text-sm font-medium text-[var(--color-text-primary)]"
+          >
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-interactive)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="password"
+            className="text-sm font-medium text-[var(--color-text-primary)]"
+          >
+            Password
+          </label>
+          <input
+            id="password"
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={8}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-interactive)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
+            placeholder="At least 8 characters"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex h-12 w-full items-center justify-center rounded-xl bg-[var(--color-navy-800)] text-sm font-semibold text-white transition-colors hover:bg-[var(--color-navy-900)] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {loading ? "Creating account…" : "Create account"}
+        </button>
+      </form>
+
+      <p className="text-sm text-[var(--color-text-secondary)]">
+        Already have an account?{" "}
+        <Link
+          href="/login"
+          className="font-medium text-[var(--color-interactive)] hover:underline"
+        >
+          Sign in
+        </Link>
+      </p>
+    </div>
+  );
+}

@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ─────────────────────────────────────────────────────────────────────────────
+   Dark mode: class-based (.dark on <html>) so the More tab toggle works.
+   System preference applied on first load via layout.tsx inline script.
+───────────────────────────────────────────────────────────────────────────── */
+@variant dark (&:where(.dark, .dark *));
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   Brand design tokens
+───────────────────────────────────────────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Navy */
+  --color-navy-50:  #f0f4f8;
+  --color-navy-100: #d9e2ec;
+  --color-navy-200: #bcccdc;
+  --color-navy-300: #9fb3c8;
+  --color-navy-400: #829ab1;
+  --color-navy-500: #627d98;
+  --color-navy-600: #486581;
+  --color-navy-700: #334e68;
+  --color-navy-800: #243b53;
+  --color-navy-900: #102a43;
+  --color-navy-950: #0a1e30;
+
+  /* Ocean */
+  --color-ocean-50:  #e8f4fd;
+  --color-ocean-100: #bee3f8;
+  --color-ocean-200: #90cdf4;
+  --color-ocean-300: #63b3ed;
+  --color-ocean-400: #4299e1;
+  --color-ocean-500: #3182ce;
+  --color-ocean-600: #2b6cb0;
+  --color-ocean-700: #2c5282;
+  --color-ocean-800: #2a4365;
+  --color-ocean-900: #1a365d;
+
+  /* Gold */
+  --color-gold-300: #fcd34d;
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+  --color-gold-600: #d97706;
+  --color-gold-700: #b45309;
+
+  /* Semantic */
+  --color-surface:         #ffffff;
+  --color-surface-raised:  #f8fafc;
+  --color-surface-overlay: #f1f5f9;
+  --color-border:          #e2e8f0;
+  --color-border-subtle:   #f1f5f9;
+  --color-text-primary:    #0f172a;
+  --color-text-secondary:  #475569;
+  --color-text-tertiary:   #94a3b8;
+  --color-text-inverse:    #ffffff;
+  --color-interactive:     #243b53;
+  --color-interactive-hover: #102a43;
+  --color-interactive-muted: #d9e2ec;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error:   #ef4444;
+  --color-info:    #3182ce;
+
+  /* Layout */
+  --tab-bar-height:   4rem;
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Dark mode overrides */
+.dark {
+  --color-surface:         #0f172a;
+  --color-surface-raised:  #1e293b;
+  --color-surface-overlay: #334155;
+  --color-border:          #334155;
+  --color-border-subtle:   #1e293b;
+  --color-text-primary:    #f8fafc;
+  --color-text-secondary:  #cbd5e1;
+  --color-text-tertiary:   #64748b;
+  --color-interactive:     #4299e1;
+  --color-interactive-hover: #63b3ed;
+  --color-interactive-muted: #1e293b;
 }
+
+/* Base */
+html { scrollbar-gutter: stable; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body { overscroll-behavior: none; }
+
+/* Tab bar helpers */
+.pb-tab-bar {
+  padding-bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom));
+}
+.bottom-tab-bar {
+  height: calc(var(--tab-bar-height) + var(--safe-area-bottom));
+  padding-bottom: var(--safe-area-bottom);
 }
