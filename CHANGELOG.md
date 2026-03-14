@@ -40,16 +40,24 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `returnTo` flow: `/r/:token` → unauthed → `/login?returnTo=%2Fr%2F{token}` → login → back to `/r/:token`.
 - Migration 012 **not yet applied to production**. All rate-limited routes will 500 until it is.
 
+### Also done (same session, Tasks 4-6)
+- `app/(protected)/app/endorsement/request/page.tsx` + `RequestEndorsementClient.tsx`: request UI — parallel data fetch (yacht, colleagues, existing requests, rate limit), manual email chips, rate-limit display, shareable link section after first send
+- `components/audience/AudienceTabs.tsx`: client tab component — Wheel B progress card (endorsements/5) with BottomSheet CTA, segment toggle (Endorsements | Colleagues), requests-received list with "Write endorsement" CTA, endorsements-received list, requests-sent list with status pills
+- `components/audience/RequestActions.tsx`: cancel/resend buttons — calls PUT /api/endorsement-requests/:id, router.refresh() on success
+- `app/(protected)/app/audience/page.tsx`: full rewrite — parallel fetch of all 5 data sets, passes to AudienceTabs
+- `app/(protected)/app/endorsement/[id]/edit/page.tsx` + `EditEndorsementClient.tsx`: ownership-checked edit page, WriteEndorsementForm in edit mode, delete with BottomSheet confirmation → DELETE /api/endorsements/:id
+- `components/profile/EndorsementsSection.tsx`: added `endorser_id` + `currentUserId?` prop — shows "Edit" link for own endorsements
+- Migration 012 applied to production ✓
+- Build passes clean. All Sprint 5 tasks complete.
+
 ### Next
-- **Apply migration 012 to production** (Supabase SQL editor — paste `supabase/migrations/20260314000012_sprint5_endorsements.sql`)
-- Merge `feat/sprint-4` → `main` if not done
-- Task 4: `app/(protected)/app/endorsement/request/page.tsx` — request UI (yacht fixed, colleague suggestions, manual email/phone, rate-limit display, shareable link)
-- Task 5: Audience tab rewrite — Wheel B card, segment control (Endorsements | Colleagues), requests inbox (received + sent with cancel/resend actions)
-- Task 6: `app/(protected)/app/endorsement/[id]/edit/page.tsx` + `EndorsementsSection` edit links
+- Merge `feat/sprint-5` → `main` via GitHub PR
+- Merge `feat/sprint-4` → `main` first if not done
+- Sprint 6: to be planned
 
 ### Flags
-- Migration 012 not applied to production — `endorsement_requests_today` RPC missing, POST /api/endorsement-requests will 500 until applied
 - Email confirmation still disabled in Supabase. Re-enable before go-live.
+- Test the full end-to-end endorsement loop on the preview deployment before merging to main.
 
 
 ## 2026-03-14 — Claude Code (Sonnet 4.6) — Sprint 4: Yacht Graph

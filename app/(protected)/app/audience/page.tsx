@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
-import Image from 'next/image'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { AudienceTabs } from '@/components/audience/AudienceTabs'
 
 interface ColleagueRow {
   colleague_id: string
@@ -27,46 +26,60 @@ export default async function AudiencePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/welcome')
 
-  // ── Fetch colleague graph ──────────────────────────────────────────────────
-  const { data: colleagueRows } = await supabase.rpc('get_colleagues', {
-    p_user_id: user.id,
-  })
+  const userEmail = user.email ?? ''
 
-  const rows = (colleagueRows as ColleagueRow[]) ?? []
+  const [
+    colleaguesRes,
+    endorsementsReceivedRes,
+    requestsReceivedRes,
+    requestsSentRes,
+    endorsementsGivenRes,
+  ] = await Promise.all([
+    supabase.rpc('get_colleagues', { p_user_id: user.id }),
+    supabase
+      .from('endorsements')
+      .select('id, content, created_at, endorser:users!endorser_id(id, display_name, full_name, profile_photo_url), yacht:yachts!yacht_id(id, name)')
+      .eq('recipient_id', user.id)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('endorsement_requests')
+      .select('id, token, yacht_id, status, expires_at, cancelled_at, requester:users!requester_id(display_name, full_name, profile_photo_url), yacht:yachts!yacht_id(name)')
+      .or(
+        userEmail
+          ? `recipient_user_id.eq.${user.id},recipient_email.eq.${userEmail}`
+          : `recipient_user_id.eq.${user.id}`
+      )
+      .is('cancelled_at', null)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('endorsement_requests')
+      .select('id, token, recipient_email, recipient_phone, status, expires_at, cancelled_at, yacht:yachts!yacht_id(name)')
+      .eq('requester_id', user.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('endorsements')
+      .select('recipient_id, yacht_id')
+      .eq('endorser_id', user.id)
+      .is('deleted_at', null),
+  ])
 
-  if (rows.length === 0) {
-    return (
-      <div className="px-4 pt-8 pb-24">
-        <h1 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">Colleagues</h1>
-        <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-          People you&apos;ve worked with on the water.
-        </p>
-        <div className="bg-[var(--color-surface-raised)] rounded-2xl p-6 text-center">
-          <p className="text-sm text-[var(--color-text-secondary)] mb-3">
-            Your colleague list will populate once you and a crewmate have both attached the same
-            yacht to your profiles.
-          </p>
-          <Link
-            href="/app/attachment/new"
-            className="text-sm text-[var(--ocean-500)] font-medium hover:underline"
-          >
-            Add a yacht →
-          </Link>
-        </div>
-      </div>
-    )
-  }
+  const colleagueRows = (colleaguesRes.data as ColleagueRow[]) ?? []
 
-  // ── Fetch profile data for each colleague ──────────────────────────────────
-  const colleagueIds = rows.map((r) => r.colleague_id)
-  const allYachtIds = Array.from(new Set(rows.flatMap((r) => r.shared_yachts)))
+  // Fetch colleague profiles and yacht names
+  const colleagueIds = colleagueRows.map((r) => r.colleague_id)
+  const allYachtIds = Array.from(new Set(colleagueRows.flatMap((r) => r.shared_yachts)))
 
   const [profilesRes, yachtsRes] = await Promise.all([
-    supabase
-      .from('users')
-      .select('id, full_name, display_name, profile_photo_url, primary_role')
-      .in('id', colleagueIds),
-    supabase.from('yachts').select('id, name').in('id', allYachtIds),
+    colleagueIds.length > 0
+      ? supabase
+          .from('users')
+          .select('id, full_name, display_name, profile_photo_url, primary_role')
+          .in('id', colleagueIds)
+      : Promise.resolve({ data: [] }),
+    allYachtIds.length > 0
+      ? supabase.from('yachts').select('id, name').in('id', allYachtIds)
+      : Promise.resolve({ data: [] }),
   ])
 
   const profileMap = new Map<string, UserProfile>(
@@ -76,72 +89,60 @@ export default async function AudiencePage() {
     ((yachtsRes.data as Yacht[]) ?? []).map((y) => [y.id, y])
   )
 
+  const colleagues = colleagueRows.map((row) => ({
+    colleague_id: row.colleague_id,
+    shared_yachts: row.shared_yachts,
+    profile: profileMap.get(row.colleague_id) ?? null,
+    sharedYachtNames: row.shared_yachts
+      .map((yid) => yachtMap.get(yid)?.name)
+      .filter((n): n is string => !!n),
+  }))
+
+  // Most recent yacht id for the wheel sheet CTA
+  const mostRecentYachtId = colleagueRows[0]?.shared_yachts[0] ?? null
+
+  // Type cast fetched data
+  type EndorsementReceived = {
+    id: string
+    content: string
+    created_at: string
+    endorser: { id: string; display_name: string | null; full_name: string; profile_photo_url: string | null } | null
+    yacht: { id: string; name: string } | null
+  }
+
+  type RequestReceived = {
+    id: string
+    token: string
+    yacht_id: string
+    status: string
+    expires_at: string
+    cancelled_at: string | null
+    requester: { display_name: string | null; full_name: string; profile_photo_url: string | null } | null
+    yacht: { name: string } | null
+  }
+
+  type RequestSent = {
+    id: string
+    token: string
+    recipient_email: string | null
+    recipient_phone: string | null
+    status: string
+    expires_at: string
+    cancelled_at: string | null
+    yacht: { name: string } | null
+  }
+
+  const endorsementsReceived = (endorsementsReceivedRes.data as unknown as EndorsementReceived[]) ?? []
+  const requestsReceived = (requestsReceivedRes.data as unknown as RequestReceived[]) ?? []
+  const requestsSent = (requestsSentRes.data as unknown as RequestSent[]) ?? []
+
   return (
-    <div className="px-4 pt-8 pb-24">
-      <h1 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">Colleagues</h1>
-      <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-        {rows.length} {rows.length === 1 ? 'person' : 'people'} you&apos;ve worked with on the water.
-      </p>
-
-      <div className="flex flex-col gap-3">
-        {rows.map((row) => {
-          const profile = profileMap.get(row.colleague_id)
-          if (!profile) return null
-          const name = profile.display_name || profile.full_name
-          const sharedNames = row.shared_yachts
-            .map((yid) => yachtMap.get(yid)?.name)
-            .filter(Boolean) as string[]
-
-          return (
-            <div
-              key={row.colleague_id}
-              className="bg-[var(--card)] rounded-2xl p-4 flex items-center gap-3"
-            >
-              {/* Avatar */}
-              <div className="w-11 h-11 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
-                {profile.profile_photo_url ? (
-                  <Image
-                    src={profile.profile_photo_url}
-                    alt={name}
-                    width={44}
-                    height={44}
-                    className="object-cover w-full h-full"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-base font-semibold text-[var(--color-text-secondary)]">
-                    {name[0]?.toUpperCase()}
-                  </div>
-                )}
-              </div>
-
-              {/* Info */}
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">{name}</p>
-                {profile.primary_role && (
-                  <p className="text-xs text-[var(--color-text-secondary)] truncate">
-                    {profile.primary_role}
-                  </p>
-                )}
-                {sharedNames.length > 0 && (
-                  <p className="text-xs text-[var(--ocean-500)] truncate mt-0.5">
-                    {sharedNames.length === 1
-                      ? sharedNames[0]
-                      : `${sharedNames[0]} +${sharedNames.length - 1} more`}
-                  </p>
-                )}
-              </div>
-
-              {/* Request endorsement */}
-              <Link
-                href={`/app/endorsement/request?colleague_id=${row.colleague_id}&yacht_id=${row.shared_yachts[0]}`}
-                className="shrink-0 text-xs text-[var(--ocean-500)] font-medium px-3 py-1.5 rounded-full border border-[var(--ocean-500)] hover:bg-[var(--ocean-500)]/5 transition-colors"
-              >
-                Endorse
-              </Link>
-            </div>
-          )
-        })}
-      </div>
-    </div>
+    <AudienceTabs
+      endorsementsReceived={endorsementsReceived}
+      requestsReceived={requestsReceived}
+      requestsSent={requestsSent}
+      colleagues={colleagues}
+      mostRecentYachtId={mostRecentYachtId}
+    />
   )
 }

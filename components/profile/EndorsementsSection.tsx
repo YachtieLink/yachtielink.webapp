@@ -1,7 +1,10 @@
 'use client'
 
+import Link from 'next/link'
+
 interface Endorsement {
   id: string
+  endorser_id: string
   content: string
   created_at: string
   yacht_id: string
@@ -17,6 +20,7 @@ interface Endorsement {
 
 interface EndorsementsSectionProps {
   endorsements: Endorsement[]
+  currentUserId?: string
 }
 
 const EXCERPT_LENGTH = 140
@@ -26,7 +30,7 @@ function excerpt(text: string): string {
   return text.slice(0, EXCERPT_LENGTH).trimEnd() + '…'
 }
 
-export function EndorsementsSection({ endorsements }: EndorsementsSectionProps) {
+export function EndorsementsSection({ endorsements, currentUserId }: EndorsementsSectionProps) {
   if (endorsements.length === 0) {
     return (
       <div className="bg-[var(--card)] rounded-2xl p-5">
@@ -54,16 +58,25 @@ export function EndorsementsSection({ endorsements }: EndorsementsSectionProps) 
             month: 'short',
             year: 'numeric',
           })
+          const isOwn = currentUserId && e.endorser_id === currentUserId
 
           return (
             <li key={e.id} className="border-l-2 border-[var(--ocean-500)] pl-4">
               <p className="text-sm text-[var(--foreground)] leading-relaxed">
-                "{excerpt(e.content)}"
+                &ldquo;{excerpt(e.content)}&rdquo;
               </p>
               <p className="text-xs text-[var(--muted-foreground)] mt-1">
                 {endorserName}
                 {e.yachts ? ` · ${e.yachts.name}` : ''}
                 {' · '}{date}
+                {isOwn && (
+                  <Link
+                    href={`/app/endorsement/${e.id}/edit`}
+                    className="text-xs text-[var(--color-interactive)] hover:underline ml-2"
+                  >
+                    Edit
+                  </Link>
+                )}
               </p>
             </li>
           )
