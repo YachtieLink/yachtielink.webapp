@@ -53,16 +53,18 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 ### Also done (same session — bug fixes)
 - `app/(public)/r/[token]/page.tsx`: replaced HTTP self-fetch with direct Supabase query. Old code fetched `NEXT_PUBLIC_APP_URL/api/endorsement-requests/:token` server-side; on preview deployments this resolved to production (`https://yachtie.link`) which didn't have the Sprint 5 routes yet → 404 on every deep link click. Fix queries the DB directly — simpler, no env var dependency, works on all deployments.
 - Same file: fixed TypeScript build errors — Supabase infers joined columns as arrays so casts must go through `unknown` first. Build now passes clean.
-- PR #27 opened: `feat/sprint-5` → `main` (covers Sprints 3–5)
+- PR #27 opened and merged: `feat/sprint-5` → `main` (covers Sprints 3–5)
+- **Root cause of persistent 404 found**: `endorsement_requests` RLS has no public-read policy — anon key cannot read the table even with a valid token. The original design noted this as "handled in API route" (implying service role) but the API route also used the anon key. Fixed with migration 013.
+- `supabase/migrations/20260314000013_endorsement_token_lookup.sql`: `SECURITY DEFINER` RPC `get_endorsement_request_by_token(p_token text)` — bypasses RLS, returns exactly the one matching row with joined requester + yacht data. Granted to `anon` and `authenticated`. **Needs applying to production.**
+- `app/(public)/r/[token]/page.tsx`: updated to use the new RPC instead of direct table query.
 
 ### Next
-- Merge `feat/sprint-4` → `main` first (if not already done)
-- Merge `feat/sprint-5` → `main` via GitHub PR
+- **Apply migration 013 to production Supabase** (SQL in `supabase/migrations/20260314000013_endorsement_token_lookup.sql`)
 - Sprint 6: to be planned
 
 ### Flags
 - Email confirmation still disabled in Supabase. Re-enable before go-live.
-- Test the full end-to-end endorsement loop on the preview deployment before merging to main.
+- Migration 013 must be applied before deep links work on production.
 
 
 ## 2026-03-14 — Claude Code (Sonnet 4.6) — Sprint 4: Yacht Graph
