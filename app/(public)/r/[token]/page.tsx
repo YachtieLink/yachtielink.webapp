@@ -48,12 +48,8 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
   // Expired
   const isExpired = new Date(request.expires_at) < new Date()
   if (isExpired) {
-    const requesterName =
-      (request.requester as { display_name: string | null; full_name: string | null } | null)
-        ?.display_name ??
-      (request.requester as { display_name: string | null; full_name: string | null } | null)
-        ?.full_name ??
-      'them'
+    const expiredRequester = request.requester as unknown as { display_name: string | null; full_name: string | null } | null
+    const requesterName = expiredRequester?.display_name ?? expiredRequester?.full_name ?? 'them'
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--color-surface)] p-4">
         <div className="max-w-sm text-center">
@@ -81,8 +77,8 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
   type Requester = { display_name: string | null; full_name: string | null; profile_photo_url: string | null }
   type Yacht = { id: string; name: string; yacht_type: string | null; length_meters: number | null; flag_state: string | null; year_built: number | null }
 
-  const requester = request.requester as Requester | null
-  const yacht = request.yacht as Yacht | null
+  const requester = request.requester as unknown as Requester | null
+  const yacht = request.yacht as unknown as Yacht | null
 
   // Defensive guard — should never happen if FK constraints are healthy
   if (!requester || !yacht) return notFound()
