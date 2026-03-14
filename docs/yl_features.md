@@ -154,7 +154,10 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 - **Length:** Exact length in metres (numeric input). First creator should aim for accuracy since this becomes the reference record
 - **Flag state:** Country dropdown
 - **Year built:** Optional, can be skipped if unknown
-- Duplicate names tolerated. Renamed yachts are separate entities — merging deferred to Phase 2 (D-006)
+- Duplicate names tolerated but actively discouraged at creation time: fuzzy match runs against existing records when a user creates a new yacht; if a close match is found, a confirmation prompt displays the candidate with type/length/flag details — user must explicitly confirm "No, create new" (D-037). Near-miss events logged for Phase 2 merge tooling.
+- Yacht merging (admin or user-initiated) deferred to Phase 2 (D-006)
+- **Cover photo** (Sprint 4): single cover photo per yacht, upload gated to users with a past or present attachment to that yacht. Stored in `yacht-photos` bucket (public). Upload overwrites previous cover. (D-038, D-039)
+- **Photo gallery** (Phase 1B Sprint 11): full multi-photo gallery replacing the single cover photo. Multiple images, contributor attribution, ordering, deletion by uploader or yacht creator. Still gated to users with an attachment. (D-038, D-039)
 - Ratings, reviews, or interactions on yacht entities aren't planned — yachts are graph infrastructure, not review targets
 
 ---

@@ -377,5 +377,35 @@
     "rationale": "The yacht graph is the lowest-hanging high-alpha wedge and the highest-value long-term asset. Narrowing the launch slice keeps the build focused on graph formation and endorsement density rather than diffusing effort across adjacent products.",
     "notes": "This is a sequencing decision, not a permanent ban on recruiter access or later social/network utilities.",
     "reversibility": "reversible"
+  },
+  {
+    "id": "D-037",
+    "date": "2026-03-14",
+    "decision_class": "product",
+    "status": "closed",
+    "topic": "Yacht duplicate prevention via creation-time prompt, merge deferred to Phase 2",
+    "decision": "When a user attempts to create a new yacht, run a fuzzy match against existing records. If any match scores above threshold, show a confirmation prompt displaying the candidate's details (type, length, flag state). User can select the existing record or confirm creation of a new one. Near-miss events are logged. Yacht merge tooling is deferred to Phase 2.",
+    "rationale": "Duplicate yachts break the colleague graph — two people attaching different 'Lady M' records are not connected even if they worked on the same vessel. Prevention at creation time solves the majority of the problem with minimal complexity. A merge tool is only justified once there is real data showing duplication patterns at scale.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-038",
+    "date": "2026-03-14",
+    "decision_class": "product",
+    "status": "closed",
+    "topic": "Yacht photo upload gated to users with a past or present attachment",
+    "decision": "Only users who have (or had) an attachment to a yacht may upload photos for that yacht. Any authenticated user can view photos.",
+    "rationale": "Photos should represent authentic crew experience on that vessel. Open upload would invite spam and irrelevant content without moderation infrastructure. Attachment gating keeps the gallery credible by construction.",
+    "reversibility": "reversible"
+  },
+  {
+    "id": "D-039",
+    "date": "2026-03-14",
+    "decision_class": "sequencing",
+    "status": "closed",
+    "topic": "Yacht photos: single cover photo in Sprint 4, full gallery in Phase 1B Sprint 11",
+    "decision": "Sprint 4 ships a single cover photo per yacht (one image, upload overwrites previous). The full multi-photo gallery — multiple images, contributor attribution, ordering, deletion — is deferred to Phase 1B Sprint 11.",
+    "rationale": "A cover photo adds visual authenticity to yacht entities with minimal build cost. The full gallery requires additional UI complexity not justified until the yacht entity has meaningful adoption. Sequencing alongside graph quality work in Sprint 11 is a natural fit.",
+    "reversibility": "reversible"
   }
 ]

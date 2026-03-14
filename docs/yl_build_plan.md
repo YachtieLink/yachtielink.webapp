@@ -123,6 +123,8 @@ Goal: Portable profile + yacht graph + endorsements + paid presentation. Prove t
 - Yacht detail view: name, type (Motor Yacht / Sailing Yacht), length in metres, flag state, year built, attached crew count
 - Yacht creation: type (required), length (exact metres — first creator should aim for accuracy), flag state dropdown, year built (optional, can skip)
 - Yacht search improvements: fuzzy matching, duplicate name tolerance
+- Duplicate detection prompt: when a user hits "create new yacht", run a fuzzy match against existing records. If any score above threshold, show confirmation: "There's already a yacht called [name] ([type], [length]m, [flag]) — is this the same vessel?" with **Use this one** / **No, create new** options. Logs near-misses for Phase 2 merge tooling.
+- Cover photo: single cover photo upload per yacht, gated to users who have (or had) an attachment to that yacht. Stored in `yacht-photos` bucket (public). Full multi-photo gallery deferred to Phase 1B.
 
 **Attachment management**
 - Add attachment: yacht typeahead/create → role → dates (start required, end or "Currently")
@@ -139,7 +141,7 @@ Goal: Portable profile + yacht graph + endorsements + paid presentation. Prove t
 - Mark yacht as established when thresholds met (60 days + crew count by size)
 - Fresh yachts: open attachment. Established yachts: attachment confirmation deferred to Phase 1B (log the status but don't gate)
 
-**Deliverable:** Yacht graph is live. Users can see who they've worked with. Colleague list populates automatically from shared yacht history.
+**Deliverable:** Yacht graph is live. Users can see who they've worked with. Colleague list populates automatically from shared yacht history. Duplicate prevention active at creation time.
 
 ---
 
@@ -339,7 +341,7 @@ Gate: Phase 1A graph loop is healthy (endorsement-to-profile ratio >0.3 at 500 p
 - Notification preferences (email digest frequency)
 - Profile completeness nudges (smart, not nagging)
 
-### Sprint 11: Graph Quality + Established Yachts (weeks 21–22)
+### Sprint 11: Graph Quality + Established Yachts + Yacht Gallery (weeks 21–22)
 
 - Attachment confirmation flow for established yachts: existing verified crew can confirm/deny new attachments
 - Confirmation voting (simple majority)
@@ -347,7 +349,14 @@ Gate: Phase 1A graph loop is healthy (endorsement-to-profile ratio >0.3 at 500 p
 - Dispute flow: flag an attachment as incorrect (escalates to abuse protocol)
 - False attachment dispute rate tracking (tripwire: 5%)
 
-**Deliverable:** Crew can signal availability. Pro users can search. Endorsement signals live. Established yachts have lightweight integrity controls.
+**Yacht photo gallery (promoted from deferred)**
+- Full multi-photo gallery on yacht detail page (replaces single cover photo from Sprint 4)
+- Upload gated to users who have (or had) an attachment to that yacht
+- Multiple photos per yacht, contributor attribution (uploader name + role)
+- Photo ordering (drag to reorder), deletion by uploader or yacht creator
+- Stored in `yacht-photos` bucket (already created in Sprint 4)
+
+**Deliverable:** Crew can signal availability. Pro users can search. Endorsement signals live. Established yachts have lightweight integrity controls. Yacht pages have community photo galleries.
 
 ---
 
