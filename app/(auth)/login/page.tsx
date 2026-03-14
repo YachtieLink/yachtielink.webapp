@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
   const supabase = createClient();
 
   const [email, setEmail] = useState("");
@@ -30,7 +32,8 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/app/profile");
+    const destination = returnTo && returnTo.startsWith("/") ? returnTo : "/app/profile";
+    router.push(destination);
     router.refresh();
   }
 
@@ -116,7 +119,7 @@ export default function LoginPage() {
       <p className="text-sm text-[var(--color-text-secondary)]">
         Don&apos;t have an account?{" "}
         <Link
-          href="/signup"
+          href={`/signup${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ""}`}
           className="font-medium text-[var(--color-interactive)] hover:underline"
         >
           Create one
