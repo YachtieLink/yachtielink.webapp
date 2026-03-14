@@ -17,6 +17,41 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-14 — Claude Code (Sonnet 4.6) — Sprint 5: Endorsement Loop (Tasks 1-3)
+
+### Done
+- Created `feat/sprint-5` branch from `feat/sprint-4`
+- Migration `20260314000012_sprint5_endorsements.sql`: `cancelled_at` + `recipient_phone` on `endorsement_requests`; `endorsement_requests_today(uuid)` rate-limit RPC; 3 performance indexes — **needs applying to production**
+- `app/api/endorsement-requests/[id]/route.ts`: merged GET (lookup by token, no auth) + PUT (cancel/resend by UUID, auth required) into single route — fixes Next.js ambiguous route error
+- `app/api/endorsements/route.ts`: POST (create with coworker check, 403/409/400 guards, request-token acceptance, notify email) + GET (list by user_id)
+- `app/api/endorsements/[id]/route.ts`: PUT (edit own) + DELETE (soft-delete own)
+- Updated `app/api/endorsement-requests/route.ts`: rate limiting, `recipient_phone`, returns `token` + `deep_link`
+- `components/endorsement/WriteEndorsementForm.tsx`: reusable create/edit form — char counter, collapsible optional details, success state, explicit 409/403 error handling
+- `components/endorsement/DeepLinkFlow.tsx`: 3-step state machine — checks attachment → add-yacht step → WriteEndorsementForm. Correctly maps `requester_id` → `recipient_id`.
+- `app/(public)/r/[token]/page.tsx`: server component rewrite — 404/expired/cancelled/unauthed/authed states; unauthed shows request context + sign-in/sign-up CTAs with `returnTo`
+- `middleware.ts`: `returnTo` preservation when bouncing unauthenticated users; respects `returnTo` on auth-only route redirect
+- `app/(auth)/login/page.tsx`: `returnTo` redirect post-login, passed through to signup link
+- `app/(auth)/signup/page.tsx`: `returnTo` passed as `next` param in email callback URL
+- Build passes clean. Committed and pushed to `feat/sprint-5`.
+
+### Context
+- CRITICAL naming (must hold for Tasks 4-6): `endorsement_requests.requester_id` = person who WANTS endorsement = `endorsements.recipient_id`. Person clicking `/r/:token` = endorser = `endorsements.endorser_id`.
+- GET `/api/endorsement-requests/:token` — the `[id]` route handles this. URL param is raw token hex string for GET, UUID for PUT.
+- `returnTo` flow: `/r/:token` → unauthed → `/login?returnTo=%2Fr%2F{token}` → login → back to `/r/:token`.
+- Migration 012 **not yet applied to production**. All rate-limited routes will 500 until it is.
+
+### Next
+- **Apply migration 012 to production** (Supabase SQL editor — paste `supabase/migrations/20260314000012_sprint5_endorsements.sql`)
+- Merge `feat/sprint-4` → `main` if not done
+- Task 4: `app/(protected)/app/endorsement/request/page.tsx` — request UI (yacht fixed, colleague suggestions, manual email/phone, rate-limit display, shareable link)
+- Task 5: Audience tab rewrite — Wheel B card, segment control (Endorsements | Colleagues), requests inbox (received + sent with cancel/resend actions)
+- Task 6: `app/(protected)/app/endorsement/[id]/edit/page.tsx` + `EndorsementsSection` edit links
+
+### Flags
+- Migration 012 not applied to production — `endorsement_requests_today` RPC missing, POST /api/endorsement-requests will 500 until applied
+- Email confirmation still disabled in Supabase. Re-enable before go-live.
+
+
 ## 2026-03-14 — Claude Code (Sonnet 4.6) — Sprint 4: Yacht Graph
 
 ### Done

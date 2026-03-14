@@ -1,5 +1,57 @@
 # Sprint 5 — Founder Notes
 
+## Session Handover Status (updated 2026-03-14)
+
+### ✅ COMPLETE — Tasks 1-3
+All foundation work is done and on `feat/sprint-5`. Build passes.
+
+**Before starting Tasks 4-6, you MUST:**
+1. Apply migration `supabase/migrations/20260314000012_sprint5_endorsements.sql` to production via Supabase SQL editor
+2. Merge `feat/sprint-4` → `main` if not already done
+
+### 🔧 Key implementation notes for Tasks 4-6
+
+**Naming gotcha (critical — don't get this wrong):**
+- `endorsement_requests.requester_id` = the person who WANTS the endorsement = eventual `endorsements.recipient_id`
+- Person clicking `/r/:token` = the endorser = `endorsements.endorser_id`
+
+**API shapes already built:**
+- POST `/api/endorsement-requests` → `{ ok, token, deep_link }` (now returns token)
+- GET `/api/endorsement-requests/:token` — pass the raw hex token as the URL param (same `[id]` route, GET detects it's a token)
+- PUT `/api/endorsement-requests/:id` — pass the UUID record id, body `{ action: 'cancel' | 'resend' }`
+- POST `/api/endorsements` → body: `{ recipient_id, yacht_id, content, endorser_role_label?, recipient_role_label?, worked_together_start?, worked_together_end?, request_token? }`
+- GET `/api/endorsements?user_id=...` → `{ endorsements }` array with nested endorser + yacht
+- PUT `/api/endorsements/:id` → partial update (content, roles, dates)
+- DELETE `/api/endorsements/:id` → 204, soft-delete
+
+**Components built:**
+- `<WriteEndorsementForm>` — use this in Task 6 edit page. Pass `existingEndorsement` prop for edit mode.
+- `<DeepLinkFlow>` — used only by `/r/[token]` page
+
+**Pattern reminders for Tasks 4-6:**
+- Toast: `const { toast } = useToast()` from `@/components/ui/Toast` — call as `toast('msg', 'success'|'error')`
+- Server components fetch data; client components handle interaction
+- `const supabase = await createClient()` in server components
+- `params` is a Promise in Next.js 16: `const { id } = await params`
+
+**Task 4 — request page route:** `/app/endorsement/request?yacht_id=...`
+- Read `yacht_id` from `searchParams` (NOT `params` — it's a query param, not a segment)
+- Use `get_colleagues` RPC filtered by yacht to show suggestions
+- Rate limit: call `endorsement_requests_today` RPC + check `users.subscription_status`
+
+**Task 5 — Audience tab data fetching:**
+- Use parallel Promise.all for all 5 queries (see spec below)
+- Expiry check: `new Date(request.expires_at) < new Date()` — done client-side
+- Wheel B count: `endorsementsReceived.length` capped at 5
+
+**Task 6 — edit page:**
+- Route: `/app/endorsement/[id]/edit`
+- Fetch endorsement by id, must be endorser
+- Render `<WriteEndorsementForm existingEndorsement={...} />`
+
+---
+
+
 Context
 Sprint 5 is the growth loop sprint. The /r/:token deep link flow is explicitly called out as a critical path item in yl_build_plan.md. If this flow is clunky, the graph doesn't compound.
 What exists today (Sprints 1-4):
