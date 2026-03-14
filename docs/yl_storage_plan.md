@@ -91,7 +91,7 @@ Never store signed URLs in the database — they expire. Store only the raw path
 |--------|--------|------------|-------|
 | `cv-uploads` | Sprint 6 | Private | Raw CV files (PDF/DOCX) uploaded for parsing. Retained for audit, not shown publicly. Path: `{user_id}/cv.{ext}` |
 | `pdf-exports` | Sprint 6 | Private | Generated PDF snapshots. Path: `{user_id}/cv-{timestamp}.pdf`. Signed URLs for download. |
-| `yacht-photos` | Phase 1B+ | Public | Yacht entity photos, optional. Requires separate moderation flow. Not in Phase 1A scope. |
+| `yacht-photos` | Sprint 4 | Public | Single cover photo per yacht. Upload gated to users with an active or past attachment to that yacht. Path: `yacht-photos/{yacht_id}/cover.{ext}`. Full multi-photo gallery (multiple images, contributor attribution, ordering, deletion) promoted to Phase 1B Sprint 11. |
 
 ---
 
@@ -130,4 +130,4 @@ Or apply directly in the Supabase SQL Editor (copy the migration file contents a
 
 ---
 
-*Updated when new buckets are added or policies change. Current buckets: 2. Next update: Sprint 6 (cv-uploads, pdf-exports).*
+*Updated when new buckets are added or policies change. Current buckets: 2. Next update: Sprint 4 (yacht-photos), Sprint 6 (cv-uploads, pdf-exports).*
