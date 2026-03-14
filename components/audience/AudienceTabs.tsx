@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { BottomSheet } from '@/components/ui/BottomSheet'
@@ -190,6 +190,79 @@ export function AudienceTabs({
   )
 }
 
+// ─── Received Request Card ────────────────────────────────────────────────────
+
+function ReceivedRequestCard({ req }: { req: RequestReceived }) {
+  // Prefer full name over username
+  const name = req.requester?.full_name ?? req.requester?.display_name ?? 'Someone'
+  const isExpired = new Date(req.expires_at) < new Date()
+  const isPending = req.status !== 'accepted' && !req.cancelled_at && !isExpired
+  const [declining, setDeclining] = useState(false)
+  const [declined, setDeclined] = useState(false)
+
+  const handleDecline = useCallback(async () => {
+    setDeclining(true)
+    try {
+      await fetch(`/api/endorsement-requests/${req.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'decline' }),
+      })
+      setDeclined(true)
+    } finally {
+      setDeclining(false)
+    }
+  }, [req.id])
+
+  if (declined) return null
+
+  return (
+    <div className="bg-[var(--card)] rounded-2xl p-4">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
+          {req.requester?.profile_photo_url ? (
+            <Image
+              src={req.requester.profile_photo_url}
+              alt={name}
+              width={36}
+              height={36}
+              className="object-cover w-full h-full"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--color-text-secondary)]">
+              {name[0]?.toUpperCase()}
+            </div>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{name}</p>
+          {req.yacht && (
+            <p className="text-xs text-[var(--color-text-secondary)] truncate">{req.yacht.name}</p>
+          )}
+        </div>
+        <StatusPill status={req.status} expiresAt={req.expires_at} cancelledAt={req.cancelled_at} />
+      </div>
+      {isPending && (
+        <div className="mt-3 flex items-center gap-4">
+          <Link
+            href={`/r/${req.token}`}
+            className="text-sm text-[var(--color-interactive)] font-medium hover:underline"
+          >
+            Write endorsement →
+          </Link>
+          <button
+            onClick={handleDecline}
+            disabled={declining}
+            className="text-sm text-[var(--color-text-tertiary)] hover:text-red-400 transition-colors disabled:opacity-50"
+          >
+            {declining ? 'Declining…' : 'Decline'}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── Endorsements Tab ─────────────────────────────────────────────────────────
 
 function EndorsementsTab({
@@ -211,57 +284,9 @@ function EndorsementsTab({
             Requests received
           </h2>
           <div className="flex flex-col gap-3">
-            {requestsReceived.map((req) => {
-              const name =
-                req.requester?.display_name ?? req.requester?.full_name ?? 'Someone'
-              const isExpired = new Date(req.expires_at) < new Date()
-              const isPending = req.status !== 'accepted' && !req.cancelled_at && !isExpired
-
-              return (
-                <div key={req.id} className="bg-[var(--card)] rounded-2xl p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
-                      {req.requester?.profile_photo_url ? (
-                        <Image
-                          src={req.requester.profile_photo_url}
-                          alt={name}
-                          width={36}
-                          height={36}
-                          className="object-cover w-full h-full"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--color-text-secondary)]">
-                          {name[0]?.toUpperCase()}
-                        </div>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
-                        {name}
-                      </p>
-                      {req.yacht && (
-                        <p className="text-xs text-[var(--color-text-secondary)] truncate">
-                          {req.yacht.name}
-                        </p>
-                      )}
-                    </div>
-                    <StatusPill
-                      status={req.status}
-                      expiresAt={req.expires_at}
-                      cancelledAt={req.cancelled_at}
-                    />
-                  </div>
-                  {isPending && (
-                    <Link
-                      href={`/r/${req.token}`}
-                      className="mt-3 inline-block text-sm text-[var(--color-interactive)] font-medium hover:underline"
-                    >
-                      Write endorsement →
-                    </Link>
-                  )}
-                </div>
-              )
-            })}
+            {requestsReceived.map((req) => (
+              <ReceivedRequestCard key={req.id} req={req} />
+            ))}
           </div>
         </section>
       )}

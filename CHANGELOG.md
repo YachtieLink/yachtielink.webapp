@@ -17,6 +17,24 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-14 — Claude Code (Sonnet 4.6) — Sprint 5 polish
+
+### Done
+- Migration 016 applied to production: (a) updated `get_endorsement_request_by_token` RPC to include `requester_attachment` (role, start/end dates) for prefill; (b) partial unique index `endorsement_requests_no_duplicate_pending` prevents requester sending duplicate active requests
+- `app/api/endorsement-requests/[id]/route.ts`: added `decline` action for recipients — sets status to cancelled, checked against `recipient_user_id` not `requester_id`
+- `app/(public)/r/[token]/page.tsx`: passes `requesterAttachment` to DeepLinkFlow; prefer `full_name` over `display_name` (username) throughout
+- `components/endorsement/DeepLinkFlow.tsx`: (a) added `already-endorsed` state — checks DB before showing form, shows clear message if duplicate; (b) passes `prefillRecipientRole` from requester attachment to write form; (c) seeds add-yacht date fields from requester attachment dates; (d) prefer `full_name` for all name display
+- `components/audience/AudienceTabs.tsx`: extracted `ReceivedRequestCard` — adds Decline button on pending received requests (calls decline action, removes card optimistically); prefer `full_name` for requester name display
+
+### Next
+- PR #28 open: all hotfixes → `main` — merge when Vercel is green
+- Sprint 6: to be planned
+
+### Flags
+- Email confirmation still disabled in Supabase. Re-enable before go-live.
+
+---
+
 ## 2026-03-14 — Claude Code (Sonnet 4.6) — Sprint 5: Endorsement Loop (Tasks 1-3)
 
 ### Done
