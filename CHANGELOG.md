@@ -59,7 +59,9 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `app/(public)/r/[token]/page.tsx`: updated to use the new RPC instead of direct table query.
 
 ### Next
-- **Apply migration 013 to production Supabase** (SQL in `supabase/migrations/20260314000013_endorsement_token_lookup.sql`)
+- **Apply migration 013 to production Supabase** (SQL in `supabase/migrations/20260314000013_endorsement_token_lookup.sql`) ✓
+- PR #28 open: hotfixes → `main`
+- `components/audience/AudienceTabs.tsx`: copy tweak — "Collecting up to 5" → "Collecting 5 or more"
 - Sprint 6: to be planned
 
 ### Flags
