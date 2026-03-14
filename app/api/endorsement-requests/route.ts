@@ -85,20 +85,21 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { yacht_id, recipient_email, yacht_name } = body as {
+  const { yacht_id, recipient_email, recipient_phone, yacht_name } = body as {
     yacht_id: string;
-    recipient_email: string;
+    recipient_email?: string;
+    recipient_phone?: string;
     yacht_name?: string;
   };
 
-  if (!yacht_id || !recipient_email) {
+  if (!yacht_id || (!recipient_email && !recipient_phone)) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
-  // Get requester display name
+  // Get requester profile
   const { data: profile } = await supabase
     .from("users")
-    .select("display_name, full_name")
+    .select("display_name, full_name, subscription_status")
     .eq("id", user.id)
     .single();
   const requesterName =
@@ -106,19 +107,32 @@ export async function POST(req: NextRequest) {
     (profile?.full_name as string | null) ||
     "A colleague";
 
+  // Rate limit check
+  const { data: todayCount } = await supabase.rpc("endorsement_requests_today", {
+    p_user_id: user.id,
+  });
+  const limit = profile?.subscription_status === "pro" ? 20 : 10;
+  if ((todayCount ?? 0) >= limit) {
+    const resetsAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+    return NextResponse.json(
+      { error: "Daily limit reached", limit, used: todayCount, resets_at: resetsAt },
+      { status: 429 }
+    );
+  }
+
   // Insert request and retrieve the auto-generated token
   const { data: request, error: insertError } = await supabase
     .from("endorsement_requests")
     .insert({
       requester_id: user.id,
       yacht_id,
-      recipient_email: recipient_email.trim().toLowerCase(),
+      recipient_email: recipient_email ? recipient_email.trim().toLowerCase() : null,
+      recipient_phone: recipient_phone ?? null,
     })
-    .select("token")
+    .select("id, token")
     .single();
 
   if (insertError || !request) {
-    // Unique constraint violation (already requested) is non-fatal — skip silently
     if (insertError?.code === "23505") {
       return NextResponse.json({ ok: true, skipped: true });
     }
@@ -130,16 +144,18 @@ export async function POST(req: NextRequest) {
   const subjectYacht = yachtDisplay ? ` on ${yachtDisplay}` : "";
 
   // Send email — non-fatal if it fails (request is already in DB)
-  try {
-    await sendNotifyEmail({
-      to: recipient_email.trim(),
-      subject: `${requesterName} asked you to endorse their work${subjectYacht}`,
-      html: buildHtml(requesterName, yachtDisplay, deepLink),
-      text: buildText(requesterName, yachtDisplay, deepLink),
-    });
-  } catch {
-    // Email failure is non-fatal — token is saved, user can resend later
+  if (recipient_email) {
+    try {
+      await sendNotifyEmail({
+        to: recipient_email.trim(),
+        subject: `${requesterName} asked you to endorse their work${subjectYacht}`,
+        html: buildHtml(requesterName, yachtDisplay, deepLink),
+        text: buildText(requesterName, yachtDisplay, deepLink),
+      });
+    } catch {
+      // Email failure is non-fatal — token is saved, user can resend later
+    }
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, token: request.token, deep_link: deepLink });
 }

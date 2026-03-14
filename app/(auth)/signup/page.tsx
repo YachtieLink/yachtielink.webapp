@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
   const supabase = createClient();
 
   const [email, setEmail] = useState("");
@@ -18,11 +21,17 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
 
+    // Pass returnTo through the callback so it's preserved after email confirmation
+    const callbackBase = `${window.location.origin}/auth/callback`;
+    const callbackUrl = returnTo
+      ? `${callbackBase}?next=${encodeURIComponent(returnTo)}`
+      : callbackBase;
+
     const { error: signUpError } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: callbackUrl,
       },
     });
 
@@ -143,7 +152,7 @@ export default function SignupPage() {
       <p className="text-sm text-[var(--color-text-secondary)]">
         Already have an account?{" "}
         <Link
-          href="/login"
+          href={`/login${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}` : ""}`}
           className="font-medium text-[var(--color-interactive)] hover:underline"
         >
           Sign in
