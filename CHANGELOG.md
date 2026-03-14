@@ -66,6 +66,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `app/api/endorsement-requests/route.ts`: at insert time, look up existing user by email and set `recipient_user_id` immediately
 - `components/audience/AudienceTabs.tsx`: copy tweak — "Collecting up to 5" → "Collecting 5 or more"
 - Supabase CLI (`supabase` npm package) installed and linked to prod — future migrations use `npx supabase db push` instead of copy-pasting SQL
+- `app/api/endorsements/route.ts`: fixed wrong RPC parameter names on `are_coworkers_on_yacht` — was `p_user_a`/`p_user_b`/`p_yacht_id`, function expects `user_a`/`user_b`/`yacht`. Caused every endorsement submission to 403.
 
 ### Next
 - PR #28 open: all hotfixes → `main` — merge once Vercel is green

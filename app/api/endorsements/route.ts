@@ -35,9 +35,9 @@ export async function POST(req: NextRequest) {
 
   // Coworker check
   const { data: coworkers } = await supabase.rpc('are_coworkers_on_yacht', {
-    p_user_a: user.id,
-    p_user_b: recipient_id,
-    p_yacht_id: yacht_id,
+    user_a: user.id,
+    user_b: recipient_id,
+    yacht: yacht_id,
   })
   if (!coworkers) {
     return NextResponse.json({ error: 'You can only endorse people you have worked with on this yacht.' }, { status: 403 })
