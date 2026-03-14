@@ -4,6 +4,49 @@ import { sendNotifyEmail } from '@/lib/email/notify'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://yachtie.link'
 
+// ─── GET /api/endorsement-requests/:token ─────────────────────────────────────
+// Public endpoint — no auth required. The token IS the credential.
+// Used by the /r/:token deep link page to load request details.
+
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id: token } = await params
+  const supabase = await createClient()
+
+  const { data: request, error } = await supabase
+    .from('endorsement_requests')
+    .select(`
+      id, token, requester_id, yacht_id, recipient_email,
+      status, expires_at, created_at, accepted_at, cancelled_at,
+      requester:users!requester_id(display_name, full_name, profile_photo_url),
+      yacht:yachts!yacht_id(id, name, yacht_type, length_meters, flag_state, year_built)
+    `)
+    .eq('token', token)
+    .single()
+
+  if (error || !request) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  // Cancelled
+  if (request.cancelled_at || request.status === 'cancelled') {
+    return NextResponse.json({ error: 'This request was cancelled' }, { status: 410 })
+  }
+
+  // Expired
+  const isExpired = new Date(request.expires_at) < new Date()
+  if (isExpired) {
+    return NextResponse.json({ expired: true, request }, { status: 200 })
+  }
+
+  return NextResponse.json({ request })
+}
+
+// ─── PUT /api/endorsement-requests/:id ────────────────────────────────────────
+// Auth required. Requester only. Actions: cancel | resend.
+
 interface UpdateRequestBody {
   action: 'cancel' | 'resend'
 }
@@ -48,8 +91,7 @@ export async function PUT(
     return NextResponse.json({ request: updated })
   }
 
-  // action === 'resend'
-  // Rate limit check
+  // action === 'resend' — rate limit check then re-send email with existing token
   const { data: todayCount } = await supabase.rpc('endorsement_requests_today', { p_user_id: user.id })
   const { data: profile } = await supabase.from('users').select('subscription_status').eq('id', user.id).single()
   const limit = profile?.subscription_status === 'pro' ? 20 : 10
@@ -57,7 +99,6 @@ export async function PUT(
     return NextResponse.json({ error: 'Rate limit exceeded', limit, used: todayCount }, { status: 429 })
   }
 
-  // Resend email (reuse existing token)
   try {
     const { data: requester } = await supabase.from('users').select('display_name, full_name').eq('id', user.id).single()
     const { data: yacht } = await supabase.from('yachts').select('name').eq('id', request.yacht_id).single()
