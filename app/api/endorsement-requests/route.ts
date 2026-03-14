@@ -120,6 +120,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Look up whether a YachtieLink account already exists for this email.
+  // If so, set recipient_user_id immediately so RLS lets them see the request
+  // in their Audience tab without waiting for a trigger.
+  let recipientUserId: string | null = null
+  if (recipient_email) {
+    const { data: existingUser } = await supabase
+      .from("users")
+      .select("id")
+      .eq("email", recipient_email.trim().toLowerCase())
+      .maybeSingle()
+    recipientUserId = existingUser?.id ?? null
+  }
+
   // Insert request and retrieve the auto-generated token
   const { data: request, error: insertError } = await supabase
     .from("endorsement_requests")
@@ -128,6 +141,7 @@ export async function POST(req: NextRequest) {
       yacht_id,
       recipient_email: recipient_email ? recipient_email.trim().toLowerCase() : null,
       recipient_phone: recipient_phone ?? null,
+      recipient_user_id: recipientUserId,
     })
     .select("id, token")
     .single();

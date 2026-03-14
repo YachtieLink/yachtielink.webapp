@@ -58,10 +58,17 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `supabase/migrations/20260314000013_endorsement_token_lookup.sql`: `SECURITY DEFINER` RPC `get_endorsement_request_by_token(p_token text)` — bypasses RLS, returns exactly the one matching row with joined requester + yacht data. Granted to `anon` and `authenticated`. **Needs applying to production.**
 - `app/(public)/r/[token]/page.tsx`: updated to use the new RPC instead of direct table query.
 
-### Next
-- **Apply migration 013 to production Supabase** (SQL in `supabase/migrations/20260314000013_endorsement_token_lookup.sql`) ✓
-- PR #28 open: hotfixes → `main`
+- **Pending requests not appearing in Audience tab** — two root causes:
+  1. RLS had no policy for `auth.email() = recipient_email` so rows were blocked even when the audience query filtered by email
+  2. `recipient_user_id` was never set at insert time, so the existing `recipient_user_id` policy never matched
+- `supabase/migrations/20260314000014_link_requests_to_recipients.sql`: (a) RLS policy `endorsement_requests: recipient email read` — `using (auth.email() = recipient_email)`; (b) trigger `on_user_created_link_endorsements` — backfills `recipient_user_id` on all pending requests matching a new user's email. **Needs applying to production.**
+- `app/api/endorsement-requests/route.ts`: at insert time, look up existing user by email and set `recipient_user_id` immediately — so existing account holders see the request in their Audience tab right away
 - `components/audience/AudienceTabs.tsx`: copy tweak — "Collecting up to 5" → "Collecting 5 or more"
+
+### Next
+- **Apply migration 014 to production Supabase** (SQL in `supabase/migrations/20260314000014_link_requests_to_recipients.sql`)
+- **Backfill existing requests**: run `UPDATE endorsement_requests er SET recipient_user_id = u.id FROM users u WHERE lower(u.email) = lower(er.recipient_email) AND er.recipient_user_id IS NULL;` on production to link historical requests
+- PR #28 open: hotfixes → `main` — merge once Vercel is green
 - Sprint 6: to be planned
 
 ### Flags
