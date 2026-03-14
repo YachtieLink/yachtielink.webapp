@@ -1,0 +1,197 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter, useParams } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
+import { Button, Input } from '@/components/ui'
+import { useToast } from '@/components/ui/Toast'
+
+interface Attachment {
+  id: string
+  role_label: string
+  started_at: string
+  ended_at: string | null
+  yachts: { id: string; name: string } | null
+}
+
+export default function AttachmentEditPage() {
+  const router = useRouter()
+  const params = useParams<{ id: string }>()
+  const { toast } = useToast()
+  const supabase = createClient()
+
+  const [attachment, setAttachment] = useState<Attachment | null>(null)
+  const [roleLabel, setRoleLabel] = useState('')
+  const [startDate, setStartDate] = useState('')
+  const [endDate, setEndDate] = useState('')
+  const [isCurrent, setIsCurrent] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase
+      .from('attachments')
+      .select('id, role_label, started_at, ended_at, yachts(id, name)')
+      .eq('id', params.id)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          const att = data as unknown as Attachment
+          setAttachment(att)
+          setRoleLabel(att.role_label)
+          setStartDate(att.started_at)
+          setEndDate(att.ended_at ?? '')
+          setIsCurrent(!att.ended_at)
+        }
+        setLoading(false)
+      })
+  }, [params.id])
+
+  async function handleSave() {
+    if (!roleLabel.trim() || !startDate) return
+    setSaving(true)
+    const { error } = await supabase
+      .from('attachments')
+      .update({
+        role_label: roleLabel.trim(),
+        started_at: startDate,
+        ended_at: isCurrent ? null : endDate || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', params.id)
+
+    setSaving(false)
+    if (error) {
+      toast('Failed to save. Please try again.', 'error')
+      return
+    }
+    toast('Attachment updated.', 'success')
+    router.push('/app/profile')
+  }
+
+  async function handleDelete() {
+    if (!confirmDelete) { setConfirmDelete(true); return }
+    setDeleting(true)
+    const { error } = await supabase
+      .from('attachments')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', params.id)
+
+    setDeleting(false)
+    if (error) {
+      toast('Failed to remove attachment.', 'error')
+      return
+    }
+    toast('Attachment removed.', 'success')
+    router.push('/app/profile')
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[var(--color-surface)] flex items-center justify-center">
+        <p className="text-sm text-[var(--color-text-secondary)]">Loading…</p>
+      </div>
+    )
+  }
+
+  if (!attachment) {
+    return (
+      <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8">
+        <p className="text-sm text-[var(--color-text-secondary)]">Attachment not found.</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
+      <button
+        onClick={() => router.back()}
+        className="text-sm text-[var(--color-text-secondary)] mb-6 flex items-center gap-1"
+      >
+        ← Back
+      </button>
+
+      <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Edit attachment</h1>
+      <p className="text-sm text-[var(--color-text-secondary)] mb-6">
+        {attachment.yachts?.name ?? 'Yacht'}
+      </p>
+
+      <div className="flex flex-col gap-4">
+        <div>
+          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
+            Role
+          </label>
+          <Input
+            value={roleLabel}
+            onChange={(e) => setRoleLabel(e.target.value)}
+            placeholder="Your role on this yacht"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
+            Start date
+          </label>
+          <Input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            max={new Date().toISOString().split('T')[0]}
+          />
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-xs font-medium text-[var(--color-text-secondary)]">
+              End date
+            </label>
+            <label className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+              <input
+                type="checkbox"
+                checked={isCurrent}
+                onChange={(e) => setIsCurrent(e.target.checked)}
+                className="rounded"
+              />
+              Currently working here
+            </label>
+          </div>
+          {!isCurrent && (
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              min={startDate}
+              max={new Date().toISOString().split('T')[0]}
+            />
+          )}
+        </div>
+
+        <Button
+          onClick={handleSave}
+          disabled={!roleLabel.trim() || !startDate || saving}
+          className="w-full mt-2"
+          size="lg"
+        >
+          {saving ? 'Saving…' : 'Save changes'}
+        </Button>
+
+        <div className="border-t border-[var(--color-border)] pt-4 mt-2">
+          <p className="text-xs text-[var(--color-text-secondary)] mb-3">
+            Removing this attachment won&apos;t delete any endorsements you&apos;ve received for this yacht.
+          </p>
+          <Button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="w-full"
+            size="lg"
+            variant={confirmDelete ? 'destructive' : 'ghost'}
+          >
+            {deleting ? 'Removing…' : confirmDelete ? 'Tap again to confirm removal' : 'Remove this yacht'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}

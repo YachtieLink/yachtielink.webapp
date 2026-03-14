@@ -93,7 +93,7 @@ export function YachtsSection({ attachments }: YachtsSectionProps) {
                   <div className="mt-3 flex flex-col gap-2 pl-1">
                     {yacht && (
                       <Link
-                        href={`/u/${yacht.id}`}
+                        href={`/app/yacht/${yacht.id}`}
                         className="text-sm text-[var(--ocean-500)] hover:underline"
                       >
                         View yacht page →

@@ -17,6 +17,40 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-14 — Claude Code (Sonnet 4.6) — Sprint 3 close + Sprint 4 pre-planning
+
+### Done
+- Diagnosed and fixed production env var issue: Vercel had staging Supabase keys — updated to production `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- Added missing Vercel env vars: `RESEND_API_KEY`, `NEXT_PUBLIC_APP_URL=https://yachtie.link`
+- Diagnosed onboarding handle step bug: `handle_available` and all other public RPC functions were missing `GRANT EXECUTE` to `anon`/`authenticated` roles — silently returning null, keeping Continue button permanently disabled
+- Created and applied migration `20260314000010_grant_rpc_execute.sql`: grants `EXECUTE` on all public RPC functions to `anon` and `authenticated` — no redeploy needed, database-only fix
+- Sprint 4 pre-planning discussion with founder: agreed yacht graph is pure infrastructure in Phase 1A (not visual, not discovery)
+- Decided yacht merging stays deferred to Phase 2 — invest in creation-time duplicate prevention instead
+- Decided: duplicate detection prompt on yacht creation (fuzzy match → confirmation if close match found). Near-miss events logged.
+- Decided: single cover photo per yacht in Sprint 4 (attachment-gated). Full multi-photo gallery deferred to Phase 1B Sprint 11.
+- Updated `docs/yl_build_plan.md`: Sprint 4 scope + Phase 1B Sprint 11 gallery
+- Updated `docs/yl_features.md`: Yacht Entities section with dupe prompt, cover photo, gallery
+- Updated `docs/yl_storage_plan.md`: `yacht-photos` bucket moved from Phase 1B+ to Sprint 4
+- Updated `docs/yl_decisions.json`: added D-037, D-038, D-039
+- All changes committed and pushed to `feat/sprint-3`
+
+### Context
+- Supabase domain for production: `xnslbbgfuuijgdfdtres.supabase.co`
+- Sprint 3 was already merged to `main` as PR #20 before this session. The `feat/sprint-3` branch still open for the hotfix migration and pre-planning docs.
+- The handle availability fix (migration 000010) is live in production — no redeploy needed
+- Vercel is connected to GitHub — every push to any branch gets a preview URL, `main` deploys to `yachtie.link`
+
+### Next
+- Merge `feat/sprint-3` to `main` (or open as a new PR for the hotfix + planning docs)
+- Create `feat/sprint-4` branch
+- Sprint 4: Yacht Graph — yacht entities, attachment management, colleague graph, duplicate detection prompt, cover photo upload
+
+### Flags
+- Email confirmation still disabled in Supabase (turned off during development). Re-enable before go-live: Supabase → Authentication → Providers → Email → Confirm email ON
+- Supabase redirect URLs: ensure `https://yachtie.link/**` and both Vercel preview URLs are in the allowed list
+
+---
+
 ## 2026-03-14 — Claude Code (Sonnet 4.6) — Sprint 3: Profile
 
 ### Done
