@@ -1,3 +1,5 @@
+'use server'
+
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DeepLinkFlow } from '@/components/endorsement/DeepLinkFlow'
@@ -11,15 +13,23 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
   const { token } = await params
   const supabase = await createClient()
 
-  // Load request
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://yachtie.link'}/api/endorsement-requests/${token}`,
-    { cache: 'no-store' }
-  )
+  // Query Supabase directly — avoids self-fetch network round-trip that breaks on
+  // preview deployments where NEXT_PUBLIC_APP_URL points to production.
+  const { data: request, error } = await supabase
+    .from('endorsement_requests')
+    .select(`
+      id, token, requester_id, yacht_id, recipient_email,
+      status, expires_at, created_at, accepted_at, cancelled_at,
+      requester:users!requester_id(display_name, full_name, profile_photo_url),
+      yacht:yachts!yacht_id(id, name, yacht_type, length_meters, flag_state, year_built)
+    `)
+    .eq('token', token)
+    .single()
 
-  if (res.status === 404) return notFound()
+  if (error || !request) return notFound()
 
-  if (res.status === 410) {
+  // Cancelled
+  if (request.cancelled_at || request.status === 'cancelled') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--color-surface)] p-4">
         <div className="max-w-sm text-center">
@@ -35,22 +45,11 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
     )
   }
 
-  const data = await res.json() as {
-    expired?: boolean
-    request: {
-      id: string
-      token: string
-      requester_id: string
-      yacht_id: string
-      recipient_email: string
-      status: string
-      expires_at: string
-      requester: { display_name: string | null; full_name: string | null; profile_photo_url: string | null }
-      yacht: { id: string; name: string; yacht_type: string | null; length_meters: number | null; flag_state: string | null; year_built: number | null }
-    }
-  }
-
-  if (data.expired) {
+  // Expired
+  const isExpired = new Date(request.expires_at) < new Date()
+  if (isExpired) {
+    const expiredRequester = request.requester as unknown as { display_name: string | null; full_name: string | null } | null
+    const requesterName = expiredRequester?.display_name ?? expiredRequester?.full_name ?? 'them'
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--color-surface)] p-4">
         <div className="max-w-sm text-center">
@@ -60,7 +59,7 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
           </h1>
           <p className="text-sm text-[var(--color-text-secondary)] mb-6">
             Endorsement requests expire after 30 days. Ask{' '}
-            {data.request.requester?.display_name ?? data.request.requester?.full_name ?? 'them'}{' '}
+            {requesterName}{' '}
             to send a new request.
           </p>
           <Link
@@ -74,13 +73,21 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
     )
   }
 
-  const { request } = data
+  // Type-narrow joined columns (Supabase returns them as unknown)
+  type Requester = { display_name: string | null; full_name: string | null; profile_photo_url: string | null }
+  type Yacht = { id: string; name: string; yacht_type: string | null; length_meters: number | null; flag_state: string | null; year_built: number | null }
+
+  const requester = request.requester as unknown as Requester | null
+  const yacht = request.yacht as unknown as Yacht | null
+
+  // Defensive guard — should never happen if FK constraints are healthy
+  if (!requester || !yacht) return notFound()
 
   // Check auth
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    const requesterName = request.requester?.display_name ?? request.requester?.full_name ?? 'A colleague'
+    const requesterName = requester.display_name ?? requester.full_name ?? 'A colleague'
     const returnTo = encodeURIComponent(`/r/${token}`)
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--color-surface)] px-4 py-12 gap-6">
@@ -89,7 +96,7 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
           <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-4 mb-6">
             <p className="text-sm text-[var(--color-text-secondary)] mb-1">Endorsement request from</p>
             <p className="text-lg font-bold text-[var(--color-text-primary)]">{requesterName}</p>
-            <p className="text-sm text-[var(--color-text-secondary)]">{request.yacht?.name}</p>
+            <p className="text-sm text-[var(--color-text-secondary)]">{yacht.name}</p>
           </div>
 
           <h1 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
@@ -118,21 +125,31 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
     )
   }
 
-  // Authenticated — render the flow
+  // Authenticated — render the write-endorsement flow
+  const requestForFlow = {
+    id: request.id,
+    token: request.token,
+    requester_id: request.requester_id,
+    yacht_id: request.yacht_id,
+    recipient_email: request.recipient_email ?? '',
+    status: request.status,
+    expires_at: request.expires_at,
+  }
+
   return (
     <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
       <div className="max-w-sm mx-auto">
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">
-          Endorse {request.requester?.display_name ?? request.requester?.full_name ?? 'colleague'}
+          Endorse {requester.display_name ?? requester.full_name ?? 'colleague'}
         </h1>
         <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-          from {request.yacht?.name}
+          from {yacht.name}
         </p>
 
         <DeepLinkFlow
-          request={request}
-          requester={request.requester}
-          yacht={request.yacht}
+          request={requestForFlow}
+          requester={requester}
+          yacht={yacht}
           currentUserId={user.id}
         />
       </div>

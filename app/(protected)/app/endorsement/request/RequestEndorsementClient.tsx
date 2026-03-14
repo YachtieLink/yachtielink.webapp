@@ -145,6 +145,24 @@ export function RequestEndorsementClient({
     }
   }
 
+  async function shareLink() {
+    if (!sentDeepLink) return
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Endorse me on YachtieLink',
+          text: `I'd love an endorsement from you for my time on ${yacht.name}. It only takes a couple of minutes.`,
+          url: sentDeepLink,
+        })
+      } catch {
+        // User dismissed share sheet — no action needed
+      }
+    } else {
+      await copyLink()
+    }
+  }
+
+  const canNativeShare = typeof navigator !== 'undefined' && !!navigator.share
   const canSend = emails.length > 0 && remaining > 0 && !sending
 
   return (
@@ -324,6 +342,18 @@ export function RequestEndorsementClient({
               Copy
             </button>
           </div>
+          {/* Native share button — opens WhatsApp, Messages, AirDrop etc on mobile */}
+          {canNativeShare && (
+            <button
+              onClick={shareLink}
+              className="mt-3 w-full flex items-center justify-center gap-2 h-11 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+            >
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 1 1 0-2.684m0 2.684 6.632 3.316m-6.632-6 6.632-3.316m0 0a3 3 0 1 0 5.367-2.684 3 3 0 0 0-5.367 2.684Zm0 9.316a3 3 0 1 0 5.368 2.684 3 3 0 0 0-5.368-2.684Z" />
+              </svg>
+              Share via…
+            </button>
+          )}
         </div>
       )}
     </div>

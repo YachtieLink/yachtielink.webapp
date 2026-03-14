@@ -50,9 +50,14 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - Migration 012 applied to production ✓
 - Build passes clean. All Sprint 5 tasks complete.
 
+### Also done (same session — bug fixes)
+- `app/(public)/r/[token]/page.tsx`: replaced HTTP self-fetch with direct Supabase query. Old code fetched `NEXT_PUBLIC_APP_URL/api/endorsement-requests/:token` server-side; on preview deployments this resolved to production (`https://yachtie.link`) which didn't have the Sprint 5 routes yet → 404 on every deep link click. Fix queries the DB directly — simpler, no env var dependency, works on all deployments.
+- Same file: fixed TypeScript build errors — Supabase infers joined columns as arrays so casts must go through `unknown` first. Build now passes clean.
+- PR #27 opened: `feat/sprint-5` → `main` (covers Sprints 3–5)
+
 ### Next
+- Merge `feat/sprint-4` → `main` first (if not already done)
 - Merge `feat/sprint-5` → `main` via GitHub PR
-- Merge `feat/sprint-4` → `main` first if not done
 - Sprint 6: to be planned
 
 ### Flags
