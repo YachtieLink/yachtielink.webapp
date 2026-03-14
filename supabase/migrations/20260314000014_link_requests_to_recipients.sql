@@ -13,13 +13,28 @@
 --         any pending requests that match their email
 -- Fix 3: API route (in code) — at request creation time, look up if a user
 --         already exists with that email and set recipient_user_id immediately
+--
+-- Written to be idempotent (safe to run more than once).
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- ── Fix 1: RLS policy for email-matched recipients ───────────────────────────
 
-create policy "endorsement_requests: recipient email read"
-  on public.endorsement_requests for select
-  using (auth.email() = recipient_email);
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public'
+      and tablename  = 'endorsement_requests'
+      and policyname = 'endorsement_requests: recipient email read'
+  ) then
+    execute $p$
+      create policy "endorsement_requests: recipient email read"
+        on public.endorsement_requests for select
+        using (auth.email() = recipient_email)
+    $p$;
+  end if;
+end;
+$$;
 
 
 -- ── Fix 2: Trigger to backfill recipient_user_id on new account creation ─────
@@ -40,7 +55,9 @@ begin
 end;
 $$;
 
--- users.email is populated from auth.users via existing trigger
+-- Drop and recreate trigger so this migration is safe to re-run
+drop trigger if exists on_user_created_link_endorsements on public.users;
+
 create trigger on_user_created_link_endorsements
   after insert on public.users
   for each row

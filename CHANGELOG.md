@@ -61,14 +61,14 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - **Pending requests not appearing in Audience tab** — two root causes:
   1. RLS had no policy for `auth.email() = recipient_email` so rows were blocked even when the audience query filtered by email
   2. `recipient_user_id` was never set at insert time, so the existing `recipient_user_id` policy never matched
-- `supabase/migrations/20260314000014_link_requests_to_recipients.sql`: (a) RLS policy `endorsement_requests: recipient email read` — `using (auth.email() = recipient_email)`; (b) trigger `on_user_created_link_endorsements` — backfills `recipient_user_id` on all pending requests matching a new user's email. **Needs applying to production.**
-- `app/api/endorsement-requests/route.ts`: at insert time, look up existing user by email and set `recipient_user_id` immediately — so existing account holders see the request in their Audience tab right away
+- `supabase/migrations/20260314000014_link_requests_to_recipients.sql`: idempotent — (a) RLS policy `endorsement_requests: recipient email read`; (b) trigger `on_user_created_link_endorsements`. Applied to production ✓ via `npx supabase db push`
+- `supabase/migrations/20260314000015_backfill_recipient_user_ids.sql`: one-off backfill — links all historical requests to existing user accounts. Applied to production ✓
+- `app/api/endorsement-requests/route.ts`: at insert time, look up existing user by email and set `recipient_user_id` immediately
 - `components/audience/AudienceTabs.tsx`: copy tweak — "Collecting up to 5" → "Collecting 5 or more"
+- Supabase CLI (`supabase` npm package) installed and linked to prod — future migrations use `npx supabase db push` instead of copy-pasting SQL
 
 ### Next
-- **Apply migration 014 to production Supabase** (SQL in `supabase/migrations/20260314000014_link_requests_to_recipients.sql`)
-- **Backfill existing requests**: run `UPDATE endorsement_requests er SET recipient_user_id = u.id FROM users u WHERE lower(u.email) = lower(er.recipient_email) AND er.recipient_user_id IS NULL;` on production to link historical requests
-- PR #28 open: hotfixes → `main` — merge once Vercel is green
+- PR #28 open: all hotfixes → `main` — merge once Vercel is green
 - Sprint 6: to be planned
 
 ### Flags
