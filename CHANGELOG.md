@@ -17,6 +17,35 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-14 — Claude Code (Sonnet 4.6) — Sprint 4: Yacht Graph
+
+### Done
+- Created `feat/sprint-4` branch from `feat/sprint-3`
+- Migration `20260314000011_yacht_sprint4.sql`: `cover_photo_url` on `yachts`, `yacht_near_miss_log` table, `search_yachts` fuzzy RPC (trigram), `yacht-photos` storage bucket (public, 5MB, crew-attachment-gated RLS) — applied to production
+- Created `lib/storage/yacht.ts`: `uploadYachtCoverPhoto`, `sizeFromLength`, `FLAG_STATES`
+- Built `components/yacht/YachtPicker.tsx`: reusable search+create with duplicate detection — fuzzy match on create; similarity ≥ 0.45 shows BottomSheet with candidates; logs near-miss to `yacht_near_miss_log`
+- Built `app/attachment/new`: 3-step flow — YachtPicker → role picker (dept filter + search + custom fallback) → dates
+- Built `app/attachment/[id]/edit`: pre-filled edit of role/dates, soft-delete with double-confirm
+- Built `app/yacht/[id]`: yacht detail — cover photo (attachment-gated upload CTA), metadata, crew count, crew list with avatars
+- Built `app/yacht/[id]/photo`: cover photo upload (upsert to `yacht-photos`, saves CDN URL to `yachts.cover_photo_url`)
+- Replaced `app/audience` placeholder: `get_colleagues` RPC → profile + yacht lookup → colleague cards with shared yacht label and "Endorse" shortcut
+- Fixed `YachtsSection`: `/u/:yacht_id` → `/app/yacht/:yacht_id`
+- Added `.obsidian/` to `.gitignore`
+- Build passes clean: zero TypeScript errors. Committed and pushed to `feat/sprint-4`.
+
+### Context
+- `search_yachts` uses pg_trgm (0.45 threshold for dupe detection). Near-misses logged for Phase 2 merge tooling.
+- `yacht-photos` RLS: extracts `yacht_id` from path `(string_to_array(name, '/'))[1]::uuid`, checks `attachments` table.
+- Colleague graph derived on access via `get_colleagues` — not stored.
+
+### Next
+- Merge `feat/sprint-4` → `main`
+- Sprint 5: Endorsements — request flow, `/r/:token` deep link, write endorsement, email + WhatsApp share, Audience tab inbox
+
+### Flags
+- Email confirmation still disabled in Supabase. Re-enable before go-live.
+- Supabase redirect URLs: confirm `https://yachtie.link/**` and Vercel preview URLs are in allowed list.
+
 ## 2026-03-14 — Claude Code (Sonnet 4.6) — Sprint 3 close + Sprint 4 pre-planning
 
 ### Done
