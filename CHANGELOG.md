@@ -17,6 +17,43 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-14 — Claude Code (Sonnet 4.6) — Sprint 3: Profile
+
+### Done
+- Created `feat/sprint-3` branch from `main`
+- Installed `react-image-crop` and `react-qr-code` npm packages
+- Migration `20260314000009_storage_buckets.sql`: created `profile-photos` (public, 5 MB, JPEG/PNG/WebP) and `cert-documents` (private, 10 MB, PDF/JPEG/PNG) buckets with full RLS policies — applied to production
+- Created `docs/yl_storage_plan.md`: canonical reference for all storage buckets, path conventions, signed URL pattern, future bucket plan, security notes
+- Created `lib/storage/upload.ts`: client-side helpers — `uploadProfilePhoto` (validates, resizes to 800px, converts to WebP, uploads to `profile-photos`), `uploadCertDocument` (validates, uploads to `cert-documents`, returns storage path not URL), `getCertDocumentUrl` (generates 1-hour signed URL at render time)
+- Built `components/profile/IdentityCard.tsx`: photo (tap → `/app/profile/photo`), display name, role, departments, profile link + copy, QR code toggle + SVG download
+- Built `components/profile/WheelACard.tsx`: 5-milestone progress wheel, taps to BottomSheet checklist with deep links to each missing milestone
+- Built `components/profile/AboutSection.tsx`: bio display with Edit/Add CTA
+- Built `components/profile/YachtsSection.tsx`: reverse-chronological list, expand to view yacht / request endorsements / edit attachment
+- Built `components/profile/CertsSection.tsx`: cert list with valid/expiring-soon/expired/no-expiry status pills, edit links
+- Built `components/profile/EndorsementsSection.tsx`: endorsed list with excerpt, endorser name, yacht, date
+- Rewrote `app/(protected)/app/profile/page.tsx`: server component, fetches profile + attachments + certs + endorsements in parallel, computes Wheel A milestones, floating "Complete next step" / "Share profile" CTA
+- Created `app/(protected)/app/profile/photo/page.tsx`: `react-image-crop` circular crop UI, canvas resize to 800×800, WebP conversion, uploads via `uploadProfilePhoto`, saves CDN URL to `users.profile_photo_url`
+- Created `app/(protected)/app/about/edit/page.tsx`: full-screen textarea, 500 char limit with live counter, saves to `users.bio`
+- Created `app/(protected)/app/profile/settings/page.tsx`: phone, WhatsApp, email, location (country dropdown + city), per-field visibility toggles
+- Created `app/(protected)/app/certification/new/page.tsx`: 3-step flow — category picker → cert picker → details (issued/expiry dates, no-expiry checkbox, optional document upload). "Other" free-text fallback at both levels, logs `other_cert_entries`
+- Created `app/(protected)/app/certification/[id]/edit/page.tsx`: edit issued/expiry dates, replace document, delete certification
+- Rewrote `app/(protected)/app/more/page.tsx`: theme switcher (system/light/dark), account settings, contact info link, billing placeholder, help/feedback, legal placeholders, sign out
+- Created `app/(protected)/app/more/account/page.tsx`: edit full name, display name, handle (live availability check + debounce), department multi-select, role picker with custom fallback
+
+### Context
+- All DB fields for Sprint 3 already existed in the Sprint 1 schema — no data migrations needed
+- `cert-documents` is private by design; call `getCertDocumentUrl(storagePath)` at render time to generate a 1-hour signed URL — never store signed URLs in the DB
+- `profile-photos` is public; CDN URL stored in `users.profile_photo_url` with `?t={timestamp}` cache-bust suffix
+- Build passes cleanly: 22 routes, zero TypeScript errors
+
+### Next
+- Sprint 4: Yacht Graph (yacht detail view, attachment management, colleague derivation)
+
+### Flags
+- None
+
+---
+
 ## 2026-03-13 — Claude Code (Sonnet 4.6) — Sprint 2 close: endorsement request emails
 
 ### Done
