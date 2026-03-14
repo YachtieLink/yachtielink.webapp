@@ -22,6 +22,12 @@ type Yacht = {
   year_built: number | null
 }
 
+type RequesterAttachment = {
+  role_label: string | null
+  started_at: string | null
+  ended_at: string | null
+} | null
+
 type EndorsementRequestRow = {
   id: string
   token: string
@@ -36,14 +42,19 @@ type EndorsementRequestRow = {
   cancelled_at: string | null
   requester: Requester | null
   yacht: Yacht | null
+  requester_attachment: RequesterAttachment
+}
+
+// Prefer full name over display name (username) everywhere on this page
+function requesterDisplayName(r: Requester | null) {
+  return r?.full_name ?? r?.display_name ?? 'A colleague'
 }
 
 export default async function EndorsementRequestPage({ params }: PageProps) {
   const { token } = await params
   const supabase = await createClient()
 
-  // Use SECURITY DEFINER RPC — bypasses RLS so the anon key can read
-  // this request by its secret token without exposing the whole table.
+  // SECURITY DEFINER RPC — bypasses RLS so the anon key can read by token.
   const { data, error } = await supabase.rpc('get_endorsement_request_by_token', {
     p_token: token,
   })
@@ -72,7 +83,6 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
   // Expired
   const isExpired = new Date(request.expires_at) < new Date()
   if (isExpired) {
-    const requesterName = request.requester?.display_name ?? request.requester?.full_name ?? 'them'
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--color-surface)] p-4">
         <div className="max-w-sm text-center">
@@ -82,7 +92,7 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
           </h1>
           <p className="text-sm text-[var(--color-text-secondary)] mb-6">
             Endorsement requests expire after 30 days. Ask{' '}
-            {requesterName}{' '}
+            {requesterDisplayName(request.requester)}{' '}
             to send a new request.
           </p>
           <Link
@@ -99,22 +109,20 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
   const requester = request.requester
   const yacht = request.yacht
 
-  // Defensive guard — should never happen if FK constraints are healthy
   if (!requester || !yacht) return notFound()
 
   // Check auth
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    const requesterName = requester.display_name ?? requester.full_name ?? 'A colleague'
+    const name = requesterDisplayName(requester)
     const returnTo = encodeURIComponent(`/r/${token}`)
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--color-surface)] px-4 py-12 gap-6">
         <div className="max-w-sm w-full">
-          {/* Request context */}
           <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-4 mb-6">
             <p className="text-sm text-[var(--color-text-secondary)] mb-1">Endorsement request from</p>
-            <p className="text-lg font-bold text-[var(--color-text-primary)]">{requesterName}</p>
+            <p className="text-lg font-bold text-[var(--color-text-primary)]">{name}</p>
             <p className="text-sm text-[var(--color-text-secondary)]">{yacht.name}</p>
           </div>
 
@@ -122,7 +130,7 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
             Sign in to write an endorsement
           </h1>
           <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-            {requesterName} is asking you to endorse their work. It takes about two minutes.
+            {name} is asking you to endorse their work. It takes about two minutes.
           </p>
 
           <div className="flex flex-col gap-3">
@@ -144,7 +152,8 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
     )
   }
 
-  // Authenticated — render the write-endorsement flow
+  const name = requesterDisplayName(requester)
+
   const requestForFlow = {
     id: request.id,
     token: request.token,
@@ -159,7 +168,7 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
     <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
       <div className="max-w-sm mx-auto">
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">
-          Endorse {requester.display_name ?? requester.full_name ?? 'colleague'}
+          Endorse {name}
         </h1>
         <p className="text-sm text-[var(--color-text-secondary)] mb-6">
           from {yacht.name}
@@ -169,6 +178,7 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
           request={requestForFlow}
           requester={requester}
           yacht={yacht}
+          requesterAttachment={request.requester_attachment}
           currentUserId={user.id}
         />
       </div>

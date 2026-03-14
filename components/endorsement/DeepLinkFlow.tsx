@@ -33,14 +33,21 @@ interface Yacht {
   year_built: number | null
 }
 
+interface RequesterAttachment {
+  role_label: string | null
+  started_at: string | null
+  ended_at: string | null
+}
+
 interface DeepLinkFlowProps {
   request: EndorsementRequest
   requester: Requester
   yacht: Yacht
+  requesterAttachment: RequesterAttachment | null
   currentUserId: string
 }
 
-type FlowStep = 'checking' | 'add-yacht' | 'write'
+type FlowStep = 'checking' | 'add-yacht' | 'write' | 'already-endorsed'
 
 interface AttachmentPrefill {
   role_label: string
@@ -48,7 +55,11 @@ interface AttachmentPrefill {
   ended_at: string | null
 }
 
-export function DeepLinkFlow({ request, requester, yacht, currentUserId }: DeepLinkFlowProps) {
+function displayName(r: Requester) {
+  return r.full_name ?? r.display_name ?? 'Your colleague'
+}
+
+export function DeepLinkFlow({ request, requester, yacht, requesterAttachment, currentUserId }: DeepLinkFlowProps) {
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
@@ -56,39 +67,49 @@ export function DeepLinkFlow({ request, requester, yacht, currentUserId }: DeepL
   const [step, setStep] = useState<FlowStep>('checking')
   const [prefill, setPrefill] = useState<AttachmentPrefill | null>(null)
 
-  // Role/date state for add-yacht step
   const [roleLabel, setRoleLabel] = useState('')
-  const [startDate, setStartDate] = useState('')
-  const [endDate, setEndDate] = useState('')
-  const [isCurrent, setIsCurrent] = useState(false)
+  const [startDate, setStartDate] = useState(requesterAttachment?.started_at?.split('T')[0] ?? '')
+  const [endDate, setEndDate] = useState(requesterAttachment?.ended_at?.split('T')[0] ?? '')
+  const [isCurrent, setIsCurrent] = useState(!requesterAttachment?.ended_at)
   const [saving, setSaving] = useState(false)
 
-  const requesterName = requester.display_name ?? requester.full_name ?? 'Your colleague'
+  const name = displayName(requester)
 
   useEffect(() => {
-    // Check if current user already has attachment to this yacht
-    supabase
-      .from('attachments')
-      .select('id, role_label, started_at, ended_at')
-      .eq('user_id', currentUserId)
-      .eq('yacht_id', request.yacht_id)
-      .is('deleted_at', null)
-      .limit(1)
-      .then(({ data }) => {
-        if (data && data.length > 0) {
-          const att = data[0] as AttachmentPrefill & { id: string }
-          setPrefill({ role_label: att.role_label, started_at: att.started_at, ended_at: att.ended_at })
-          setStep('write')
-        } else {
-          setStep('add-yacht')
-        }
-      })
-  }, [currentUserId, request.yacht_id])
+    Promise.all([
+      supabase
+        .from('attachments')
+        .select('id, role_label, started_at, ended_at')
+        .eq('user_id', currentUserId)
+        .eq('yacht_id', request.yacht_id)
+        .is('deleted_at', null)
+        .limit(1),
+      supabase
+        .from('endorsements')
+        .select('id')
+        .eq('endorser_id', currentUserId)
+        .eq('recipient_id', request.requester_id)
+        .eq('yacht_id', request.yacht_id)
+        .is('deleted_at', null)
+        .limit(1),
+    ]).then(([attachmentRes, endorsementRes]) => {
+      if (endorsementRes.data && endorsementRes.data.length > 0) {
+        setStep('already-endorsed')
+        return
+      }
+      if (attachmentRes.data && attachmentRes.data.length > 0) {
+        const att = attachmentRes.data[0] as AttachmentPrefill & { id: string }
+        setPrefill({ role_label: att.role_label, started_at: att.started_at, ended_at: att.ended_at })
+        setStep('write')
+      } else {
+        setStep('add-yacht')
+      }
+    })
+  }, [currentUserId, request.yacht_id, request.requester_id])
 
   async function handleConfirmYacht() {
     if (!roleLabel.trim() || !startDate) return
     setSaving(true)
-
     const { error } = await supabase.from('attachments').insert({
       user_id: currentUserId,
       yacht_id: request.yacht_id,
@@ -96,13 +117,11 @@ export function DeepLinkFlow({ request, requester, yacht, currentUserId }: DeepL
       started_at: startDate,
       ended_at: isCurrent ? null : endDate || null,
     })
-
     setSaving(false)
     if (error) {
       toast('Failed to add yacht. Please try again.', 'error')
       return
     }
-
     setPrefill({ role_label: roleLabel.trim(), started_at: startDate, ended_at: isCurrent ? null : endDate || null })
     setStep('write')
   }
@@ -115,7 +134,25 @@ export function DeepLinkFlow({ request, requester, yacht, currentUserId }: DeepL
   if (step === 'checking') {
     return (
       <div className="flex items-center justify-center py-16">
-        <p className="text-sm text-[var(--color-text-secondary)]">Loading…</p>
+        <p className="text-sm text-[var(--color-text-secondary)]">Loading...</p>
+      </div>
+    )
+  }
+
+  if (step === 'already-endorsed') {
+    return (
+      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-6 text-center">
+        <p className="text-2xl mb-3">checkmark</p>
+        <p className="text-sm font-medium text-[var(--color-text-primary)] mb-1">Already endorsed</p>
+        <p className="text-sm text-[var(--color-text-secondary)]">
+          You have already written an endorsement for {name} on {yacht.name}.
+        </p>
+        <button
+          onClick={() => router.push('/app/audience')}
+          className="mt-4 text-sm text-[var(--color-interactive)] font-medium hover:underline"
+        >
+          View your endorsements
+        </button>
       </div>
     )
   }
@@ -123,99 +160,59 @@ export function DeepLinkFlow({ request, requester, yacht, currentUserId }: DeepL
   if (step === 'add-yacht') {
     return (
       <div className="flex flex-col gap-5">
-        {/* Request context */}
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-4">
           <p className="text-sm text-[var(--color-text-secondary)] mb-1">
-            <strong className="text-[var(--color-text-primary)]">{requesterName}</strong> is asking you to endorse their work on
+            <strong className="text-[var(--color-text-primary)]">{name}</strong> is asking you to endorse their work on
           </p>
           <p className="text-lg font-bold text-[var(--color-text-primary)]">{yacht.name}</p>
           {yacht.yacht_type && (
             <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{yacht.yacht_type}</p>
           )}
         </div>
-
         <p className="text-sm text-[var(--color-text-secondary)]">
           To write an endorsement, confirm your time on <strong>{yacht.name}</strong> first.
         </p>
-
         <div>
           <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
             Your role on {yacht.name} *
           </label>
-          <Input
-            value={roleLabel}
-            onChange={(e) => setRoleLabel(e.target.value)}
-            placeholder="e.g. First Officer"
-          />
+          <Input value={roleLabel} onChange={(e) => setRoleLabel(e.target.value)} placeholder="e.g. First Officer" />
         </div>
-
         <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-            Start date *
-          </label>
-          <Input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            max={new Date().toISOString().split('T')[0]}
-          />
+          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">Start date *</label>
+          <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} max={new Date().toISOString().split('T')[0]} />
         </div>
-
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="text-xs font-medium text-[var(--color-text-secondary)]">
-              End date
-            </label>
+            <label className="text-xs font-medium text-[var(--color-text-secondary)]">End date</label>
             <label className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
-              <input
-                type="checkbox"
-                checked={isCurrent}
-                onChange={(e) => setIsCurrent(e.target.checked)}
-                className="rounded"
-              />
+              <input type="checkbox" checked={isCurrent} onChange={(e) => setIsCurrent(e.target.checked)} className="rounded" />
               Currently working here
             </label>
           </div>
           {!isCurrent && (
-            <Input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              min={startDate}
-              max={new Date().toISOString().split('T')[0]}
-            />
+            <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} min={startDate} max={new Date().toISOString().split('T')[0]} />
           )}
         </div>
-
-        <Button
-          onClick={handleConfirmYacht}
-          disabled={!roleLabel.trim() || !startDate || saving}
-          className="w-full"
-          size="lg"
-        >
-          {saving ? 'Saving…' : 'Confirm yacht & continue'}
+        <Button onClick={handleConfirmYacht} disabled={!roleLabel.trim() || !startDate || saving} className="w-full" size="lg">
+          {saving ? 'Saving...' : 'Confirm yacht & continue'}
         </Button>
-
-        <button
-          type="button"
-          onClick={handleDecline}
-          className="text-sm text-[var(--color-text-secondary)] text-center py-2 hover:text-[var(--color-text-primary)] transition-colors"
-        >
+        <button type="button" onClick={handleDecline} className="text-sm text-[var(--color-text-secondary)] text-center py-2 hover:text-[var(--color-text-primary)] transition-colors">
           Decline
         </button>
       </div>
     )
   }
 
-  // step === 'write'
   return (
     <WriteEndorsementForm
       recipientId={request.requester_id}
-      recipientName={requesterName}
+      recipientName={name}
       yachtId={request.yacht_id}
       yachtName={yacht.name}
       requestToken={request.token}
       prefillEndorserRole={prefill?.role_label}
+      prefillRecipientRole={requesterAttachment?.role_label ?? undefined}
       prefillStartDate={prefill?.started_at}
       prefillEndDate={prefill?.ended_at ?? undefined}
       onSuccess={() => router.push('/app/audience')}

@@ -48,7 +48,7 @@ export async function GET(
 // Auth required. Requester only. Actions: cancel | resend.
 
 interface UpdateRequestBody {
-  action: 'cancel' | 'resend'
+  action: 'cancel' | 'resend' | 'decline'
 }
 
 export async function PUT(
@@ -63,11 +63,33 @@ export async function PUT(
   const body = await req.json() as UpdateRequestBody
   const { action } = body
 
-  if (action !== 'cancel' && action !== 'resend') {
+  if (action !== 'cancel' && action !== 'resend' && action !== 'decline') {
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
   }
 
-  // Load request (must belong to current user)
+  // 'decline' is performed by the recipient, not the requester
+  if (action === 'decline') {
+    const { data: request, error: loadError } = await supabase
+      .from('endorsement_requests')
+      .select('id, recipient_user_id, status')
+      .eq('id', id)
+      .eq('recipient_user_id', user.id)
+      .single()
+
+    if (loadError || !request) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
+
+    const { error } = await supabase
+      .from('endorsement_requests')
+      .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
+      .eq('id', id)
+
+    if (error) return NextResponse.json({ error: 'Failed to decline' }, { status: 500 })
+    return NextResponse.json({ ok: true })
+  }
+
+  // Load request (must belong to current user as requester)
   const { data: request, error: loadError } = await supabase
     .from('endorsement_requests')
     .select('id, token, requester_id, recipient_email, yacht_id, status, cancelled_at')
