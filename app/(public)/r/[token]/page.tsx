@@ -1,5 +1,3 @@
-'use server'
-
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { DeepLinkFlow } from '@/components/endorsement/DeepLinkFlow'
@@ -9,24 +7,50 @@ interface PageProps {
   params: Promise<{ token: string }>
 }
 
+type Requester = {
+  display_name: string | null
+  full_name: string | null
+  profile_photo_url: string | null
+}
+
+type Yacht = {
+  id: string
+  name: string
+  yacht_type: string | null
+  length_meters: number | null
+  flag_state: string | null
+  year_built: number | null
+}
+
+type EndorsementRequestRow = {
+  id: string
+  token: string
+  requester_id: string
+  yacht_id: string
+  recipient_email: string | null
+  recipient_user_id: string | null
+  status: string
+  expires_at: string
+  created_at: string
+  accepted_at: string | null
+  cancelled_at: string | null
+  requester: Requester | null
+  yacht: Yacht | null
+}
+
 export default async function EndorsementRequestPage({ params }: PageProps) {
   const { token } = await params
   const supabase = await createClient()
 
-  // Query Supabase directly — avoids self-fetch network round-trip that breaks on
-  // preview deployments where NEXT_PUBLIC_APP_URL points to production.
-  const { data: request, error } = await supabase
-    .from('endorsement_requests')
-    .select(`
-      id, token, requester_id, yacht_id, recipient_email,
-      status, expires_at, created_at, accepted_at, cancelled_at,
-      requester:users!requester_id(display_name, full_name, profile_photo_url),
-      yacht:yachts!yacht_id(id, name, yacht_type, length_meters, flag_state, year_built)
-    `)
-    .eq('token', token)
-    .single()
+  // Use SECURITY DEFINER RPC — bypasses RLS so the anon key can read
+  // this request by its secret token without exposing the whole table.
+  const { data, error } = await supabase.rpc('get_endorsement_request_by_token', {
+    p_token: token,
+  })
 
-  if (error || !request) return notFound()
+  if (error || !data) return notFound()
+
+  const request = data as EndorsementRequestRow
 
   // Cancelled
   if (request.cancelled_at || request.status === 'cancelled') {
@@ -48,8 +72,7 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
   // Expired
   const isExpired = new Date(request.expires_at) < new Date()
   if (isExpired) {
-    const expiredRequester = request.requester as unknown as { display_name: string | null; full_name: string | null } | null
-    const requesterName = expiredRequester?.display_name ?? expiredRequester?.full_name ?? 'them'
+    const requesterName = request.requester?.display_name ?? request.requester?.full_name ?? 'them'
     return (
       <div className="flex min-h-screen items-center justify-center bg-[var(--color-surface)] p-4">
         <div className="max-w-sm text-center">
@@ -73,12 +96,8 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
     )
   }
 
-  // Type-narrow joined columns (Supabase returns them as unknown)
-  type Requester = { display_name: string | null; full_name: string | null; profile_photo_url: string | null }
-  type Yacht = { id: string; name: string; yacht_type: string | null; length_meters: number | null; flag_state: string | null; year_built: number | null }
-
-  const requester = request.requester as unknown as Requester | null
-  const yacht = request.yacht as unknown as Yacht | null
+  const requester = request.requester
+  const yacht = request.yacht
 
   // Defensive guard — should never happen if FK constraints are healthy
   if (!requester || !yacht) return notFound()
