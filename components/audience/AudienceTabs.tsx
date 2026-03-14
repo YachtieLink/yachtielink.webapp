@@ -149,7 +149,7 @@ export function AudienceTabs({
         title="Endorsements"
       >
         <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-          Endorsements add context to your work history. Collecting up to 5 for a yacht strengthens
+          Endorsements add context to your work history. Collecting 5 or more for a yacht strengthens
           your profile significantly.
         </p>
         <Link href={`/app/endorsement/request${requestYachtParam}`}>
