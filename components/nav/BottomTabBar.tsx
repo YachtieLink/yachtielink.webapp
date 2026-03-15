@@ -12,7 +12,7 @@ interface Tab {
 
 const tabs: Tab[] = [
   {
-    label: "Profile",
+    label: "My Profile",
     href: "/app/profile",
     icon: <ProfileIcon />,
     activeIcon: <ProfileIconFilled />,

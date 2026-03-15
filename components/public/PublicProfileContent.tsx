@@ -1,4 +1,5 @@
 import { EndorsementCard } from './EndorsementCard'
+import { ShareButton } from './ShareButton'
 import QRCode from 'react-qr-code'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -136,6 +137,10 @@ export function PublicProfileContent({
         <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">
           yachtie.link/u/{user.handle}
         </p>
+        <ShareButton
+          url={`https://yachtie.link/u/${user.handle}`}
+          name={displayName}
+        />
       </div>
 
       {/* ── About ─────────────────────────────────────────────────────────── */}

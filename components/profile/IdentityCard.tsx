@@ -26,6 +26,19 @@ export function IdentityCard({
   const [showQR, setShowQR]   = useState(false)
   const profileUrl = `https://yachtie.link/u/${handle}`
 
+  async function shareProfile() {
+    const shareData = {
+      title: `${displayName} — YachtieLink`,
+      text: `Check out ${displayName}'s profile on YachtieLink`,
+      url: profileUrl,
+    }
+    if (navigator.share) {
+      try { await navigator.share(shareData) } catch { /* user cancelled */ }
+    } else {
+      await copyLink()
+    }
+  }
+
   async function copyLink() {
     try {
       await navigator.clipboard.writeText(profileUrl)
@@ -99,6 +112,13 @@ export function IdentityCard({
         >
           yachtie.link/u/{handle}
         </Link>
+
+        <button
+          onClick={shareProfile}
+          className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-[var(--teal-500)] text-white hover:bg-[var(--teal-600)] transition-colors font-medium"
+        >
+          Share
+        </button>
 
         <button
           onClick={copyLink}
