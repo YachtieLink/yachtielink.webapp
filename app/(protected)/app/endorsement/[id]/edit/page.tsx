@@ -27,7 +27,7 @@ export default async function EditEndorsementPage({
     .single()
 
   if (!endorsement || endorsement.endorser_id !== user.id) {
-    redirect('/app/audience')
+    redirect('/app/network')
   }
 
   type EndorsementRow = typeof endorsement & {

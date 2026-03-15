@@ -37,7 +37,7 @@ export default async function RequestEndorsementPage({
   if (!user) redirect('/welcome')
 
   const { yacht_id } = await searchParams
-  if (!yacht_id) redirect('/app/audience')
+  if (!yacht_id) redirect('/app/network')
 
   const [
     yachtRes,
@@ -72,7 +72,7 @@ export default async function RequestEndorsementPage({
   ])
 
   const yacht = yachtRes.data
-  if (!yacht) redirect('/app/audience')
+  if (!yacht) redirect('/app/network')
 
   // Filter colleagues to those who share this yacht
   const allColleagueRows = (colleagueRowsRes.data as ColleagueRow[]) ?? []

@@ -148,7 +148,7 @@ export function DeepLinkFlow({ request, requester, yacht, requesterAttachment, c
           You have already written an endorsement for {name} on {yacht.name}.
         </p>
         <button
-          onClick={() => router.push('/app/audience')}
+          onClick={() => router.push('/app/network')}
           className="mt-4 text-sm text-[var(--color-interactive)] font-medium hover:underline"
         >
           View your endorsements
@@ -215,7 +215,7 @@ export function DeepLinkFlow({ request, requester, yacht, requesterAttachment, c
       prefillRecipientRole={requesterAttachment?.role_label ?? undefined}
       prefillStartDate={prefill?.started_at}
       prefillEndDate={prefill?.ended_at ?? undefined}
-      onSuccess={() => router.push('/app/audience')}
+      onSuccess={() => router.push('/app/network')}
     />
   )
 }

@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
         to: recipient.email,
         subject: `${endorserName} endorsed you on YachtieLink`,
         html: buildEndorsementReceivedHtml(endorserName, yachtName, excerpt),
-        text: `${endorserName} wrote an endorsement for your time on ${yachtName}:\n\n"${excerpt}"\n\nView it at: ${APP_URL}/app/audience`,
+        text: `${endorserName} wrote an endorsement for your time on ${yachtName}:\n\n"${excerpt}"\n\nView it at: ${APP_URL}/app/network`,
       })
     }
   } catch (e) {
@@ -133,7 +133,7 @@ export async function GET(req: NextRequest) {
 }
 
 function buildEndorsementReceivedHtml(endorserName: string, yachtName: string, excerpt: string) {
-  const profileUrl = `${APP_URL}/app/audience`
+  const profileUrl = `${APP_URL}/app/network`
   return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
