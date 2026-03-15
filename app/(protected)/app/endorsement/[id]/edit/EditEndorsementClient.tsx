@@ -39,7 +39,7 @@ export function EditEndorsementClient({
   const [deleting, setDeleting] = useState(false)
 
   function handleSuccess() {
-    router.push('/app/audience')
+    router.push('/app/network')
   }
 
   async function handleDelete() {
@@ -54,7 +54,7 @@ export function EditEndorsementClient({
         return
       }
       toast('Endorsement deleted.', 'success')
-      router.push('/app/audience')
+      router.push('/app/network')
     } catch {
       toast('Failed to delete endorsement.', 'error')
       setDeleting(false)
