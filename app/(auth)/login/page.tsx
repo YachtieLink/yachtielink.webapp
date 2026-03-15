@@ -110,7 +110,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="flex h-12 w-full items-center justify-center rounded-xl bg-[var(--color-navy-800)] text-sm font-semibold text-white transition-colors hover:bg-[var(--color-navy-900)] disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-12 w-full items-center justify-center rounded-xl bg-[var(--color-teal-700)] text-sm font-semibold text-white transition-colors hover:bg-[var(--color-teal-800)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "Signing in…" : "Sign in"}
         </button>

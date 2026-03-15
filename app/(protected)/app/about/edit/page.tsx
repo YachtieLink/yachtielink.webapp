@@ -75,7 +75,7 @@ export default function AboutEditPage() {
               onChange={(e) => setBio(e.target.value)}
               placeholder="e.g. Experienced Chief Stewardess with 8 seasons on motor yachts across the Med and Caribbean…"
               rows={8}
-              className={`w-full bg-[var(--card)] border rounded-xl px-4 py-3 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--ocean-500)] transition-shadow ${
+              className={`w-full bg-[var(--card)] border rounded-xl px-4 py-3 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--teal-500)] transition-shadow ${
                 overLimit ? 'border-red-500' : 'border-[var(--border)]'
               }`}
             />

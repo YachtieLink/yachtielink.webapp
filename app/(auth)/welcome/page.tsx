@@ -12,7 +12,7 @@ export default function WelcomePage() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-12 bg-[var(--color-surface)]">
       {/* Logo / wordmark placeholder */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-[var(--color-navy-900)] dark:text-[var(--color-navy-100)]">
+        <h1 className="text-3xl font-bold tracking-tight text-[var(--color-teal-800)] dark:text-[var(--color-teal-100)]">
           YachtieLink
         </h1>
         <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
@@ -24,7 +24,7 @@ export default function WelcomePage() {
       <div className="flex w-full max-w-sm flex-col gap-3">
         <Link
           href="/login"
-          className="flex h-12 w-full items-center justify-center rounded-xl bg-[var(--color-navy-800)] text-sm font-semibold text-white transition-colors hover:bg-[var(--color-navy-900)]"
+          className="flex h-12 w-full items-center justify-center rounded-xl bg-[var(--color-teal-700)] text-sm font-semibold text-white transition-colors hover:bg-[var(--color-teal-800)]"
         >
           Sign in with email
         </Link>

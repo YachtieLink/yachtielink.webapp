@@ -77,7 +77,7 @@ function ToastItem({
   const colourMap: Record<ToastType, string> = {
     success: "bg-emerald-600 text-white",
     error:   "bg-red-600 text-white",
-    info:    "bg-[var(--color-navy-800)] text-white",
+    info:    "bg-[var(--color-teal-700)] text-white",
   };
 
   return (

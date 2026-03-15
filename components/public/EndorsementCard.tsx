@@ -1,0 +1,75 @@
+'use client'
+
+import { useState } from 'react'
+
+interface EndorsementCardProps {
+  endorserName: string
+  endorserPhoto?: string | null
+  yachtName?: string | null
+  date: string
+  content: string
+}
+
+const TRUNCATE_LENGTH = 150
+
+export function EndorsementCard({
+  endorserName,
+  endorserPhoto,
+  yachtName,
+  date,
+  content,
+}: EndorsementCardProps) {
+  const [expanded, setExpanded] = useState(false)
+  const needsTruncation = content.length > TRUNCATE_LENGTH
+
+  const displayText = needsTruncation && !expanded
+    ? content.slice(0, TRUNCATE_LENGTH) + '…'
+    : content
+
+  const formattedDate = new Date(date).toLocaleDateString('en-GB', {
+    month: 'short',
+    year: 'numeric',
+  })
+
+  return (
+    <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+      {/* Endorser info */}
+      <div className="flex items-center gap-3 mb-3">
+        {endorserPhoto ? (
+          <img
+            src={endorserPhoto}
+            alt={endorserName}
+            className="h-8 w-8 rounded-full object-cover"
+          />
+        ) : (
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-surface-overlay)] text-xs font-medium text-[var(--color-text-secondary)]">
+            {endorserName.charAt(0).toUpperCase()}
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
+            {endorserName}
+          </p>
+          <p className="text-xs text-[var(--color-text-tertiary)]">
+            {yachtName && <>{yachtName} · </>}
+            {formattedDate}
+          </p>
+        </div>
+      </div>
+
+      {/* Content */}
+      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed whitespace-pre-line">
+        &ldquo;{displayText}&rdquo;
+      </p>
+
+      {needsTruncation && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="mt-2 text-xs font-medium text-[var(--color-interactive)] hover:text-[var(--color-interactive-hover)]"
+        >
+          {expanded ? 'Show less' : 'Read more'}
+        </button>
+      )}
+    </div>
+  )
+}

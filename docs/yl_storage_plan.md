@@ -85,12 +85,52 @@ Never store signed URLs in the database — they expire. Store only the raw path
 
 ---
 
+### `cv-uploads`
+
+| Property | Value |
+|----------|-------|
+| Visibility | **Private** |
+| Max file size | 10 MB |
+| Allowed types | `application/pdf`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document` |
+| Path pattern | `cv-uploads/{user_id}/cv.{ext}` |
+| Sprint added | Sprint 6 |
+
+**Why private?** Raw CV files may contain personal data (addresses, phone numbers, dates of birth). They are retained for audit purposes, not shown publicly.
+
+**Path convention:** `{user_id}/cv.{ext}` — one file per user, upload overwrites the previous.
+
+**Signed URLs:** Private bucket — generate signed URLs at render time (1-hour expiry). Store only the raw path on `users.cv_storage_path`.
+
+**RLS summary:**
+- Only the owner can read, insert, update, or delete their own files
+
+---
+
+### `pdf-exports`
+
+| Property | Value |
+|----------|-------|
+| Visibility | **Private** |
+| Max file size | 10 MB |
+| Allowed types | `application/pdf` |
+| Path pattern | `pdf-exports/{user_id}/profile-{timestamp}.pdf` |
+| Sprint added | Sprint 6 |
+
+**Why private?** Generated PDFs contain the user's full profile data. Download requires authentication via signed URL.
+
+**Path convention:** `{user_id}/profile-{timestamp}.pdf` — versioned, latest path stored on `users.latest_pdf_path`.
+
+**Signed URLs:** Private bucket — generate signed URLs at render time (1-hour expiry). Store only the raw path on `users.latest_pdf_path`.
+
+**RLS summary:**
+- Only the owner can read, insert, update, or delete their own files
+
+---
+
 ## Future buckets (planned)
 
 | Bucket | Sprint | Visibility | Notes |
 |--------|--------|------------|-------|
-| `cv-uploads` | Sprint 6 | Private | Raw CV files (PDF/DOCX) uploaded for parsing. Retained for audit, not shown publicly. Path: `{user_id}/cv.{ext}` |
-| `pdf-exports` | Sprint 6 | Private | Generated PDF snapshots. Path: `{user_id}/cv-{timestamp}.pdf`. Signed URLs for download. |
 | `yacht-photos` | Sprint 4 | Public | Single cover photo per yacht. Upload gated to users with an active or past attachment to that yacht. Path: `yacht-photos/{yacht_id}/cover.{ext}`. Full multi-photo gallery (multiple images, contributor attribution, ordering, deletion) promoted to Phase 1B Sprint 11. |
 
 ---
@@ -130,4 +170,4 @@ Or apply directly in the Supabase SQL Editor (copy the migration file contents a
 
 ---
 
-*Updated when new buckets are added or policies change. Current buckets: 2. Next update: Sprint 4 (yacht-photos), Sprint 6 (cv-uploads, pdf-exports).*
+*Updated when new buckets are added or policies change. Current buckets: 4 (profile-photos, cert-documents, cv-uploads, pdf-exports). Next update: Sprint 4 (yacht-photos).*

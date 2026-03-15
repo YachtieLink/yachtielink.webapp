@@ -154,7 +154,7 @@ export default function CertNewPage() {
           <li>
             <button
               onClick={() => { setCategory(''); pickOther() }}
-              className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--ocean-500)] hover:bg-[var(--muted)]/30 transition-colors text-left last:rounded-b-2xl"
+              className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--teal-500)] hover:bg-[var(--muted)]/30 transition-colors text-left last:rounded-b-2xl"
             >
               Other / not listed
               <span className="text-[var(--muted-foreground)]">›</span>
@@ -202,7 +202,7 @@ export default function CertNewPage() {
           <li>
             <button
               onClick={pickOther}
-              className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--ocean-500)] hover:bg-[var(--muted)]/30 transition-colors text-left last:rounded-b-2xl"
+              className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--teal-500)] hover:bg-[var(--muted)]/30 transition-colors text-left last:rounded-b-2xl"
             >
               Other / not listed
               <span className="text-[var(--muted-foreground)]">›</span>
@@ -266,7 +266,7 @@ export default function CertNewPage() {
               type="checkbox"
               checked={noExpiry}
               onChange={(e) => { setNoExpiry(e.target.checked); if (e.target.checked) setExpiresAt('') }}
-              className="rounded border-[var(--border)] text-[var(--ocean-500)]"
+              className="rounded border-[var(--border)] text-[var(--teal-500)]"
             />
             <span className="text-sm text-[var(--muted-foreground)]">No expiry / lifetime certification</span>
           </label>
@@ -284,7 +284,7 @@ export default function CertNewPage() {
             className="text-sm text-[var(--foreground)]"
           />
           {docFile && (
-            <p className="text-xs text-[var(--ocean-500)] mt-1">{docFile.name}</p>
+            <p className="text-xs text-[var(--teal-500)] mt-1">{docFile.name}</p>
           )}
         </div>
       </div>

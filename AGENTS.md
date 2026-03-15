@@ -122,8 +122,10 @@ If docs conflict, follow `yl_system_state.json`, `yl_phase1_execution.md`, and `
 - Any meaningful decision (product, architecture, or process)
 - Any significant file created or changed
 - Any flag raised to the founder
-- Before committing and pushing — confirm it's current
 - At session end — confirm it's complete
+
+**CRITICAL — before every `git commit`:**
+You MUST update `CHANGELOG.md` to reflect all work being committed BEFORE running `git commit`. This is a blocking pre-commit requirement. If the changelog does not cover the changes in the commit, stop and update it first. No exceptions — this has been missed repeatedly.
 
 Format: reverse chronological, one entry per session, with Done / Context / Next / Flags sections. If a session ends unexpectedly or you commit mid-session, the log should already reflect what happened.
 

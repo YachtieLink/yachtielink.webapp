@@ -70,7 +70,7 @@ function ToggleRow({
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative w-11 h-6 rounded-full transition-colors ${
-          checked ? 'bg-[var(--ocean-500)]' : 'bg-[var(--muted)]'
+          checked ? 'bg-[var(--teal-500)]' : 'bg-[var(--muted)]'
         }`}
       >
         <span
@@ -242,7 +242,7 @@ export default function ProfileSettingsPage() {
               <select
                 value={form.location_country}
                 onChange={(e) => set('location_country', e.target.value)}
-                className="flex-1 bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ocean-500)]"
+                className="flex-1 bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--teal-500)]"
               >
                 <option value="">Country</option>
                 {COUNTRIES.map((c) => (
@@ -254,7 +254,7 @@ export default function ProfileSettingsPage() {
                 value={form.location_city}
                 onChange={(e) => set('location_city', e.target.value)}
                 placeholder="City"
-                className="flex-1 bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ocean-500)]"
+                className="flex-1 bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--teal-500)]"
               />
             </div>
           </div>

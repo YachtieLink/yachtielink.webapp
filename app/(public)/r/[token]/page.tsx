@@ -97,7 +97,7 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
           </p>
           <Link
             href="/signup"
-            className="inline-block px-6 py-3 rounded-xl bg-[var(--color-navy-800)] text-white text-sm font-semibold"
+            className="inline-block px-6 py-3 rounded-xl bg-[var(--color-teal-700)] text-white text-sm font-semibold"
           >
             Create a YachtieLink profile
           </Link>
@@ -136,7 +136,7 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
           <div className="flex flex-col gap-3">
             <Link
               href={`/login?returnTo=${returnTo}`}
-              className="flex h-12 items-center justify-center rounded-xl bg-[var(--color-navy-800)] text-white text-sm font-semibold"
+              className="flex h-12 items-center justify-center rounded-xl bg-[var(--color-teal-700)] text-white text-sm font-semibold"
             >
               Sign in
             </Link>

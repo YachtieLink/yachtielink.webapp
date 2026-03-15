@@ -92,7 +92,7 @@ export default async function YachtDetailPage({ params }: PageProps) {
         <div className="flex items-start justify-between mb-1">
           <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">{yacht.name}</h1>
           {yacht.is_established && (
-            <span className="shrink-0 ml-3 mt-1 text-xs bg-[var(--ocean-500)]/10 text-[var(--ocean-500)] px-2 py-0.5 rounded-full font-medium">
+            <span className="shrink-0 ml-3 mt-1 text-xs bg-[var(--teal-500)]/10 text-[var(--teal-500)] px-2 py-0.5 rounded-full font-medium">
               Established
             </span>
           )}
@@ -177,7 +177,7 @@ export default async function YachtDetailPage({ params }: PageProps) {
         {!userHasAttachment && (
           <Link
             href={`/app/attachment/new`}
-            className="mt-4 block w-full text-center py-3 rounded-2xl border border-[var(--ocean-500)] text-[var(--ocean-500)] text-sm font-medium hover:bg-[var(--ocean-500)]/5 transition-colors"
+            className="mt-4 block w-full text-center py-3 rounded-2xl border border-[var(--teal-500)] text-[var(--teal-500)] text-sm font-medium hover:bg-[var(--teal-500)]/5 transition-colors"
           >
             + Add this yacht to my profile
           </Link>

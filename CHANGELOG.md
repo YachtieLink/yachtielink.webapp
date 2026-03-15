@@ -17,6 +17,117 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-15 — Claude Code (Opus 4.6) — Brand Palette & Style Guide
+
+### Done
+- Created **`/yl_style_guide.md`** (project root, above webapp) — full brand style guide documenting colour palette, typography, component styling, spacing, dark mode, and brand voice rules
+- Replaced entire colour palette: navy/ocean/gold → **teal** (primary, #0D7377 at 700) + **sand** (accent, #E8DCC8) across all 29 files
+- Swapped typography from Geist (Next.js default) to **DM Sans** via `next/font/google` — warmer personality, still clean
+- Updated `globals.css` with new design tokens: teal-50→950, sand-100→400, updated semantic colours (interactive, info now teal-700)
+- Updated dark mode overrides: interactive colour now teal-500 in dark mode for visibility
+- Updated all UI components (Button, Toast) and 26 page/component files — zero remaining references to old palette
+- Build passes clean
+
+### Context
+- Design direction: "Clean & light with 25% maritime feel" — professional without being corporate, nautical without being cheesy
+- Primary brand colour: teal-700 (`#0D7377`) — deep ocean feel, not generic corporate navy
+- Sand accent for warmth (teak deck reference) — used sparingly on badges, Pro features, highlights
+- No anchors, compass roses, wave backgrounds, or yacht-club aesthetics
+- shadcn/ui installation deferred — palette locked in first, component upgrade is a logical next step
+
+### Next
+- Consider installing shadcn/ui for production-grade component library (theming now ready)
+- Logo/wordmark design needed (currently text-only)
+- Clean up template assets in `/public` (vercel.svg, next.svg, etc.)
+
+### Flags
+- None
+
+---
+
+## 2026-03-15 — Claude Code (Opus 4.6) — AI Feature Registry + Priority Ratings
+
+### Done
+- Added **Languages** section to the Profile feature — multi-select with proficiency levels (Native/Fluent/Conversational/Basic), always visible, extracted from CV import. Updated profile section order to include Languages at position 2
+- Added **Native Profile Sharing** as a new Phase 1A feature — Web Share API for native share sheet on mobile (WhatsApp, Telegram, iMessage, email, etc.), desktop fallback with deep links, prominent placement on public profile page
+- Founder decision: work preferences (charter/private, yacht size, region) not added — not standard on CVs, and if someone is viewing a profile the candidate has already expressed interest
+- Researched OpenAI API features comprehensively (models, vision, image gen, TTS/STT, embeddings, fine-tuning, Responses API, function calling, structured outputs, moderation, Realtime API, Agents SDK, pricing)
+- Added 21 AI features (AI-01 through AI-21) to `docs/yl_features.md` in full feature registry format with What/Why/Tier/Cost/Phase/Status/Priority/Details
+- Features span Free tier (moderation, endorsement helper, multilingual translation, yacht auto-complete, profile suggestions) and Pro tier (cert OCR, cert intelligence, season readiness, CV vision upgrade, endorsement advisor, gap analyzer, smart requests, profile insights, photo coach, cover letter, interview prep, job market pulse) plus Recruiter tier (NLP crew search, sentiment analysis) and one-time (voice onboarding)
+- Enhanced **QR Code** feature with Pro-tier customisation — foreground/background colour pickers, transparent background toggle, SVG export, live preview, contrast validation, and global application (customised QR persists on profile page, generated PDFs, and downloads). Free tier gets two preset styles: black-on-white (default) and white-on-black (inverted)
+- Added **Priority** field to ALL existing features in the registry (Phase 1A, 1B, 1C, 2+) — not just AI features
+- Priority scale: "Must have" / "Nice to have" / "Only if we have lots of time"
+- Bumped feature registry version from 2.0 to 3.0, date to 2026-03-15
+- All AI features respect canonical monetisation law: AI improves presentation/convenience, never creates/suppresses/alters trust
+
+### Context
+- API strategy: single vendor (OpenAI), cheapest viable model per feature
+- Free-tier AI cost target: <EUR 0.01/user/month; Pro-tier: <EUR 0.10/user/month
+- Content moderation (AI-01) is completely free via OpenAI's moderation API — recommended to ship with launch
+- Phase assignment: 3 AI features in 1A, 10 in 1B, 2 in 1C, 6 in 2+
+- Key models: GPT-5 Nano for cheap text tasks, GPT-4o Mini for vision, text-embedding-3-small for semantic search, GPT-5/GPT-5 Mini for complex generation, Realtime API for voice
+
+### Next
+- Sprint 7 planning (Stripe integration)
+- Consider adding AI-01 (content moderation) to Sprint 8 launch prep scope
+
+### Flags
+- None
+
+---
+
+## 2026-03-15 — Claude Code (Opus 4.6) — Sprint 6: Public Profile + CV
+
+### Done
+- Created `feat/sprint-6` branch from updated `main`
+- **Task 1 — Dependencies + Migration:**
+  - Installed: `openai`, `pdf-parse`, `mammoth`, `@react-pdf/renderer`, `qrcode`, `@types/pdf-parse`, `@types/qrcode`
+  - Migration `20260315000017_sprint6_cv_storage.sql`: `cv-uploads` + `pdf-exports` buckets, owner-only RLS, user columns (`cv_storage_path`, `cv_parsed_at`, `cv_parse_count_today/reset_at`, `latest_pdf_path/generated_at`), `check_cv_parse_limit` RPC (3/day)
+  - Added `uploadCV` + `getPdfExportUrl` to `lib/storage/upload.ts`
+  - Updated `docs/yl_storage_plan.md` — moved `cv-uploads` and `pdf-exports` from future to active
+  - `lib/cv/prompt.ts` — extraction prompt constant (shared across providers)
+  - Added `OPENAI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` placeholders to `.env.local`
+- **Task 2 — Public Profile Page:**
+  - `app/(public)/u/[handle]/page.tsx` — full rewrite: server-rendered, parallel data fetch, all sections (hero, about, contact with visibility, employment history, certs with expiry status, endorsements, QR code)
+  - `generateMetadata` with OG + Twitter card tags
+  - `components/public/PublicProfileContent.tsx` — shared component used by both `/u/:handle` and `/app/cv`
+  - `components/public/EndorsementCard.tsx` — collapsible endorsement with 150-char truncation
+- **Task 3 — CV Tab:**
+  - `app/(protected)/app/cv/page.tsx` — full rewrite: profile preview + actions
+  - `components/cv/CvActions.tsx` — share link, PDF generate/download/regenerate, CV upload link, QR code toggle/download, template selector (Standard free, 2 Pro locked)
+- **Task 4 — CV Upload + AI Parsing:**
+  - `app/(protected)/app/cv/upload/page.tsx` + `components/cv/CvUploadClient.tsx` — drag-and-drop upload, client-side validation, upload to Supabase Storage, call parse API, navigate to review
+  - `app/api/cv/parse/route.ts` — auth, rate limit via `check_cv_parse_limit` RPC, download file via service role, extract text (pdf-parse for PDF, mammoth for DOCX), call OpenAI GPT-4o-mini with JSON mode, graceful error handling (timeout, malformed, rate limit)
+  - `app/(protected)/app/cv/review/page.tsx` + `components/cv/CvReviewClient.tsx` — review parsed data, editable profile fields (respects existing data), yacht dedup via `search_yachts` RPC, cert type matching, save to profile
+- **Task 5 — PDF Generation:**
+  - `app/api/cv/generate-pdf/route.ts` — auth, Pro check for non-standard templates, parallel data fetch, QR via `qrcode` (Node.js), render via `@react-pdf/renderer`, upload to `pdf-exports`, signed URL return
+  - `app/api/cv/download-pdf/route.ts` — auth, fetch `latest_pdf_path`, generate signed URL
+  - `components/pdf/ProfilePdfDocument.tsx` — `@react-pdf/renderer` layout: header with photo, about, contact, employment, certs, top 3 endorsements (truncated 200 chars), QR code, watermark for free tier
+- **Task 6 — Share/Actions wired up** in CvActions component
+- **Task 7 — Docs updated** (storage plan)
+- Build passes clean with all new routes
+
+### Context
+- **Switched from Anthropic to OpenAI** — founder decision: one vendor, one bill, more optionality (Whisper, vision, embeddings for future). CV parsing now uses `gpt-4o-mini` with `response_format: { type: 'json_object' }` for guaranteed valid JSON. Cost: ~$0.005/parse.
+- Migration `20260315000017` **needs applying to production** before CV features work
+- `OPENAI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` need real values in `.env.local` and Vercel
+- PDF generation uses service role Supabase client (bypasses RLS for storage operations)
+- CV parse rate limit: 3/day per user via DB function
+- pdf-parse v2 uses `PDFParse` class (not default export) — `new PDFParse({ data: Uint8Array })`
+- `AGENTS.md` updated: pre-commit changelog update is now a CRITICAL blocking requirement
+
+### Next
+- Apply migration 017 to production
+- Set real API keys (OpenAI + Supabase service role) in `.env.local` and Vercel
+- End-to-end testing of all flows
+- Sprint 7 planning
+
+### Flags
+- `OPENAI_API_KEY` and `SUPABASE_SERVICE_ROLE_KEY` must be set before CV parsing / PDF generation will work
+- Email confirmation still disabled in Supabase — re-enable before go-live
+
+---
+
 ## 2026-03-14 — Claude Code (Sonnet 4.6) — Sprint 5 polish
 
 ### Done

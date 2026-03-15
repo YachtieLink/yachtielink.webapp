@@ -89,9 +89,9 @@ function ProgressBar({
           key={i}
           className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
             i < current
-              ? "bg-[var(--color-navy-800)]"
+              ? "bg-[var(--color-teal-700)]"
               : i === current
-                ? "bg-[var(--color-navy-800)] opacity-50"
+                ? "bg-[var(--color-teal-700)] opacity-50"
                 : "bg-[var(--color-border)]"
           }`}
         />
@@ -361,7 +361,7 @@ function RoleRow({
       onClick={() => onSelect(role.name)}
       className={`flex w-full items-center gap-3 border-b border-[var(--color-border)] px-4 py-3 text-left text-sm last:border-b-0 transition-colors ${
         selected
-          ? "bg-[var(--color-navy-800)] text-white"
+          ? "bg-[var(--color-teal-700)] text-white"
           : "text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]"
       }`}
     >
@@ -453,7 +453,7 @@ function StepRole({
     return (
       <StepShell title="What's your role?">
         <div className="flex h-40 items-center justify-center">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--color-navy-800)] border-t-transparent" />
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--color-teal-700)] border-t-transparent" />
         </div>
       </StepShell>
     );
@@ -477,7 +477,7 @@ function StepRole({
                 onClick={() => selectDept(d.name)}
                 className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
                   selectedDept === d.name
-                    ? "border-[var(--color-navy-800)] bg-[var(--color-navy-800)] text-white"
+                    ? "border-[var(--color-teal-700)] bg-[var(--color-teal-700)] text-white"
                     : "border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]"
                 }`}
               >
@@ -514,7 +514,7 @@ function StepRole({
                   onClick={handleUseCustom}
                   className={`flex w-full items-center px-4 py-3 text-left text-sm transition-colors ${
                     selectedRole === roleSearch.trim()
-                      ? "bg-[var(--color-navy-800)] text-white"
+                      ? "bg-[var(--color-teal-700)] text-white"
                       : "text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]"
                   }`}
                 >
@@ -640,7 +640,7 @@ function StepYacht({
             onClick={() => setMode(m)}
             className={`flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors ${
               mode === m
-                ? "border-[var(--color-navy-800)] bg-[var(--color-navy-800)] text-white"
+                ? "border-[var(--color-teal-700)] bg-[var(--color-teal-700)] text-white"
                 : "border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]"
             }`}
           >
@@ -660,7 +660,7 @@ function StepYacht({
 
           {searching && (
             <div className="flex justify-center py-4">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--color-navy-800)] border-t-transparent" />
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--color-teal-700)] border-t-transparent" />
             </div>
           )}
 
@@ -730,7 +730,7 @@ function StepYacht({
                   onClick={() => setNewType(t)}
                   className={`flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors ${
                     newType === t
-                      ? "border-[var(--color-navy-800)] bg-[var(--color-navy-800)] text-white"
+                      ? "border-[var(--color-teal-700)] bg-[var(--color-teal-700)] text-white"
                       : "border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]"
                   }`}
                 >
@@ -751,7 +751,7 @@ function StepYacht({
                   onClick={() => setNewSize(s.value)}
                   className={`rounded-xl border py-2.5 text-sm font-medium transition-colors ${
                     newSize === s.value
-                      ? "border-[var(--color-navy-800)] bg-[var(--color-navy-800)] text-white"
+                      ? "border-[var(--color-teal-700)] bg-[var(--color-teal-700)] text-white"
                       : "border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]"
                   }`}
                 >
@@ -969,7 +969,7 @@ function StepDone({
       </div>
 
       <div className="flex flex-col items-center gap-2 pt-2">
-        <div className="h-7 w-7 animate-spin rounded-full border-2 border-[var(--color-navy-800)] border-t-transparent" />
+        <div className="h-7 w-7 animate-spin rounded-full border-2 border-[var(--color-teal-700)] border-t-transparent" />
         <p className="text-xs text-[var(--color-text-tertiary)]">
           Taking you to your profile…
         </p>

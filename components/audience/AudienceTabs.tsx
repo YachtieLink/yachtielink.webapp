@@ -136,7 +136,7 @@ export function AudienceTabs({
         </div>
         <div className="w-full h-2 rounded-full bg-[var(--color-surface-raised)] overflow-hidden mb-2">
           <div
-            className="h-full rounded-full bg-[var(--ocean-500)] transition-all"
+            className="h-full rounded-full bg-[var(--teal-500)] transition-all"
             style={{ width: `${progressPct}%` }}
           />
         </div>
@@ -304,7 +304,7 @@ function EndorsementsTab({
             <p className="text-sm text-[var(--color-text-secondary)] mb-3">No endorsements yet.</p>
             <Link
               href="/app/endorsement/request"
-              className="text-sm text-[var(--ocean-500)] font-medium hover:underline"
+              className="text-sm text-[var(--teal-500)] font-medium hover:underline"
             >
               Request endorsements →
             </Link>
@@ -319,7 +319,7 @@ function EndorsementsTab({
                 year: 'numeric',
               })
               return (
-                <div key={e.id} className="bg-[var(--card)] rounded-2xl p-4 border-l-2 border-[var(--ocean-500)]">
+                <div key={e.id} className="bg-[var(--card)] rounded-2xl p-4 border-l-2 border-[var(--teal-500)]">
                   <p className="text-sm text-[var(--color-text-primary)] leading-relaxed mb-2">
                     &ldquo;{excerpt(e.content)}&rdquo;
                   </p>
@@ -391,7 +391,7 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
         </p>
         <Link
           href="/app/attachment/new"
-          className="text-sm text-[var(--ocean-500)] font-medium hover:underline"
+          className="text-sm text-[var(--teal-500)] font-medium hover:underline"
         >
           Add a yacht →
         </Link>
@@ -434,7 +434,7 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
                 </p>
               )}
               {entry.sharedYachtNames.length > 0 && (
-                <p className="text-xs text-[var(--ocean-500)] truncate mt-0.5">
+                <p className="text-xs text-[var(--teal-500)] truncate mt-0.5">
                   {entry.sharedYachtNames.length === 1
                     ? entry.sharedYachtNames[0]
                     : `${entry.sharedYachtNames[0]} +${entry.sharedYachtNames.length - 1} more`}
@@ -443,7 +443,7 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
             </div>
             <Link
               href={`/app/endorsement/request?colleague_id=${entry.colleague_id}&yacht_id=${entry.shared_yachts[0]}`}
-              className="shrink-0 text-xs text-[var(--ocean-500)] font-medium px-3 py-1.5 rounded-full border border-[var(--ocean-500)] hover:bg-[var(--ocean-500)]/5 transition-colors"
+              className="shrink-0 text-xs text-[var(--teal-500)] font-medium px-3 py-1.5 rounded-full border border-[var(--teal-500)] hover:bg-[var(--teal-500)]/5 transition-colors"
             >
               Endorse
             </Link>
