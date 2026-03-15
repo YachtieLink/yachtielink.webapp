@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/cert-expiry",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/analytics-nudge",
+      "schedule": "0 10 * * 1"
+    }
+  ]
+}

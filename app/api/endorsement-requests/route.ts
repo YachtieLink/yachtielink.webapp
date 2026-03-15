@@ -85,14 +85,15 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { yacht_id, recipient_email, recipient_phone, yacht_name } = body as {
+  const { yacht_id, recipient_email, recipient_phone, recipient_user_id: directRecipientId, yacht_name } = body as {
     yacht_id: string;
     recipient_email?: string;
     recipient_phone?: string;
+    recipient_user_id?: string;
     yacht_name?: string;
   };
 
-  if (!yacht_id || (!recipient_email && !recipient_phone)) {
+  if (!yacht_id || (!recipient_email && !recipient_phone && !directRecipientId)) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
@@ -120,15 +121,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Look up whether a YachtieLink account already exists for this email.
-  // If so, set recipient_user_id immediately so RLS lets them see the request
-  // in their Audience tab without waiting for a trigger.
-  let recipientUserId: string | null = null
-  if (recipient_email) {
+  // Resolve recipient_user_id: direct colleague ID, email lookup, or phone lookup
+  let recipientUserId: string | null = directRecipientId ?? null
+  if (!recipientUserId && recipient_email) {
     const { data: existingUser } = await supabase
       .from("users")
       .select("id")
       .eq("email", recipient_email.trim().toLowerCase())
+      .maybeSingle()
+    recipientUserId = existingUser?.id ?? null
+  }
+  if (!recipientUserId && recipient_phone) {
+    const { data: existingUser } = await supabase
+      .from("users")
+      .select("id")
+      .or(`phone.eq.${recipient_phone},whatsapp.eq.${recipient_phone}`)
       .maybeSingle()
     recipientUserId = existingUser?.id ?? null
   }
@@ -157,11 +164,22 @@ export async function POST(req: NextRequest) {
   const yachtDisplay = (yacht_name as string | undefined) ?? "";
   const subjectYacht = yachtDisplay ? ` on ${yachtDisplay}` : "";
 
+  // Resolve email to send notification to (explicit email or looked up from user)
+  let notifyEmail = recipient_email?.trim() ?? null
+  if (!notifyEmail && recipientUserId) {
+    const { data: recipientProfile } = await supabase
+      .from("users")
+      .select("email")
+      .eq("id", recipientUserId)
+      .single()
+    notifyEmail = recipientProfile?.email ?? null
+  }
+
   // Send email — non-fatal if it fails (request is already in DB)
-  if (recipient_email) {
+  if (notifyEmail) {
     try {
       await sendNotifyEmail({
-        to: recipient_email.trim(),
+        to: notifyEmail,
         subject: `${requesterName} asked you to endorse their work${subjectYacht}`,
         html: buildHtml(requesterName, yachtDisplay, deepLink),
         text: buildText(requesterName, yachtDisplay, deepLink),

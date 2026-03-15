@@ -17,6 +17,150 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-15 — Claude Code (Opus 4.6) — Sprint 7: Endorsement virality + fixes
+
+### Done
+- **Endorsement virality — full implementation:**
+  - `supabase/migrations/20260315000019_endorsement_virality.sql` — `is_shareable` column, updated `has_recipient` constraint (allows phone/shareable), phone index, extended `link_pending_requests_to_new_user()` trigger for phone/WhatsApp matching, UPDATE trigger on users table, unique index for shareable links
+  - `app/api/endorsement-requests/share-link/route.ts` — new POST endpoint for reusable shareable links (idempotent, one per requester+yacht)
+  - `app/api/endorsement-requests/route.ts` — added `recipient_user_id` for direct colleague requests, phone-based user lookup, email notification fallback when only user_id provided
+  - `app/(protected)/app/endorsement/request/RequestEndorsementClient.tsx` — complete rewrite: share section (WhatsApp, Copy Link, native Share) at top, colleague cards with one-tap Request buttons, email/phone input with auto-detect, contact chips, rate limit display
+  - `app/(protected)/app/endorsement/request/page.tsx` — yacht picker when no `yacht_id`, fetches colleague emails, improved request status matching
+  - `components/endorsement/DeepLinkFlow.tsx` — added `mini-onboard` step for new/incomplete users (name, role, yacht dates), auto-prefill dates from requester's attachment, post-endorsement redirect to `/onboarding` for incomplete users
+  - `components/endorsement/WriteEndorsementForm.tsx` — post-endorsement upsell CTA ("Want endorsements too? Request yours →")
+  - `components/audience/AudienceTabs.tsx` — replaced BottomSheet indirection with prominent teal CTA card linking to `/app/endorsement/request`, progress bar embedded
+  - `app/(protected)/app/profile/page.tsx` — floating CTA tiered logic: (1) next milestone, (2) "Request endorsements" when <5 endorsements, (3) "Share profile" fallback
+- **Fixes:**
+  - `next.config.ts` — added Supabase storage remote pattern for Next/Image
+  - `components/ui/Input.tsx` — replaced `Math.random()` ID with `useId()` to fix hydration mismatch
+  - `supabase/migrations/20260315000018_sprint7_payments.sql` — fixed `expiry_date` → `expires_at` column reference in certifications index
+- **Migrations applied** to remote database: both `20260315000018` and `20260315000019`
+- **PR #35** created on `feat/sprint-7`
+
+### Context
+- Endorsement virality is the primary growth lever — WhatsApp is the #1 comms channel for yacht crew
+- Shareable links are reusable (one per requester+yacht), so sharing via WhatsApp/social doesn't create duplicate DB rows
+- Phone matching uses DB triggers (INSERT + UPDATE on users table) so endorsement requests auto-link when someone signs up with a matching phone/WhatsApp/email
+- Mini-onboarding for endorsers: just name, role, and yacht dates — full onboarding deferred to after they write the endorsement
+
+### Next
+- Merge PR #35 to main
+- Test end-to-end: share link via WhatsApp → recipient opens → mini-onboard → write endorsement → auto-link
+- Sprint 8 planning
+
+### Flags
+- None
+
+---
+
+## 2026-03-15 — Claude Code (Sonnet 4.6) — Sprint 7 addendum: Founding member pricing + Stripe go-live
+
+### Done
+- **Founding member pricing (€4.99/mo locked forever, first 100 subs):**
+  - `app/api/stripe/checkout/route.ts` — `resolveMonthlyPriceId()` checks `users.founding_member` count; if < 100 and `STRIPE_PRO_FOUNDING_PRICE_ID` is set, uses founding price; otherwise standard €8.99 price
+  - `app/api/stripe/webhook/route.ts` — stamps `founding_member = true` on the user when `subscription.metadata.founding_member === 'true'`
+  - `components/insights/UpgradeCTA.tsx` — accepts `foundingSlotsLeft` prop; shows "X founding spots left" badge + "locked in forever" copy + correct price label (€4.99) when slots remain; auto-selects Annual when slots exhausted
+  - `app/(protected)/app/insights/page.tsx` — fetches founding count server-side, passes `foundingSlotsLeft` to UpgradeCTA
+  - `supabase/migrations/20260315000018_sprint7_payments.sql` — added `users.founding_member boolean DEFAULT false`
+- Pricing env var added: `STRIPE_PRO_FOUNDING_PRICE_ID` (optional — feature degrades gracefully if unset)
+- **Stripe product configured by founder:** one product "Crew Pro", 3 prices — €4.99/mo (founding), €8.99/mo (standard), €69.99/yr
+- **Stripe webhook configured:** `https://yachtie.link/api/stripe/webhook` — 4 events subscribed
+- **Vercel env vars added:** `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_MONTHLY_PRICE_ID`, `STRIPE_PRO_ANNUAL_PRICE_ID`, `STRIPE_PRO_FOUNDING_PRICE_ID`, `NEXT_PUBLIC_SITE_URL`, `CRON_SECRET`
+- **Migration applied** via `npx supabase db push` — `20260315000018` confirmed in sync
+- Branch `feat/sprint-7` committed and pushed — ready to merge to main
+- Build: passes ✓
+
+### Context
+- Founding price is a normal Stripe price at €4.99 — no coupon needed; cap logic lives in the checkout route
+- Existing founding subscribers are never automatically migrated off the €4.99 price by Stripe
+- All 19 migrations in sync between local and remote
+
+### Next
+- Merge `feat/sprint-7` PR to main → Vercel auto-deploys
+- Test end-to-end checkout flow in production (use Stripe test mode first if needed)
+- Sprint 8 planning
+
+### Flags
+- None — all env vars set, migration applied, webhook live
+
+---
+
+## 2026-03-15 — Claude Code (Sonnet 4.6) — Sprint 7: Payments + Pro
+
+### Done
+- Created `feat/sprint-7` branch from `feat/sprint-6`
+- **Task 1 — Stripe SDK + helpers:**
+  - Installed `stripe` npm package
+  - `lib/stripe/client.ts` — lazy Stripe singleton (proxy pattern to avoid build-time env throw)
+  - `lib/stripe/pro.ts` — `getProStatus()` helper checking both status flag and expiry date
+  - `lib/supabase/admin.ts` — service role Supabase client for webhook + cron routes
+- **Task 2 — Checkout + Portal API routes:**
+  - `app/api/stripe/checkout/route.ts` — POST: creates/reuses Stripe Customer, creates Checkout Session, returns redirect URL
+  - `app/api/stripe/portal/route.ts` — POST: creates Customer Portal session, returns redirect URL
+- **Task 3 — Stripe webhook handler:**
+  - `app/api/stripe/webhook/route.ts` — handles `subscription.created/updated/deleted`, `invoice.payment_failed`
+  - On create/update: sets `subscription_status`, `subscription_plan`, `subscription_ends_at`, `show_watermark`
+  - On delete: revokes `custom_subdomain`, resets `template_id`, sets `show_watermark = true`
+  - On payment_failed: logs + sends email, does NOT downgrade (Stripe retries)
+  - Sends welcome email on `subscription.created`
+- **Task 4 — Insights tab (full rewrite):**
+  - `app/(protected)/app/insights/page.tsx` — server component, branches on Pro status
+  - Free: 5 teaser cards (locked), profile completeness gate (Wheel A < 5/5 shows "finish setup first"), UpgradeCTA
+  - Pro: time-range toggle (7d/30d/all-time), 3 analytics cards with bar charts, cert expiry card, plan management
+  - `components/insights/AnalyticsChart.tsx` — pure CSS bar chart (no external library)
+  - `components/insights/UpgradeCTA.tsx` — monthly/annual plan toggle, calls Checkout API
+  - `components/insights/InsightsUpgradedToast.tsx` — post-checkout success/pending toast, auto-refreshes if webhook hasn't fired
+  - `components/insights/ManagePortalButton.tsx` — calls Portal API, redirects to Stripe
+  - `app/(public)/u/[handle]/page.tsx` — added `record_profile_event('profile_view')` fire-and-forget call
+- **Task 5 — Pro PDF templates:**
+  - `components/pdf/ProfilePdfDocument.tsx` — added `PdfTemplate` type, `template` prop, dispatches to Classic Navy / Modern Minimal sub-components
+  - Classic Navy: navy header band (#1B3A5C), gold accents (#C5A55A), Times-Roman serif font, gold dividers
+  - Modern Minimal: teal hero band (#0D9488), Helvetica, generous whitespace
+  - Both use built-in @react-pdf/renderer fonts only
+  - `components/cv/CvActions.tsx` — template selector now interactive: free users click Pro templates → redirected to `/app/insights`; Pro users can switch and regenerate; `selectedTemplate` state wired to `generate-pdf` API call
+- **Task 6 — Cert Document Manager:**
+  - `app/(protected)/app/certs/page.tsx` — server component, fetches certs + Pro status, shows upgrade nudge for free users
+  - `components/certs/CertsClient.tsx` — client component: expiry alert (Pro), filter tabs (All/Valid/Expiring/Expired), cert rows with status badges, document view/upload links
+  - `lib/email/cert-expiry.ts` — cert expiry reminder email
+  - `app/api/cron/cert-expiry/route.ts` — daily cron: finds Pro users' certs expiring ≤60 days, sends 60d + 30d reminders, marks flags
+- **Task 7 — Custom subdomain routing:**
+  - `middleware.ts` — detects `*.yachtie.link` (excluding `yachtie.link` + `www`), rewrites to `/u/{subdomain}`; runs before auth checks
+- **Task 8 — Billing UI + emails + crons:**
+  - `app/(protected)/app/more/page.tsx` — billing section: free users see upgrade link; Pro users see plan, renewal date, Manage Subscription button (Stripe Portal)
+  - `lib/email/subscription-welcome.ts` — welcome email listing Pro features
+  - `lib/email/payment-failed.ts` — payment failed email with portal link
+  - `lib/email/analytics-nudge.ts` — one-time nudge email for free users with above-avg views
+  - `app/api/cron/analytics-nudge/route.ts` — weekly Monday cron: finds free users with 2x avg views, sends one-time nudge, sets `analytics_nudge_sent = true`
+  - `vercel.json` — cron schedule: cert-expiry at 09:00 UTC daily, analytics-nudge at 10:00 UTC Mondays
+- **Task 9 — Migration `20260315000018_sprint7_payments.sql`:**
+  - `users.analytics_nudge_sent` (boolean)
+  - `certifications.expiry_reminder_60d_sent` + `expiry_reminder_30d_sent` (boolean)
+  - `record_profile_event()`, `get_analytics_summary()`, `get_analytics_timeseries()`, `get_endorsement_request_limit()` RPCs
+  - Index on `profile_analytics(user_id, event_type, occurred_at DESC)`
+  - Index on `certifications(expires_at)` where not null
+- **Build:** passes clean ✓ (all 45 routes)
+- Note: Stripe API version auto-detected as `2026-02-25.clover` (matches installed SDK)
+
+### Context
+- Stripe client uses lazy proxy pattern to avoid module-level env throw at build time
+- Endorsement request limit (20 Pro / 10 free) was already implemented in Sprint 5 API route
+- Custom subdomain routing: middleware rewrites universally; only the displayed URL (Pro badge in UI) is gated
+- Vercel wildcard DNS (`*.yachtie.link → CNAME cname.vercel-dns.com`) must be set up manually by founder
+- All Pro email templates use `sendNotifyEmail` from existing `lib/email/notify.ts` (Resend, `notifications@mail.yachtie.link`)
+
+### Next
+- Founder: configure Stripe (product, prices, webhook) and add env vars to Vercel + `.env.local`
+- Founder: set up `*.yachtie.link` wildcard DNS in Vercel + DNS provider
+- Apply migration `20260315000018` to production
+- Sprint 8 planning
+
+### Flags
+- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_MONTHLY_PRICE_ID`, `STRIPE_PRO_ANNUAL_PRICE_ID`, `NEXT_PUBLIC_SITE_URL` must be added to Vercel env and `.env.local` before Stripe features work
+- `CRON_SECRET` should be set in Vercel env for cron route security
+- Stripe webhook must point to `https://yachtie.link/api/stripe/webhook` and subscribe to: `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`
+
+---
+
 ## 2026-03-15 — Claude Code (Opus 4.6) — Brand Palette, Style Guide & shadcn/ui
 
 ### Done
