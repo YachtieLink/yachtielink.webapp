@@ -179,3 +179,62 @@ export async function getCertDocumentUrl(storagePath: string): Promise<string | 
   if (error || !data?.signedUrl) return null
   return data.signedUrl
 }
+
+// ─────────────────────────────────────────
+// CV upload
+// ─────────────────────────────────────────
+
+const ALLOWED_CV_TYPES = [
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]
+const MAX_CV_BYTES = 10 * 1024 * 1024 // 10 MB
+
+export type UploadCVResult =
+  | { ok: true; storagePath: string }
+  | { ok: false; error: string }
+
+/**
+ * Validate and upload a CV file (PDF or DOCX).
+ * Saves to: cv-uploads/{userId}/cv.{ext} — one file per user, overwrites previous.
+ * Returns the raw storage path (generate signed URLs at render time).
+ */
+export async function uploadCV(
+  userId: string,
+  file: File,
+): Promise<UploadCVResult> {
+  if (!ALLOWED_CV_TYPES.includes(file.type)) {
+    return { ok: false, error: 'Only PDF or DOCX files are allowed.' }
+  }
+  if (file.size > MAX_CV_BYTES) {
+    return { ok: false, error: 'File must be under 10 MB.' }
+  }
+
+  const ext = file.type === 'application/pdf' ? 'pdf' : 'docx'
+  const path = `${userId}/cv.${ext}`
+
+  const supabase = createClient()
+  const { error } = await supabase.storage
+    .from('cv-uploads')
+    .upload(path, file, { contentType: file.type, upsert: true })
+
+  if (error) {
+    return { ok: false, error: error.message }
+  }
+
+  return { ok: true, storagePath: path }
+}
+
+/**
+ * Generate a 1-hour signed URL for a PDF export.
+ * Call this at render time — never store the signed URL.
+ */
+export async function getPdfExportUrl(storagePath: string): Promise<string | null> {
+  const supabase = createClient()
+  const { data, error } = await supabase.storage
+    .from('pdf-exports')
+    .createSignedUrl(storagePath, 3600)
+
+  if (error || !data?.signedUrl) return null
+  return data.signedUrl
+}

@@ -45,7 +45,7 @@ export function YachtsSection({ attachments }: YachtsSectionProps) {
         <h2 className="font-semibold text-[var(--foreground)]">Yachts</h2>
         <Link
           href="/app/attachment/new"
-          className="text-sm text-[var(--ocean-500)] hover:underline"
+          className="text-sm text-[var(--teal-500)] hover:underline"
         >
           Add
         </Link>
@@ -94,14 +94,14 @@ export function YachtsSection({ attachments }: YachtsSectionProps) {
                     {yacht && (
                       <Link
                         href={`/app/yacht/${yacht.id}`}
-                        className="text-sm text-[var(--ocean-500)] hover:underline"
+                        className="text-sm text-[var(--teal-500)] hover:underline"
                       >
                         View yacht page →
                       </Link>
                     )}
                     <Link
                       href={`/app/endorsement/request?yacht_id=${yacht?.id}`}
-                      className="text-sm text-[var(--ocean-500)] hover:underline"
+                      className="text-sm text-[var(--teal-500)] hover:underline"
                     >
                       Request endorsements from this yacht →
                     </Link>

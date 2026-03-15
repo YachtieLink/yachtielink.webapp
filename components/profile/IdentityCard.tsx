@@ -71,7 +71,7 @@ export function IdentityCard({
             </div>
           )}
           {/* Edit badge */}
-          <span className="absolute -bottom-1 -right-1 bg-[var(--ocean-500)] text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center shadow">
+          <span className="absolute -bottom-1 -right-1 bg-[var(--teal-500)] text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center shadow">
             ✎
           </span>
         </Link>
@@ -95,7 +95,7 @@ export function IdentityCard({
       <div className="flex items-center gap-2">
         <Link
           href={`/u/${handle}`}
-          className="flex-1 text-sm text-[var(--ocean-500)] truncate hover:underline"
+          className="flex-1 text-sm text-[var(--teal-500)] truncate hover:underline"
         >
           yachtie.link/u/{handle}
         </Link>
@@ -129,7 +129,7 @@ export function IdentityCard({
           </div>
           <button
             onClick={downloadQR}
-            className="text-xs text-[var(--ocean-500)] hover:underline"
+            className="text-xs text-[var(--teal-500)] hover:underline"
           >
             Download QR code
           </button>

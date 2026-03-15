@@ -156,7 +156,7 @@ export default function CertEditPage() {
               type="checkbox"
               checked={noExpiry}
               onChange={(e) => { setNoExpiry(e.target.checked); if (e.target.checked) setExpiresAt('') }}
-              className="rounded border-[var(--border)] text-[var(--ocean-500)]"
+              className="rounded border-[var(--border)] text-[var(--teal-500)]"
             />
             <span className="text-sm text-[var(--muted-foreground)]">No expiry / lifetime certification</span>
           </label>
@@ -173,7 +173,7 @@ export default function CertEditPage() {
             onChange={(e) => setDocFile(e.target.files?.[0] ?? null)}
             className="text-sm text-[var(--foreground)]"
           />
-          {docFile && <p className="text-xs text-[var(--ocean-500)] mt-1">{docFile.name}</p>}
+          {docFile && <p className="text-xs text-[var(--teal-500)] mt-1">{docFile.name}</p>}
         </div>
       </div>
 

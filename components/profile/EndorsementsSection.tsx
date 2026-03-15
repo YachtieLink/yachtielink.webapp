@@ -61,7 +61,7 @@ export function EndorsementsSection({ endorsements, currentUserId }: Endorsement
           const isOwn = currentUserId && e.endorser_id === currentUserId
 
           return (
-            <li key={e.id} className="border-l-2 border-[var(--ocean-500)] pl-4">
+            <li key={e.id} className="border-l-2 border-[var(--teal-500)] pl-4">
               <p className="text-sm text-[var(--foreground)] leading-relaxed">
                 &ldquo;{excerpt(e.content)}&rdquo;
               </p>

@@ -98,7 +98,7 @@ export default function MorePage() {
                 onClick={() => applyTheme(t)}
                 className={`flex-1 py-2 rounded-lg text-sm capitalize transition-colors ${
                   theme === t
-                    ? 'bg-[var(--ocean-500)] text-white'
+                    ? 'bg-[var(--teal-500)] text-white'
                     : 'bg-[var(--muted)] text-[var(--foreground)] hover:bg-[var(--muted-foreground)]/10'
                 }`}
               >

@@ -60,7 +60,7 @@ export function WheelACard({ milestones }: WheelACardProps) {
               <li key={m.key}>
                 {done ? (
                   <div className="flex items-center gap-3 py-2">
-                    <span className="w-6 h-6 rounded-full bg-[var(--ocean-500)] flex items-center justify-center shrink-0">
+                    <span className="w-6 h-6 rounded-full bg-[var(--teal-500)] flex items-center justify-center shrink-0">
                       <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 14 14" fill="none">
                         <path d="M2 7l4 4 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
@@ -71,7 +71,7 @@ export function WheelACard({ milestones }: WheelACardProps) {
                   <a
                     href={m.href}
                     onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 py-2 hover:text-[var(--ocean-500)] transition-colors"
+                    className="flex items-center gap-3 py-2 hover:text-[var(--teal-500)] transition-colors"
                   >
                     <span className="w-6 h-6 rounded-full border-2 border-[var(--border)] shrink-0" />
                     <span className="text-sm text-[var(--foreground)]">{m.label}</span>

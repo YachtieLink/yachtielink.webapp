@@ -50,7 +50,7 @@ export function CertsSection({ certs }: CertsSectionProps) {
         <h2 className="font-semibold text-[var(--foreground)]">Certifications</h2>
         <Link
           href="/app/certification/new"
-          className="text-sm text-[var(--ocean-500)] hover:underline"
+          className="text-sm text-[var(--teal-500)] hover:underline"
         >
           Add
         </Link>
@@ -77,7 +77,7 @@ export function CertsSection({ certs }: CertsSectionProps) {
                     </p>
                   )}
                   {cert.document_url && (
-                    <p className="text-xs text-[var(--ocean-500)] mt-0.5">Document attached</p>
+                    <p className="text-xs text-[var(--teal-500)] mt-0.5">Document attached</p>
                   )}
                 </div>
                 <div className="flex flex-col items-end gap-1 shrink-0">

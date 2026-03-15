@@ -48,9 +48,9 @@ export default function SignupPage() {
   if (done) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-12 bg-[var(--color-surface)]">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-navy-100)] dark:bg-[var(--color-navy-900)]">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-teal-100)] dark:bg-[var(--color-teal-800)]">
           <svg
-            className="h-8 w-8 text-[var(--color-navy-800)] dark:text-[var(--color-navy-200)]"
+            className="h-8 w-8 text-[var(--color-teal-700)] dark:text-[var(--color-teal-200)]"
             fill="none"
             stroke="currentColor"
             strokeWidth={1.5}
@@ -143,7 +143,7 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={loading}
-          className="flex h-12 w-full items-center justify-center rounded-xl bg-[var(--color-navy-800)] text-sm font-semibold text-white transition-colors hover:bg-[var(--color-navy-900)] disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex h-12 w-full items-center justify-center rounded-xl bg-[var(--color-teal-700)] text-sm font-semibold text-white transition-colors hover:bg-[var(--color-teal-800)] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "Creating account…" : "Create account"}
         </button>

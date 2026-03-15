@@ -13,7 +13,7 @@ export function AboutSection({ bio }: AboutSectionProps) {
         <h2 className="font-semibold text-[var(--foreground)]">About</h2>
         <Link
           href="/app/about/edit"
-          className="text-sm text-[var(--ocean-500)] hover:underline"
+          className="text-sm text-[var(--teal-500)] hover:underline"
         >
           {bio ? 'Edit' : 'Add'}
         </Link>

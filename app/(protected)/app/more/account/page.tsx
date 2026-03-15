@@ -222,7 +222,7 @@ export default function AccountPage() {
               onClick={() => toggleDepartment(dept)}
               className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
                 departments.includes(dept)
-                  ? 'bg-[var(--ocean-500)] text-white'
+                  ? 'bg-[var(--teal-500)] text-white'
                   : 'bg-[var(--muted)] text-[var(--foreground)] hover:bg-[var(--muted-foreground)]/10'
               }`}
             >
@@ -242,7 +242,7 @@ export default function AccountPage() {
               <select
                 value={primaryRole}
                 onChange={(e) => setPrimaryRole(e.target.value)}
-                className="w-full bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--ocean-500)]"
+                className="w-full bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--teal-500)]"
               >
                 <option value="">Select role</option>
                 {filteredRoles.map((r) => (
@@ -251,7 +251,7 @@ export default function AccountPage() {
               </select>
               <button
                 onClick={() => { setUseCustomRole(true); setPrimaryRole('') }}
-                className="text-xs text-[var(--ocean-500)] hover:underline text-left"
+                className="text-xs text-[var(--teal-500)] hover:underline text-left"
               >
                 Not listed? Enter custom role
               </button>
@@ -266,7 +266,7 @@ export default function AccountPage() {
               />
               <button
                 onClick={() => { setUseCustomRole(false); setCustomRole('') }}
-                className="text-xs text-[var(--ocean-500)] hover:underline text-left"
+                className="text-xs text-[var(--teal-500)] hover:underline text-left"
               >
                 Choose from list instead
               </button>

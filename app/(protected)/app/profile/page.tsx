@@ -111,14 +111,14 @@ export default async function ProfilePage() {
       {nextStep ? (
         <Link
           href={nextStep.href}
-          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[var(--ocean-500)] text-white text-sm font-medium px-6 py-3 rounded-full shadow-lg hover:bg-[var(--ocean-600)] transition-colors whitespace-nowrap"
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[var(--teal-500)] text-white text-sm font-medium px-6 py-3 rounded-full shadow-lg hover:bg-[var(--teal-600)] transition-colors whitespace-nowrap"
         >
           {nextStep.label} →
         </Link>
       ) : (
         <Link
           href={`/u/${profile.handle}`}
-          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[var(--ocean-500)] text-white text-sm font-medium px-6 py-3 rounded-full shadow-lg hover:bg-[var(--ocean-600)] transition-colors whitespace-nowrap"
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[var(--teal-500)] text-white text-sm font-medium px-6 py-3 rounded-full shadow-lg hover:bg-[var(--teal-600)] transition-colors whitespace-nowrap"
         >
           Share profile →
         </Link>

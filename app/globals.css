@@ -7,61 +7,49 @@
 @variant dark (&:where(.dark, .dark *));
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Brand design tokens
+   Brand design tokens — YachtieLink Style Guide v1.0
+   See /yl_style_guide.md for full documentation.
 ───────────────────────────────────────────────────────────────────────────── */
 @theme inline {
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-dm-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Navy */
-  --color-navy-50:  #f0f4f8;
-  --color-navy-100: #d9e2ec;
-  --color-navy-200: #bcccdc;
-  --color-navy-300: #9fb3c8;
-  --color-navy-400: #829ab1;
-  --color-navy-500: #627d98;
-  --color-navy-600: #486581;
-  --color-navy-700: #334e68;
-  --color-navy-800: #243b53;
-  --color-navy-900: #102a43;
-  --color-navy-950: #0a1e30;
+  /* Teal — primary brand colour (deep ocean) */
+  --color-teal-50:  #F0FDFC;
+  --color-teal-100: #CBFCF7;
+  --color-teal-200: #97F8F0;
+  --color-teal-300: #5BEDE7;
+  --color-teal-400: #2AD7D5;
+  --color-teal-500: #11BABB;
+  --color-teal-600: #0B9296;
+  --color-teal-700: #0D7377;
+  --color-teal-800: #105B5F;
+  --color-teal-900: #124C4F;
+  --color-teal-950: #032C30;
 
-  /* Ocean */
-  --color-ocean-50:  #e8f4fd;
-  --color-ocean-100: #bee3f8;
-  --color-ocean-200: #90cdf4;
-  --color-ocean-300: #63b3ed;
-  --color-ocean-400: #4299e1;
-  --color-ocean-500: #3182ce;
-  --color-ocean-600: #2b6cb0;
-  --color-ocean-700: #2c5282;
-  --color-ocean-800: #2a4365;
-  --color-ocean-900: #1a365d;
-
-  /* Gold */
-  --color-gold-300: #fcd34d;
-  --color-gold-400: #fbbf24;
-  --color-gold-500: #f59e0b;
-  --color-gold-600: #d97706;
-  --color-gold-700: #b45309;
+  /* Sand — warm accent (teak deck) */
+  --color-sand-100: #F5F0E8;
+  --color-sand-200: #E8DCC8;
+  --color-sand-300: #D4C4A8;
+  --color-sand-400: #B8A080;
 
   /* Semantic */
-  --color-surface:         #ffffff;
-  --color-surface-raised:  #f8fafc;
-  --color-surface-overlay: #f1f5f9;
-  --color-border:          #e2e8f0;
-  --color-border-subtle:   #f1f5f9;
-  --color-text-primary:    #0f172a;
-  --color-text-secondary:  #475569;
-  --color-text-tertiary:   #94a3b8;
-  --color-text-inverse:    #ffffff;
-  --color-interactive:     #243b53;
-  --color-interactive-hover: #102a43;
-  --color-interactive-muted: #d9e2ec;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error:   #ef4444;
-  --color-info:    #3182ce;
+  --color-surface:           #ffffff;
+  --color-surface-raised:    #f8fafc;
+  --color-surface-overlay:   #f1f5f9;
+  --color-border:            #e2e8f0;
+  --color-border-subtle:     #f1f5f9;
+  --color-text-primary:      #1a1a2e;
+  --color-text-secondary:    #64748b;
+  --color-text-tertiary:     #94a3b8;
+  --color-text-inverse:      #ffffff;
+  --color-interactive:        #0D7377;
+  --color-interactive-hover:  #105B5F;
+  --color-interactive-muted:  #F0FDFC;
+  --color-success: #059669;
+  --color-warning: #D97706;
+  --color-error:   #DC2626;
+  --color-info:    #0D7377;
 
   /* Layout */
   --tab-bar-height:   4rem;
@@ -70,17 +58,17 @@
 
 /* Dark mode overrides */
 .dark {
-  --color-surface:         #0f172a;
-  --color-surface-raised:  #1e293b;
-  --color-surface-overlay: #334155;
-  --color-border:          #334155;
-  --color-border-subtle:   #1e293b;
-  --color-text-primary:    #f8fafc;
-  --color-text-secondary:  #cbd5e1;
-  --color-text-tertiary:   #64748b;
-  --color-interactive:     #4299e1;
-  --color-interactive-hover: #63b3ed;
-  --color-interactive-muted: #1e293b;
+  --color-surface:           #0f172a;
+  --color-surface-raised:    #1e293b;
+  --color-surface-overlay:   #334155;
+  --color-border:            #334155;
+  --color-border-subtle:     #1e293b;
+  --color-text-primary:      #f8fafc;
+  --color-text-secondary:    #cbd5e1;
+  --color-text-tertiary:     #64748b;
+  --color-interactive:        #11BABB;
+  --color-interactive-hover:  #2AD7D5;
+  --color-interactive-muted:  #124C4F;
 }
 
 /* Base */
