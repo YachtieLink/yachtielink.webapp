@@ -1,4 +1,5 @@
 import { type ButtonHTMLAttributes, forwardRef } from "react";
+import { cn } from "@/lib/utils";
 
 type Variant = "primary" | "secondary" | "ghost" | "destructive";
 type Size    = "sm" | "md" | "lg";
@@ -11,13 +12,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<Variant, string> = {
   primary:
-    "bg-[var(--color-teal-700)] text-white hover:bg-[var(--color-teal-800)] disabled:bg-[var(--color-teal-300)]",
+    "bg-primary text-primary-foreground hover:bg-primary/90 disabled:bg-primary/40",
   secondary:
-    "border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]",
+    "border border-border bg-background text-foreground hover:bg-muted",
   ghost:
-    "bg-transparent text-[var(--color-interactive)] hover:bg-[var(--color-interactive-muted)]",
+    "bg-transparent text-primary hover:bg-secondary",
   destructive:
-    "bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300",
+    "bg-destructive text-white hover:bg-destructive/90 disabled:bg-destructive/40",
 };
 
 const sizeClasses: Record<Size, string> = {
@@ -43,15 +44,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         disabled={disabled || loading}
-        className={`
-          inline-flex items-center justify-center rounded-xl font-semibold
-          transition-colors focus-visible:outline-none focus-visible:ring-2
-          focus-visible:ring-[var(--color-interactive)]/50
-          disabled:cursor-not-allowed disabled:opacity-60
-          ${variantClasses[variant]}
-          ${sizeClasses[size]}
-          ${className}
-        `}
+        className={cn(
+          "inline-flex items-center justify-center rounded-xl font-semibold",
+          "transition-colors focus-visible:outline-none focus-visible:ring-2",
+          "focus-visible:ring-ring/50",
+          "disabled:cursor-not-allowed disabled:opacity-60",
+          variantClasses[variant],
+          sizeClasses[size],
+          className,
+        )}
         {...props}
       >
         {loading ? (

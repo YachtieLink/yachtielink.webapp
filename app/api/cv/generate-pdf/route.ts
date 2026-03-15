@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
         id, full_name, display_name, handle, primary_role, departments,
         bio, profile_photo_url,
         phone, whatsapp, email, location_country, location_city,
-        phone_visible, whatsapp_visible, email_visible, location_visible
+        show_phone, show_whatsapp, show_email, show_location
       `)
       .eq('id', user.id)
       .single(),

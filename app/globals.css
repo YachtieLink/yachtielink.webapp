@@ -1,15 +1,17 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Dark mode: class-based (.dark on <html>) so the More tab toggle works.
-   System preference applied on first load via layout.tsx inline script.
-───────────────────────────────────────────────────────────────────────────── */
-@variant dark (&:where(.dark, .dark *));
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   Brand design tokens — YachtieLink Style Guide v1.0
+   YachtieLink Brand Theme — Style Guide v1.0
    See /yl_style_guide.md for full documentation.
+
+   shadcn/ui variables are mapped to our teal + sand palette.
+   Our legacy semantic variables are preserved for existing components.
 ───────────────────────────────────────────────────────────────────────────── */
+
 @theme inline {
   --font-sans: var(--font-dm-sans);
   --font-mono: var(--font-geist-mono);
@@ -33,7 +35,7 @@
   --color-sand-300: #D4C4A8;
   --color-sand-400: #B8A080;
 
-  /* Semantic */
+  /* Legacy semantic tokens (existing components) */
   --color-surface:           #ffffff;
   --color-surface-raised:    #f8fafc;
   --color-surface-overlay:   #f1f5f9;
@@ -51,13 +53,133 @@
   --color-error:   #DC2626;
   --color-info:    #0D7377;
 
+  /* shadcn/ui variable mappings → teal + sand palette */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Radius */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
   /* Layout */
   --tab-bar-height:   4rem;
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Dark mode overrides */
+/* ─── Light mode (default) ─── */
+:root {
+  --radius: 0.75rem;
+
+  /* Core — teal brand */
+  --background: #ffffff;
+  --foreground: #1a1a2e;
+  --card: #f8fafc;
+  --card-foreground: #1a1a2e;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a2e;
+  --primary: #0D7377;
+  --primary-foreground: #ffffff;
+  --secondary: #F0FDFC;
+  --secondary-foreground: #0D7377;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #F5F0E8;
+  --accent-foreground: #1a1a2e;
+  --destructive: #DC2626;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #0D7377;
+
+  /* Charts — teal progression */
+  --chart-1: #0D7377;
+  --chart-2: #11BABB;
+  --chart-3: #2AD7D5;
+  --chart-4: #5BEDE7;
+  --chart-5: #97F8F0;
+
+  /* Sidebar */
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #1a1a2e;
+  --sidebar-primary: #0D7377;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #F0FDFC;
+  --sidebar-accent-foreground: #0D7377;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #0D7377;
+}
+
+/* ─── Dark mode ─── */
 .dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
+  --primary: #11BABB;
+  --primary-foreground: #032C30;
+  --secondary: #124C4F;
+  --secondary-foreground: #CBFCF7;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  --accent: #1e293b;
+  --accent-foreground: #f8fafc;
+  --destructive: #ef4444;
+  --border: #334155;
+  --input: #334155;
+  --ring: #11BABB;
+
+  /* Charts — teal progression (dark) */
+  --chart-1: #11BABB;
+  --chart-2: #2AD7D5;
+  --chart-3: #0D7377;
+  --chart-4: #0B9296;
+  --chart-5: #105B5F;
+
+  /* Sidebar */
+  --sidebar: #1e293b;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-primary: #11BABB;
+  --sidebar-primary-foreground: #032C30;
+  --sidebar-accent: #334155;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border: #334155;
+  --sidebar-ring: #11BABB;
+
+  /* Legacy semantic overrides */
   --color-surface:           #0f172a;
   --color-surface-raised:    #1e293b;
   --color-surface-overlay:   #334155;
@@ -71,13 +193,12 @@
   --color-interactive-muted:  #124C4F;
 }
 
-/* Base */
+/* ─── Base styles ─── */
 html { scrollbar-gutter: stable; }
 
 body {
   background-color: var(--color-surface);
   color: var(--color-text-primary);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -91,4 +212,13 @@ html, body { overscroll-behavior: none; }
 .bottom-tab-bar {
   height: calc(var(--tab-bar-height) + var(--safe-area-bottom));
   padding-bottom: var(--safe-area-bottom);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

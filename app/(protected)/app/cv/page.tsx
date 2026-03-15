@@ -16,7 +16,7 @@ export default async function CvPage() {
       id, full_name, display_name, handle, primary_role, departments,
       bio, profile_photo_url,
       phone, whatsapp, email, location_country, location_city,
-      phone_visible, whatsapp_visible, email_visible, location_visible,
+      show_phone, show_whatsapp, show_email, show_location,
       latest_pdf_path, latest_pdf_generated_at, subscription_status
     `)
     .eq('id', authUser.id)
