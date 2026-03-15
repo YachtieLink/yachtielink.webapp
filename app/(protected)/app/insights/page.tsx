@@ -54,6 +54,17 @@ export default async function InsightsPage({ searchParams }: Props) {
   const completedCount = Object.values(milestones).filter(Boolean).length;
   const profileComplete = completedCount >= 5;
 
+  // Founding member slots remaining (for free users only)
+  let foundingSlotsLeft: number | null = null;
+  if (!proStatus.isPro && process.env.STRIPE_PRO_FOUNDING_PRICE_ID) {
+    const { count: foundingCount } = await supabase
+      .from('users')
+      .select('id', { count: 'exact', head: true })
+      .eq('subscription_status', 'pro')
+      .eq('founding_member', true);
+    foundingSlotsLeft = Math.max(0, 100 - (foundingCount ?? 0));
+  }
+
   // Pro analytics data
   type TimeseriesRow = { day: string; event_count: number };
   type SummaryRow = { event_type: string; event_count: number };
@@ -184,7 +195,7 @@ export default async function InsightsPage({ searchParams }: Props) {
               </Link>
             </div>
           ) : (
-            <UpgradeCTA />
+            <UpgradeCTA foundingSlotsLeft={foundingSlotsLeft} />
           )}
         </>
       )}

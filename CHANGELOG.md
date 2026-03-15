@@ -17,6 +17,28 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-15 — Claude Code (Sonnet 4.6) — Sprint 7 addendum: Founding member pricing
+
+### Done
+- **Founding member pricing (€6.99/mo locked forever, first 100 subs):**
+  - `app/api/stripe/checkout/route.ts` — `resolveMonthlyPriceId()` checks `users.founding_member` count; if < 100 and `STRIPE_PRO_FOUNDING_PRICE_ID` is set, uses founding price; otherwise standard €8.99 price
+  - `app/api/stripe/webhook/route.ts` — stamps `founding_member = true` on the user when `subscription.metadata.founding_member === 'true'`
+  - `components/insights/UpgradeCTA.tsx` — accepts `foundingSlotsLeft` prop; shows "X founding spots left" badge + "locked in forever" copy + correct price label when slots remain; auto-selects Annual when slots exhausted
+  - `app/(protected)/app/insights/page.tsx` — fetches founding count server-side, passes `foundingSlotsLeft` to UpgradeCTA
+  - `supabase/migrations/20260315000018_sprint7_payments.sql` — added `users.founding_member boolean DEFAULT false`
+- Pricing env var added: `STRIPE_PRO_FOUNDING_PRICE_ID` (optional — feature degrades gracefully if unset)
+- Build: passes ✓
+
+### Context
+- Stripe product setup: one product "Crew Pro", 3 prices — €6.99/mo (founding), €8.99/mo (standard), €69.99/yr
+- Founding price is just a normal Stripe price — no coupon or promo code needed; the cap logic lives entirely in the checkout route
+- Existing founding subscribers are never automatically migrated off the €6.99 price by Stripe
+
+### Flags
+- Add `STRIPE_PRO_FOUNDING_PRICE_ID=price_xxx` to Vercel env + `.env.local` after creating the founding price in Stripe
+
+---
+
 ## 2026-03-15 — Claude Code (Sonnet 4.6) — Sprint 7: Payments + Pro
 
 ### Done

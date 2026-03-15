@@ -4,7 +4,8 @@
 -- ── 1. Users table additions ───────────────────────────────────────────────
 
 ALTER TABLE public.users
-  ADD COLUMN IF NOT EXISTS analytics_nudge_sent boolean DEFAULT false;
+  ADD COLUMN IF NOT EXISTS analytics_nudge_sent boolean DEFAULT false,
+  ADD COLUMN IF NOT EXISTS founding_member boolean DEFAULT false;
 
 -- ── 2. Cert expiry reminder tracking ──────────────────────────────────────
 

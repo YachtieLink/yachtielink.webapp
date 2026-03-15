@@ -1,12 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-export function UpgradeCTA() {
+interface Props {
+  /** Passed from server — remaining founding slots (null = no founding price configured) */
+  foundingSlotsLeft?: number | null;
+}
+
+export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
   const router = useRouter();
-  const [plan, setPlan] = useState<'monthly' | 'annual'>('annual');
+  const [plan, setPlan] = useState<'monthly' | 'annual'>('monthly');
   const [loading, setLoading] = useState(false);
+
+  // Default to annual if no founding slots available
+  useEffect(() => {
+    if (foundingSlotsLeft === 0) setPlan('annual');
+  }, [foundingSlotsLeft]);
+
+  const hasFoundingSlots = foundingSlotsLeft !== null && foundingSlotsLeft > 0;
+  const monthlyPrice = hasFoundingSlots ? '€4.99' : '€8.99';
 
   async function handleUpgrade() {
     setLoading(true);
@@ -29,10 +42,22 @@ export function UpgradeCTA() {
     <div className="bg-[var(--card)] rounded-2xl p-5 border border-[var(--teal-700)]/20">
       <div className="flex items-center gap-2 mb-1">
         <span className="text-lg font-bold text-[var(--foreground)]">Crew Pro</span>
-        <span className="text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded-full">
-          Best value
-        </span>
+        {hasFoundingSlots ? (
+          <span className="text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded-full">
+            🔑 {foundingSlotsLeft} founding spots left
+          </span>
+        ) : (
+          <span className="text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded-full">
+            Best value
+          </span>
+        )}
       </div>
+
+      {hasFoundingSlots && (
+        <p className="text-xs text-[var(--teal-700)] dark:text-[var(--teal-400)] mt-1 mb-2 font-medium">
+          Founding members lock in {monthlyPrice}/mo forever.
+        </p>
+      )}
 
       {/* Plan toggle */}
       <div className="flex gap-2 mt-3 mb-4">
@@ -45,7 +70,7 @@ export function UpgradeCTA() {
           }`}
         >
           Monthly
-          <span className="block text-xs font-normal opacity-80">€12 / mo</span>
+          <span className="block text-xs font-normal opacity-80">{monthlyPrice} / mo</span>
         </button>
         <button
           onClick={() => setPlan('annual')}
@@ -56,7 +81,7 @@ export function UpgradeCTA() {
           }`}
         >
           Annual
-          <span className="block text-xs font-normal opacity-80">€9 / mo · save 25%</span>
+          <span className="block text-xs font-normal opacity-80">€69.99 / yr · save 35%</span>
         </button>
       </div>
 

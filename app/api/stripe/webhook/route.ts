@@ -43,6 +43,8 @@ export async function POST(req: NextRequest) {
       const interval = subscription.items.data[0]?.price.recurring?.interval;
       const plan = interval === 'year' ? 'annual' : 'monthly';
 
+      const isFoundingMember = subscription.metadata?.founding_member === 'true';
+
       await supabase.from('users').update({
         subscription_status: isActive ? 'pro' : 'free',
         subscription_plan: isActive ? plan : null,
@@ -50,6 +52,7 @@ export async function POST(req: NextRequest) {
           ? new Date((subscription as any).current_period_end * 1000).toISOString()
           : null,
         show_watermark: !isActive,
+        ...(isActive && isFoundingMember ? { founding_member: true } : {}),
       }).eq('id', userId);
 
       // Send welcome email on new subscription
