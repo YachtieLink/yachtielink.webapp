@@ -6,11 +6,22 @@ import { createServiceClient } from '@/lib/supabase/admin';
 const FOUNDING_MEMBER_CAP = 100;
 
 /**
+ * Returns the current founding member count (across both monthly and annual).
+ * Used to gate both founding price IDs behind the same 100-slot cap.
+ */
+async function getFoundingMemberCount(): Promise<number> {
+  const admin = createServiceClient();
+  const { count } = await admin
+    .from('users')
+    .select('id', { count: 'exact', head: true })
+    .eq('subscription_status', 'pro')
+    .eq('founding_member', true);
+  return count ?? 0;
+}
+
+/**
  * Resolves which monthly price ID to use.
- * Returns the founding price (€6.99) if:
- *   - STRIPE_PRO_FOUNDING_PRICE_ID is configured
- *   - Active founding subscriber count is still < 100
- * Otherwise falls back to the standard monthly price (€8.99).
+ * Returns the founding price (€4.99) if slots remain, otherwise standard (€8.99).
  */
 async function resolveMonthlyPriceId(): Promise<string> {
   const foundingPriceId = process.env.STRIPE_PRO_FOUNDING_PRICE_ID;
@@ -19,15 +30,23 @@ async function resolveMonthlyPriceId(): Promise<string> {
   if (!standardPriceId) throw new Error('STRIPE_PRO_MONTHLY_PRICE_ID is not set');
   if (!foundingPriceId) return standardPriceId;
 
-  // Count active Pro subscribers currently tagged as founding members
-  const admin = createServiceClient();
-  const { count } = await admin
-    .from('users')
-    .select('id', { count: 'exact', head: true })
-    .eq('subscription_status', 'pro')
-    .eq('founding_member', true);
+  const count = await getFoundingMemberCount();
+  return count < FOUNDING_MEMBER_CAP ? foundingPriceId : standardPriceId;
+}
 
-  return (count ?? 0) < FOUNDING_MEMBER_CAP ? foundingPriceId : standardPriceId;
+/**
+ * Resolves which annual price ID to use.
+ * Returns the founding annual price (€49.99) if slots remain, otherwise standard (€69.99).
+ */
+async function resolveAnnualPriceId(): Promise<string> {
+  const foundingAnnualPriceId = process.env.STRIPE_PRO_FOUNDING_ANNUAL_PRICE_ID;
+  const standardAnnualPriceId = process.env.STRIPE_PRO_ANNUAL_PRICE_ID;
+
+  if (!standardAnnualPriceId) throw new Error('STRIPE_PRO_ANNUAL_PRICE_ID is not set');
+  if (!foundingAnnualPriceId) return standardAnnualPriceId;
+
+  const count = await getFoundingMemberCount();
+  return count < FOUNDING_MEMBER_CAP ? foundingAnnualPriceId : standardAnnualPriceId;
 }
 
 export async function POST(req: NextRequest) {
@@ -73,8 +92,8 @@ export async function POST(req: NextRequest) {
   let isFoundingPrice = false;
 
   if (plan === 'annual') {
-    priceId = process.env.STRIPE_PRO_ANNUAL_PRICE_ID ?? '';
-    if (!priceId) return NextResponse.json({ error: 'Annual price ID not configured' }, { status: 500 });
+    priceId = await resolveAnnualPriceId();
+    isFoundingPrice = priceId === process.env.STRIPE_PRO_FOUNDING_ANNUAL_PRICE_ID;
   } else {
     priceId = await resolveMonthlyPriceId();
     isFoundingPrice = priceId === process.env.STRIPE_PRO_FOUNDING_PRICE_ID;

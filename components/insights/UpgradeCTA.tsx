@@ -20,6 +20,8 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
 
   const hasFoundingSlots = foundingSlotsLeft !== null && foundingSlotsLeft > 0;
   const monthlyPrice = hasFoundingSlots ? '€4.99' : '€8.99';
+  const annualPrice = hasFoundingSlots ? '€49.99' : '€69.99';
+  const annualSaving = hasFoundingSlots ? 'save 17%' : 'save 35%';
 
   async function handleUpgrade() {
     setLoading(true);
@@ -55,7 +57,7 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
 
       {hasFoundingSlots && (
         <p className="text-xs text-[var(--teal-700)] dark:text-[var(--teal-400)] mt-1 mb-2 font-medium">
-          Founding members lock in {monthlyPrice}/mo forever.
+          Founding members lock in {monthlyPrice}/mo or {annualPrice}/yr forever.
         </p>
       )}
 
@@ -81,7 +83,7 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
           }`}
         >
           Annual
-          <span className="block text-xs font-normal opacity-80">€69.99 / yr · save 35%</span>
+          <span className="block text-xs font-normal opacity-80">{annualPrice} / yr · {annualSaving}</span>
         </button>
       </div>
 
