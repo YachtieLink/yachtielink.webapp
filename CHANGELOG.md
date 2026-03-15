@@ -137,7 +137,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
   - `certifications.expiry_reminder_60d_sent` + `expiry_reminder_30d_sent` (boolean)
   - `record_profile_event()`, `get_analytics_summary()`, `get_analytics_timeseries()`, `get_endorsement_request_limit()` RPCs
   - Index on `profile_analytics(user_id, event_type, occurred_at DESC)`
-  - Index on `certifications(expiry_date)` where not null
+  - Index on `certifications(expires_at)` where not null
 - **Build:** passes clean ✓ (all 45 routes)
 - Note: Stripe API version auto-detected as `2026-02-25.clover` (matches installed SDK)
 
