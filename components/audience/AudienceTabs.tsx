@@ -3,8 +3,6 @@
 import { useState, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { BottomSheet } from '@/components/ui/BottomSheet'
-import { Button } from '@/components/ui/Button'
 import { RequestActions } from './RequestActions'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -113,51 +111,39 @@ export function AudienceTabs({
   mostRecentYachtId,
 }: AudienceTabsProps) {
   const [activeTab, setActiveTab] = useState<'endorsements' | 'colleagues'>('endorsements')
-  const [wheelSheetOpen, setWheelSheetOpen] = useState(false)
 
   const endorsementCount = Math.min(endorsementsReceived.length, 5)
   const progressPct = (endorsementCount / 5) * 100
 
-  const requestYachtParam = mostRecentYachtId ? `?yacht_id=${mostRecentYachtId}` : ''
-
   return (
     <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
 
-      {/* Wheel B card */}
-      <button
-        onClick={() => setWheelSheetOpen(true)}
-        className="w-full text-left bg-[var(--card)] rounded-2xl p-4 mb-6"
+      {/* Request endorsements CTA */}
+      <Link
+        href="/app/endorsement/request"
+        className="block w-full bg-[var(--teal-500)] rounded-2xl p-4 mb-6 hover:bg-[var(--teal-600)] transition-colors"
       >
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-semibold text-[var(--color-text-primary)]">Endorsements</p>
-          <span className="text-sm font-semibold text-[var(--color-text-primary)]">
-            {endorsementCount}/5
-          </span>
+          <p className="text-sm font-semibold text-white">Request endorsements</p>
+          <svg className="h-5 w-5 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+          </svg>
         </div>
-        <div className="w-full h-2 rounded-full bg-[var(--color-surface-raised)] overflow-hidden mb-2">
-          <div
-            className="h-full rounded-full bg-[var(--teal-500)] transition-all"
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-        <p className="text-xs text-[var(--color-text-tertiary)]">Tap to learn more</p>
-      </button>
-
-      <BottomSheet
-        open={wheelSheetOpen}
-        onClose={() => setWheelSheetOpen(false)}
-        title="Endorsements"
-      >
-        <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-          Endorsements add context to your work history. Collecting 5 or more for a yacht strengthens
-          your profile significantly.
+        <p className="text-xs text-white/70">
+          Ask colleagues to endorse your work via email, WhatsApp, or a shareable link.
         </p>
-        <Link href={`/app/endorsement/request${requestYachtParam}`}>
-          <Button className="w-full" size="lg" onClick={() => setWheelSheetOpen(false)}>
-            Request endorsements →
-          </Button>
-        </Link>
-      </BottomSheet>
+        {endorsementCount < 5 && (
+          <div className="mt-3">
+            <div className="w-full h-1.5 rounded-full bg-white/20 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-white/70 transition-all"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+            <p className="text-xs text-white/60 mt-1">{endorsementCount}/5 endorsements</p>
+          </div>
+        )}
+      </Link>
 
       {/* Segment control */}
       <div className="flex bg-[var(--color-surface-raised)] rounded-xl p-1 mb-6">

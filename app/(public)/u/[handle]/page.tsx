@@ -62,6 +62,12 @@ export default async function PublicProfilePage({ params }: Props) {
   const user = userRes.data
   if (!user) notFound()
 
+  // Record profile view (fire-and-forget — don't block page render)
+  void supabase.rpc('record_profile_event', {
+    p_user_id: user.id,
+    p_event_type: 'profile_view',
+  }).then(() => {})
+
   // Phase 2: fetch related data in parallel now that we have user.id
   const [attRes, certRes, endRes] = await Promise.all([
     supabase

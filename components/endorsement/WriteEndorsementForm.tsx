@@ -142,8 +142,15 @@ export function WriteEndorsementForm({
           </p>
         </div>
         <Button onClick={onSuccess} className="w-full max-w-xs" size="lg">
-          Back to Audience
+          Continue
         </Button>
+        <button
+          type="button"
+          onClick={() => router.push('/app/endorsement/request')}
+          className="text-sm text-[var(--color-interactive)] font-medium hover:underline"
+        >
+          Want endorsements too? Request yours →
+        </button>
       </div>
     )
   }

@@ -115,6 +115,13 @@ export default async function ProfilePage() {
         >
           {nextStep.label} →
         </Link>
+      ) : (endorsements?.length ?? 0) < 5 && (attachments?.length ?? 0) > 0 ? (
+        <Link
+          href="/app/endorsement/request"
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[var(--teal-500)] text-white text-sm font-medium px-6 py-3 rounded-full shadow-lg hover:bg-[var(--teal-600)] transition-colors whitespace-nowrap"
+        >
+          Request endorsements →
+        </Link>
       ) : (
         <Link
           href={`/u/${profile.handle}`}

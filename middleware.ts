@@ -8,6 +8,23 @@ const PROTECTED_PREFIXES = ["/app", "/onboarding"];
 const AUTH_ONLY_PREFIXES = ["/welcome", "/login", "/signup", "/reset-password"];
 
 export async function middleware(request: NextRequest) {
+  // ── Custom subdomain routing ──────────────────────────────────────────────
+  // handle.yachtie.link → rewrite to /u/handle
+  // Wildcard DNS routes all *.yachtie.link here; showing the subdomain URL
+  // in the UI is gated on Pro status, but routing works for everyone.
+  const host = request.headers.get("host") ?? "";
+  const isSubdomain =
+    host.endsWith(".yachtie.link") &&
+    host !== "yachtie.link" &&
+    host !== "www.yachtie.link";
+
+  if (isSubdomain) {
+    const subdomain = host.split(".yachtie.link")[0];
+    const url = request.nextUrl.clone();
+    url.pathname = `/u/${subdomain}`;
+    return NextResponse.rewrite(url);
+  }
+
   const { supabase, response } = createMiddlewareClient(request);
 
   // Refresh session if expired — keeps cookies in sync

@@ -12,11 +12,20 @@ interface CvActionsProps {
   isPro: boolean
 }
 
+type Template = 'standard' | 'classic-navy' | 'modern-minimal'
+
+const TEMPLATES: { id: Template; label: string; sublabel: string; proOnly: boolean }[] = [
+  { id: 'standard',       label: 'Standard',       sublabel: 'Free',                    proOnly: false },
+  { id: 'classic-navy',   label: 'Classic Navy',   sublabel: 'Pro · Traditional serif', proOnly: true  },
+  { id: 'modern-minimal', label: 'Modern Minimal', sublabel: 'Pro · Clean & spacious',  proOnly: true  },
+]
+
 export function CvActions({ handle, hasPdf, pdfGeneratedAt, isPro }: CvActionsProps) {
   const { toast } = useToast()
   const [generating, setGenerating] = useState(false)
   const [pdfReady, setPdfReady] = useState(hasPdf)
   const [showQR, setShowQR] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState<Template>('standard')
 
   const profileUrl = `https://yachtie.link/u/${handle}`
 
@@ -35,7 +44,7 @@ export function CvActions({ handle, hasPdf, pdfGeneratedAt, isPro }: CvActionsPr
       const res = await fetch('/api/cv/generate-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ template: 'standard' }),
+        body: JSON.stringify({ template: selectedTemplate }),
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
@@ -167,36 +176,41 @@ export function CvActions({ handle, hasPdf, pdfGeneratedAt, isPro }: CvActionsPr
           PDF Template
         </h2>
         <div className="flex flex-col gap-2">
-          {/* Standard (active) */}
-          <div className="flex items-center justify-between rounded-lg border-2 border-[var(--color-interactive)] bg-[var(--color-surface)] p-3">
-            <div>
-              <p className="text-sm font-medium text-[var(--color-text-primary)]">Standard</p>
-              <p className="text-xs text-[var(--color-text-tertiary)]">Free</p>
-            </div>
-            <div className="h-4 w-4 rounded-full bg-[var(--color-interactive)]" />
-          </div>
-
-          {/* Classic Navy (locked) */}
-          <div className="flex items-center justify-between rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-overlay)] p-3 opacity-60">
-            <div>
-              <p className="text-sm font-medium text-[var(--color-text-primary)]">Classic Navy</p>
-              <p className="text-xs text-[var(--color-text-tertiary)]">Pro</p>
-            </div>
-            <svg className="h-4 w-4 text-[var(--color-text-tertiary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-          </div>
-
-          {/* Modern Minimal (locked) */}
-          <div className="flex items-center justify-between rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-overlay)] p-3 opacity-60">
-            <div>
-              <p className="text-sm font-medium text-[var(--color-text-primary)]">Modern Minimal</p>
-              <p className="text-xs text-[var(--color-text-tertiary)]">Pro</p>
-            </div>
-            <svg className="h-4 w-4 text-[var(--color-text-tertiary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-            </svg>
-          </div>
+          {TEMPLATES.map((t) => {
+            const locked = t.proOnly && !isPro
+            const selected = selectedTemplate === t.id
+            return (
+              <button
+                key={t.id}
+                onClick={() => {
+                  if (locked) {
+                    window.location.href = '/app/insights'
+                    return
+                  }
+                  setSelectedTemplate(t.id)
+                }}
+                className={`flex items-center justify-between rounded-lg border p-3 transition-colors text-left ${
+                  selected
+                    ? 'border-[var(--color-interactive)] border-2 bg-[var(--color-surface)]'
+                    : locked
+                    ? 'border-[var(--color-border)] bg-[var(--color-surface-overlay)] opacity-60'
+                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-overlay)]'
+                }`}
+              >
+                <div>
+                  <p className="text-sm font-medium text-[var(--color-text-primary)]">{t.label}</p>
+                  <p className="text-xs text-[var(--color-text-tertiary)]">{t.sublabel}</p>
+                </div>
+                {locked ? (
+                  <svg className="h-4 w-4 text-[var(--color-text-tertiary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                ) : selected ? (
+                  <div className="h-4 w-4 rounded-full bg-[var(--color-interactive)]" />
+                ) : null}
+              </button>
+            )
+          })}
 
           {!isPro && (
             <Link
