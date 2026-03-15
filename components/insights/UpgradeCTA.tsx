@@ -20,6 +20,9 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
 
   const hasFoundingSlots = foundingSlotsLeft !== null && foundingSlotsLeft > 0;
   const monthlyPrice = hasFoundingSlots ? '€4.99' : '€8.99';
+  const annualPrice = hasFoundingSlots ? '€49.99' : '€69.99';
+  const monthlySaving = hasFoundingSlots ? 'save 44%' : null;
+  const annualSaving = hasFoundingSlots ? 'save 53%' : 'save 35%';
 
   async function handleUpgrade() {
     setLoading(true);
@@ -55,7 +58,7 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
 
       {hasFoundingSlots && (
         <p className="text-xs text-[var(--teal-700)] dark:text-[var(--teal-400)] mt-1 mb-2 font-medium">
-          Founding members lock in {monthlyPrice}/mo forever.
+          Founding members lock in {monthlyPrice}/mo or {annualPrice}/yr forever — price rises to €8.99/mo after spots fill.
         </p>
       )}
 
@@ -63,25 +66,33 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
       <div className="flex gap-2 mt-3 mb-4">
         <button
           onClick={() => setPlan('monthly')}
-          className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${
+          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
             plan === 'monthly'
               ? 'bg-[var(--teal-700)] text-white'
               : 'bg-[var(--muted)] text-[var(--foreground)]'
           }`}
         >
           Monthly
-          <span className="block text-xs font-normal opacity-80">{monthlyPrice} / mo</span>
+          <span className="block text-xs font-normal opacity-90">
+            {monthlyPrice} / mo{monthlySaving ? ` · ${monthlySaving}` : ''}
+          </span>
+          {hasFoundingSlots && (
+            <span className="block text-xs font-normal opacity-60">then €8.99/mo</span>
+          )}
         </button>
         <button
           onClick={() => setPlan('annual')}
-          className={`flex-1 py-2 rounded-xl text-sm font-medium transition-colors ${
+          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
             plan === 'annual'
               ? 'bg-[var(--teal-700)] text-white'
               : 'bg-[var(--muted)] text-[var(--foreground)]'
           }`}
         >
           Annual
-          <span className="block text-xs font-normal opacity-80">€69.99 / yr · save 35%</span>
+          <span className="block text-xs font-normal opacity-90">{annualPrice} / yr · {annualSaving}</span>
+          {hasFoundingSlots && (
+            <span className="block text-xs font-normal opacity-60">then €69.99/yr</span>
+          )}
         </button>
       </div>
 
