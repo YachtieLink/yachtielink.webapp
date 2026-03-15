@@ -17,6 +17,34 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-15 — Claude Code (Sonnet 4.6) — Sprint 7: Stripe testing, webhook fix, founding annual price
+
+### Done
+- **End-to-end Stripe test (sandbox):** confirmed checkout → webhook → Supabase Pro upgrade flow works
+- **Webhook fix:** `app/api/stripe/webhook/route.ts` — `current_period_end` moved from top-level subscription to `items.data[0]` in Stripe API `2026-02-25.clover`; added fallback to handle both locations
+- **Founding annual price (€49.99/yr):**
+  - `app/api/stripe/checkout/route.ts` — extracted `getFoundingMemberCount()` shared helper; added `resolveAnnualPriceId()` mirroring monthly logic; annual plan now gets founding price when slots remain; `isFoundingPrice` flag set correctly for annual; new env var `STRIPE_PRO_FOUNDING_ANNUAL_PRICE_ID`
+  - Founder created €49.99/yr price in both Stripe sandbox and live; added `STRIPE_PRO_FOUNDING_ANNUAL_PRICE_ID` to Vercel
+- **UpgradeCTA pricing display overhaul:**
+  - Shows correct savings vs full €8.99/mo rate: monthly founding save 44%, annual founding save 53%, standard annual save 35%
+  - Shows "full price €8.99/mo" / "full price €69.99/yr" on plan buttons (not "then €X" which implied a trial)
+  - Tagline: "Lock in €4.99/mo or €49.99/yr forever. After N spots fill, new members pay €8.99/mo."
+- **Vercel env vars** swapped back to live Stripe keys + live price IDs after testing
+
+### Context
+- The founding cap (100) is shared across both monthly and annual founding plans — `getFoundingMemberCount()` counts all `founding_member = true` Pro users regardless of interval
+- Sandbox test confirmed: subscription_status, subscription_plan, subscription_ends_at all stamped correctly by webhook; founding_member was false on the annual test (expected — founding annual logic wasn't in code at that point; now fixed)
+
+### Next
+- Redeploy Vercel (env vars updated)
+- Merge PR #35 to main → Vercel auto-deploys Sprint 7 to production
+- Sprint 8 planning
+
+### Flags
+- None
+
+---
+
 ## 2026-03-15 — Claude Code (Opus 4.6) — Sprint 7: Endorsement virality + fixes
 
 ### Done
