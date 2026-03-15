@@ -17,25 +17,71 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
-## 2026-03-15 — Claude Code (Sonnet 4.6) — Sprint 7 addendum: Founding member pricing
+## 2026-03-15 — Claude Code (Opus 4.6) — Sprint 7: Endorsement virality + fixes
 
 ### Done
-- **Founding member pricing (€6.99/mo locked forever, first 100 subs):**
+- **Endorsement virality — full implementation:**
+  - `supabase/migrations/20260315000019_endorsement_virality.sql` — `is_shareable` column, updated `has_recipient` constraint (allows phone/shareable), phone index, extended `link_pending_requests_to_new_user()` trigger for phone/WhatsApp matching, UPDATE trigger on users table, unique index for shareable links
+  - `app/api/endorsement-requests/share-link/route.ts` — new POST endpoint for reusable shareable links (idempotent, one per requester+yacht)
+  - `app/api/endorsement-requests/route.ts` — added `recipient_user_id` for direct colleague requests, phone-based user lookup, email notification fallback when only user_id provided
+  - `app/(protected)/app/endorsement/request/RequestEndorsementClient.tsx` — complete rewrite: share section (WhatsApp, Copy Link, native Share) at top, colleague cards with one-tap Request buttons, email/phone input with auto-detect, contact chips, rate limit display
+  - `app/(protected)/app/endorsement/request/page.tsx` — yacht picker when no `yacht_id`, fetches colleague emails, improved request status matching
+  - `components/endorsement/DeepLinkFlow.tsx` — added `mini-onboard` step for new/incomplete users (name, role, yacht dates), auto-prefill dates from requester's attachment, post-endorsement redirect to `/onboarding` for incomplete users
+  - `components/endorsement/WriteEndorsementForm.tsx` — post-endorsement upsell CTA ("Want endorsements too? Request yours →")
+  - `components/audience/AudienceTabs.tsx` — replaced BottomSheet indirection with prominent teal CTA card linking to `/app/endorsement/request`, progress bar embedded
+  - `app/(protected)/app/profile/page.tsx` — floating CTA tiered logic: (1) next milestone, (2) "Request endorsements" when <5 endorsements, (3) "Share profile" fallback
+- **Fixes:**
+  - `next.config.ts` — added Supabase storage remote pattern for Next/Image
+  - `components/ui/Input.tsx` — replaced `Math.random()` ID with `useId()` to fix hydration mismatch
+  - `supabase/migrations/20260315000018_sprint7_payments.sql` — fixed `expiry_date` → `expires_at` column reference in certifications index
+- **Migrations applied** to remote database: both `20260315000018` and `20260315000019`
+- **PR #35** created on `feat/sprint-7`
+
+### Context
+- Endorsement virality is the primary growth lever — WhatsApp is the #1 comms channel for yacht crew
+- Shareable links are reusable (one per requester+yacht), so sharing via WhatsApp/social doesn't create duplicate DB rows
+- Phone matching uses DB triggers (INSERT + UPDATE on users table) so endorsement requests auto-link when someone signs up with a matching phone/WhatsApp/email
+- Mini-onboarding for endorsers: just name, role, and yacht dates — full onboarding deferred to after they write the endorsement
+
+### Next
+- Merge PR #35 to main
+- Test end-to-end: share link via WhatsApp → recipient opens → mini-onboard → write endorsement → auto-link
+- Sprint 8 planning
+
+### Flags
+- None
+
+---
+
+## 2026-03-15 — Claude Code (Sonnet 4.6) — Sprint 7 addendum: Founding member pricing + Stripe go-live
+
+### Done
+- **Founding member pricing (€4.99/mo locked forever, first 100 subs):**
   - `app/api/stripe/checkout/route.ts` — `resolveMonthlyPriceId()` checks `users.founding_member` count; if < 100 and `STRIPE_PRO_FOUNDING_PRICE_ID` is set, uses founding price; otherwise standard €8.99 price
   - `app/api/stripe/webhook/route.ts` — stamps `founding_member = true` on the user when `subscription.metadata.founding_member === 'true'`
-  - `components/insights/UpgradeCTA.tsx` — accepts `foundingSlotsLeft` prop; shows "X founding spots left" badge + "locked in forever" copy + correct price label when slots remain; auto-selects Annual when slots exhausted
+  - `components/insights/UpgradeCTA.tsx` — accepts `foundingSlotsLeft` prop; shows "X founding spots left" badge + "locked in forever" copy + correct price label (€4.99) when slots remain; auto-selects Annual when slots exhausted
   - `app/(protected)/app/insights/page.tsx` — fetches founding count server-side, passes `foundingSlotsLeft` to UpgradeCTA
   - `supabase/migrations/20260315000018_sprint7_payments.sql` — added `users.founding_member boolean DEFAULT false`
 - Pricing env var added: `STRIPE_PRO_FOUNDING_PRICE_ID` (optional — feature degrades gracefully if unset)
+- **Stripe product configured by founder:** one product "Crew Pro", 3 prices — €4.99/mo (founding), €8.99/mo (standard), €69.99/yr
+- **Stripe webhook configured:** `https://yachtie.link/api/stripe/webhook` — 4 events subscribed
+- **Vercel env vars added:** `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_MONTHLY_PRICE_ID`, `STRIPE_PRO_ANNUAL_PRICE_ID`, `STRIPE_PRO_FOUNDING_PRICE_ID`, `NEXT_PUBLIC_SITE_URL`, `CRON_SECRET`
+- **Migration applied** via `npx supabase db push` — `20260315000018` confirmed in sync
+- Branch `feat/sprint-7` committed and pushed — ready to merge to main
 - Build: passes ✓
 
 ### Context
-- Stripe product setup: one product "Crew Pro", 3 prices — €6.99/mo (founding), €8.99/mo (standard), €69.99/yr
-- Founding price is just a normal Stripe price — no coupon or promo code needed; the cap logic lives entirely in the checkout route
-- Existing founding subscribers are never automatically migrated off the €6.99 price by Stripe
+- Founding price is a normal Stripe price at €4.99 — no coupon needed; cap logic lives in the checkout route
+- Existing founding subscribers are never automatically migrated off the €4.99 price by Stripe
+- All 19 migrations in sync between local and remote
+
+### Next
+- Merge `feat/sprint-7` PR to main → Vercel auto-deploys
+- Test end-to-end checkout flow in production (use Stripe test mode first if needed)
+- Sprint 8 planning
 
 ### Flags
-- Add `STRIPE_PRO_FOUNDING_PRICE_ID=price_xxx` to Vercel env + `.env.local` after creating the founding price in Stripe
+- None — all env vars set, migration applied, webhook live
 
 ---
 
