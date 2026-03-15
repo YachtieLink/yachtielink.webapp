@@ -58,7 +58,7 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
 
       {hasFoundingSlots && (
         <p className="text-xs text-[var(--teal-700)] dark:text-[var(--teal-400)] mt-1 mb-2 font-medium">
-          Founding members lock in {monthlyPrice}/mo or {annualPrice}/yr forever — price rises to €8.99/mo after spots fill.
+          Lock in {monthlyPrice}/mo or {annualPrice}/yr forever. After {foundingSlotsLeft} spots fill, new members pay €8.99/mo.
         </p>
       )}
 
@@ -77,7 +77,7 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
             {monthlyPrice} / mo{monthlySaving ? ` · ${monthlySaving}` : ''}
           </span>
           {hasFoundingSlots && (
-            <span className="block text-xs font-normal opacity-60">then €8.99/mo</span>
+            <span className="block text-xs font-normal opacity-60">full price €8.99/mo</span>
           )}
         </button>
         <button
@@ -91,7 +91,7 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
           Annual
           <span className="block text-xs font-normal opacity-90">{annualPrice} / yr · {annualSaving}</span>
           {hasFoundingSlots && (
-            <span className="block text-xs font-normal opacity-60">then €69.99/yr</span>
+            <span className="block text-xs font-normal opacity-60">full price €69.99/yr</span>
           )}
         </button>
       </div>
