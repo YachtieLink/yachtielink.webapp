@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-
-interface UpdateEndorsementBody {
-  content?: string
-  endorser_role_label?: string
-  recipient_role_label?: string
-  worked_together_start?: string
-  worked_together_end?: string
-}
+import { validateBody } from '@/lib/validation/validate'
+import { updateEndorsementSchema } from '@/lib/validation/schemas'
+import { applyRateLimit } from '@/lib/rate-limit/helpers'
+import { moderateText } from '@/lib/ai/moderation'
+import { trackServerEvent } from '@/lib/analytics/server'
 
 export async function PUT(
   req: NextRequest,
@@ -18,11 +15,19 @@ export async function PUT(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await req.json() as UpdateEndorsementBody
+  const limited = await applyRateLimit(req, 'endorsementEdit', user.id)
+  if (limited) return limited
 
-  if (body.content !== undefined) {
-    if (body.content.length < 10 || body.content.length > 2000) {
-      return NextResponse.json({ error: 'Content must be between 10 and 2000 characters' }, { status: 400 })
+  const result = await validateBody(req, updateEndorsementSchema)
+  if ('error' in result) return result.error
+  const body = result.data
+
+  // AI-01: Content moderation on updated content (if provided)
+  if (body.content) {
+    const moderation = await moderateText(body.content)
+    if (moderation.flagged) {
+      trackServerEvent(user.id, 'moderation.flagged', { context: 'endorsement.update', categories: moderation.categories })
+      return NextResponse.json({ error: 'Your endorsement was flagged as potentially inappropriate. Please revise it.' }, { status: 422 })
     }
   }
 
@@ -62,6 +67,8 @@ export async function DELETE(
     .is('deleted_at', null)
 
   if (error) return NextResponse.json({ error: 'Failed to delete endorsement' }, { status: 500 })
+
+  trackServerEvent(user.id, 'endorsement.deleted', { endorsement_id: id })
 
   return new NextResponse(null, { status: 204 })
 }

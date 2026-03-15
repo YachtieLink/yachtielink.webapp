@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Geist_Mono } from "next/font/google";
 import { ToastProvider } from "@/components/ui/Toast";
+import { PostHogProvider } from "@/components/providers/PostHogProvider";
+import { CookieBanner } from "@/components/CookieBanner";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -58,9 +60,12 @@ export default function RootLayout({
       <body
         className={`${dmSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+        <PostHogProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+          <CookieBanner />
+        </PostHogProvider>
       </body>
     </html>
   );

@@ -1,34 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendNotifyEmail } from '@/lib/email/notify'
+import { validateBody } from '@/lib/validation/validate'
+import { createEndorsementSchema } from '@/lib/validation/schemas'
+import { applyRateLimit } from '@/lib/rate-limit/helpers'
+import { moderateText } from '@/lib/ai/moderation'
+import { trackServerEvent } from '@/lib/analytics/server'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://yachtie.link'
-
-interface CreateEndorsementBody {
-  recipient_id: string
-  yacht_id: string
-  content: string
-  endorser_role_label?: string
-  recipient_role_label?: string
-  worked_together_start?: string
-  worked_together_end?: string
-  request_token?: string
-}
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await req.json() as CreateEndorsementBody
-  const { recipient_id, yacht_id, content, endorser_role_label, recipient_role_label, worked_together_start, worked_together_end, request_token } = body
+  const limited = await applyRateLimit(req, 'endorsementCreate', user.id)
+  if (limited) return limited
 
-  if (!recipient_id || !yacht_id || !content) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-  }
-  if (content.length < 10 || content.length > 2000) {
-    return NextResponse.json({ error: 'Content must be between 10 and 2000 characters' }, { status: 400 })
-  }
+  const result = await validateBody(req, createEndorsementSchema)
+  if ('error' in result) return result.error
+  const { recipient_id, yacht_id, content, endorser_role_label, recipient_role_label, worked_together_start, worked_together_end, request_token } = result.data
+
   if (user.id === recipient_id) {
     return NextResponse.json({ error: "You can't endorse yourself." }, { status: 400 })
   }
@@ -41,6 +33,13 @@ export async function POST(req: NextRequest) {
   })
   if (!coworkers) {
     return NextResponse.json({ error: 'You can only endorse people you have worked with on this yacht.' }, { status: 403 })
+  }
+
+  // AI-01: Content moderation
+  const moderation = await moderateText(content)
+  if (moderation.flagged) {
+    trackServerEvent(user.id, 'moderation.flagged', { context: 'endorsement.create', categories: moderation.categories })
+    return NextResponse.json({ error: 'Your endorsement was flagged as potentially inappropriate. Please revise it.' }, { status: 422 })
   }
 
   const { data: endorsement, error: insertError } = await supabase
@@ -64,6 +63,8 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ error: 'Failed to create endorsement' }, { status: 500 })
   }
+
+  trackServerEvent(user.id, 'endorsement.created', { recipient_id, yacht_id })
 
   // If responding to a request, update its status
   if (request_token) {

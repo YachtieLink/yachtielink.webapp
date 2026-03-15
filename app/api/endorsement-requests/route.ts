@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { sendNotifyEmail } from "@/lib/email";
+import { validateBody } from "@/lib/validation/validate";
+import { createEndorsementRequestSchema } from "@/lib/validation/schemas";
+import { applyRateLimit } from "@/lib/rate-limit/helpers";
+import { trackServerEvent } from "@/lib/analytics/server";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://yachtie.link";
 
@@ -84,16 +88,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await req.json();
-  const { yacht_id, recipient_email, recipient_phone, recipient_user_id: directRecipientId, yacht_name } = body as {
-    yacht_id: string;
-    recipient_email?: string;
-    recipient_phone?: string;
-    recipient_user_id?: string;
-    yacht_name?: string;
-  };
+  const limited = await applyRateLimit(req, 'endorsementCreate', user.id);
+  if (limited) return limited;
 
-  if (!yacht_id || (!recipient_email && !recipient_phone && !directRecipientId)) {
+  const result = await validateBody(req, createEndorsementRequestSchema);
+  if ('error' in result) return result.error;
+  const { yacht_id, recipient_email, recipient_phone, recipient_user_id: directRecipientId, yacht_name } = result.data;
+
+  if (!recipient_email && !recipient_phone && !directRecipientId) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
@@ -159,6 +161,8 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ error: "Failed to create request" }, { status: 500 });
   }
+
+  trackServerEvent(user.id, 'endorsement.requested', { yacht_id, has_recipient_user: !!recipientUserId });
 
   const deepLink = `${APP_URL}/r/${request.token}`;
   const yachtDisplay = (yacht_name as string | undefined) ?? "";

@@ -4,18 +4,21 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { renderToBuffer } from '@react-pdf/renderer'
 import QRCode from 'qrcode'
 import { ProfilePdfDocument } from '@/components/pdf/ProfilePdfDocument'
-
-interface GeneratePdfBody {
-  template?: 'standard' | 'classic-navy' | 'modern-minimal'
-}
+import { validateBody } from '@/lib/validation/validate'
+import { generatePDFSchema } from '@/lib/validation/schemas'
+import { applyRateLimit } from '@/lib/rate-limit/helpers'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await req.json().catch(() => ({})) as GeneratePdfBody
-  const template = body.template ?? 'standard'
+  const limited = await applyRateLimit(req, 'pdfGenerate', user.id)
+  if (limited) return limited
+
+  const result = await validateBody(req, generatePDFSchema)
+  if ('error' in result) return result.error
+  const { template } = result.data
 
   // Check Pro for non-standard templates
   if (template !== 'standard') {

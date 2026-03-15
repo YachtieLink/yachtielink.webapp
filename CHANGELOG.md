@@ -17,6 +17,113 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-15 — Claude Code (Sonnet 4.6) — Sprint 8: Launch Prep + Content Moderation
+
+### Done
+- **Branch:** `feat/sprint-8` created from `feat/sprint-7`
+- **Packages installed:** `zod`, `posthog-js`, `posthog-node`, `@sentry/nextjs`, `@vercel/kv`
+- **Task 1 — Instrumentation:**
+  - `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`, `instrumentation.ts` created
+  - `components/providers/PostHogProvider.tsx` — PostHog init, `autocapture: false`, `replaysSessionSampleRate: 0`
+  - `lib/analytics/events.ts` — `trackEvent`, `identifyUser`, `resetAnalytics` (client-side)
+  - `lib/analytics/server.ts` — `trackServerEvent`, `getPostHogServer` (server-side)
+  - `app/layout.tsx` updated: PostHogProvider + CookieBanner wrapping children
+  - `components/CookieBanner.tsx` — minimal cookie consent banner
+- **Task 2 — Zod validation:**
+  - `lib/validation/schemas.ts` — all schemas (endorsements, requests, CV, PDF, Stripe, account delete, handle)
+  - `lib/validation/validate.ts` — `validateBody()` helper (Zod v4 uses `issues` not `errors`)
+  - `lib/validation/sanitize.ts` — `sanitizeHtml()` for non-JSX contexts
+  - Applied to: `api/endorsements/route.ts`, `api/endorsements/[id]/route.ts`, `api/endorsement-requests/route.ts`, `api/cv/parse/route.ts`, `api/cv/generate-pdf/route.ts`, `api/stripe/checkout/route.ts` — old manual checks removed
+- **Task 3 — Rate limiting:**
+  - `lib/rate-limit/limiter.ts` — Vercel KV sliding window counter
+  - `lib/rate-limit/helpers.ts` — `applyRateLimit()`, `RATE_LIMITS` config, `getClientIP()`
+  - Applied to all 6 API routes above. Stripe webhook intentionally excluded (Sentry signature is the guard)
+- **Task 4 — Security headers + CORS:**
+  - `lib/cors.ts` — `corsHeaders()`, `handleCorsPreFlight()`. Stripe webhook excluded
+  - `next.config.ts` updated: X-Frame-Options, X-Content-Type-Options, Referrer-Policy, HSTS, Permissions-Policy + `withSentryConfig` wrapper
+- **Task 5 — Growth controls:**
+  - `app/(public)/invite-only/page.tsx` — static invite-only landing page
+  - `middleware.ts` updated: `SIGNUP_MODE=invite` gates `/welcome` and `/signup`
+- **Task 6 — GDPR:**
+  - `app/api/account/export/route.ts` — full data export (users, attachments, certs, endorsements, analytics) as JSON download
+  - `app/api/account/delete/route.ts` — soft-delete (anonymise user, cancel Stripe, delete files, delete auth user). Endorsements written remain on recipient profiles attributed to "[Deleted User]"
+  - `app/(protected)/app/more/delete-account/page.tsx` — confirmation UI requiring exact phrase "DELETE MY ACCOUNT"
+  - `app/(protected)/app/more/page.tsx` updated: Download data + Delete account links in Privacy section; live Terms/Privacy links in Legal section
+- **Task 7 — Legal pages:**
+  - `app/(public)/terms/page.tsx` — Terms of Service (placeholder text, marked `[LEGAL REVIEW NEEDED]` where needed)
+  - `app/(public)/privacy/page.tsx` — Privacy Policy (GDPR rights, cookie policy, data storage)
+- **Task 8 — Performance + QA:**
+  - `app/error.tsx` — Sentry-integrated error boundary
+  - `app/not-found.tsx` — 404 page
+  - `lib/api/errors.ts` — `apiError()`, `handleApiError()` with Sentry capture
+  - No raw `<img>` tags found — codebase was already clean
+  - `notes/launch_qa_checklist.md` — manual QA checklist for founder
+  - `supabase/migrations/20260315000020_sprint8_launch_prep.sql` — `deleted_at` on users + 7 performance indexes
+- **Task 9 — AI-01 Content Moderation:**
+  - `lib/ai/moderation.ts` — `moderateText()` using `omni-moderation-latest` (FREE). Non-blocking on API failure
+  - Applied to `POST /api/endorsements` and `PUT /api/endorsements/[id]`
+- **PostHog events wired (11 total):**
+  - `endorsement.created` — on successful endorsement insert
+  - `endorsement.deleted` — on soft-delete
+  - `endorsement.requested` — on endorsement request creation
+  - `cv.parsed` — on successful CV parse
+  - `cv.parse_failed` — on timeout or parse error (with `reason` property)
+  - `pro.subscribed` — on `customer.subscription.created` webhook (with plan + founding_member)
+  - `pro.cancelled` — on `customer.subscription.deleted` webhook
+  - `moderation.flagged` — when content moderation blocks a submission
+  - Client events (`profile.created`, `profile.shared`, `attachment.created`) to be wired in UI components
+- **Build:** passes clean (`npm run build`)
+
+### Context
+- Zod v4 uses `issues` not `errors` on ZodError — fixed in `validate.ts`
+- `@sentry/nextjs` v10 dropped `hideSourceMaps` and `disableLogger` options — removed from `withSentryConfig`
+- Rate limiting requires Vercel KV — founder must create `yachtielink-ratelimit` KV database in Vercel dashboard and set `KV_REST_API_URL` + `KV_REST_API_TOKEN`
+- Sentry requires `SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` env vars — set after Sentry account setup
+- PostHog requires `NEXT_PUBLIC_POSTHOG_KEY` and `NEXT_PUBLIC_POSTHOG_HOST` env vars
+- `SIGNUP_MODE=public` to launch open, `SIGNUP_MODE=invite` to gate signups
+- New migration `20260315000020_sprint8_launch_prep.sql` needs applying to production
+
+### Next
+- Founder: set new env vars in Vercel (PostHog, Sentry, KV, CRON_SECRET, SIGNUP_MODE)
+- Founder: create Vercel KV database (`yachtielink-ratelimit`)
+- Founder: create Sentry project and add DSN + auth token
+- Founder: create PostHog project and add key
+- Founder: apply migration `20260315000020` to production
+- Founder: run QA checklist (`notes/launch_qa_checklist.md`)
+- Merge `feat/sprint-8` → main → SHIP Phase 1A
+- Sprint 8.1: Languages on Profile + AI-04/AI-02/AI-17
+
+### Flags
+- Legal pages marked `[LEGAL REVIEW NEEDED]` — lawyer review required before public launch
+- `profile.created`, `profile.shared`, `attachment.created` PostHog events are stubs — need wiring in respective client components (onboarding done page, share button, yacht attachment save)
+
+---
+
+## 2026-03-15 — Claude Code (Opus 4.6) — Build plan update: Sprint 8 + 8.1 + 8.2
+
+### Done
+- **Phase 1A gap analysis:** identified Sprint 8 (Launch Prep), Languages on Profile, and AI-01 Content Moderation as remaining gaps
+- **Features doc status updates:** updated 18 Phase 1A features from `specced` to `shipped`, changed CV Import model ref from Claude Sonnet to OpenAI GPT-4o-mini
+- **Sprint 8 updated in `docs/yl_build_plan.md`:** added AI-01 Content Moderation (OpenAI moderation API, free) to Sprint 8 scope, added `moderation.flagged` to PostHog events
+- **Sprint 8.1 founder's notes created (`notes/sprint8_1_founder_notes.md`):** Languages on Profile, AI-04 Endorsement Writing Assistant, AI-02 Cert OCR, AI-17 Smart Profile Suggestions — detailed specs for Sonnet to build
+- **Sprint 8.2 founder's notes created (`notes/sprint8_2_founder_notes.md`):** AI-03 Multilingual Endorsement Requests, AI-12 Yacht History Gap Analyzer — detailed specs for Sonnet to build
+- **Build plan dependency chain and summary table updated** to reflect 8 → SHIP → 8.1 → 8.2 → Phase 1B flow
+
+### Context
+- GPT-5 Nano, GPT-5 Mini are available models (March 2026) — AI feature specs referencing them are correct
+- Sprint 8.1/8.2 are post-launch sprints shipping immediately after Phase 1A, before Phase 1B proper
+- AI-01 is free (OpenAI moderation API costs nothing), so it belongs in Sprint 8 with launch prep
+- Languages on Profile in 8.1 is a prerequisite for AI-03 multilingual requests in 8.2
+
+### Next
+- Build Sprint 8 (start with existing `notes/sprint8_build_plan.md` + add AI-01)
+- After Sprint 8 ships → Sprint 8.1 → Sprint 8.2
+
+### Flags
+- None
+
+---
+
 ## 2026-03-15 — Claude Code (Sonnet 4.6) — Sprint 7: Stripe testing, webhook fix, founding annual price
 
 ### Done

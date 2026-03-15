@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/admin';
+import { validateBody } from '@/lib/validation/validate';
+import { checkoutSchema } from '@/lib/validation/schemas';
+import { applyRateLimit } from '@/lib/rate-limit/helpers';
 
 const FOUNDING_MEMBER_CAP = 100;
 
@@ -57,12 +60,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await req.json();
-  const plan = body?.plan as 'monthly' | 'annual' | undefined;
+  // Rate limit by IP to prevent spam checkout sessions
+  const limited = await applyRateLimit(req, 'auth');
+  if (limited) return limited;
 
-  if (plan !== 'monthly' && plan !== 'annual') {
-    return NextResponse.json({ error: 'Invalid plan' }, { status: 400 });
-  }
+  const result = await validateBody(req, checkoutSchema);
+  if ('error' in result) return result.error;
+  const { plan } = result.data;
 
   // Fetch user record
   const { data: userRecord } = await supabase

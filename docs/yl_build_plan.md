@@ -1,7 +1,7 @@
 # YachtieLink — Build Plan
 
-**Version:** 2.0
-**Date:** 2026-03-13
+**Version:** 2.1
+**Date:** 2026-03-15
 **Status:** Active
 **Target:** Ship Phase 1A for Med season (June 2026)
 
@@ -16,13 +16,15 @@
 
 ---
 
-## Phase 1A — 8 Sprints (~16 weeks)
+## Phase 1A — 8 Sprints (Sprints 1–7 shipped in ~3 days with Claude Code)
 
 Goal: Portable profile + yacht graph + endorsements + paid presentation. Prove the wedge.
 
+> **Velocity note:** Sprints 1–7 were built in under 3 days using Claude Code (AI-assisted development). Original "2-week sprint" estimates assumed a solo human developer. Actual pace: ~half a day per sprint. Timings below are updated to reflect this.
+
 ---
 
-### Sprint 1: Foundation (weeks 1–2)
+### Sprint 1: Foundation ✅
 
 **Database**
 - Run migrations for core tables: `users`, `yachts`, `roles`, `departments`, `attachments`, `certifications`, `certification_types`, `endorsements`, `endorsement_requests`, `templates`
@@ -53,7 +55,7 @@ Goal: Portable profile + yacht graph + endorsements + paid presentation. Prove t
 
 ---
 
-### Sprint 2: Auth + Onboarding (weeks 3–4)
+### Sprint 2: Auth + Onboarding ✅
 
 **Screens**
 - `/welcome` — Auth method selection (Apple, Google, Email)
@@ -83,7 +85,7 @@ Goal: Portable profile + yacht graph + endorsements + paid presentation. Prove t
 
 ---
 
-### Sprint 3: Profile (weeks 5–6)
+### Sprint 3: Profile ✅
 
 **Profile home (`/app/profile`)**
 - Identity card: photo, display name, role, department(s), profile link + copy, QR code download button
@@ -117,7 +119,7 @@ Goal: Portable profile + yacht graph + endorsements + paid presentation. Prove t
 
 ---
 
-### Sprint 4: Yacht Graph (weeks 7–8)
+### Sprint 4: Yacht Graph ✅
 
 **Yacht entities**
 - Yacht detail view: name, type (Motor Yacht / Sailing Yacht), length in metres, flag state, year built, attached crew count
@@ -145,7 +147,7 @@ Goal: Portable profile + yacht graph + endorsements + paid presentation. Prove t
 
 ---
 
-### Sprint 5: Endorsements (weeks 9–10)
+### Sprint 5: Endorsements ✅
 
 **Request flow (`/app/endorsement/request?yacht_id=...`)**
 - Yacht fixed at top
@@ -185,7 +187,7 @@ Goal: Portable profile + yacht graph + endorsements + paid presentation. Prove t
 
 ---
 
-### Sprint 6: Public Profile + CV (weeks 11–12)
+### Sprint 6: Public Profile + CV ✅
 
 **Public profile (`/u/:handle`)**
 - Server-rendered page (SEO)
@@ -224,7 +226,7 @@ Goal: Portable profile + yacht graph + endorsements + paid presentation. Prove t
 
 ---
 
-### Sprint 7: Payments + Pro (weeks 13–14)
+### Sprint 7: Payments + Pro ✅
 
 **Stripe integration**
 - Stripe Customer creation on signup (or lazy on first billing interaction)
@@ -262,10 +264,18 @@ Goal: Portable profile + yacht graph + endorsements + paid presentation. Prove t
 
 ---
 
-### Sprint 8: Launch Prep (weeks 15–16)
+### Sprint 8: Launch Prep + Content Moderation (~1 day)
+
+**AI-01: Content Moderation**
+- OpenAI `omni-moderation-latest` API on all user-generated content
+- Runs on: profile bios, endorsement text, endorsement request messages, profile photos, yacht cover photos
+- Action on flag: block publishing, show generic "content policy" message, log for review
+- Latency target: <500ms per check, runs on submit (not on keystroke)
+- Cost: FREE — OpenAI charges nothing for the moderation API
+- No false-positive appeal flow — manual admin review if users report an issue
 
 **Instrumentation**
-- PostHog setup + event tracking: `profile.created`, `cv.parsed`, `cv.parse_failed`, `attachment.created`, `endorsement.requested`, `endorsement.created`, `endorsement.deleted`, `profile.shared`, `pro.subscribed`, `pro.cancelled`
+- PostHog setup + event tracking: `profile.created`, `cv.parsed`, `cv.parse_failed`, `attachment.created`, `endorsement.requested`, `endorsement.created`, `endorsement.deleted`, `profile.shared`, `pro.subscribed`, `pro.cancelled`, `moderation.flagged`
 - Sentry error tracking
 - Basic PostHog dashboard for tripwire metrics
 
@@ -300,32 +310,62 @@ Goal: Portable profile + yacht graph + endorsements + paid presentation. Prove t
 - Desktop responsive check
 - Dark mode testing across all screens
 
-**Deliverable:** Production-ready. Security hardened. Instrumented. Legal pages live. Ready for real users.
+**Deliverable:** Production-ready. Security hardened. Instrumented. Content moderation active. Legal pages live. Ready for real users.
+
+---
+
+### Sprint 8.1: Onboarding Polish + AI Assist (~1 day, post-launch)
+
+> Detailed founder's notes: `notes/sprint8_1_founder_notes.md`
+
+Ships immediately after launch. Reduces friction in the first-hour experience.
+
+- **Languages on Profile** — multi-select with proficiency levels, displayed on profile + public page + PDF. Prerequisite for AI-03
+- **AI-04: Endorsement Writing Assistant** — "Help me write" button, 2–3 guided questions → draft endorsement (GPT-5 Nano, free tier)
+- **AI-02: Certification OCR & Auto-Fill** — photograph a cert, AI extracts type + dates + issuing authority (GPT-4o Mini Vision, Pro only)
+- **AI-17: Smart Profile Suggestions** — "Improve" button on bio/text fields, suggests better phrasing + grammar (GPT-5 Nano, free tier)
+
+**Deliverable:** Profile setup is faster (cert OCR, languages from CV). Endorsement quality improves (writing assistant). Profile text is polished (suggestions).
+
+---
+
+### Sprint 8.2: Multilingual + Timeline Intelligence (~half day, optional)
+
+> Detailed founder's notes: `notes/sprint8_2_founder_notes.md`
+
+Extends graph formation internationally and improves employment presentation.
+
+- **AI-03: Multilingual Endorsement Requests** — auto-translate request emails to recipient's language (GPT-5 Nano, free tier). Requires Languages on Profile from 8.1
+- **AI-12: Yacht History Gap Analyzer** — scan employment timeline, flag gaps/short stints with constructive suggestions (GPT-5 Nano, Pro only)
+
+**Deliverable:** Language barriers removed from endorsement requests. Crew timelines are cleaner before recruiters see them.
 
 ---
 
 ## Phase 1A Summary
 
-| Sprint | Weeks | Delivers |
-|--------|-------|----------|
-| 1. Foundation | 1–2 | Database, auth (with email verification), app shell, components, dark mode |
-| 2. Auth + Onboarding | 3–4 | Signup, onboarding flow, first yacht + endorsement request |
-| 3. Profile | 5–6 | Profile management, photo, certs (with upload), contact info, settings |
-| 4. Yacht Graph | 7–8 | Yacht entities, attachments, colleague derivation |
-| 5. Endorsements | 9–10 | Request → write → display loop, deep links, email + WhatsApp share |
-| 6. Public Profile + CV | 11–12 | Public page, CV import, PDF export, QR codes |
-| 7. Payments + Pro | 13–14 | Stripe (monthly + annual), Pro features, cert document manager, time-series analytics |
-| 8. Launch Prep | 15–16 | Instrumentation, security, GDPR, legal, QA |
+| Sprint | Status | Delivers |
+|--------|--------|----------|
+| 1. Foundation | ✅ Shipped | Database, auth (with email verification), app shell, components, dark mode |
+| 2. Auth + Onboarding | ✅ Shipped | Signup, onboarding flow, first yacht + endorsement request |
+| 3. Profile | ✅ Shipped | Profile management, photo, certs (with upload), contact info, settings |
+| 4. Yacht Graph | ✅ Shipped | Yacht entities, attachments, colleague derivation |
+| 5. Endorsements | ✅ Shipped | Request → write → display loop, deep links, email + WhatsApp share |
+| 6. Public Profile + CV | ✅ Shipped | Public page, CV import, PDF export, QR codes |
+| 7. Payments + Pro | ✅ Shipped | Stripe (monthly + annual), Pro features, cert document manager, time-series analytics |
+| 8. Launch Prep + Content Moderation | ~1 day | AI-01 moderation, instrumentation, security, GDPR, legal, QA |
+| 8.1 Onboarding Polish + AI Assist | ~1 day | Languages, AI-04 endorsement assist, AI-02 cert OCR, AI-17 profile suggestions |
+| 8.2 Multilingual + Timeline Intel | ~½ day | AI-03 multilingual requests, AI-12 gap analyzer |
 
-**Timeline:** ~16 weeks (4 months). Target: ship by end of June 2026 for Med season.
+**Actual velocity:** Sprints 1–7 shipped in ~3 days with Claude Code. Sprint 8 + 8.1 + 8.2 estimated at ~2.5 days total. Target: ship Phase 1A by end of March 2026.
 
 ---
 
-## Phase 1B — Discovery + Convenience (~6 weeks)
+## Phase 1B — Discovery + Convenience (~3 days with Claude Code)
 
 Gate: Phase 1A graph loop is healthy (endorsement-to-profile ratio >0.3 at 500 profiles, organic share rate >10%).
 
-### Sprint 9: Availability + Search + Endorsement Signals (weeks 17–18)
+### Sprint 9: Availability + Search + Endorsement Signals (~1 day)
 
 - Availability toggle on profile: available for work (yes/no), available from (date), notes
 - 7-day auto-expiry on availability (re-confirm to stay visible)
@@ -334,14 +374,14 @@ Gate: Phase 1A graph loop is healthy (endorsement-to-profile ratio >0.3 at 500 p
 - Contextual profile visibility: search result = summary only, direct link = full profile (D-025)
 - Endorsement signals (agree/disagree) — display only, trust weight in Phase 2+
 
-### Sprint 10: Expanded Analytics + Convenience (weeks 19–20)
+### Sprint 10: Expanded Analytics + Convenience (~1 day)
 
 - Enhanced Insights tab: who viewed your profile (anonymised counts by role/location), trend lines
 - Endorsement pinning for Pro users (choose which endorsements appear first)
 - Notification preferences (email digest frequency)
 - Profile completeness nudges (smart, not nagging)
 
-### Sprint 11: Graph Quality + Established Yachts + Yacht Gallery (weeks 21–22)
+### Sprint 11: Graph Quality + Established Yachts + Yacht Gallery (~1 day)
 
 - Attachment confirmation flow for established yachts: existing verified crew can confirm/deny new attachments
 - Confirmation voting (simple majority)
@@ -360,11 +400,11 @@ Gate: Phase 1A graph loop is healthy (endorsement-to-profile ratio >0.3 at 500 p
 
 ---
 
-## Phase 1C — Commercial Adjacency (~8 weeks)
+## Phase 1C — Commercial Adjacency (~4 days with Claude Code)
 
 Gate: Crew-side product stands on its own. 10,000+ crew, 3,000+ yachts, recruiter demand signal (inbound inquiries or waitlist).
 
-### Sprint 12: Peer Hiring (weeks 23–24)
+### Sprint 12: Peer Hiring (~1 day)
 
 - Crew can post open positions on yachts they're attached to (free, per D-022)
 - Position visible to: colleagues (graph-adjacent crew)
@@ -372,7 +412,7 @@ Gate: Crew-side product stands on its own. 10,000+ crew, 3,000+ yachts, recruite
 - Apply flow: express interest → direct contact (no platform intermediation in 1C)
 - Position expiry: 30 days, renewable
 
-### Sprint 13: Recruiter Access — Foundation (weeks 25–26)
+### Sprint 13: Recruiter Access — Foundation (~1 day)
 
 - Separate recruiter signup flow (not crew accounts)
 - Recruiter subscription: EUR 29/month base + credit system for profile unlocks (D-024)
@@ -380,7 +420,7 @@ Gate: Crew-side product stands on its own. 10,000+ crew, 3,000+ yachts, recruite
 - Search returns locked summaries; full profile unlock costs credits
 - Crew opt-in required: "Visible to recruiters" toggle (default off)
 
-### Sprint 14: Recruiter Access — Polish (weeks 27–28)
+### Sprint 14: Recruiter Access — Polish (~1 day)
 
 - Shortlisting: save candidates to named lists
 - Recruiter analytics: search patterns, unlock rates
@@ -388,7 +428,7 @@ Gate: Crew-side product stands on its own. 10,000+ crew, 3,000+ yachts, recruite
 - Recruiter sorting by endorsement count allowed (D-026) — presentation order, not trust weight
 - Rate limiting on recruiter searches to prevent scraping
 
-### Sprint 15: Agency Plans (weeks 29–30)
+### Sprint 15: Agency Plans (~1 day)
 
 - Multi-seat agency accounts (EUR 299–499/month)
 - Shared shortlists across agency seats
@@ -410,10 +450,12 @@ Sprint 1 (Foundation)
               └─► Sprint 5 (Endorsements)
                     └─► Sprint 6 (Public Profile + CV)
                           └─► Sprint 7 (Payments + Pro)
-                                └─► Sprint 8 (Launch Prep)
-                                      └─► SHIP 1A
-                                            └─► Sprint 9–11 (Phase 1B)
-                                                  └─► Sprint 12–15 (Phase 1C)
+                                └─► Sprint 8 (Launch Prep + AI-01)
+                                      └─► SHIP 1A 🚀
+                                            └─► Sprint 8.1 (Onboarding Polish + AI Assist)
+                                                  └─► Sprint 8.2 (Multilingual + Timeline Intel)
+                                                        └─► Sprint 9–11 (Phase 1B)
+                                                              └─► Sprint 12–15 (Phase 1C)
 ```
 
 Sprints 3 and 4 can overlap if there's more than one person building. Everything else is sequential.
@@ -444,7 +486,7 @@ Explicitly excluded from all sprints above (deferred to Phase 2+). Build with fu
 - In-app notifications (awaiting native app for push)
 - NLP search
 - Conversational onboarding
-- Multilingual support
+- Full multilingual UI (Sprint 8.2 covers endorsement request translation only)
 - Native mobile app (iOS/Android)
 - Verification API (enterprise)
 - Endorsement signals (moved to Phase 1B Sprint 9)
@@ -455,15 +497,13 @@ These are real features with real value. They're not in scope because the yacht 
 
 ## Sprint Sizing Assumptions
 
-- Solo developer or 1 dev + 1 founder doing product/design
-- 2-week sprints, ~8 working days per sprint (accounting for context switching)
-- Each sprint should produce a deployable increment (continuous deployment via Vercel)
+- Founder + Claude Code (AI-assisted development)
+- Actual pace: ~½ day per sprint (Sprints 1–7 shipped in under 3 days)
+- Each sprint produces a deployable increment (continuous deployment via Vercel)
 - Design happens just-in-time within each sprint (no separate design phase)
 - UX spec (`yl_mobile_first_ux_spec_for_pm_v1.md`) is the design source of truth
-- English only for Phase 1A
+- English only for Phase 1A (Sprint 8.2 adds endorsement request translation)
 - Online-only web app (no PWA/offline support)
-
-If a second developer joins, Sprints 3+4 can run in parallel, compressing the timeline by ~2 weeks.
 
 ---
 

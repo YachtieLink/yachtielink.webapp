@@ -159,6 +159,17 @@ export default function MorePage() {
           href="/app/profile/settings"
           sublabel="Control what's shown on your public profile"
         />
+        <SettingsRow
+          label="Download my data"
+          href="/api/account/export"
+          sublabel="Export all your data as JSON (GDPR)"
+        />
+        <SettingsRow
+          label="Delete my account"
+          href="/app/more/delete-account"
+          sublabel="Permanently delete your account and data"
+          danger
+        />
       </div>
 
       {/* ── Billing ────────────────────────────────── */}
@@ -207,8 +218,8 @@ export default function MorePage() {
       {/* ── Legal ──────────────────────────────────── */}
       <SectionHeader title="Legal" />
       <div className="bg-[var(--card)] rounded-2xl overflow-hidden divide-y divide-[var(--border)]">
-        <SettingsRow label="Terms of Service"   sublabel="Coming soon" />
-        <SettingsRow label="Privacy Policy"     sublabel="Coming soon" />
+        <SettingsRow label="Terms of Service" href="/terms" />
+        <SettingsRow label="Privacy Policy"   href="/privacy" />
       </div>
 
       {/* ── Sign out ───────────────────────────────── */}

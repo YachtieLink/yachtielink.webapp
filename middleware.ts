@@ -25,6 +25,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
+  // ── Invite-only gate ──────────────────────────────────────────────────────
+  // SIGNUP_MODE=invite blocks /welcome and /signup unless ?invite param present
+  if (
+    process.env.SIGNUP_MODE === 'invite' &&
+    (request.nextUrl.pathname === '/welcome' || request.nextUrl.pathname === '/signup') &&
+    !request.nextUrl.searchParams.has('invite')
+  ) {
+    return NextResponse.redirect(new URL('/invite-only', request.url));
+  }
+
   const { supabase, response } = createMiddlewareClient(request);
 
   // Refresh session if expired — keeps cookies in sync
