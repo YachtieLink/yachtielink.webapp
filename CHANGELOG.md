@@ -17,7 +17,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
-## 2026-03-15 — Claude Code (Opus 4.6) — Brand Palette & Style Guide
+## 2026-03-15 — Claude Code (Opus 4.6) — Brand Palette, Style Guide & shadcn/ui
 
 ### Done
 - Created **`/yl_style_guide.md`** (project root, above webapp) — full brand style guide documenting colour palette, typography, component styling, spacing, dark mode, and brand voice rules
@@ -26,6 +26,16 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - Updated `globals.css` with new design tokens: teal-50→950, sand-100→400, updated semantic colours (interactive, info now teal-700)
 - Updated dark mode overrides: interactive colour now teal-500 in dark mode for visibility
 - Updated all UI components (Button, Toast) and 26 page/component files — zero remaining references to old palette
+- **Installed shadcn/ui** (v4, base-nova style) with teal-themed CSS variables:
+  - `--primary` → teal-700, `--secondary` → teal-50, `--accent` → sand-100, `--destructive` → #DC2626
+  - Dark mode: `--primary` → teal-500 for visibility, surfaces from Slate palette
+  - Charts themed in teal progression
+  - `--radius: 0.75rem` (matches our rounded-xl convention)
+- Added shadcn components: Dialog, Badge, Separator, Avatar, Tabs, Tooltip, Sheet, Skeleton, DropdownMenu
+- Preserved custom YachtieLink components (Button with `loading` prop, Card, Input, Toast, BottomSheet, ProgressWheel) — shadcn components coexist alongside via barrel export
+- Fixed shadcn's Button conflict: Dialog and Sheet close buttons inlined instead of depending on shadcn's Button (macOS case-insensitive FS conflict with our Button.tsx)
+- Added `lib/utils.ts` with `cn()` helper (clsx + tailwind-merge) — custom Button now uses it
+- Updated barrel export in `components/ui/index.ts` — all custom + shadcn components available
 - Build passes clean
 
 ### Context
@@ -33,15 +43,16 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - Primary brand colour: teal-700 (`#0D7377`) — deep ocean feel, not generic corporate navy
 - Sand accent for warmth (teak deck reference) — used sparingly on badges, Pro features, highlights
 - No anchors, compass roses, wave backgrounds, or yacht-club aesthetics
-- shadcn/ui installation deferred — palette locked in first, component upgrade is a logical next step
+- **shadcn/ui approach**: custom YachtieLink components (Button, Card, Input, Toast, BottomSheet, ProgressWheel) remain as-is for existing pages. New shadcn components (Dialog, Badge, Avatar, Tabs, etc.) available for new features. All share the same teal-themed CSS variables.
+- **Button conflict**: shadcn wants to own `button.tsx` (lowercase) but macOS FS is case-insensitive. Our `Button.tsx` takes precedence. When adding new shadcn components that depend on button, answer "n" to overwrite prompt. Dialog and Sheet already patched to not import button.
 
 ### Next
-- Consider installing shadcn/ui for production-grade component library (theming now ready)
 - Logo/wordmark design needed (currently text-only)
 - Clean up template assets in `/public` (vercel.svg, next.svg, etc.)
+- Can add more shadcn components on demand: `npx shadcn add [component]` (answer "n" to button overwrite)
 
 ### Flags
-- None
+- When running `npx shadcn add`, always decline the button.tsx overwrite prompt — our custom Button.tsx must be preserved
 
 ---
 

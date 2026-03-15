@@ -17,10 +17,10 @@ interface UserProfile {
   email?: string | null
   location_country?: string | null
   location_city?: string | null
-  phone_visible?: boolean
-  whatsapp_visible?: boolean
-  email_visible?: boolean
-  location_visible?: boolean
+  show_phone?: boolean
+  show_whatsapp?: boolean
+  show_email?: boolean
+  show_location?: boolean
 }
 
 interface Attachment {
@@ -105,10 +105,10 @@ export function PublicProfileContent({
 
   // Contact visibility
   const hasVisibleContact =
-    (user.phone_visible && user.phone) ||
-    (user.whatsapp_visible && user.whatsapp) ||
-    (user.email_visible && user.email) ||
-    (user.location_visible && (user.location_city || user.location_country))
+    (user.show_phone && user.phone) ||
+    (user.show_whatsapp && user.whatsapp) ||
+    (user.show_email && user.email) ||
+    (user.show_location && (user.location_city || user.location_country))
 
   return (
     <div className="flex flex-col gap-6">
@@ -157,16 +157,16 @@ export function PublicProfileContent({
             Contact
           </h2>
           <div className="flex flex-col gap-1.5 text-sm text-[var(--color-text-primary)]">
-            {user.email_visible && user.email && (
+            {user.show_email && user.email && (
               <p>{user.email}</p>
             )}
-            {user.phone_visible && user.phone && (
+            {user.show_phone && user.phone && (
               <p>{user.phone}</p>
             )}
-            {user.whatsapp_visible && user.whatsapp && (
+            {user.show_whatsapp && user.whatsapp && (
               <p>WhatsApp: {user.whatsapp}</p>
             )}
-            {user.location_visible && (user.location_city || user.location_country) && (
+            {user.show_location && (user.location_city || user.location_country) && (
               <p>{[user.location_city, user.location_country].filter(Boolean).join(', ')}</p>
             )}
           </div>

@@ -15,10 +15,10 @@ interface UserProfile {
   email?: string | null
   location_country?: string | null
   location_city?: string | null
-  phone_visible?: boolean
-  whatsapp_visible?: boolean
-  email_visible?: boolean
-  location_visible?: boolean
+  show_phone?: boolean
+  show_whatsapp?: boolean
+  show_email?: boolean
+  show_location?: boolean
 }
 
 interface Attachment {
@@ -247,10 +247,10 @@ export function ProfilePdfDocument({
   const displayName = user.display_name ?? user.full_name
 
   const hasVisibleContact =
-    (user.phone_visible && user.phone) ||
-    (user.whatsapp_visible && user.whatsapp) ||
-    (user.email_visible && user.email) ||
-    (user.location_visible && (user.location_city || user.location_country))
+    (user.show_phone && user.phone) ||
+    (user.show_whatsapp && user.whatsapp) ||
+    (user.show_email && user.email) ||
+    (user.show_location && (user.location_city || user.location_country))
 
   return (
     <Document>
@@ -289,16 +289,16 @@ export function ProfilePdfDocument({
         {hasVisibleContact && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Contact</Text>
-            {user.email_visible && user.email && (
+            {user.show_email && user.email && (
               <Text style={styles.contactRow}>{user.email}</Text>
             )}
-            {user.phone_visible && user.phone && (
+            {user.show_phone && user.phone && (
               <Text style={styles.contactRow}>{user.phone}</Text>
             )}
-            {user.whatsapp_visible && user.whatsapp && (
+            {user.show_whatsapp && user.whatsapp && (
               <Text style={styles.contactRow}>WhatsApp: {user.whatsapp}</Text>
             )}
-            {user.location_visible && (user.location_city || user.location_country) && (
+            {user.show_location && (user.location_city || user.location_country) && (
               <Text style={styles.contactRow}>
                 {[user.location_city, user.location_country].filter(Boolean).join(', ')}
               </Text>

@@ -47,24 +47,17 @@ export default async function PublicProfilePage({ params }: Props) {
   const { handle } = await params
   const supabase = await createClient()
 
-  // Parallel data fetching
-  const [userRes, attachmentsRes, certsRes, endorsementsRes] = await Promise.all([
-    supabase
-      .from('users')
-      .select(`
-        id, full_name, display_name, handle, primary_role, departments,
-        bio, profile_photo_url,
-        phone, whatsapp, email, location_country, location_city,
-        phone_visible, whatsapp_visible, email_visible, location_visible
-      `)
-      .eq('handle', handle.toLowerCase())
-      .single(),
-    // Defer these until we have the user ID — but since we're fetching by handle,
-    // we need the user first. Use a two-phase approach.
-    Promise.resolve(null),
-    Promise.resolve(null),
-    Promise.resolve(null),
-  ])
+  // Phase 1: fetch user by handle
+  const userRes = await supabase
+    .from('users')
+    .select(`
+      id, full_name, display_name, handle, primary_role, departments,
+      bio, profile_photo_url,
+      phone, whatsapp, email, location_country, location_city,
+      show_phone, show_whatsapp, show_email, show_location
+    `)
+    .eq('handle', handle.toLowerCase())
+    .single()
 
   const user = userRes.data
   if (!user) notFound()
