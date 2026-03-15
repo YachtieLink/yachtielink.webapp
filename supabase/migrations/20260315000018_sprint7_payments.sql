@@ -104,5 +104,5 @@ CREATE INDEX IF NOT EXISTS idx_profile_analytics_user_event_date
   ON public.profile_analytics (user_id, event_type, occurred_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_certifications_expiry
-  ON public.certifications (expiry_date)
-  WHERE expiry_date IS NOT NULL;
+  ON public.certifications (expires_at)
+  WHERE expires_at IS NOT NULL;
