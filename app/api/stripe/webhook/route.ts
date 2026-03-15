@@ -45,12 +45,19 @@ export async function POST(req: NextRequest) {
 
       const isFoundingMember = subscription.metadata?.founding_member === 'true';
 
+      // current_period_end moved to items in newer Stripe API versions — fall back to top-level
+      const periodEnd =
+        (subscription.items.data[0] as any)?.current_period_end ??
+        (subscription as any).current_period_end;
+      const subscriptionEndsAt =
+        isActive && periodEnd
+          ? new Date(periodEnd * 1000).toISOString()
+          : null;
+
       await supabase.from('users').update({
         subscription_status: isActive ? 'pro' : 'free',
         subscription_plan: isActive ? plan : null,
-        subscription_ends_at: isActive
-          ? new Date((subscription as any).current_period_end * 1000).toISOString()
-          : null,
+        subscription_ends_at: subscriptionEndsAt,
         show_watermark: !isActive,
         ...(isActive && isFoundingMember ? { founding_member: true } : {}),
       }).eq('id', userId);
