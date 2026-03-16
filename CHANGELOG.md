@@ -17,6 +17,55 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-16 — Claude Code (Sonnet 4.6) — Post-Sprint 8: QA pass + dev account
+
+### Done
+- Created dev/QA Supabase account: `dev@yachtie.link` (auth user `ef5dec27-...`)
+  - Profile row seeded: handle `dev-qa`, role First Officer, subscription_plan `monthly`, subscription_status `pro`, founding_member true
+  - Credentials stored in `.env.local` as `DEV_TEST_EMAIL` / `DEV_TEST_PASSWORD` — never commit
+- Fixed rate limiter (`lib/rate-limit/limiter.ts`): fails open gracefully when `KV_REST_API_URL` is placeholder or missing, so local dev and unlinked deploys don't 500
+- Ran automated QA against all Sprint 8 pages and flows:
+  - ✅ /terms, /privacy, /invite-only, /app/more/delete-account — all render correctly
+  - ✅ Public profile /u/dev-qa — renders correctly
+  - ✅ Auth guard: unauthenticated /app/* → /welcome?returnTo=...
+  - ✅ Data export: GET /api/account/export → 200 + attachment header
+  - ✅ Cookie banner: shows on first visit, dismisses and persists in localStorage
+  - ✅ More tab: PRIVACY links (Download data, Delete account) + LEGAL links (Terms, Privacy Policy)
+  - ✅ Dark mode: More page screenshot verified
+  - ✅ Migration 20260315000020 already applied to production (confirmed via `supabase migration list`)
+- Updated `notes/launch_qa_checklist.md` with automated pass/fail results
+
+### Context
+- Rate limiter was crashing with ENOTFOUND on placeholder KV URL — all protected API routes were 500ing in dev
+- Dev account is a real Supabase user going through normal auth — no code bypasses
+- Vercel KV, PostHog, and Sentry still need real keys before launch (see sprint status)
+
+### Next
+- Founder: set up Vercel KV, PostHog, Sentry and add env vars to Vercel dashboard
+- Founder: run manual QA items (OAuth flows, Stripe, endorsement emails, mobile Safari)
+- Founder: legal review of /terms and /privacy before going public
+- When ready: merge feat/sprint-8 → main and deploy
+
+### Flags
+- None
+
+---
+
+## 2026-03-15 — Claude Code (Sonnet 4.6) — Post-Sprint 8: proxy.ts migration
+
+### Done
+- Renamed `middleware.ts` → `proxy.ts`, export renamed `middleware` → `proxy` (Next.js 16 deprecation fix)
+- Verified all Sprint 8 pages render correctly: `/invite-only`, `/terms`, `/privacy`, cookie banner
+
+### Context
+- Next.js 16 deprecated the `middleware` file convention in favour of `proxy`
+- No logic changes — pure rename
+
+### Next
+- See Sprint 8 entry below for launch checklist
+
+---
+
 ## 2026-03-15 — Claude Code (Sonnet 4.6) — Sprint 8: Launch Prep + Content Moderation
 
 ### Done

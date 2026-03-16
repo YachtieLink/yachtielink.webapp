@@ -97,6 +97,21 @@ These guide judgement calls. When a decision feels like it might drift from them
 
 ---
 
+## Dev / QA Account
+
+A real Supabase account exists for automated testing. No code bypasses — it goes through normal auth.
+
+| Field | Value |
+|-------|-------|
+| Email | `dev@yachtie.link` |
+| Handle | `dev-qa` |
+| Plan | Pro (monthly) |
+| Password | `DEV_TEST_PASSWORD` in `.env.local` (never commit) |
+
+**To log in via preview:** navigate to `/login`, fill email + password, click Sign in → lands at `/app/profile`.
+
+---
+
 ## Docs Reference
 
 | Doc | Purpose |

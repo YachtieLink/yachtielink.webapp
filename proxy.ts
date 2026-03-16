@@ -7,7 +7,7 @@ const PROTECTED_PREFIXES = ["/app", "/onboarding"];
 // Routes only for unauthenticated users
 const AUTH_ONLY_PREFIXES = ["/welcome", "/login", "/signup", "/reset-password"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // ── Custom subdomain routing ──────────────────────────────────────────────
   // handle.yachtie.link → rewrite to /u/handle
   // Wildcard DNS routes all *.yachtie.link here; showing the subdomain URL
