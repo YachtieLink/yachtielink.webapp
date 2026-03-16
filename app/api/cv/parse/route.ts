@@ -3,21 +3,22 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import OpenAI from 'openai'
 import { CV_EXTRACTION_PROMPT } from '@/lib/cv/prompt'
-
-interface ParseRequestBody {
-  storagePath: string
-}
+import { validateBody } from '@/lib/validation/validate'
+import { parseCVSchema } from '@/lib/validation/schemas'
+import { applyRateLimit } from '@/lib/rate-limit/helpers'
+import { trackServerEvent } from '@/lib/analytics/server'
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await req.json() as ParseRequestBody
-  const { storagePath } = body
-  if (!storagePath) {
-    return NextResponse.json({ error: 'Missing storagePath' }, { status: 400 })
-  }
+  const limited = await applyRateLimit(req, 'fileUpload', user.id)
+  if (limited) return limited
+
+  const result = await validateBody(req, parseCVSchema)
+  if ('error' in result) return result.error
+  const { storagePath } = result.data
 
   // Rate limit check
   const { data: allowed } = await supabase.rpc('check_cv_parse_limit', { p_user_id: user.id })
@@ -118,11 +119,13 @@ export async function POST(req: NextRequest) {
     parsedData = JSON.parse(content)
   } catch (err) {
     if (err instanceof Error && err.name === 'AbortError') {
+      trackServerEvent(user.id, 'cv.parse_failed', { reason: 'timeout' })
       return NextResponse.json(
         { error: 'CV parsing timed out. Try again or enter your details manually.' },
         { status: 504 },
       )
     }
+    trackServerEvent(user.id, 'cv.parse_failed', { reason: 'parse_error' })
     return NextResponse.json(
       { error: 'Could not parse CV data. Try entering your details manually.' },
       { status: 422 },
@@ -135,5 +138,6 @@ export async function POST(req: NextRequest) {
     .update({ cv_storage_path: storagePath, cv_parsed_at: new Date().toISOString() })
     .eq('id', user.id)
 
+  trackServerEvent(user.id, 'cv.parsed')
   return NextResponse.json({ ok: true, data: parsedData })
 }

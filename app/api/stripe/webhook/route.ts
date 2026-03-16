@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe/client';
 import { createServiceClient } from '@/lib/supabase/admin';
 import { sendSubscriptionWelcomeEmail } from '@/lib/email/subscription-welcome';
 import { sendPaymentFailedEmail } from '@/lib/email/payment-failed';
+import { trackServerEvent } from '@/lib/analytics/server';
 
 // Must be nodejs runtime to access raw request body for signature verification
 export const runtime = 'nodejs';
@@ -62,8 +63,10 @@ export async function POST(req: NextRequest) {
         ...(isActive && isFoundingMember ? { founding_member: true } : {}),
       }).eq('id', userId);
 
-      // Send welcome email on new subscription
+      // Send welcome email + fire analytics event on new subscription
       if (event.type === 'customer.subscription.created' && isActive) {
+        trackServerEvent(userId, 'pro.subscribed', { plan, founding_member: isFoundingMember });
+
         const { data: userRecord } = await supabase
           .from('users')
           .select('email, display_name, full_name')
@@ -97,6 +100,8 @@ export async function POST(req: NextRequest) {
         custom_subdomain: null,
         template_id: null,
       }).eq('id', userId);
+
+      trackServerEvent(userId, 'pro.cancelled');
 
       break;
     }

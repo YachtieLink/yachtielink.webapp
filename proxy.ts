@@ -7,7 +7,7 @@ const PROTECTED_PREFIXES = ["/app", "/onboarding"];
 // Routes only for unauthenticated users
 const AUTH_ONLY_PREFIXES = ["/welcome", "/login", "/signup", "/reset-password"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // ── Custom subdomain routing ──────────────────────────────────────────────
   // handle.yachtie.link → rewrite to /u/handle
   // Wildcard DNS routes all *.yachtie.link here; showing the subdomain URL
@@ -23,6 +23,16 @@ export async function middleware(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = `/u/${subdomain}`;
     return NextResponse.rewrite(url);
+  }
+
+  // ── Invite-only gate ──────────────────────────────────────────────────────
+  // SIGNUP_MODE=invite blocks /welcome and /signup unless ?invite param present
+  if (
+    process.env.SIGNUP_MODE === 'invite' &&
+    (request.nextUrl.pathname === '/welcome' || request.nextUrl.pathname === '/signup') &&
+    !request.nextUrl.searchParams.has('invite')
+  ) {
+    return NextResponse.redirect(new URL('/invite-only', request.url));
   }
 
   const { supabase, response } = createMiddlewareClient(request);

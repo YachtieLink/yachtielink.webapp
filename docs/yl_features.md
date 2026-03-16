@@ -29,7 +29,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** Account creation via Apple OAuth, Google OAuth, or email/password. Email accounts require email verification before the account becomes active.
 **Why:** Standard auth with verification to prevent mistyped emails locking users out of password recovery and endorsement notifications.
 **Sprint:** 1–2
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Details:**
 - Auth methods: Apple OAuth, Google OAuth, email/password
@@ -44,7 +44,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** A guided flow after signup that collects the minimum information needed to create a useful profile: name, handle, department(s), role, first yacht, and optional endorsement requests.
 **Why:** Gets the user to a live public profile with one yacht attached as fast as possible. Every step feeds the graph.
 **Sprint:** 2
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Details:**
 
@@ -90,7 +90,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** A crew member's professional identity page — photo, display name, handle, department(s), role, bio, contact info, location, and a link they own.
 **Why:** The portable identity layer every other feature builds on. A crew member should be able to hand someone a URL and have it represent them professionally, permanently, and for free.
 **Sprint:** 3
-**Status:** specced
+**Status:** shipped (except Languages — not yet built)
 **Priority:** Must have
 **Crew-first note:** Core identity stays free. Paying improves presentation of the profile, not access to it.
 **Details:**
@@ -150,7 +150,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** A structured record of a crew member's past and current roles — yacht name, role, department, start and end dates.
 **Why:** Employment history is the raw material for the yacht graph. Without it, colleague discovery and endorsement gating have nothing to work from.
 **Sprint:** 2–3
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Key notes:** Role and date range required on every attachment. Soft-deletes preserve endorsement links (D-006).
 
@@ -161,7 +161,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** Yachts as real database objects with a UUID, display name, type, length, flag state, and year built — not free-text strings. The yacht's "Wikipedia page" in the industry.
 **Why:** Making yachts entities (not just text fields) is what allows the graph to form. Two crew who both attach "Lady M" are connected because they referenced the same object.
 **Sprint:** 4
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Details:**
 - **Yacht type:** Motor Yacht or Sailing Yacht (two options only)
@@ -181,7 +181,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** The link between a crew member and a yacht — role, dates, and yacht reference — forming the basic unit of the graph.
 **Why:** Attachments are the edges that make the graph. Every other graph feature (colleagues, endorsement gating) derives from overlapping attachments.
 **Sprint:** 2–4
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Key notes:** Fresh yachts are open to attach. Established yachts (60 days + crew threshold) move to confirmation flow in Phase 1B. Soft delete preserves existing endorsements.
 
@@ -192,7 +192,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** An automatically derived view of who you've worked with — computed from users who share at least 1 yacht attachment, not stored as explicit relationships.
 **Why:** This is the wedge. The colleague graph compounds as more crew claim their history. It makes the platform useful the moment you add a second yacht.
 **Sprint:** 4
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Key notes:** Graph edges come from shared real employment — not from follows, contacts, or payments (D-028). Computed on access, not stored as a relationship table. Display: name, shared yacht(s), relationship label.
 
@@ -203,7 +203,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** A record of a crew member's professional certifications — type, issued date, expiry date, and optional document upload. Free tier allows document upload; Pro tier unlocks a document manager for organising and tracking cert documents.
 **Why:** Certifications are a core part of a yachtie's professional identity. Tracking expiry dates is genuinely useful — crew need to know when certs are expiring.
 **Sprint:** 3
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Details:**
 
@@ -234,7 +234,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** A tool for crew to request endorsements from colleagues identified via shared yacht history, sent via deep link (email, and optionally WhatsApp if the user chooses to share as a message).
 **Why:** Increases the response rate on the endorsement loop. The tooling improves response rate — it doesn't change who is eligible to endorse (D-009).
 **Sprint:** 5
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Details:**
 - Rate-limited: 10/day free, 20/day Pro
@@ -251,7 +251,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** A written endorsement from one crew member to another, requiring shared yacht attachment, containing free-text and structured metadata (role, dates, yacht).
 **Why:** Endorsements are the trust signal — attestation from real coworkers with verifiable shared history. They're what makes the profile more than a self-authored CV.
 **Sprint:** 5
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Details:**
 - Shared yacht attachment required to endorse (D-009) — this keeps endorsements grounded in real experience
@@ -285,7 +285,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** A server-rendered public page at `/u/:handle` (and `handle.yachtie.link` for Pro users) showing a crew member's identity, employment history, certifications, and endorsements — shareable and SEO-indexed.
 **Why:** The portable profile is useless if it can't be shared. This is the linktr.ee use case — crew hand someone this URL on a dock, in a port, or via a QR code.
 **Sprint:** 6
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Details:**
 - Sections: Name + role, about, employment history, certifications, endorsements received
@@ -303,10 +303,10 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** Upload an existing CV (PDF or DOCX) to auto-populate profile fields via LLM extraction, with a review step before saving.
 **Why:** Crew already have CVs. Making them re-type employment history creates unnecessary friction that delays graph formation. The goal is time-to-first-endorsement under 30 days (D-021).
 **Sprint:** 6
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Details:**
-- Extraction via Claude Sonnet API
+- Extraction via OpenAI GPT-4o-mini API
 - Review screen: pre-filled form the user can edit field by field before saving
 - Extracted data is still self-reported — this is not verification
 - Cost target: less than EUR 0.05 per parse
@@ -321,7 +321,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** A downloadable PDF of the crew member's profile — clean, professional layout, generated on demand.
 **Why:** Crew need a physical/email-ready CV for situations where a URL isn't enough. PDF export is core portable identity and should stay free (D-014).
 **Sprint:** 6
-**Status:** specced
+**Status:** shipped
 **Priority:** Nice to have
 **Details:**
 - **Sections on PDF:** Name, photo, role, about, employment history, certifications, top 3 endorsements (excerpt + endorser name + yacht), link to full endorsements on public profile
@@ -340,7 +340,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** A subscription that unlocks presentation polish and workflow convenience — premium PDF templates, watermark removal, custom subdomain, profile analytics, certification document manager, and higher endorsement request allowance.
 **Why:** Funds operations without affecting trust. Paid features improve how a profile looks and how efficiently it can be worked — not how trustworthy it appears.
 **Sprint:** 7
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Details:**
 
@@ -372,7 +372,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** A downloadable QR code encoding the user's public profile URL, displayed on their profile page and embedded in generated PDFs. Pro users can customise the QR code's appearance — colors, background, transparency — and the customised design persists everywhere the QR appears.
 **Why:** Crew share profiles in person — on docks, in marinas, at crew agencies. A QR code is the fastest way to hand someone your profile. Pro customisation lets crew match the QR to their personal brand or the yacht's livery — a presentation upgrade that makes printed and shared materials look polished and intentional.
 **Sprint:** 6
-**Status:** specced
+**Status:** shipped
 **Priority:** Nice to have
 **Details:**
 - QR encodes `/u/:handle` (or `handle.yachtie.link` for Pro users)
@@ -398,7 +398,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** A prominent share button on the public profile page and the profile owner's own profile view that triggers the device's native share sheet — letting users share a profile via WhatsApp, iMessage, Telegram, email, or any other app on their phone in two taps.
 **Why:** Crew share profiles constantly — recommending colleagues to captains, forwarding their own profile to agencies, sharing in crew WhatsApp groups. The share flow must be as fast and frictionless as possible. The native share sheet shows the user's own installed apps (WhatsApp, Telegram, Messages, Mail, etc.) so it always works regardless of which messaging apps they use. This is how crew actually communicate — not via desktop browsers.
 **Sprint:** 6 (alongside Public Profile Page)
-**Status:** proposed
+**Status:** shipped
 **Priority:** Must have
 **Details:**
 - **Web Share API** (`navigator.share()`): supported on all modern mobile browsers (iOS Safari, Chrome Android). Triggers the native OS share sheet showing the user's installed apps
@@ -424,7 +424,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** Transactional email for key events, with a light touch — no spam, no marketing fluff.
 **Why:** Users need to know about endorsement requests, account events, and (for free tier) nudges when profile views spike.
 **Sprint:** 2 (auth emails), 5 (endorsement emails), 7 (analytics nudges), 8 (full set)
-**Status:** specced
+**Status:** shipped
 **Priority:** Must have
 **Details:**
 
@@ -452,7 +452,7 @@ Goal: prove the wedge. A crew member can build a real portable identity anchored
 **What:** Full dark mode support, toggled in settings or following system preference.
 **Why:** Industry standard. Crew use phones in all lighting conditions.
 **Sprint:** 1 (built into Tailwind config from the start)
-**Status:** specced
+**Status:** shipped
 **Priority:** Nice to have
 **Details:**
 - System preference respected by default
