@@ -105,7 +105,7 @@ export async function getProfileSections(userId: string) {
 }
 
 /**
- * Fetch Sprint 10 extended profile sections: hobbies, education, skills,
+ * Fetch extended profile sections (Phase 1A Profile Robustness): hobbies, education, skills,
  * user photos (gallery), and work gallery. Runs all in parallel.
  */
 export async function getExtendedProfileSections(userId: string) {

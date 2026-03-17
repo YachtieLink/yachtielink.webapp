@@ -1,5 +1,5 @@
 /**
- * PublicProfileContent — Sprint 10 redesign
+ * PublicProfileContent — Phase 1A Profile Robustness redesign
  * Bumble-style hero photo + accordion sections.
  */
 import Image from 'next/image'

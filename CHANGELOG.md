@@ -17,10 +17,10 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
-## 2026-03-18 — Claude Code (Opus 4.6) — Sprint 10 Phase 1A Profile Robustness implementation
+## 2026-03-18 — Claude Code (Opus 4.6) — Phase 1A Profile Robustness implementation
 
 ### Done
-- **DB migration** `supabase/migrations/20260317000021_sprint10_profile_robustness.sql` — 7 new tables (user_photos, user_gallery, profile_folders, saved_profiles, user_hobbies, user_education, user_skills), 4 new columns on users (ai_summary, ai_summary_edited, section_visibility jsonb, social_links jsonb), RLS policies for all tables, get_sea_time() helper function, storage bucket policies for user-photos and user-gallery
+- **DB migration** `supabase/migrations/20260317000021_profile_robustness.sql` — 7 new tables (user_photos, user_gallery, profile_folders, saved_profiles, user_hobbies, user_education, user_skills), 4 new columns on users (ai_summary, ai_summary_edited, section_visibility jsonb, social_links jsonb), RLS policies for all tables, get_sea_time() helper function, storage bucket policies for user-photos and user-gallery
 - **Zod schemas** — 12 new schemas in lib/validation/schemas.ts (photos, gallery, saved profiles, folders, hobbies, education, skills, social links, section visibility, AI summary)
 - **Profile queries** extended — getUserById/getUserByHandle now include new columns; new: getExtendedProfileSections(), getSavedStatus(), getSavedProfiles(), getProfileFolders(), getEndorserRoleOnYacht()
 - **lib/profile-summaries.ts** — server-side summary line helpers: formatSeaTime, experienceSummary, endorsementsSummary, certificationsSummary, educationSummary, hobbiesSummary, skillsSummary, gallerySummary, computeProfileStrength

@@ -1,5 +1,5 @@
 /**
- * /u/:handle — Public profile page (Sprint 10: Bumble-style redesign)
+ * /u/:handle — Public profile page (Phase 1A Profile Robustness: Bumble-style redesign)
  * Server-rendered, SEO-optimised, shareable.
  */
 import { notFound } from 'next/navigation'
