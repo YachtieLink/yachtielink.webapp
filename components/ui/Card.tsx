@@ -16,7 +16,8 @@ export function Card({
       className={`
         rounded-2xl border border-[var(--color-border)]
         bg-[var(--color-surface-raised)] p-4
-        ${interactive ? "cursor-pointer transition-colors hover:bg-[var(--color-surface-overlay)] active:scale-[0.99]" : ""}
+        shadow-sm transition-all duration-200
+        ${interactive ? "cursor-pointer hover:-translate-y-0.5 hover:shadow-md hover:bg-[var(--color-surface-overlay)] active:scale-[0.98]" : ""}
         ${className}
       `}
       {...props}

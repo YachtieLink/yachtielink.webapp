@@ -17,6 +17,30 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-17 — Claude Code (Opus 4.6) — UI/UX refresh Phase 1 + Salty mascot spec
+
+### Done
+- Expanded colour palette: added coral (#E8634A), navy (#2B4C7E), and amber (#E5A832) token families (50/100/200/500/700 each) to `globals.css`
+- Added DM Serif Display font to `layout.tsx` as display/headline font alongside DM Sans
+- Created `lib/motion.ts` — shared Framer Motion animation presets (fadeUp, fadeIn, staggerContainer, cardHover, buttonTap, scrollReveal, popIn, spring configs)
+- Updated `Card.tsx` — `shadow-sm` default + interactive hover lift + press animation
+- Updated `Button.tsx` — refined press animation to `scale-[0.97]` with `transition-all duration-150`
+- Updated chart colours to multi-colour palette (teal, coral, navy, amber) for light and dark modes
+- Rewrote `yl_style_guide.md` to v2.0 — expanded colours, DM Serif Display typography, motion guidelines, Salty section, bento layouts, updated brand voice
+- Created `notes/salty_mascot_spec.md` — full mascot spec: ethereal wind/water spirit, 8 moods, 5 sizes, voice guide, feature integration map, animation spec, component architecture, rollout plan
+
+### Context
+- Inspired by Notion.com's design energy — colour-coded sections, mascot character, purposeful animation, bento layouts
+- Key decisions: DM Serif Display font, Salty mascot (AI-powered but brand never says "AI"), Phase 1 quick wins first
+- Salty needs SVG artwork before implementation — spec is ready, visuals are not
+
+### Next
+- Phase 2: bento layout for profile page, empty-state illustrations, staggered list animations
+- Phase 3: marketing landing page with bento feature grid, scroll reveals, serif hero
+- Salty SVG artwork needed before Phase 4 mascot implementation
+
+---
+
 ## 2026-03-17 — Claude Code (Opus 4.6) — Nav perf + public profile CTA improvements
 
 ### Done
