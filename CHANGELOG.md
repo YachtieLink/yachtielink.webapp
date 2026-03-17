@@ -17,6 +17,63 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-18 — Claude Code (Opus 4.6) — Phase 1A Profile Robustness implementation
+
+### Done
+- **DB migration** `supabase/migrations/20260317000021_profile_robustness.sql` — 7 new tables (user_photos, user_gallery, profile_folders, saved_profiles, user_hobbies, user_education, user_skills), 4 new columns on users (ai_summary, ai_summary_edited, section_visibility jsonb, social_links jsonb), RLS policies for all tables, get_sea_time() helper function, storage bucket policies for user-photos and user-gallery
+- **Zod schemas** — 12 new schemas in lib/validation/schemas.ts (photos, gallery, saved profiles, folders, hobbies, education, skills, social links, section visibility, AI summary)
+- **Profile queries** extended — getUserById/getUserByHandle now include new columns; new: getExtendedProfileSections(), getSavedStatus(), getSavedProfiles(), getProfileFolders(), getEndorserRoleOnYacht()
+- **lib/profile-summaries.ts** — server-side summary line helpers: formatSeaTime, experienceSummary, endorsementsSummary, certificationsSummary, educationSummary, hobbiesSummary, skillsSummary, gallerySummary, computeProfileStrength
+- **6 new core components**: ProfileAccordion (collapsible with AnimatePresence), PhotoGallery (swipeable hero 65vh, touch events, desktop arrows, dot indicators), SocialLinksRow (platform icons with hover colors), ProfileStrength (donut SVG, 4 strength labels), SaveProfileButton (save/unsave with optimistic toggle), SectionManager (toggle switches with optimistic PATCH calls)
+- **14 new API routes**: /api/user-photos (GET/POST/PUT), /api/user-photos/[id] (DELETE), /api/user-gallery (GET/POST/PUT), /api/user-gallery/[id] (PUT/DELETE), /api/saved-profiles (GET/POST/DELETE), /api/profile-folders (GET/POST), /api/profile-folders/[id] (PUT/DELETE), /api/user-hobbies (GET/PUT), /api/user-education (GET/POST), /api/user-education/[id] (PUT/DELETE), /api/user-skills (GET/PUT), /api/profile/social-links (GET/PATCH), /api/profile/section-visibility (PATCH), /api/profile/ai-summary (POST/PATCH)
+- **Public profile /u/[handle]** — full rewrite: Bumble-style split layout (photo left 40% sticky on desktop, content right), accordion sections with smart summaries, save button for logged-in viewers, sectionVisibility respected (empty + hidden = don't render), social links row, extended data sections (hobbies, education, skills, gallery)
+- **Own profile /app/profile** — full rewrite: PhotoGallery editable with add button, ProfileStrength meter (replaces WheelACard), SectionManager card, SocialLinksRow, all sections as ProfileAccordion with edit links, empty-state prompts with add links
+- **6 new edit pages**: /app/profile/photos (upload/delete, 3-col grid), /app/profile/gallery (upload/delete), /app/hobbies/edit (pill input, emoji, max 10), /app/skills/edit (pill input, category selector, max 20), /app/education/new (form with dates), /app/social-links/edit (one field per platform, 7 platforms)
+
+### Context
+- Sprint 10 = Phase 1A Profile Robustness Sprint from approved plan file (zany-squishing-crystal.md)
+- WheelACard component is still in place but no longer used by profile page — can be deleted in cleanup
+- Education [id]/edit page not yet created (only new; delete is via API)
+- Storage buckets (user-photos, user-gallery) must be created manually in Supabase dashboard before photos work
+- Migration must be applied via Supabase dashboard or `supabase db push` before testing
+- AI summary endpoint requires OPENAI_API_KEY env var (already exists from CV parse)
+- supabase.storage.from('user-photos') CDN URLs are used for photo_url — ensure bucket is public
+
+### Next
+- Apply DB migration via Supabase dashboard
+- Create user-photos and user-gallery storage buckets (public read)
+- Test photo upload flow end-to-end
+- Build /app/education/[id]/edit page (edit existing education entries)
+- Build saved profiles page (/app/network/saved) + folder UI
+- Add animation pass (all new components should use lib/motion.ts presets)
+- Add Salty empty state illustrations to the new sections
+- QA dark mode on all new components
+
+### Flags
+- None critical — all code is new additions, no breaking changes to existing functionality
+
+## 2026-03-17 — Claude Code (Sonnet 4.6) — Feature Roadmap build plan
+
+### Done
+- Created `notes/feature_roadmap_build_plan.md` — full detailed build plan for the community feature roadmap feature
+- Feature lives in the More tab; Pro users can vote + submit requests, free users read-only
+- Plan covers: DB migration (`20260318000001_feature_roadmap.sql`) with 4 tables + RLS + vote-count triggers + seed data, TypeScript types, 5 API routes, 12 components, rate limiting config, admin workflow, decision log (D-031–D-038), and 17 success criteria
+
+### Context
+- Inspired by BuddyBoss roadmap: 3-tab layout (Roadmap / Community Ideas / Released), card-based layout, thumbs-up toggle voting, status badges
+- ~75% of roadmap items will target Pro users, ~25% target all users (editorial guideline, not enforced by code)
+- Roadmap items are admin-managed via Supabase dashboard; community requests require admin approval before going public
+- Reuses existing `UpgradeCTA`, `getProStatus()`, `SettingsRow`, Zod validation, and rate-limiting patterns
+
+### Next
+- Implement the feature roadmap: apply migration → types → API routes → components → route page → More page entry
+- Seed initial roadmap items in Supabase after migration
+
+### Flags
+- None
+
+---
+
 ## 2026-03-17 — Claude Code (Opus 4.6) — UI/UX refresh Phase 1 + Salty mascot spec
 
 ### Done

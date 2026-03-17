@@ -75,6 +75,11 @@ export default async function CvPage() {
           attachments={(attRes.data as any) ?? []}
           certifications={(certRes.data as any) ?? []}
           endorsements={(endRes.data as any) ?? []}
+          profilePhotos={[]}
+          hobbies={[]}
+          education={[]}
+          skills={[]}
+          gallery={[]}
         />
       </div>
     </div>
