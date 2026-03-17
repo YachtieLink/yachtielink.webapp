@@ -70,3 +70,106 @@ export const updateHandleSchema = z.object({
       'Handle must be lowercase alphanumeric with hyphens, no leading/trailing hyphen',
     ),
 });
+
+// --- Profile Photos ---
+
+export const userPhotoSchema = z.object({
+  photo_url: z.string().url(),
+  sort_order: z.number().int().min(0).max(20),
+});
+
+export const reorderPhotosSchema = z.object({
+  photo_ids: z.array(z.string().uuid()).min(1).max(9),
+});
+
+// --- User Gallery ---
+
+export const userGalleryItemSchema = z.object({
+  image_url: z.string().url(),
+  caption: z.string().max(300).optional(),
+  yacht_id: z.string().uuid().optional().nullable(),
+  sort_order: z.number().int().min(0).max(50),
+});
+
+export const updateGalleryItemSchema = z.object({
+  caption: z.string().max(300).optional().nullable(),
+  yacht_id: z.string().uuid().optional().nullable(),
+});
+
+export const reorderGallerySchema = z.object({
+  item_ids: z.array(z.string().uuid()).min(1).max(30),
+});
+
+// --- Saved Profiles ---
+
+export const saveProfileSchema = z.object({
+  saved_user_id: z.string().uuid(),
+  folder_id: z.string().uuid().optional().nullable(),
+});
+
+export const moveToFolderSchema = z.object({
+  folder_id: z.string().uuid().nullable(),
+});
+
+// --- Profile Folders ---
+
+export const profileFolderSchema = z.object({
+  name: z.string().min(1).max(50).trim(),
+  emoji: z.string().max(10).optional(),
+});
+
+// --- Hobbies ---
+
+export const bulkHobbiesSchema = z.object({
+  hobbies: z.array(
+    z.object({
+      name: z.string().min(1).max(100).trim(),
+      emoji: z.string().max(10).optional(),
+    })
+  ).min(0).max(10),
+});
+
+// --- Education ---
+
+export const userEducationSchema = z.object({
+  institution: z.string().min(1).max(200).trim(),
+  qualification: z.string().max(200).trim().optional(),
+  field_of_study: z.string().max(200).trim().optional(),
+  started_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
+  ended_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
+});
+
+// --- Skills ---
+
+export const bulkSkillsSchema = z.object({
+  skills: z.array(
+    z.object({
+      name: z.string().min(1).max(100).trim(),
+      category: z.enum(['technical', 'certifiable', 'language', 'software', 'other']).optional(),
+    })
+  ).min(0).max(20),
+});
+
+// --- Social Links ---
+
+export const socialLinksSchema = z.object({
+  links: z.array(
+    z.object({
+      platform: z.enum(['instagram', 'linkedin', 'tiktok', 'youtube', 'x', 'facebook', 'website']),
+      url: z.string().url(),
+    })
+  ).max(7),
+});
+
+// --- Section Visibility ---
+
+export const sectionVisibilitySchema = z.object({
+  section: z.enum(['about', 'experience', 'endorsements', 'certifications', 'hobbies', 'education', 'skills', 'photos', 'gallery']),
+  visible: z.boolean(),
+});
+
+// --- AI Summary ---
+
+export const aiSummaryEditSchema = z.object({
+  summary: z.string().min(10).max(500).trim(),
+});

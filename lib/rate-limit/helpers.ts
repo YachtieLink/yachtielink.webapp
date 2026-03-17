@@ -20,6 +20,7 @@ export const RATE_LIMITS = {
   fileUpload:        { limit: 20,  window: 60 * 60,           scope: 'user' as const }, // 20/1h/user
   search:            { limit: 60,  window: 60,                scope: 'user' as const }, // 60/min/user
   accountFlag:       { limit: 10,  window: 7 * 24 * 60 * 60,  scope: 'user' as const }, // 10/7days/user
+  aiSummary:         { limit: 10,  window: 60 * 60,           scope: 'user' as const }, // 10/1h/user
 } as const;
 
 export async function applyRateLimit(
