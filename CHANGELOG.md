@@ -17,6 +17,28 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-17 — Claude Code (Sonnet 4.6) — Feature Roadmap build plan
+
+### Done
+- Created `notes/feature_roadmap_build_plan.md` — full detailed build plan for the community feature roadmap feature
+- Feature lives in the More tab; Pro users can vote + submit requests, free users read-only
+- Plan covers: DB migration (`20260318000001_feature_roadmap.sql`) with 4 tables + RLS + vote-count triggers + seed data, TypeScript types, 5 API routes, 12 components, rate limiting config, admin workflow, decision log (D-031–D-038), and 17 success criteria
+
+### Context
+- Inspired by BuddyBoss roadmap: 3-tab layout (Roadmap / Community Ideas / Released), card-based layout, thumbs-up toggle voting, status badges
+- ~75% of roadmap items will target Pro users, ~25% target all users (editorial guideline, not enforced by code)
+- Roadmap items are admin-managed via Supabase dashboard; community requests require admin approval before going public
+- Reuses existing `UpgradeCTA`, `getProStatus()`, `SettingsRow`, Zod validation, and rate-limiting patterns
+
+### Next
+- Implement the feature roadmap: apply migration → types → API routes → components → route page → More page entry
+- Seed initial roadmap items in Supabase after migration
+
+### Flags
+- None
+
+---
+
 ## 2026-03-17 — Claude Code (Opus 4.6) — UI/UX refresh Phase 1 + Salty mascot spec
 
 ### Done
