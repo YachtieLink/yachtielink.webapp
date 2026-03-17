@@ -17,6 +17,28 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-17 — Claude Code (Opus 4.6) — Nav perf + public profile CTA improvements
+
+### Done
+- `staleTimes.dynamic: 60` in next.config.ts — 60s client-side RSC cache for instant tab switching
+- BottomTabBar + SidebarNav: prefetch all 5 tab routes on mount via `router.prefetch()`
+- Public profile CTA rework:
+  - Not logged in: dual CTAs — "Build your own profile" (signup) + "Sign in to see how you know [Name]" (login)
+  - Logged in, own profile: "Back to dashboard" button
+  - Logged in, someone else: "Back to my profile" button
+- Cleaned up 64 iCloud sync conflict duplicate files
+- Reconciled diverged local/remote main via rebase, pushed Phase 1A as PR #41
+
+### Context
+- Phase 1A cleanup complete and deployed via PR #41
+- PR #42 open for nav perf + CTA changes
+
+### Next
+- Sprint 9: availability + search + endorsement signals (see notes/sprint9_build_plan.md)
+- Feature roadmap page (saved to memory for future sprint)
+
+---
+
 ## 2026-03-17 — Claude Code (Sonnet 4.6) — Pre-merge audit + launch env finalised
 
 ### Done
@@ -42,6 +64,28 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ### Flags
 - Privacy page section 11 missing registered business address — required for GDPR compliance before launch
+
+---
+
+## 2026-03-17 — Claude Code (Opus 4.6) — Nav perf + public profile CTA improvements
+
+### Done
+- `staleTimes.dynamic: 60` in next.config.ts — 60s client-side RSC cache for instant tab switching
+- BottomTabBar + SidebarNav: prefetch all 5 tab routes on mount via `router.prefetch()`
+- Public profile CTA rework:
+  - Not logged in: dual CTAs — "Build your own profile" (signup) + "Sign in to see how you know [Name]" (login)
+  - Logged in, own profile: "Back to dashboard" button
+  - Logged in, someone else: "Back to my profile" button
+- Cleaned up 64 iCloud sync conflict duplicate files
+- Reconciled diverged local/remote main via rebase, pushed Phase 1A as PR #41
+
+### Context
+- Phase 1A cleanup complete and deployed via PR #41
+- PR #42 open for nav perf + CTA changes
+
+### Next
+- Sprint 9: availability + search + endorsement signals (see notes/sprint9_build_plan.md)
+- Feature roadmap page (saved to memory for future sprint)
 
 ---
 
