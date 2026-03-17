@@ -17,6 +17,34 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-17 — Claude Code (Sonnet 4.6) — Pre-merge audit + launch env finalised
+
+### Done
+- Completed all Phase 1A launch env setup: PostHog (EU), Sentry (EU), SIGNUP_MODE=public, REDIS_URL live
+- Created `memory/service_accounts.md` — table of all third-party accounts + Vercel env var status
+- Improved `app/(public)/privacy/page.tsx`: added GDPR legal bases (Art 6(1)(b)/(f)), technical data disclosure, Sentry SCCs note, objection/restriction rights, complaint rights, billing retention justification
+- Full codebase audit before merging `feat/sprint-8` → `main`:
+  - No critical conflicts — `@vercel/kv` fully removed, `ioredis` properly in place, no duplicate implementations
+  - 10 `console.error` calls found (all safe, non-sensitive)
+- Fixed `app/api/cv/generate-pdf/route.ts` line 102: `isPro: false` → `isPro: profile?.subscription_status === 'pro'`; added `subscription_status` to profile select
+- Privacy page `app/(public)/privacy/page.tsx`: TODO comment for business address left in place — founder must supply registered address before launch
+
+### Context
+- `app/(protected)/app/audience/page.tsx` is an untracked legitimate feature page (audience/network management); audit confirmed safe — include in this commit
+- Privacy page business address (`section 11`) is still a TODO placeholder — legal requirement, founder must add before going public
+- PDF `isPro` was hardcoded `false` since Sprint 8 build — all users got the free PDF tier regardless of plan
+
+### Next
+- Commit all outstanding changes and merge `feat/sprint-8` → `main` to trigger Vercel production deployment
+- Replace placeholder PWA icons with real YachtieLink brand assets
+- Manual QA: OAuth flows, Stripe checkout/cancel, endorsement emails, mobile Safari
+- Legal review of `/terms` and `/privacy` (add business address to privacy page first)
+
+### Flags
+- Privacy page section 11 missing registered business address — required for GDPR compliance before launch
+
+---
+
 ## 2026-03-17 — Claude Code (Sonnet 4.6) — Redis swap + launch env setup
 
 ### Done

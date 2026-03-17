@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import QRCode from 'react-qr-code'
+import dynamic from 'next/dynamic'
 import { useToast } from '@/components/ui/Toast'
+
+const QRCode = dynamic(() => import('react-qr-code').then(m => m.default), { ssr: false })
 
 interface CvActionsProps {
   handle: string

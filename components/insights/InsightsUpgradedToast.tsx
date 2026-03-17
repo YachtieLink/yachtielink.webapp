@@ -33,7 +33,7 @@ export function InsightsUpgradedToast({ isPro }: Props) {
       className={`rounded-2xl px-4 py-3 text-sm font-medium ${
         isPro
           ? 'bg-emerald-50 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300'
-          : 'bg-[var(--muted)] text-[var(--muted-foreground)]'
+          : 'bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]'
       }`}
     >
       {isPro

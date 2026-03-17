@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 type ToastType = "success" | "error" | "info";
 
@@ -59,9 +60,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         aria-atomic="false"
         className="pointer-events-none fixed bottom-24 left-0 right-0 z-50 flex flex-col items-center gap-2 px-4"
       >
-        {toasts.map((t) => (
-          <ToastItem key={t.id} toast={t} onDismiss={dismiss} />
-        ))}
+        <AnimatePresence>
+          {toasts.map((t) => (
+            <ToastItem key={t.id} toast={t} onDismiss={dismiss} />
+          ))}
+        </AnimatePresence>
       </div>
     </ToastContext.Provider>
   );
@@ -74,6 +77,8 @@ function ToastItem({
   toast: Toast;
   onDismiss: (id: string) => void;
 }) {
+  const prefersReducedMotion = useReducedMotion();
+
   const colourMap: Record<ToastType, string> = {
     success: "bg-emerald-600 text-white",
     error:   "bg-red-600 text-white",
@@ -81,8 +86,16 @@ function ToastItem({
   };
 
   return (
-    <div
+    <motion.div
       role="status"
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.95 }}
+      transition={
+        prefersReducedMotion
+          ? { duration: 0 }
+          : { type: "spring", damping: 20, stiffness: 300 }
+      }
       className={`
         pointer-events-auto flex w-full max-w-sm items-center justify-between
         rounded-xl px-4 py-3 shadow-lg
@@ -99,7 +112,7 @@ function ToastItem({
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
         </svg>
       </button>
-    </div>
+    </motion.div>
   );
 }
 

@@ -19,8 +19,8 @@ function SettingsRow({
   sublabel?: string
   danger?: boolean
 }) {
-  const cls = `flex items-center justify-between px-5 py-4 hover:bg-[var(--muted)]/30 transition-colors ${
-    danger ? 'text-red-500' : 'text-[var(--foreground)]'
+  const cls = `flex items-center justify-between px-5 py-4 hover:bg-[var(--color-surface-raised)]/30 transition-colors ${
+    danger ? 'text-red-500' : 'text-[var(--color-text-primary)]'
   }`
 
   if (href) {
@@ -28,9 +28,9 @@ function SettingsRow({
       <Link href={href} className={cls}>
         <div>
           <p className="text-sm">{label}</p>
-          {sublabel && <p className="text-xs text-[var(--muted-foreground)]">{sublabel}</p>}
+          {sublabel && <p className="text-xs text-[var(--color-text-secondary)]">{sublabel}</p>}
         </div>
-        <span className="text-[var(--muted-foreground)] text-lg">›</span>
+        <span className="text-[var(--color-text-secondary)] text-lg">›</span>
       </Link>
     )
   }
@@ -39,7 +39,7 @@ function SettingsRow({
     <div className={cls}>
       <div>
         <p className="text-sm">{label}</p>
-        {sublabel && <p className="text-xs text-[var(--muted-foreground)]">{sublabel}</p>}
+        {sublabel && <p className="text-xs text-[var(--color-text-secondary)]">{sublabel}</p>}
       </div>
     </div>
   )
@@ -47,7 +47,7 @@ function SettingsRow({
 
 function SectionHeader({ title }: { title: string }) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-wider text-[var(--muted-foreground)] px-1 pt-4 pb-1">
+    <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] px-1 pt-4 pb-1">
       {title}
     </p>
   )
@@ -64,7 +64,7 @@ export default function MorePage() {
 
   // Read current theme from localStorage on mount
   useEffect(() => {
-    const stored = localStorage.getItem('theme') as Theme | null
+    const stored = localStorage.getItem('yl-theme') as Theme | null
     setTheme(stored ?? 'system')
   }, [])
 
@@ -92,7 +92,7 @@ export default function MorePage() {
 
   function applyTheme(t: Theme) {
     setTheme(t)
-    localStorage.setItem('theme', t)
+    localStorage.setItem('yl-theme', t)
     const root = document.documentElement
     if (t === 'dark') {
       root.classList.add('dark')
@@ -115,9 +115,9 @@ export default function MorePage() {
     <div className="flex flex-col pb-24">
       {/* ── Appearance ─────────────────────────────── */}
       <SectionHeader title="Appearance" />
-      <div className="bg-[var(--card)] rounded-2xl overflow-hidden">
+      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden">
         <div className="px-5 py-4">
-          <p className="text-sm font-medium text-[var(--foreground)] mb-3">Theme</p>
+          <p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">Theme</p>
           <div className="flex gap-2">
             {(['system', 'light', 'dark'] as Theme[]).map((t) => (
               <button
@@ -125,8 +125,8 @@ export default function MorePage() {
                 onClick={() => applyTheme(t)}
                 className={`flex-1 py-2 rounded-lg text-sm capitalize transition-colors ${
                   theme === t
-                    ? 'bg-[var(--teal-500)] text-white'
-                    : 'bg-[var(--muted)] text-[var(--foreground)] hover:bg-[var(--muted-foreground)]/10'
+                    ? 'bg-[var(--color-interactive)] text-white'
+                    : 'bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] hover:bg-[var(--color-text-secondary)]/10'
                 }`}
               >
                 {t}
@@ -138,7 +138,7 @@ export default function MorePage() {
 
       {/* ── Account ────────────────────────────────── */}
       <SectionHeader title="Account" />
-      <div className="bg-[var(--card)] rounded-2xl overflow-hidden divide-y divide-[var(--border)]">
+      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
         <SettingsRow
           label="Edit name, handle & role"
           href="/app/more/account"
@@ -153,7 +153,7 @@ export default function MorePage() {
 
       {/* ── Privacy ────────────────────────────────── */}
       <SectionHeader title="Privacy" />
-      <div className="bg-[var(--card)] rounded-2xl overflow-hidden divide-y divide-[var(--border)]">
+      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
         <SettingsRow
           label="Contact visibility"
           href="/app/profile/settings"
@@ -174,14 +174,14 @@ export default function MorePage() {
 
       {/* ── Billing ────────────────────────────────── */}
       <SectionHeader title="Billing" />
-      <div className="bg-[var(--card)] rounded-2xl overflow-hidden divide-y divide-[var(--border)]">
+      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
         {isPro ? (
           <div className="px-5 py-4">
-            <p className="text-sm text-[var(--foreground)]">
+            <p className="text-sm text-[var(--color-text-primary)]">
               Current plan: <span className="font-semibold">Crew Pro · {subPlan === 'annual' ? 'Annual' : 'Monthly'}</span>
             </p>
             {subEndsAt && (
-              <p className="text-xs text-[var(--muted-foreground)] mt-0.5">
+              <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
                 Renews {new Date(subEndsAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
               </p>
             )}
@@ -194,20 +194,20 @@ export default function MorePage() {
         ) : (
           <Link
             href="/app/insights"
-            className="flex items-center justify-between px-5 py-4 hover:bg-[var(--muted)]/30 transition-colors"
+            className="flex items-center justify-between px-5 py-4 hover:bg-[var(--color-surface-raised)]/30 transition-colors"
           >
             <div>
-              <p className="text-sm text-[var(--foreground)]">Current plan: Free</p>
-              <p className="text-xs text-[var(--muted-foreground)]">Upgrade to Crew Pro</p>
+              <p className="text-sm text-[var(--color-text-primary)]">Current plan: Free</p>
+              <p className="text-xs text-[var(--color-text-secondary)]">Upgrade to Crew Pro</p>
             </div>
-            <span className="text-[var(--muted-foreground)] text-lg">›</span>
+            <span className="text-[var(--color-text-secondary)] text-lg">›</span>
           </Link>
         )}
       </div>
 
       {/* ── Help ───────────────────────────────────── */}
       <SectionHeader title="Help" />
-      <div className="bg-[var(--card)] rounded-2xl overflow-hidden divide-y divide-[var(--border)]">
+      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
         <SettingsRow
           label="Send feedback"
           href="mailto:hello@yachtie.link?subject=YachtieLink feedback"
@@ -217,23 +217,23 @@ export default function MorePage() {
 
       {/* ── Legal ──────────────────────────────────── */}
       <SectionHeader title="Legal" />
-      <div className="bg-[var(--card)] rounded-2xl overflow-hidden divide-y divide-[var(--border)]">
+      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
         <SettingsRow label="Terms of Service" href="/terms" />
         <SettingsRow label="Privacy Policy"   href="/privacy" />
       </div>
 
       {/* ── Sign out ───────────────────────────────── */}
       <SectionHeader title="" />
-      <div className="bg-[var(--card)] rounded-2xl overflow-hidden">
+      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden">
         <button
           onClick={handleSignOut}
-          className="w-full flex items-center justify-between px-5 py-4 text-sm text-red-500 hover:bg-[var(--muted)]/30 transition-colors"
+          className="w-full flex items-center justify-between px-5 py-4 text-sm text-red-500 hover:bg-[var(--color-surface-raised)]/30 transition-colors"
         >
           Sign out
         </button>
       </div>
 
-      <p className="text-center text-xs text-[var(--muted-foreground)] mt-6 mb-2">
+      <p className="text-center text-xs text-[var(--color-text-secondary)] mt-6 mb-2">
         YachtieLink · Phase 1A
       </p>
     </div>

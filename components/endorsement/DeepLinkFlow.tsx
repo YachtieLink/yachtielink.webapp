@@ -215,7 +215,7 @@ export function DeepLinkFlow({ request, requester, yacht, requesterAttachment, c
   if (step === 'already-endorsed') {
     return (
       <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-6 text-center">
-        <p className="text-2xl mb-3">checkmark</p>
+        <p className="text-2xl mb-3"><span className="text-2xl text-[var(--color-success)]">✓</span></p>
         <p className="text-sm font-medium text-[var(--color-text-primary)] mb-1">Already endorsed</p>
         <p className="text-sm text-[var(--color-text-secondary)]">
           You have already written an endorsement for {name} on {yacht.name}.

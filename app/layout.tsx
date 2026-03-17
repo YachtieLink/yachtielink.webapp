@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Geist_Mono } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import { ToastProvider } from "@/components/ui/Toast";
 import { PostHogProvider } from "@/components/providers/PostHogProvider";
 import { CookieBanner } from "@/components/CookieBanner";
@@ -11,22 +11,28 @@ const dmSans = DM_Sans({
   weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "YachtieLink — Crew Profiles & Endorsements",
   description:
     "Build your portable yachting profile anchored to real employment history. Get endorsed by crew you've actually worked with.",
   metadataBase: new URL("https://yachtie.link"),
+  manifest: "/manifest.webmanifest",
+  icons: {
+    apple: "/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "YachtieLink",
+    statusBarStyle: "default",
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)",  color: "#0f172a" },
@@ -58,7 +64,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${dmSans.variable} ${geistMono.variable} antialiased`}
+        className={`${dmSans.variable} antialiased`}
       >
         <PostHogProvider>
           <ToastProvider>

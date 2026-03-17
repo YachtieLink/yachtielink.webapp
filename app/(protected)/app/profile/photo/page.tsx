@@ -121,8 +121,8 @@ export default function ProfilePhotoPage() {
   return (
     <div className="flex flex-col gap-6 pb-8">
       <div>
-        <h1 className="text-xl font-semibold text-[var(--foreground)]">Profile photo</h1>
-        <p className="text-sm text-[var(--muted-foreground)] mt-1">
+        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Profile photo</h1>
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
           JPEG, PNG, or WebP · max 5 MB · square crop
         </p>
       </div>
@@ -130,7 +130,7 @@ export default function ProfilePhotoPage() {
       {!imgSrc ? (
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="w-full border-2 border-dashed border-[var(--border)] rounded-2xl p-12 flex flex-col items-center gap-3 text-[var(--muted-foreground)] hover:border-[var(--teal-500)] hover:text-[var(--teal-500)] transition-colors"
+          className="w-full border-2 border-dashed border-[var(--color-border)] rounded-2xl p-12 flex flex-col items-center gap-3 text-[var(--color-text-secondary)] hover:border-[var(--color-interactive)] hover:text-[var(--color-interactive)] transition-colors"
         >
           <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />

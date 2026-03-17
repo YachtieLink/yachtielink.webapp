@@ -70,7 +70,7 @@ export default function YachtPhotoPage() {
       {/* Preview */}
       <div
         onClick={() => inputRef.current?.click()}
-        className="relative w-full aspect-[16/9] rounded-2xl bg-[var(--color-surface-raised)] overflow-hidden mb-6 cursor-pointer border-2 border-dashed border-[var(--color-border)] hover:border-[var(--teal-500)] transition-colors"
+        className="relative w-full aspect-[16/9] rounded-2xl bg-[var(--color-surface-raised)] overflow-hidden mb-6 cursor-pointer border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-interactive)] transition-colors"
       >
         {preview ? (
           <Image src={preview} alt="Preview" fill className="object-cover" />

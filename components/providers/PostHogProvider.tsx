@@ -1,21 +1,29 @@
-'use client';
+'use client'
 
-import posthog from 'posthog-js';
-import { PostHogProvider as PHProvider } from 'posthog-js/react';
-import { useEffect } from 'react';
+import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 
 export function PostHogProvider({ children }: { children: React.ReactNode }) {
-  useEffect(() => {
-    if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
-      posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
-        api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
-        capture_pageview: true,
-        capture_pageleave: true,
-        persistence: 'localStorage',
-        autocapture: false, // manual events only — less noise
-      });
-    }
-  }, []);
+  const pathname = usePathname()
 
-  return <PHProvider client={posthog}>{children}</PHProvider>;
+  useEffect(() => {
+    // Skip PostHog on public/auth pages
+    if (!pathname.startsWith('/app')) return
+
+    // Dynamic import — only loads the bundle when needed
+    import('posthog-js').then((posthog) => {
+      if (!posthog.default.__loaded) {
+        posthog.default.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+          api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+          capture_pageview: false,
+          capture_pageleave: true,
+          persistence: 'localStorage',
+          autocapture: false, // manual events only — less noise
+        })
+      }
+      posthog.default.capture('$pageview')
+    })
+  }, [pathname])
+
+  return <>{children}</>
 }

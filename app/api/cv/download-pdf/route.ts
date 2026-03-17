@@ -1,11 +1,15 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createServiceClient } from '@/lib/supabase/admin'
+import { applyRateLimit } from '@/lib/rate-limit/helpers'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const limited = await applyRateLimit(req, 'pdfGenerate', user.id)
+  if (limited) return limited
 
   const { data: profile } = await supabase
     .from('users')
@@ -17,10 +21,7 @@ export async function GET() {
     return NextResponse.json({ error: 'No PDF generated yet' }, { status: 404 })
   }
 
-  const serviceClient = createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
+  const serviceClient = createServiceClient()
 
   const { data: signedUrl } = await serviceClient.storage
     .from('pdf-exports')

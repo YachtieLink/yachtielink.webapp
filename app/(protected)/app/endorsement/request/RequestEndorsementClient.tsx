@@ -303,7 +303,7 @@ export function RequestEndorsementClient({
       </div>
 
       {/* ── Share section (always visible, most prominent) ──────────────────── */}
-      <div className="bg-[var(--card)] rounded-2xl p-4 mb-6">
+      <div className="bg-[var(--color-surface)] rounded-2xl p-4 mb-6">
         <h2 className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">
           Share with anyone
         </h2>
@@ -363,7 +363,7 @@ export function RequestEndorsementClient({
               return (
                 <div
                   key={colleague.id}
-                  className="bg-[var(--card)] rounded-2xl p-3 flex items-center gap-3"
+                  className="bg-[var(--color-surface)] rounded-2xl p-3 flex items-center gap-3"
                 >
                   <div className="w-9 h-9 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
                     {colleague.profile_photo_url ? (
@@ -399,7 +399,7 @@ export function RequestEndorsementClient({
                       <button
                         onClick={() => sendToColleague(colleague)}
                         disabled={state === 'sending' || remaining === 0}
-                        className="text-xs px-3 py-1.5 rounded-full border border-[var(--teal-500)] text-[var(--teal-500)] font-medium hover:bg-[var(--teal-500)]/5 transition-colors disabled:opacity-50"
+                        className="text-xs px-3 py-1.5 rounded-full border border-[var(--color-interactive)] text-[var(--color-interactive)] font-medium hover:bg-[var(--color-interactive)]/5 transition-colors disabled:opacity-50"
                       >
                         {state === 'sending' ? 'Sending...' : 'Request'}
                       </button>
@@ -422,7 +422,7 @@ export function RequestEndorsementClient({
             {inactiveColleagues.map((colleague) => (
               <div
                 key={colleague.id}
-                className="bg-[var(--card)] rounded-2xl p-3 flex items-center gap-3 opacity-60"
+                className="bg-[var(--color-surface)] rounded-2xl p-3 flex items-center gap-3 opacity-60"
               >
                 <div className="w-9 h-9 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
                   {colleague.profile_photo_url ? (

@@ -42,9 +42,9 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
   }
 
   return (
-    <div className="bg-[var(--card)] rounded-2xl p-5 border border-[var(--teal-700)]/20">
+    <div className="bg-[var(--color-surface)] rounded-2xl p-5 border border-[var(--color-teal-700)]/20">
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-lg font-bold text-[var(--foreground)]">Crew Pro</span>
+        <span className="text-lg font-bold text-[var(--color-text-primary)]">Crew Pro</span>
         {hasFoundingSlots ? (
           <span className="text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400 px-2 py-0.5 rounded-full">
             🔑 {foundingSlotsLeft} founding spots left
@@ -57,7 +57,7 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
       </div>
 
       {hasFoundingSlots && (
-        <p className="text-xs text-[var(--teal-700)] dark:text-[var(--teal-400)] mt-1 mb-2 font-medium">
+        <p className="text-xs text-[var(--color-teal-700)] dark:text-[var(--color-teal-400)] mt-1 mb-2 font-medium">
           Lock in {monthlyPrice}/mo or {annualPrice}/yr forever. After {foundingSlotsLeft} spots fill, new members pay €8.99/mo.
         </p>
       )}
@@ -68,8 +68,8 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
           onClick={() => setPlan('monthly')}
           className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
             plan === 'monthly'
-              ? 'bg-[var(--teal-700)] text-white'
-              : 'bg-[var(--muted)] text-[var(--foreground)]'
+              ? 'bg-[var(--color-teal-700)] text-white'
+              : 'bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]'
           }`}
         >
           Monthly
@@ -84,8 +84,8 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
           onClick={() => setPlan('annual')}
           className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
             plan === 'annual'
-              ? 'bg-[var(--teal-700)] text-white'
-              : 'bg-[var(--muted)] text-[var(--foreground)]'
+              ? 'bg-[var(--color-teal-700)] text-white'
+              : 'bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]'
           }`}
         >
           Annual
@@ -97,7 +97,7 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
       </div>
 
       {/* Feature list */}
-      <ul className="text-sm text-[var(--muted-foreground)] space-y-1.5 mb-5">
+      <ul className="text-sm text-[var(--color-text-secondary)] space-y-1.5 mb-5">
         {[
           'Profile analytics — see who views your profile',
           'Premium CV templates (Classic Navy, Modern Minimal)',
@@ -107,7 +107,7 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
           '20 endorsement requests / day (vs 10)',
         ].map((feature) => (
           <li key={feature} className="flex items-start gap-2">
-            <span className="text-[var(--teal-700)] mt-0.5">✓</span>
+            <span className="text-[var(--color-teal-700)] mt-0.5">✓</span>
             {feature}
           </li>
         ))}
@@ -116,12 +116,12 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
       <button
         onClick={handleUpgrade}
         disabled={loading}
-        className="w-full py-3 rounded-xl bg-[var(--teal-700)] text-white font-semibold text-sm hover:bg-[var(--teal-800)] disabled:opacity-60 transition-colors"
+        className="w-full py-3 rounded-xl bg-[var(--color-teal-700)] text-white font-semibold text-sm hover:bg-[var(--color-teal-800)] disabled:opacity-60 transition-colors"
       >
         {loading ? 'Redirecting to checkout…' : 'Upgrade to Crew Pro'}
       </button>
 
-      <p className="text-center text-xs text-[var(--muted-foreground)] mt-3">
+      <p className="text-center text-xs text-[var(--color-text-secondary)] mt-3">
         Cancel any time · Powered by Stripe
       </p>
     </div>

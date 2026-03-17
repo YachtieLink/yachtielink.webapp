@@ -3,7 +3,10 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import QRCode from 'react-qr-code'
+import dynamic from 'next/dynamic'
+import { AnimatePresence, motion } from 'framer-motion'
+
+const QRCode = dynamic(() => import('react-qr-code').then(m => m.default), { ssr: false })
 
 interface IdentityCardProps {
   displayName: string
@@ -63,7 +66,7 @@ export function IdentityCard({
   }
 
   return (
-    <div className="bg-[var(--card)] rounded-2xl p-5 flex flex-col gap-4">
+    <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
       {/* Photo + name row */}
       <div className="flex items-center gap-4">
         <Link href="/app/profile/photo" className="relative shrink-0">
@@ -73,31 +76,31 @@ export function IdentityCard({
               alt={displayName}
               width={72}
               height={72}
-              className="w-18 h-18 rounded-full object-cover ring-2 ring-[var(--border)]"
+              className="w-18 h-18 rounded-full object-cover ring-2 ring-[var(--color-border)]"
               unoptimized // CDN URL; next/image optimisation would re-fetch
             />
           ) : (
-            <div className="w-[72px] h-[72px] rounded-full bg-[var(--muted)] flex items-center justify-center ring-2 ring-[var(--border)]">
-              <span className="text-2xl text-[var(--muted-foreground)]">
+            <div className="w-[72px] h-[72px] rounded-full bg-[var(--color-surface-raised)] flex items-center justify-center ring-2 ring-[var(--color-border)]">
+              <span className="text-2xl text-[var(--color-text-secondary)]">
                 {(displayName || fullName).charAt(0).toUpperCase()}
               </span>
             </div>
           )}
           {/* Edit badge */}
-          <span className="absolute -bottom-1 -right-1 bg-[var(--teal-500)] text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center shadow">
+          <span className="absolute -bottom-1 -right-1 bg-[var(--color-interactive)] text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center shadow">
             ✎
           </span>
         </Link>
 
         <div className="min-w-0 flex-1">
-          <h1 className="font-semibold text-lg leading-tight text-[var(--foreground)] truncate">
+          <h1 className="font-semibold text-lg leading-tight text-[var(--color-text-primary)] truncate">
             {displayName || fullName}
           </h1>
           {primaryRole && (
-            <p className="text-sm text-[var(--muted-foreground)] truncate">{primaryRole}</p>
+            <p className="text-sm text-[var(--color-text-secondary)] truncate">{primaryRole}</p>
           )}
           {departments && departments.length > 0 && (
-            <p className="text-xs text-[var(--muted-foreground)] truncate">
+            <p className="text-xs text-[var(--color-text-secondary)] truncate">
               {departments.join(' · ')}
             </p>
           )}
@@ -108,28 +111,28 @@ export function IdentityCard({
       <div className="flex items-center gap-2">
         <Link
           href={`/u/${handle}`}
-          className="flex-1 text-sm text-[var(--teal-500)] truncate hover:underline"
+          className="flex-1 text-sm text-[var(--color-interactive)] truncate hover:underline"
         >
           yachtie.link/u/{handle}
         </Link>
 
         <button
           onClick={shareProfile}
-          className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-[var(--teal-500)] text-white hover:bg-[var(--teal-600)] transition-colors font-medium"
+          className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-[var(--color-interactive)] text-white hover:bg-[var(--color-interactive-hover)] transition-colors font-medium"
         >
           Share
         </button>
 
         <button
           onClick={copyLink}
-          className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-[var(--muted)] text-[var(--foreground)] hover:bg-[var(--muted-foreground)]/10 transition-colors"
+          className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] hover:bg-[var(--color-text-secondary)]/10 transition-colors"
         >
           {copied ? 'Copied!' : 'Copy'}
         </button>
 
         <button
           onClick={() => setShowQR((v) => !v)}
-          className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-[var(--muted)] text-[var(--foreground)] hover:bg-[var(--muted-foreground)]/10 transition-colors"
+          className="shrink-0 text-xs px-3 py-1.5 rounded-lg bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] hover:bg-[var(--color-text-secondary)]/10 transition-colors"
           aria-label="Show QR code"
         >
           QR
@@ -137,24 +140,34 @@ export function IdentityCard({
       </div>
 
       {/* QR panel (toggle) */}
-      {showQR && (
-        <div className="flex flex-col items-center gap-3 pt-1">
-          <div className="bg-white p-3 rounded-xl">
-            <QRCode
-              id="profile-qr-svg"
-              value={profileUrl}
-              size={160}
-              level="M"
-            />
-          </div>
-          <button
-            onClick={downloadQR}
-            className="text-xs text-[var(--teal-500)] hover:underline"
+      <AnimatePresence>
+        {showQR && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="overflow-hidden"
           >
-            Download QR code
-          </button>
-        </div>
-      )}
+            <div className="flex flex-col items-center gap-3 pt-1">
+              <div className="bg-white p-3 rounded-xl">
+                <QRCode
+                  id="profile-qr-svg"
+                  value={profileUrl}
+                  size={160}
+                  level="M"
+                />
+              </div>
+              <button
+                onClick={downloadQR}
+                className="text-xs text-[var(--color-interactive)] hover:underline"
+              >
+                Download QR code
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

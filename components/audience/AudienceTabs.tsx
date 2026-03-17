@@ -121,7 +121,7 @@ export function AudienceTabs({
       {/* Request endorsements CTA */}
       <Link
         href="/app/endorsement/request"
-        className="block w-full bg-[var(--teal-500)] rounded-2xl p-4 mb-6 hover:bg-[var(--teal-600)] transition-colors"
+        className="block w-full bg-[var(--color-interactive)] rounded-2xl p-4 mb-6 hover:bg-[var(--color-interactive-hover)] transition-colors"
       >
         <div className="flex items-center justify-between mb-2">
           <p className="text-sm font-semibold text-white">Request endorsements</p>
@@ -203,7 +203,7 @@ function ReceivedRequestCard({ req }: { req: RequestReceived }) {
   if (declined) return null
 
   return (
-    <div className="bg-[var(--card)] rounded-2xl p-4">
+    <div className="bg-[var(--color-surface)] rounded-2xl p-4">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
           {req.requester?.profile_photo_url ? (
@@ -286,11 +286,11 @@ function EndorsementsTab({
           </span>
         </h2>
         {endorsementsReceived.length === 0 ? (
-          <div className="bg-[var(--card)] rounded-2xl p-5 text-center">
+          <div className="bg-[var(--color-surface)] rounded-2xl p-5 text-center">
             <p className="text-sm text-[var(--color-text-secondary)] mb-3">No endorsements yet.</p>
             <Link
               href="/app/endorsement/request"
-              className="text-sm text-[var(--teal-500)] font-medium hover:underline"
+              className="text-sm text-[var(--color-interactive)] font-medium hover:underline"
             >
               Request endorsements →
             </Link>
@@ -305,7 +305,7 @@ function EndorsementsTab({
                 year: 'numeric',
               })
               return (
-                <div key={e.id} className="bg-[var(--card)] rounded-2xl p-4 border-l-2 border-[var(--teal-500)]">
+                <div key={e.id} className="bg-[var(--color-surface)] rounded-2xl p-4 border-l-2 border-[var(--color-interactive)]">
                   <p className="text-sm text-[var(--color-text-primary)] leading-relaxed mb-2">
                     &ldquo;{excerpt(e.content)}&rdquo;
                   </p>
@@ -331,7 +331,7 @@ function EndorsementsTab({
             {requestsSent.map((req) => {
               const recipient = req.recipient_email ?? req.recipient_phone ?? 'Unknown'
               return (
-                <div key={req.id} className="bg-[var(--card)] rounded-2xl p-4">
+                <div key={req.id} className="bg-[var(--color-surface)] rounded-2xl p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
@@ -370,14 +370,14 @@ function EndorsementsTab({
 function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
   if (colleagues.length === 0) {
     return (
-      <div className="bg-[var(--card)] rounded-2xl p-6 text-center">
+      <div className="bg-[var(--color-surface)] rounded-2xl p-6 text-center">
         <p className="text-sm text-[var(--color-text-secondary)] mb-3">
           Your colleague list will populate once you and a crewmate have both attached the same
           yacht to your profiles.
         </p>
         <Link
           href="/app/attachment/new"
-          className="text-sm text-[var(--teal-500)] font-medium hover:underline"
+          className="text-sm text-[var(--color-interactive)] font-medium hover:underline"
         >
           Add a yacht →
         </Link>
@@ -395,7 +395,7 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
         return (
           <div
             key={entry.colleague_id}
-            className="bg-[var(--card)] rounded-2xl p-4 flex items-center gap-3"
+            className="bg-[var(--color-surface)] rounded-2xl p-4 flex items-center gap-3"
           >
             <div className="w-11 h-11 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
               {profile.profile_photo_url ? (
@@ -420,7 +420,7 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
                 </p>
               )}
               {entry.sharedYachtNames.length > 0 && (
-                <p className="text-xs text-[var(--teal-500)] truncate mt-0.5">
+                <p className="text-xs text-[var(--color-interactive)] truncate mt-0.5">
                   {entry.sharedYachtNames.length === 1
                     ? entry.sharedYachtNames[0]
                     : `${entry.sharedYachtNames[0]} +${entry.sharedYachtNames.length - 1} more`}
@@ -429,7 +429,7 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
             </div>
             <Link
               href={`/app/endorsement/request?colleague_id=${entry.colleague_id}&yacht_id=${entry.shared_yachts[0]}`}
-              className="shrink-0 text-xs text-[var(--teal-500)] font-medium px-3 py-1.5 rounded-full border border-[var(--teal-500)] hover:bg-[var(--teal-500)]/5 transition-colors"
+              className="shrink-0 text-xs text-[var(--color-interactive)] font-medium px-3 py-1.5 rounded-full border border-[var(--color-interactive)] hover:bg-[var(--color-interactive)]/5 transition-colors"
             >
               Endorse
             </Link>

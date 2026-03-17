@@ -36,10 +36,10 @@ export default async function CertsPage() {
   return (
     <div className="flex flex-col gap-4 pb-24">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-[var(--foreground)]">Certifications</h1>
+        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Certifications</h1>
         <Link
           href="/app/certification/new"
-          className="text-sm font-medium text-[var(--teal-700)] dark:text-[var(--teal-400)]"
+          className="text-sm font-medium text-[var(--color-teal-700)] dark:text-[var(--color-teal-400)]"
         >
           + Add
         </Link>

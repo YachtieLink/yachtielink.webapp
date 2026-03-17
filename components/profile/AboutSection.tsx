@@ -8,23 +8,23 @@ interface AboutSectionProps {
 
 export function AboutSection({ bio }: AboutSectionProps) {
   return (
-    <div className="bg-[var(--card)] rounded-2xl p-5">
+    <div className="bg-[var(--color-surface)] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-semibold text-[var(--foreground)]">About</h2>
+        <h2 className="font-semibold text-[var(--color-text-primary)]">About</h2>
         <Link
           href="/app/about/edit"
-          className="text-sm text-[var(--teal-500)] hover:underline"
+          className="text-sm text-[var(--color-interactive)] hover:underline"
         >
           {bio ? 'Edit' : 'Add'}
         </Link>
       </div>
 
       {bio ? (
-        <p className="text-sm text-[var(--foreground)] whitespace-pre-wrap leading-relaxed">
+        <p className="text-sm text-[var(--color-text-primary)] whitespace-pre-wrap leading-relaxed">
           {bio}
         </p>
       ) : (
-        <p className="text-sm text-[var(--muted-foreground)]">
+        <p className="text-sm text-[var(--color-text-secondary)]">
           Add a short bio to tell people about yourself.
         </p>
       )}

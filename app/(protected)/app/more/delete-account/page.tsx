@@ -39,19 +39,19 @@ export default function DeleteAccountPage() {
     <div className="flex flex-col max-w-sm mx-auto px-4 py-8 pb-24">
       <Link
         href="/app/more"
-        className="text-sm text-[var(--muted-foreground)] mb-6 inline-flex items-center gap-1"
+        className="text-sm text-[var(--color-text-secondary)] mb-6 inline-flex items-center gap-1"
       >
         ← Back
       </Link>
 
-      <h1 className="text-xl font-semibold text-[var(--foreground)] mb-2">Delete Your Account</h1>
-      <p className="text-sm text-[var(--muted-foreground)] mb-6 leading-relaxed">
+      <h1 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">Delete Your Account</h1>
+      <p className="text-sm text-[var(--color-text-secondary)] mb-6 leading-relaxed">
         This will permanently delete your account and all associated data.
       </p>
 
-      <div className="bg-[var(--card)] rounded-2xl p-5 mb-6 space-y-2">
-        <p className="text-sm font-medium text-[var(--foreground)]">What happens:</p>
-        <ul className="text-sm text-[var(--muted-foreground)] space-y-1 list-disc list-inside">
+      <div className="bg-[var(--color-surface)] rounded-2xl p-5 mb-6 space-y-2">
+        <p className="text-sm font-medium text-[var(--color-text-primary)]">What happens:</p>
+        <ul className="text-sm text-[var(--color-text-secondary)] space-y-1 list-disc list-inside">
           <li>Your profile, photos, and documents are deleted</li>
           <li>Your certifications are removed</li>
           <li>Your employment history is removed</li>
@@ -62,15 +62,15 @@ export default function DeleteAccountPage() {
       </div>
 
       <div className="mb-6">
-        <label className="text-sm text-[var(--muted-foreground)] mb-2 block">
-          Type <span className="font-mono font-semibold text-[var(--foreground)]">{REQUIRED}</span> to confirm:
+        <label className="text-sm text-[var(--color-text-secondary)] mb-2 block">
+          Type <span className="font-mono font-semibold text-[var(--color-text-primary)]">{REQUIRED}</span> to confirm:
         </label>
         <input
           type="text"
           value={confirmation}
           onChange={(e) => setConfirmation(e.target.value)}
           placeholder={REQUIRED}
-          className="w-full px-4 py-3 rounded-xl bg-[var(--muted)] text-[var(--foreground)] text-sm border border-[var(--border)] focus:outline-none focus:ring-2 focus:ring-red-500"
+          className="w-full px-4 py-3 rounded-xl bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] text-sm border border-[var(--color-border)] focus:outline-none focus:ring-2 focus:ring-red-500"
         />
       </div>
 
@@ -88,7 +88,7 @@ export default function DeleteAccountPage() {
 
       <Link
         href="/app/more"
-        className="w-full py-3 rounded-xl text-sm font-semibold text-center text-[var(--foreground)] bg-[var(--muted)] hover:bg-[var(--muted)]/70 transition-colors"
+        className="w-full py-3 rounded-xl text-sm font-semibold text-center text-[var(--color-text-primary)] bg-[var(--color-surface-raised)] hover:bg-[var(--color-surface-raised)]/70 transition-colors"
       >
         Cancel
       </Link>

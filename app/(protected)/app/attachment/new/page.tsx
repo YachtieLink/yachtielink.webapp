@@ -138,7 +138,7 @@ export default function AttachmentNewPage() {
             onClick={() => setSelectedDept('')}
             className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               !selectedDept
-                ? 'bg-[var(--teal-500)] text-white'
+                ? 'bg-[var(--color-interactive)] text-white'
                 : 'bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]'
             }`}
           >
@@ -150,7 +150,7 @@ export default function AttachmentNewPage() {
               onClick={() => setSelectedDept(d)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                 selectedDept === d
-                  ? 'bg-[var(--teal-500)] text-white'
+                  ? 'bg-[var(--color-interactive)] text-white'
                   : 'bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]'
               }`}
             >
@@ -175,7 +175,7 @@ export default function AttachmentNewPage() {
               onClick={() => { setSelectedRole(r.name); setUseCustom(false) }}
               className={`flex items-center justify-between px-4 py-3 text-sm text-left transition-colors ${
                 selectedRole === r.name && !useCustom
-                  ? 'bg-[var(--teal-500)] text-white'
+                  ? 'bg-[var(--color-interactive)] text-white'
                   : 'bg-[var(--color-surface)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]'
               }`}
             >
@@ -193,7 +193,7 @@ export default function AttachmentNewPage() {
             onClick={() => { setCustomRole(roleQuery); setUseCustom(true) }}
             className={`w-full px-4 py-3 rounded-2xl border text-sm text-left transition-colors ${
               useCustom
-                ? 'border-[var(--teal-500)] bg-[var(--teal-500)]/10 text-[var(--teal-500)]'
+                ? 'border-[var(--color-interactive)] bg-[var(--color-interactive)]/10 text-[var(--color-interactive)]'
                 : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-raised)]'
             }`}
           >

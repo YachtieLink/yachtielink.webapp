@@ -14,7 +14,7 @@
 
 @theme inline {
   --font-sans: var(--font-dm-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* Teal — primary brand colour (deep ocean) */
   --color-teal-50:  #F0FDFC;
