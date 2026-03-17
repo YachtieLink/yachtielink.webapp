@@ -24,10 +24,9 @@ export default function SkillsEditPage() {
   useEffect(() => {
     fetch('/api/user-skills')
       .then((r) => r.json())
-      .then((d) => {
-        setSkills(d.skills ?? [])
-        setLoading(false)
-      })
+      .then((d) => { setSkills(d.skills ?? []) })
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }, [])
 
   function addSkill() {
@@ -44,11 +43,16 @@ export default function SkillsEditPage() {
   async function save() {
     setSaving(true)
     try {
-      await fetch('/api/user-skills', {
+      const res = await fetch('/api/user-skills', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ skills: skills.map(({ name, category }) => ({ name, category })) }),
       })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+        alert(d.error ?? 'Save failed. Please try again.')
+        return
+      }
       router.push('/app/profile')
     } finally {
       setSaving(false)

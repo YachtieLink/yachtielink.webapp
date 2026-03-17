@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { getUserById, getProfileSections, getExtendedProfileSections } from '@/lib/queries/profile'
-import { PhotoGallery } from '@/components/profile/PhotoGallery'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { ProfileStrength } from '@/components/profile/ProfileStrength'
 import { SectionManager } from '@/components/profile/SectionManager'
@@ -99,14 +99,56 @@ export default async function ProfilePage() {
         </Link>
       </div>
 
-      {/* Photo gallery */}
-      <div className="rounded-2xl overflow-hidden">
-        <PhotoGallery
-          photos={profilePhotos ?? []}
-          profilePhotoUrl={profile.profile_photo_url}
-          displayName={profile.display_name ?? profile.full_name}
-          editable
-        />
+      {/* Photo strip — compact editing view */}
+      <div className="bg-[var(--color-surface)] rounded-2xl p-3 flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-[var(--color-text-primary)]">Photos</span>
+          <Link
+            href="/app/profile/photos"
+            className="text-xs text-[var(--color-interactive)] hover:underline"
+          >
+            {(profilePhotos?.length ?? 0) > 0 ? 'Edit photos' : 'Add photos'}
+          </Link>
+        </div>
+        {(profilePhotos?.length ?? 0) > 0 ? (
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {(profilePhotos ?? []).map((p, i) => (
+              <div key={p.id} className="relative shrink-0 w-[72px] h-[72px] rounded-xl overflow-hidden bg-[var(--color-surface-raised)]">
+                <Image
+                  src={p.photo_url}
+                  alt={`Photo ${i + 1}`}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+                {i === 0 && (
+                  <div className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[9px] text-center py-0.5 font-medium">
+                    Main
+                  </div>
+                )}
+              </div>
+            ))}
+            <Link
+              href="/app/profile/photos"
+              className="shrink-0 w-[72px] h-[72px] rounded-xl border-2 border-dashed border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-secondary)] hover:border-[var(--color-interactive)] hover:text-[var(--color-interactive)] transition-colors"
+            >
+              <span className="text-xl">+</span>
+            </Link>
+          </div>
+        ) : (
+          <Link
+            href="/app/profile/photos"
+            className="flex items-center gap-3 p-1 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors"
+          >
+            <div className="w-12 h-12 shrink-0 rounded-xl bg-[var(--color-surface-raised)] flex items-center justify-center text-2xl">
+              👤
+            </div>
+            <div>
+              <p className="text-sm font-medium text-[var(--color-text-primary)]">Add profile photos</p>
+              <p className="text-xs text-[var(--color-text-secondary)]">Show the crew who you are</p>
+            </div>
+          </Link>
+        )}
       </div>
 
       {/* Identity */}

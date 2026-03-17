@@ -37,7 +37,12 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    await supabase.from('user_education').delete().eq('id', id).eq('user_id', user.id)
+    const { data: existing } = await supabase
+      .from('user_education').select('id').eq('id', id).eq('user_id', user.id).single()
+    if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+    const { error } = await supabase.from('user_education').delete().eq('id', id).eq('user_id', user.id)
+    if (error) throw error
 
     return NextResponse.json({ ok: true })
   } catch (e) {

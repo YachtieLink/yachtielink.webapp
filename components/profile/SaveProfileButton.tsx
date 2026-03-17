@@ -17,23 +17,21 @@ export function SaveProfileButton({ savedUserId, initialSaved, initialFolderId }
   async function toggle() {
     if (loading) return
     setLoading(true)
+    const wasSaved = saved
+    setSaved(!wasSaved) // optimistic
     try {
-      if (saved) {
-        await fetch('/api/saved-profiles', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ saved_user_id: savedUserId }),
-        })
-        setSaved(false)
+      const res = await fetch('/api/saved-profiles', {
+        method: wasSaved ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ saved_user_id: savedUserId, folder_id: initialFolderId ?? null }),
+      })
+      if (!res.ok) {
+        setSaved(wasSaved) // roll back
       } else {
-        await fetch('/api/saved-profiles', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ saved_user_id: savedUserId, folder_id: initialFolderId ?? null }),
-        })
-        setSaved(true)
+        router.refresh()
       }
-      router.refresh()
+    } catch {
+      setSaved(wasSaved) // roll back on network error
     } finally {
       setLoading(false)
     }

@@ -21,7 +21,9 @@ export default function WorkGalleryPage() {
   useEffect(() => {
     fetch('/api/user-gallery')
       .then((r) => r.json())
-      .then((d) => { setItems(d.items ?? []); setLoading(false) })
+      .then((d) => { setItems(d.items ?? []) })
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }, [])
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -57,8 +59,8 @@ export default function WorkGalleryPage() {
 
   async function deleteItem(id: string) {
     if (!confirm('Remove this photo from your gallery?')) return
-    await fetch(`/api/user-gallery/${id}`, { method: 'DELETE' })
-    setItems((prev) => prev.filter((i) => i.id !== id))
+    const res = await fetch(`/api/user-gallery/${id}`, { method: 'DELETE' })
+    if (res.ok) setItems((prev) => prev.filter((i) => i.id !== id))
   }
 
   if (loading) return <div className="p-4 text-[var(--color-text-secondary)]">Loading…</div>

@@ -18,6 +18,10 @@ export async function POST(req: NextRequest) {
     const limited = await applyRateLimit(req, 'aiSummary', user.id)
     if (limited) return limited
 
+    // Optional: force=true bypasses the edited-summary guard
+    const body = await req.json().catch(() => ({}))
+    const force = body?.force === true
+
     // Fetch bio + attachments + top endorsement excerpts
     const [profileRes, attachRes, endorseRes] = await Promise.all([
       supabase.from('users').select('bio, primary_role, ai_summary_edited').eq('id', user.id).single(),
@@ -27,8 +31,8 @@ export async function POST(req: NextRequest) {
 
     const profile = profileRes.data
     if (!profile) return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
-    if (profile.ai_summary_edited) {
-      return NextResponse.json({ error: 'Summary has been manually edited — regeneration disabled.' }, { status: 400 })
+    if (profile.ai_summary_edited && !force) {
+      return NextResponse.json({ error: 'Summary has been manually edited — pass force:true to regenerate.' }, { status: 400 })
     }
 
     const context = [
