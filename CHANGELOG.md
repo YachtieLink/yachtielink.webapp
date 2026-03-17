@@ -20,8 +20,10 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 ## 2026-03-17 — Claude Code (Opus 4.6) — Nav perf + public profile CTA improvements
 
 ### Done
-- `staleTimes.dynamic: 60` in next.config.ts — 60s client-side RSC cache for instant tab switching
+- `staleTimes.dynamic: 300` in next.config.ts — 5 min client-side RSC cache, show stale + refresh in background
 - BottomTabBar + SidebarNav: prefetch all 5 tab routes on mount via `router.prefetch()`
+- Moved network badge from server layout → client-side hook (`useNetworkBadge`) — app shell renders instantly
+- New `/api/badge-count` endpoint + `lib/hooks/useNetworkBadge.ts` — polls every 60s client-side
 - Public profile CTA rework:
   - Not logged in: dual CTAs — "Build your own profile" (signup) + "Sign in to see how you know [Name]" (login)
   - Logged in, own profile: "Back to dashboard" button
@@ -70,8 +72,10 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 ## 2026-03-17 — Claude Code (Opus 4.6) — Nav perf + public profile CTA improvements
 
 ### Done
-- `staleTimes.dynamic: 60` in next.config.ts — 60s client-side RSC cache for instant tab switching
+- `staleTimes.dynamic: 300` in next.config.ts — 5 min client-side RSC cache, show stale + refresh in background
 - BottomTabBar + SidebarNav: prefetch all 5 tab routes on mount via `router.prefetch()`
+- Moved network badge from server layout → client-side hook (`useNetworkBadge`) — app shell renders instantly
+- New `/api/badge-count` endpoint + `lib/hooks/useNetworkBadge.ts` — polls every 60s client-side
 - Public profile CTA rework:
   - Not logged in: dual CTAs — "Build your own profile" (signup) + "Sign in to see how you know [Name]" (login)
   - Logged in, own profile: "Back to dashboard" button

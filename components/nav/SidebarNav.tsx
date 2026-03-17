@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { useNetworkBadge } from '@/lib/hooks/useNetworkBadge'
 import {
   ProfileIcon,
   ProfileIconFilled,
@@ -56,13 +57,10 @@ const tabs: Tab[] = [
   },
 ]
 
-interface SidebarNavProps {
-  networkBadge?: number
-}
-
-export function SidebarNav({ networkBadge }: SidebarNavProps) {
+export function SidebarNav() {
   const pathname = usePathname()
   const router = useRouter()
+  const networkBadge = useNetworkBadge()
 
   // Prefetch all tab routes on mount for instant navigation
   useEffect(() => {
@@ -82,7 +80,7 @@ export function SidebarNav({ networkBadge }: SidebarNavProps) {
       {/* Tab links */}
       {tabs.map((tab) => {
         const isActive = pathname.startsWith(tab.href)
-        const showBadge = tab.href === '/app/network' && (networkBadge ?? 0) > 0
+        const showBadge = tab.href === '/app/network' && networkBadge > 0
         return (
           <Link
             key={tab.href}
