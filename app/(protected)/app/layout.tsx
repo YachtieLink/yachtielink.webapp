@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { BottomTabBar } from "@/components/nav/BottomTabBar";
 import { SidebarNav } from "@/components/nav/SidebarNav";
-import { getPendingRequestCount } from "@/lib/queries/notifications";
 
 export default async function AppLayout({
   children,
@@ -29,12 +28,13 @@ export default async function AppLayout({
     redirect("/onboarding");
   }
 
-  const pendingCount = await getPendingRequestCount(user.id, user.email ?? '');
+  // Badge count is now fetched client-side via useNetworkBadge hook
+  // so the app shell renders instantly without waiting for that query.
 
   return (
     <div className="relative flex min-h-screen flex-col bg-[var(--color-surface)]">
       {/* Fixed sidebar navigation — desktop only */}
-      <SidebarNav networkBadge={pendingCount} />
+      <SidebarNav />
 
       {/* Page content — padded so it clears the tab bar on mobile, sidebar on desktop */}
       <main className="flex-1 pb-tab-bar md:pb-0 md:pl-16">
@@ -44,7 +44,7 @@ export default async function AppLayout({
       </main>
 
       {/* Fixed bottom tab bar — mobile only */}
-      <BottomTabBar networkBadge={pendingCount} />
+      <BottomTabBar />
     </div>
   );
 }
