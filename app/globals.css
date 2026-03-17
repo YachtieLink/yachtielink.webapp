@@ -14,6 +14,7 @@
 
 @theme inline {
   --font-sans: var(--font-dm-sans);
+  --font-serif: var(--font-dm-serif-display);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* Teal — primary brand colour (deep ocean) */
@@ -34,6 +35,27 @@
   --color-sand-200: #E8DCC8;
   --color-sand-300: #D4C4A8;
   --color-sand-400: #B8A080;
+
+  /* Coral — energy accent (sunset over water) */
+  --color-coral-50:  #FEF2F0;
+  --color-coral-100: #FCCFC7;
+  --color-coral-200: #F9A99C;
+  --color-coral-500: #E8634A;
+  --color-coral-700: #C24832;
+
+  /* Navy — depth accent (night sky at sea) */
+  --color-navy-50:  #EEF2F7;
+  --color-navy-100: #D0DAE8;
+  --color-navy-200: #A8BAD3;
+  --color-navy-500: #2B4C7E;
+  --color-navy-700: #1A3358;
+
+  /* Amber — warmth accent (brass fittings, golden hour) */
+  --color-amber-50:  #FEF7E8;
+  --color-amber-100: #FDE9B8;
+  --color-amber-200: #FBD97D;
+  --color-amber-500: #E5A832;
+  --color-amber-700: #B8841F;
 
   /* Legacy semantic tokens (existing components) */
   --color-surface:           #ffffff;
@@ -123,12 +145,12 @@
   --input: #e2e8f0;
   --ring: #0D7377;
 
-  /* Charts — teal progression */
+  /* Charts — multi-colour palette */
   --chart-1: #0D7377;
-  --chart-2: #11BABB;
-  --chart-3: #2AD7D5;
-  --chart-4: #5BEDE7;
-  --chart-5: #97F8F0;
+  --chart-2: #E8634A;
+  --chart-3: #2B4C7E;
+  --chart-4: #E5A832;
+  --chart-5: #11BABB;
 
   /* Sidebar */
   --sidebar: #f8fafc;
@@ -162,12 +184,12 @@
   --input: #334155;
   --ring: #11BABB;
 
-  /* Charts — teal progression (dark) */
+  /* Charts — multi-colour palette (dark) */
   --chart-1: #11BABB;
-  --chart-2: #2AD7D5;
-  --chart-3: #0D7377;
-  --chart-4: #0B9296;
-  --chart-5: #105B5F;
+  --chart-2: #F9A99C;
+  --chart-3: #A8BAD3;
+  --chart-4: #FBD97D;
+  --chart-5: #2AD7D5;
 
   /* Sidebar */
   --sidebar: #1e293b;
