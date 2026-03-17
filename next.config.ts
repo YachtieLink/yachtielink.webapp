@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    staleTimes: {
+      dynamic: 60,  // cache dynamic RSC payloads for 60s client-side
+    },
+  },
   images: {
     remotePatterns: [
       {
