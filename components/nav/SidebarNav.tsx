@@ -1,7 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   ProfileIcon,
   ProfileIconFilled,
@@ -61,6 +62,12 @@ interface SidebarNavProps {
 
 export function SidebarNav({ networkBadge }: SidebarNavProps) {
   const pathname = usePathname()
+  const router = useRouter()
+
+  // Prefetch all tab routes on mount for instant navigation
+  useEffect(() => {
+    tabs.forEach((tab) => router.prefetch(tab.href))
+  }, [router])
 
   return (
     <nav
