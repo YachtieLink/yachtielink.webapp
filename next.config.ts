@@ -4,7 +4,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig: NextConfig = {
   experimental: {
     staleTimes: {
-      dynamic: 300,  // cache dynamic RSC payloads for 5 min — show stale, refresh in background
+      dynamic: 120,  // cache dynamic RSC payloads for 2 min — instant tabs, reasonable freshness
     },
   },
   images: {
