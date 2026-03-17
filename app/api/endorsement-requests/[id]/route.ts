@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { sendNotifyEmail } from '@/lib/email/notify'
+import { sanitizeHtml } from '@/lib/validation/sanitize'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://yachtie.link'
 
@@ -47,9 +49,9 @@ export async function GET(
 // ─── PUT /api/endorsement-requests/:id ────────────────────────────────────────
 // Auth required. Requester only. Actions: cancel | resend.
 
-interface UpdateRequestBody {
-  action: 'cancel' | 'resend' | 'decline'
-}
+const updateRequestBodySchema = z.object({
+  action: z.enum(['cancel', 'resend', 'decline']),
+})
 
 export async function PUT(
   req: NextRequest,
@@ -60,12 +62,18 @@ export async function PUT(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = await req.json() as UpdateRequestBody
-  const { action } = body
-
-  if (action !== 'cancel' && action !== 'resend' && action !== 'decline') {
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+  let body: z.infer<typeof updateRequestBodySchema>
+  try {
+    const raw = await req.json()
+    const parsed = updateRequestBodySchema.safeParse(raw)
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+    }
+    body = parsed.data
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
+  const { action } = body
 
   // 'decline' is performed by the recipient, not the requester
   if (action === 'decline') {
@@ -128,11 +136,13 @@ export async function PUT(
     const yachtName = yacht?.name ?? ''
     const deepLink = `${APP_URL}/r/${request.token}`
     const subjectYacht = yachtName ? ` on ${yachtName}` : ''
+    const safeRequesterName = sanitizeHtml(requesterName)
+    const safeYachtName = sanitizeHtml(yachtName)
     if (request.recipient_email) {
       await sendNotifyEmail({
         to: request.recipient_email,
         subject: `${requesterName} asked you to endorse their work${subjectYacht}`,
-        html: buildResendHtml(requesterName, yachtName, deepLink),
+        html: buildResendHtml(safeRequesterName, safeYachtName, deepLink),
         text: `${requesterName} is asking for an endorsement. Write one here: ${deepLink}`,
       })
     }

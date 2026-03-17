@@ -62,15 +62,15 @@ function ToggleRow({
   return (
     <label className="flex items-center justify-between py-2 cursor-pointer">
       <div>
-        <p className="text-sm font-medium text-[var(--foreground)]">{label}</p>
-        {sublabel && <p className="text-xs text-[var(--muted-foreground)]">{sublabel}</p>}
+        <p className="text-sm font-medium text-[var(--color-text-primary)]">{label}</p>
+        {sublabel && <p className="text-xs text-[var(--color-text-secondary)]">{sublabel}</p>}
       </div>
       <button
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative w-11 h-6 rounded-full transition-colors ${
-          checked ? 'bg-[var(--teal-500)]' : 'bg-[var(--muted)]'
+          checked ? 'bg-[var(--color-interactive)]' : 'bg-[var(--color-surface-raised)]'
         }`}
       >
         <span
@@ -165,7 +165,7 @@ export default function ProfileSettingsPage() {
     return (
       <div className="flex flex-col gap-4">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-14 bg-[var(--muted)] rounded-xl animate-pulse" />
+          <div key={i} className="h-14 bg-[var(--color-surface-raised)] rounded-xl animate-pulse" />
         ))}
       </div>
     )
@@ -174,14 +174,14 @@ export default function ProfileSettingsPage() {
   return (
     <div className="flex flex-col gap-6 pb-8">
       <div>
-        <h1 className="text-xl font-semibold text-[var(--foreground)]">Contact info</h1>
-        <p className="text-sm text-[var(--muted-foreground)] mt-1">
+        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Contact info</h1>
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
           All fields are hidden on your public profile by default. Toggle to show.
         </p>
       </div>
 
       {/* ── Fields ─────────────────────────────────── */}
-      <div className="bg-[var(--card)] rounded-2xl p-5 flex flex-col gap-4">
+      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
         <div className="flex flex-col gap-1">
           <Input
             label="Phone"
@@ -197,7 +197,7 @@ export default function ProfileSettingsPage() {
           />
         </div>
 
-        <hr className="border-[var(--border)]" />
+        <hr className="border-[var(--color-border)]" />
 
         <div className="flex flex-col gap-1">
           <Input
@@ -214,7 +214,7 @@ export default function ProfileSettingsPage() {
           />
         </div>
 
-        <hr className="border-[var(--border)]" />
+        <hr className="border-[var(--color-border)]" />
 
         <div className="flex flex-col gap-1">
           <Input
@@ -233,16 +233,16 @@ export default function ProfileSettingsPage() {
           />
         </div>
 
-        <hr className="border-[var(--border)]" />
+        <hr className="border-[var(--color-border)]" />
 
         <div className="flex flex-col gap-2">
           <div>
-            <label className="text-sm font-medium text-[var(--foreground)]">Location</label>
+            <label className="text-sm font-medium text-[var(--color-text-primary)]">Location</label>
             <div className="flex gap-2 mt-1.5">
               <select
                 value={form.location_country}
                 onChange={(e) => set('location_country', e.target.value)}
-                className="flex-1 bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--teal-500)]"
+                className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
               >
                 <option value="">Country</option>
                 {COUNTRIES.map((c) => (
@@ -254,7 +254,7 @@ export default function ProfileSettingsPage() {
                 value={form.location_city}
                 onChange={(e) => set('location_city', e.target.value)}
                 placeholder="City"
-                className="flex-1 bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--teal-500)]"
+                className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
               />
             </div>
           </div>

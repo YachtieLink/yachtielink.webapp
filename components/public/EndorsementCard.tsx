@@ -1,9 +1,11 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
 interface EndorsementCardProps {
   endorserName: string
+  endorserRole?: string | null
   endorserPhoto?: string | null
   yachtName?: string | null
   date: string
@@ -14,6 +16,7 @@ const TRUNCATE_LENGTH = 150
 
 export function EndorsementCard({
   endorserName,
+  endorserRole,
   endorserPhoto,
   yachtName,
   date,
@@ -36,9 +39,11 @@ export function EndorsementCard({
       {/* Endorser info */}
       <div className="flex items-center gap-3 mb-3">
         {endorserPhoto ? (
-          <img
+          <Image
             src={endorserPhoto}
             alt={endorserName}
+            width={32}
+            height={32}
             className="h-8 w-8 rounded-full object-cover"
           />
         ) : (
@@ -50,6 +55,11 @@ export function EndorsementCard({
           <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
             {endorserName}
           </p>
+          {endorserRole && (
+            <p className="text-xs text-[var(--color-text-secondary)] truncate">
+              {endorserRole}
+            </p>
+          )}
           <p className="text-xs text-[var(--color-text-tertiary)]">
             {yachtName && <>{yachtName} · </>}
             {formattedDate}

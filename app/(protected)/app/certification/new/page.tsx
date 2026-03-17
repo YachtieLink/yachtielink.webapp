@@ -136,28 +136,28 @@ export default function CertNewPage() {
     return (
       <div className="flex flex-col gap-4 pb-8">
         <div>
-          <h1 className="text-xl font-semibold text-[var(--foreground)]">Add certification</h1>
-          <p className="text-sm text-[var(--muted-foreground)] mt-1">Choose a category to start.</p>
+          <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Add certification</h1>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">Choose a category to start.</p>
         </div>
-        <ul className="bg-[var(--card)] rounded-2xl divide-y divide-[var(--border)]">
+        <ul className="bg-[var(--color-surface)] rounded-2xl divide-y divide-[var(--color-border)]">
           {categories.map((cat) => (
             <li key={cat}>
               <button
                 onClick={() => pickCategory(cat)}
-                className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--foreground)] hover:bg-[var(--muted)]/30 transition-colors text-left first:rounded-t-2xl last:rounded-b-2xl"
+                className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]/30 transition-colors text-left first:rounded-t-2xl last:rounded-b-2xl"
               >
                 {cat}
-                <span className="text-[var(--muted-foreground)]">›</span>
+                <span className="text-[var(--color-text-secondary)]">›</span>
               </button>
             </li>
           ))}
           <li>
             <button
               onClick={() => { setCategory(''); pickOther() }}
-              className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--teal-500)] hover:bg-[var(--muted)]/30 transition-colors text-left last:rounded-b-2xl"
+              className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--color-interactive)] hover:bg-[var(--color-surface-raised)]/30 transition-colors text-left last:rounded-b-2xl"
             >
               Other / not listed
-              <span className="text-[var(--muted-foreground)]">›</span>
+              <span className="text-[var(--color-text-secondary)]">›</span>
             </button>
           </li>
         </ul>
@@ -172,40 +172,40 @@ export default function CertNewPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setStep('category')}
-            className="text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+            className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
             aria-label="Back"
           >
             ‹
           </button>
           <div>
-            <h1 className="text-xl font-semibold text-[var(--foreground)]">{category}</h1>
-            <p className="text-sm text-[var(--muted-foreground)]">Choose your certification</p>
+            <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">{category}</h1>
+            <p className="text-sm text-[var(--color-text-secondary)]">Choose your certification</p>
           </div>
         </div>
-        <ul className="bg-[var(--card)] rounded-2xl divide-y divide-[var(--border)]">
+        <ul className="bg-[var(--color-surface)] rounded-2xl divide-y divide-[var(--color-border)]">
           {certsInCategory.map((ct) => (
             <li key={ct.id}>
               <button
                 onClick={() => pickCert(ct.id)}
-                className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[var(--muted)]/30 transition-colors first:rounded-t-2xl"
+                className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-[var(--color-surface-raised)]/30 transition-colors first:rounded-t-2xl"
               >
                 <div>
-                  <p className="text-sm text-[var(--foreground)]">{ct.name}</p>
+                  <p className="text-sm text-[var(--color-text-primary)]">{ct.name}</p>
                   {ct.short_name && (
-                    <p className="text-xs text-[var(--muted-foreground)]">{ct.short_name}</p>
+                    <p className="text-xs text-[var(--color-text-secondary)]">{ct.short_name}</p>
                   )}
                 </div>
-                <span className="text-[var(--muted-foreground)]">›</span>
+                <span className="text-[var(--color-text-secondary)]">›</span>
               </button>
             </li>
           ))}
           <li>
             <button
               onClick={pickOther}
-              className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--teal-500)] hover:bg-[var(--muted)]/30 transition-colors text-left last:rounded-b-2xl"
+              className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--color-interactive)] hover:bg-[var(--color-surface-raised)]/30 transition-colors text-left last:rounded-b-2xl"
             >
               Other / not listed
-              <span className="text-[var(--muted-foreground)]">›</span>
+              <span className="text-[var(--color-text-secondary)]">›</span>
             </button>
           </li>
         </ul>
@@ -219,22 +219,22 @@ export default function CertNewPage() {
       <div className="flex items-center gap-3">
         <button
           onClick={() => setStep(isOther && !category ? 'category' : 'cert')}
-          className="text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
+          className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
           aria-label="Back"
         >
           ‹
         </button>
         <div>
-          <h1 className="text-xl font-semibold text-[var(--foreground)]">
+          <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">
             {isOther ? 'Other certification' : (selectedCert?.name ?? 'Certification')}
           </h1>
           {!isOther && category && (
-            <p className="text-sm text-[var(--muted-foreground)]">{category}</p>
+            <p className="text-sm text-[var(--color-text-secondary)]">{category}</p>
           )}
         </div>
       </div>
 
-      <div className="bg-[var(--card)] rounded-2xl p-5 flex flex-col gap-4">
+      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
         {isOther && (
           <Input
             label="Certification name"
@@ -266,25 +266,25 @@ export default function CertNewPage() {
               type="checkbox"
               checked={noExpiry}
               onChange={(e) => { setNoExpiry(e.target.checked); if (e.target.checked) setExpiresAt('') }}
-              className="rounded border-[var(--border)] text-[var(--teal-500)]"
+              className="rounded border-[var(--color-border)] text-[var(--color-interactive)]"
             />
-            <span className="text-sm text-[var(--muted-foreground)]">No expiry / lifetime certification</span>
+            <span className="text-sm text-[var(--color-text-secondary)]">No expiry / lifetime certification</span>
           </label>
         </div>
 
         <div>
-          <label className="text-sm font-medium text-[var(--foreground)]">
-            Supporting document <span className="font-normal text-[var(--muted-foreground)]">(optional)</span>
+          <label className="text-sm font-medium text-[var(--color-text-primary)]">
+            Supporting document <span className="font-normal text-[var(--color-text-secondary)]">(optional)</span>
           </label>
-          <p className="text-xs text-[var(--muted-foreground)] mb-2">PDF, JPEG, or PNG · max 10 MB · private, only you can see it</p>
+          <p className="text-xs text-[var(--color-text-secondary)] mb-2">PDF, JPEG, or PNG · max 10 MB · private, only you can see it</p>
           <input
             type="file"
             accept=".pdf,image/jpeg,image/png"
             onChange={(e) => setDocFile(e.target.files?.[0] ?? null)}
-            className="text-sm text-[var(--foreground)]"
+            className="text-sm text-[var(--color-text-primary)]"
           />
           {docFile && (
-            <p className="text-xs text-[var(--teal-500)] mt-1">{docFile.name}</p>
+            <p className="text-xs text-[var(--color-interactive)] mt-1">{docFile.name}</p>
           )}
         </div>
       </div>

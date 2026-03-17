@@ -33,9 +33,9 @@ function excerpt(text: string): string {
 export function EndorsementsSection({ endorsements, currentUserId }: EndorsementsSectionProps) {
   if (endorsements.length === 0) {
     return (
-      <div className="bg-[var(--card)] rounded-2xl p-5">
-        <h2 className="font-semibold text-[var(--foreground)] mb-3">Endorsements</h2>
-        <p className="text-sm text-[var(--muted-foreground)]">
+      <div className="bg-[var(--color-surface)] rounded-2xl p-5">
+        <h2 className="font-semibold text-[var(--color-text-primary)] mb-3">Endorsements</h2>
+        <p className="text-sm text-[var(--color-text-secondary)]">
           Endorsements add context to your work history.
         </p>
       </div>
@@ -43,10 +43,10 @@ export function EndorsementsSection({ endorsements, currentUserId }: Endorsement
   }
 
   return (
-    <div className="bg-[var(--card)] rounded-2xl p-5">
-      <h2 className="font-semibold text-[var(--foreground)] mb-3">
+    <div className="bg-[var(--color-surface)] rounded-2xl p-5">
+      <h2 className="font-semibold text-[var(--color-text-primary)] mb-3">
         Endorsements{' '}
-        <span className="font-normal text-[var(--muted-foreground)] text-sm">
+        <span className="font-normal text-[var(--color-text-secondary)] text-sm">
           ({endorsements.length})
         </span>
       </h2>
@@ -61,11 +61,11 @@ export function EndorsementsSection({ endorsements, currentUserId }: Endorsement
           const isOwn = currentUserId && e.endorser_id === currentUserId
 
           return (
-            <li key={e.id} className="border-l-2 border-[var(--teal-500)] pl-4">
-              <p className="text-sm text-[var(--foreground)] leading-relaxed">
+            <li key={e.id} className="border-l-2 border-[var(--color-interactive)] pl-4">
+              <p className="text-sm text-[var(--color-text-primary)] leading-relaxed">
                 &ldquo;{excerpt(e.content)}&rdquo;
               </p>
-              <p className="text-xs text-[var(--muted-foreground)] mt-1">
+              <p className="text-xs text-[var(--color-text-secondary)] mt-1">
                 {endorserName}
                 {e.yachts ? ` · ${e.yachts.name}` : ''}
                 {' · '}{date}

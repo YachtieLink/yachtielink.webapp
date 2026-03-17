@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import { createServiceClient } from '@/lib/supabase/admin'
 import OpenAI from 'openai'
 import { CV_EXTRACTION_PROMPT } from '@/lib/cv/prompt'
 import { validateBody } from '@/lib/validation/validate'
@@ -30,10 +30,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Download file from storage using service role (server-side)
-  const serviceClient = createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
+  const serviceClient = createServiceClient()
 
   const { data: fileData, error: downloadErr } = await serviceClient.storage
     .from('cv-uploads')

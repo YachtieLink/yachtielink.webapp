@@ -31,7 +31,7 @@ function formatDate(dateStr: string | null | undefined): string {
 }
 
 function StatusBadge({ status }: { status: ReturnType<typeof getExpiryStatus> }) {
-  if (status === 'no-expiry') return <span className="text-xs text-[var(--muted-foreground)]">No expiry</span>;
+  if (status === 'no-expiry') return <span className="text-xs text-[var(--color-text-secondary)]">No expiry</span>;
   if (status === 'expired') return <span className="text-xs text-red-600 dark:text-red-400 font-medium">● Expired</span>;
   if (status === 'expiring') return <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">⚠ Expiring soon</span>;
   return <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">● Valid</span>;
@@ -89,8 +89,8 @@ export function CertsClient({
               onClick={() => setFilter(f.id)}
               className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 filter === f.id
-                  ? 'bg-[var(--teal-700)] text-white'
-                  : 'bg-[var(--muted)] text-[var(--foreground)]'
+                  ? 'bg-[var(--color-teal-700)] text-white'
+                  : 'bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]'
               }`}
             >
               {f.label}
@@ -102,31 +102,31 @@ export function CertsClient({
       {/* Cert list */}
       {filtered.length === 0 ? (
         <div className="text-center py-10">
-          <p className="text-sm text-[var(--muted-foreground)]">
+          <p className="text-sm text-[var(--color-text-secondary)]">
             {filter === 'all' ? 'No certifications yet.' : `No ${filter} certifications.`}
           </p>
           {filter === 'all' && (
-            <Link href="/app/certification/new" className="mt-2 inline-block text-sm text-[var(--teal-700)] font-medium">
+            <Link href="/app/certification/new" className="mt-2 inline-block text-sm text-[var(--color-teal-700)] font-medium">
               Add your first certification
             </Link>
           )}
         </div>
       ) : (
         filtered.map(({ cert, status }) => (
-          <div key={cert.id} className="bg-[var(--card)] rounded-2xl p-4">
+          <div key={cert.id} className="bg-[var(--color-surface)] rounded-2xl p-4">
             <div className="flex items-start justify-between gap-2 mb-1">
               <div className="flex-1">
-                <p className="text-sm font-semibold text-[var(--foreground)]">
+                <p className="text-sm font-semibold text-[var(--color-text-primary)]">
                   {cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'}
                 </p>
                 {cert.certification_types?.category && (
-                  <p className="text-xs text-[var(--muted-foreground)]">{cert.certification_types.category}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">{cert.certification_types.category}</p>
                 )}
               </div>
               {isPro && <StatusBadge status={status} />}
             </div>
 
-            <div className="text-xs text-[var(--muted-foreground)] space-y-0.5 mt-1">
+            <div className="text-xs text-[var(--color-text-secondary)] space-y-0.5 mt-1">
               {cert.issued_at && <p>Issued: {formatDate(cert.issued_at)}</p>}
               {cert.expiry_date && <p>Expires: {formatDate(cert.expiry_date)}</p>}
             </div>
@@ -138,13 +138,13 @@ export function CertsClient({
                     href={cert.document_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs font-medium text-[var(--teal-700)] dark:text-[var(--teal-400)]"
+                    className="text-xs font-medium text-[var(--color-teal-700)] dark:text-[var(--color-teal-400)]"
                   >
                     📄 View document
                   </a>
                   <Link
                     href={`/app/certification/${cert.id}/edit`}
-                    className="text-xs font-medium text-[var(--muted-foreground)]"
+                    className="text-xs font-medium text-[var(--color-text-secondary)]"
                   >
                     Replace
                   </Link>
@@ -152,14 +152,14 @@ export function CertsClient({
               ) : (
                 <Link
                   href={`/app/certification/${cert.id}/edit`}
-                  className="text-xs font-medium text-[var(--teal-700)] dark:text-[var(--teal-400)]"
+                  className="text-xs font-medium text-[var(--color-teal-700)] dark:text-[var(--color-teal-400)]"
                 >
                   📄 Upload document
                 </Link>
               )}
               <Link
                 href={`/app/certification/${cert.id}/edit`}
-                className="ml-auto text-xs font-medium text-[var(--muted-foreground)]"
+                className="ml-auto text-xs font-medium text-[var(--color-text-secondary)]"
               >
                 Edit
               </Link>

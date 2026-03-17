@@ -92,7 +92,7 @@ export default async function YachtDetailPage({ params }: PageProps) {
         <div className="flex items-start justify-between mb-1">
           <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">{yacht.name}</h1>
           {yacht.is_established && (
-            <span className="shrink-0 ml-3 mt-1 text-xs bg-[var(--teal-500)]/10 text-[var(--teal-500)] px-2 py-0.5 rounded-full font-medium">
+            <span className="shrink-0 ml-3 mt-1 text-xs bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-2 py-0.5 rounded-full font-medium">
               Established
             </span>
           )}
@@ -122,9 +122,9 @@ export default async function YachtDetailPage({ params }: PageProps) {
 
         {/* Crew list */}
         {crewCount > 0 && (
-          <div className="bg-[var(--card)] rounded-2xl p-5">
-            <h2 className="font-semibold text-[var(--foreground)] mb-3">Crew</h2>
-            <ul className="flex flex-col divide-y divide-[var(--border)]">
+          <div className="bg-[var(--color-surface)] rounded-2xl p-5">
+            <h2 className="font-semibold text-[var(--color-text-primary)] mb-3">Crew</h2>
+            <ul className="flex flex-col divide-y divide-[var(--color-border)]">
               {(crew ?? []).map((c: {
                 id: string
                 role_label: string
@@ -177,7 +177,7 @@ export default async function YachtDetailPage({ params }: PageProps) {
         {!userHasAttachment && (
           <Link
             href={`/app/attachment/new`}
-            className="mt-4 block w-full text-center py-3 rounded-2xl border border-[var(--teal-500)] text-[var(--teal-500)] text-sm font-medium hover:bg-[var(--teal-500)]/5 transition-colors"
+            className="mt-4 block w-full text-center py-3 rounded-2xl border border-[var(--color-interactive)] text-[var(--color-interactive)] text-sm font-medium hover:bg-[var(--color-interactive)]/5 transition-colors"
           >
             + Add this yacht to my profile
           </Link>

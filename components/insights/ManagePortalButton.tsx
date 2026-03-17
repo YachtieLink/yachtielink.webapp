@@ -22,7 +22,7 @@ export function ManagePortalButton() {
     <button
       onClick={handleManage}
       disabled={loading}
-      className="w-full py-2.5 rounded-xl border border-[var(--border)] text-sm font-medium text-[var(--foreground)] hover:bg-[var(--muted)]/40 disabled:opacity-60 transition-colors"
+      className="w-full py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]/40 disabled:opacity-60 transition-colors"
     >
       {loading ? 'Redirecting…' : 'Manage Subscription'}
     </button>

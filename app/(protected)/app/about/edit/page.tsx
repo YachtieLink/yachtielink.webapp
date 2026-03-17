@@ -59,14 +59,14 @@ export default function AboutEditPage() {
   return (
     <div className="flex flex-col gap-6 pb-8">
       <div>
-        <h1 className="text-xl font-semibold text-[var(--foreground)]">About</h1>
-        <p className="text-sm text-[var(--muted-foreground)] mt-1">
+        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">About</h1>
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
           Tell people about your background and experience.
         </p>
       </div>
 
       {!loaded ? (
-        <div className="h-40 bg-[var(--muted)] rounded-xl animate-pulse" />
+        <div className="h-40 bg-[var(--color-surface-raised)] rounded-xl animate-pulse" />
       ) : (
         <>
           <div className="relative">
@@ -75,13 +75,13 @@ export default function AboutEditPage() {
               onChange={(e) => setBio(e.target.value)}
               placeholder="e.g. Experienced Chief Stewardess with 8 seasons on motor yachts across the Med and Caribbean…"
               rows={8}
-              className={`w-full bg-[var(--card)] border rounded-xl px-4 py-3 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--teal-500)] transition-shadow ${
-                overLimit ? 'border-red-500' : 'border-[var(--border)]'
+              className={`w-full bg-[var(--color-surface)] border rounded-xl px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)] transition-shadow ${
+                overLimit ? 'border-red-500' : 'border-[var(--color-border)]'
               }`}
             />
             <span
               className={`absolute bottom-3 right-4 text-xs ${
-                overLimit ? 'text-red-500' : 'text-[var(--muted-foreground)]'
+                overLimit ? 'text-red-500' : 'text-[var(--color-text-secondary)]'
               }`}
             >
               {remaining}

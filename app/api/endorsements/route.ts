@@ -6,108 +6,117 @@ import { createEndorsementSchema } from '@/lib/validation/schemas'
 import { applyRateLimit } from '@/lib/rate-limit/helpers'
 import { moderateText } from '@/lib/ai/moderation'
 import { trackServerEvent } from '@/lib/analytics/server'
+import { sanitizeHtml } from '@/lib/validation/sanitize'
+import { handleApiError } from '@/lib/api/errors'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://yachtie.link'
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  const limited = await applyRateLimit(req, 'endorsementCreate', user.id)
-  if (limited) return limited
-
-  const result = await validateBody(req, createEndorsementSchema)
-  if ('error' in result) return result.error
-  const { recipient_id, yacht_id, content, endorser_role_label, recipient_role_label, worked_together_start, worked_together_end, request_token } = result.data
-
-  if (user.id === recipient_id) {
-    return NextResponse.json({ error: "You can't endorse yourself." }, { status: 400 })
-  }
-
-  // Coworker check
-  const { data: coworkers } = await supabase.rpc('are_coworkers_on_yacht', {
-    user_a: user.id,
-    user_b: recipient_id,
-    yacht: yacht_id,
-  })
-  if (!coworkers) {
-    return NextResponse.json({ error: 'You can only endorse people you have worked with on this yacht.' }, { status: 403 })
-  }
-
-  // AI-01: Content moderation
-  const moderation = await moderateText(content)
-  if (moderation.flagged) {
-    trackServerEvent(user.id, 'moderation.flagged', { context: 'endorsement.create', categories: moderation.categories })
-    return NextResponse.json({ error: 'Your endorsement was flagged as potentially inappropriate. Please revise it.' }, { status: 422 })
-  }
-
-  const { data: endorsement, error: insertError } = await supabase
-    .from('endorsements')
-    .insert({
-      endorser_id: user.id,
-      recipient_id,
-      yacht_id,
-      content,
-      endorser_role_label: endorser_role_label ?? null,
-      recipient_role_label: recipient_role_label ?? null,
-      worked_together_start: worked_together_start ?? null,
-      worked_together_end: worked_together_end ?? null,
-    })
-    .select()
-    .single()
-
-  if (insertError) {
-    if (insertError.code === '23505') {
-      return NextResponse.json({ error: "You've already endorsed this person for this yacht." }, { status: 409 })
-    }
-    return NextResponse.json({ error: 'Failed to create endorsement' }, { status: 500 })
-  }
-
-  trackServerEvent(user.id, 'endorsement.created', { recipient_id, yacht_id })
-
-  // If responding to a request, update its status
-  if (request_token) {
-    await supabase
-      .from('endorsement_requests')
-      .update({ status: 'accepted', accepted_at: new Date().toISOString(), recipient_user_id: user.id })
-      .eq('token', request_token)
-  }
-
-  // Send notification email to recipient (non-fatal)
   try {
-    const { data: recipient } = await supabase
-      .from('users')
-      .select('email, display_name, full_name')
-      .eq('id', recipient_id)
-      .single()
-    const { data: endorser } = await supabase
-      .from('users')
-      .select('display_name, full_name')
-      .eq('id', user.id)
-      .single()
-    const { data: yacht } = await supabase
-      .from('yachts')
-      .select('name')
-      .eq('id', yacht_id)
-      .single()
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    if (recipient?.email) {
-      const endorserName = endorser?.display_name ?? endorser?.full_name ?? 'A colleague'
-      const yachtName = yacht?.name ?? 'your yacht'
-      const excerpt = content.length > 100 ? content.slice(0, 97) + '…' : content
-      await sendNotifyEmail({
-        to: recipient.email,
-        subject: `${endorserName} endorsed you on YachtieLink`,
-        html: buildEndorsementReceivedHtml(endorserName, yachtName, excerpt),
-        text: `${endorserName} wrote an endorsement for your time on ${yachtName}:\n\n"${excerpt}"\n\nView it at: ${APP_URL}/app/network`,
-      })
+    const limited = await applyRateLimit(req, 'endorsementCreate', user.id)
+    if (limited) return limited
+
+    const result = await validateBody(req, createEndorsementSchema)
+    if ('error' in result) return result.error
+    const { recipient_id, yacht_id, content, endorser_role_label, recipient_role_label, worked_together_start, worked_together_end, request_token } = result.data
+
+    if (user.id === recipient_id) {
+      return NextResponse.json({ error: "You can't endorse yourself." }, { status: 400 })
     }
-  } catch (e) {
-    console.error('Endorsement notification email failed:', e)
-  }
 
-  return NextResponse.json({ endorsement }, { status: 201 })
+    // Coworker check
+    const { data: coworkers } = await supabase.rpc('are_coworkers_on_yacht', {
+      user_a: user.id,
+      user_b: recipient_id,
+      yacht: yacht_id,
+    })
+    if (!coworkers) {
+      return NextResponse.json({ error: 'You can only endorse people you have worked with on this yacht.' }, { status: 403 })
+    }
+
+    // AI-01: Content moderation
+    const moderation = await moderateText(content)
+    if (moderation.flagged) {
+      trackServerEvent(user.id, 'moderation.flagged', { context: 'endorsement.create', categories: moderation.categories })
+      return NextResponse.json({ error: 'Your endorsement was flagged as potentially inappropriate. Please revise it.' }, { status: 422 })
+    }
+
+    const { data: endorsement, error: insertError } = await supabase
+      .from('endorsements')
+      .insert({
+        endorser_id: user.id,
+        recipient_id,
+        yacht_id,
+        content,
+        endorser_role_label: endorser_role_label ?? null,
+        recipient_role_label: recipient_role_label ?? null,
+        worked_together_start: worked_together_start ?? null,
+        worked_together_end: worked_together_end ?? null,
+      })
+      .select()
+      .single()
+
+    if (insertError) {
+      if (insertError.code === '23505') {
+        return NextResponse.json({ error: "You've already endorsed this person for this yacht." }, { status: 409 })
+      }
+      return NextResponse.json({ error: 'Failed to create endorsement' }, { status: 500 })
+    }
+
+    trackServerEvent(user.id, 'endorsement.created', { recipient_id, yacht_id })
+
+    // If responding to a request, update its status
+    if (request_token) {
+      await supabase
+        .from('endorsement_requests')
+        .update({ status: 'accepted', accepted_at: new Date().toISOString(), recipient_user_id: user.id })
+        .eq('token', request_token)
+    }
+
+    // Send notification email to recipient (non-fatal)
+    try {
+      const { data: recipient } = await supabase
+        .from('users')
+        .select('email, display_name, full_name')
+        .eq('id', recipient_id)
+        .single()
+      const { data: endorser } = await supabase
+        .from('users')
+        .select('display_name, full_name')
+        .eq('id', user.id)
+        .single()
+      const { data: yacht } = await supabase
+        .from('yachts')
+        .select('name')
+        .eq('id', yacht_id)
+        .single()
+
+      if (recipient?.email) {
+        const endorserName = endorser?.display_name ?? endorser?.full_name ?? 'A colleague'
+        const yachtName = yacht?.name ?? 'your yacht'
+        const excerpt = content.length > 100 ? content.slice(0, 97) + '…' : content
+        const safeEndorserName = sanitizeHtml(endorserName)
+        const safeYachtName = sanitizeHtml(yachtName)
+        const safeExcerpt = sanitizeHtml(excerpt)
+        await sendNotifyEmail({
+          to: recipient.email,
+          subject: `${endorserName} endorsed you on YachtieLink`,
+          html: buildEndorsementReceivedHtml(safeEndorserName, safeYachtName, safeExcerpt),
+          text: `${endorserName} wrote an endorsement for your time on ${yachtName}:\n\n"${excerpt}"\n\nView it at: ${APP_URL}/app/network`,
+        })
+      }
+    } catch (e) {
+      console.error('Endorsement notification email failed:', e)
+    }
+
+    return NextResponse.json({ endorsement }, { status: 201 })
+  } catch (err) {
+    return handleApiError(err)
+  }
 }
 
 export async function GET(req: NextRequest) {

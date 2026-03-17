@@ -5,6 +5,8 @@ import { validateBody } from "@/lib/validation/validate";
 import { createEndorsementRequestSchema } from "@/lib/validation/schemas";
 import { applyRateLimit } from "@/lib/rate-limit/helpers";
 import { trackServerEvent } from "@/lib/analytics/server";
+import { sanitizeHtml } from "@/lib/validation/sanitize";
+import { handleApiError } from "@/lib/api/errors";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://yachtie.link";
 
@@ -79,119 +81,125 @@ You received this because ${requesterName} added your email address. If you don'
 // ─── Route handler ────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const limited = await applyRateLimit(req, 'endorsementCreate', user.id);
-  if (limited) return limited;
-
-  const result = await validateBody(req, createEndorsementRequestSchema);
-  if ('error' in result) return result.error;
-  const { yacht_id, recipient_email, recipient_phone, recipient_user_id: directRecipientId, yacht_name } = result.data;
-
-  if (!recipient_email && !recipient_phone && !directRecipientId) {
-    return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-  }
-
-  // Get requester profile
-  const { data: profile } = await supabase
-    .from("users")
-    .select("display_name, full_name, subscription_status")
-    .eq("id", user.id)
-    .single();
-  const requesterName =
-    (profile?.display_name as string | null) ||
-    (profile?.full_name as string | null) ||
-    "A colleague";
-
-  // Rate limit check
-  const { data: todayCount } = await supabase.rpc("endorsement_requests_today", {
-    p_user_id: user.id,
-  });
-  const limit = profile?.subscription_status === "pro" ? 20 : 10;
-  if ((todayCount ?? 0) >= limit) {
-    const resetsAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-    return NextResponse.json(
-      { error: "Daily limit reached", limit, used: todayCount, resets_at: resetsAt },
-      { status: 429 }
-    );
-  }
-
-  // Resolve recipient_user_id: direct colleague ID, email lookup, or phone lookup
-  let recipientUserId: string | null = directRecipientId ?? null
-  if (!recipientUserId && recipient_email) {
-    const { data: existingUser } = await supabase
-      .from("users")
-      .select("id")
-      .eq("email", recipient_email.trim().toLowerCase())
-      .maybeSingle()
-    recipientUserId = existingUser?.id ?? null
-  }
-  if (!recipientUserId && recipient_phone) {
-    const { data: existingUser } = await supabase
-      .from("users")
-      .select("id")
-      .or(`phone.eq.${recipient_phone},whatsapp.eq.${recipient_phone}`)
-      .maybeSingle()
-    recipientUserId = existingUser?.id ?? null
-  }
-
-  // Insert request and retrieve the auto-generated token
-  const { data: request, error: insertError } = await supabase
-    .from("endorsement_requests")
-    .insert({
-      requester_id: user.id,
-      yacht_id,
-      recipient_email: recipient_email ? recipient_email.trim().toLowerCase() : null,
-      recipient_phone: recipient_phone ?? null,
-      recipient_user_id: recipientUserId,
-    })
-    .select("id, token")
-    .single();
-
-  if (insertError || !request) {
-    if (insertError?.code === "23505") {
-      return NextResponse.json({ ok: true, skipped: true });
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.json({ error: "Failed to create request" }, { status: 500 });
-  }
 
-  trackServerEvent(user.id, 'endorsement.requested', { yacht_id, has_recipient_user: !!recipientUserId });
+    const limited = await applyRateLimit(req, 'endorsementCreate', user.id);
+    if (limited) return limited;
 
-  const deepLink = `${APP_URL}/r/${request.token}`;
-  const yachtDisplay = (yacht_name as string | undefined) ?? "";
-  const subjectYacht = yachtDisplay ? ` on ${yachtDisplay}` : "";
+    const result = await validateBody(req, createEndorsementRequestSchema);
+    if ('error' in result) return result.error;
+    const { yacht_id, recipient_email, recipient_phone, recipient_user_id: directRecipientId, yacht_name } = result.data;
 
-  // Resolve email to send notification to (explicit email or looked up from user)
-  let notifyEmail = recipient_email?.trim() ?? null
-  if (!notifyEmail && recipientUserId) {
-    const { data: recipientProfile } = await supabase
-      .from("users")
-      .select("email")
-      .eq("id", recipientUserId)
-      .single()
-    notifyEmail = recipientProfile?.email ?? null
-  }
-
-  // Send email — non-fatal if it fails (request is already in DB)
-  if (notifyEmail) {
-    try {
-      await sendNotifyEmail({
-        to: notifyEmail,
-        subject: `${requesterName} asked you to endorse their work${subjectYacht}`,
-        html: buildHtml(requesterName, yachtDisplay, deepLink),
-        text: buildText(requesterName, yachtDisplay, deepLink),
-      });
-    } catch {
-      // Email failure is non-fatal — token is saved, user can resend later
+    if (!recipient_email && !recipient_phone && !directRecipientId) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
-  }
 
-  return NextResponse.json({ ok: true, token: request.token, deep_link: deepLink });
+    // Get requester profile
+    const { data: profile } = await supabase
+      .from("users")
+      .select("display_name, full_name, subscription_status")
+      .eq("id", user.id)
+      .single();
+    const requesterName =
+      (profile?.display_name as string | null) ||
+      (profile?.full_name as string | null) ||
+      "A colleague";
+
+    // Rate limit check
+    const { data: todayCount } = await supabase.rpc("endorsement_requests_today", {
+      p_user_id: user.id,
+    });
+    const limit = profile?.subscription_status === "pro" ? 20 : 10;
+    if ((todayCount ?? 0) >= limit) {
+      const resetsAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      return NextResponse.json(
+        { error: "Daily limit reached", limit, used: todayCount, resets_at: resetsAt },
+        { status: 429 }
+      );
+    }
+
+    // Resolve recipient_user_id: direct colleague ID, email lookup, or phone lookup
+    let recipientUserId: string | null = directRecipientId ?? null
+    if (!recipientUserId && recipient_email) {
+      const { data: existingUser } = await supabase
+        .from("users")
+        .select("id")
+        .eq("email", recipient_email.trim().toLowerCase())
+        .maybeSingle()
+      recipientUserId = existingUser?.id ?? null
+    }
+    if (!recipientUserId && recipient_phone) {
+      const { data: existingUser } = await supabase
+        .from("users")
+        .select("id")
+        .or(`phone.eq.${recipient_phone},whatsapp.eq.${recipient_phone}`)
+        .maybeSingle()
+      recipientUserId = existingUser?.id ?? null
+    }
+
+    // Insert request and retrieve the auto-generated token
+    const { data: request, error: insertError } = await supabase
+      .from("endorsement_requests")
+      .insert({
+        requester_id: user.id,
+        yacht_id,
+        recipient_email: recipient_email ? recipient_email.trim().toLowerCase() : null,
+        recipient_phone: recipient_phone ?? null,
+        recipient_user_id: recipientUserId,
+      })
+      .select("id, token")
+      .single();
+
+    if (insertError || !request) {
+      if (insertError?.code === "23505") {
+        return NextResponse.json({ ok: true, skipped: true });
+      }
+      return NextResponse.json({ error: "Failed to create request" }, { status: 500 });
+    }
+
+    trackServerEvent(user.id, 'endorsement.requested', { yacht_id, has_recipient_user: !!recipientUserId });
+
+    const deepLink = `${APP_URL}/r/${request.token}`;
+    const yachtDisplay = (yacht_name as string | undefined) ?? "";
+    const subjectYacht = yachtDisplay ? ` on ${yachtDisplay}` : "";
+
+    // Resolve email to send notification to (explicit email or looked up from user)
+    let notifyEmail = recipient_email?.trim() ?? null
+    if (!notifyEmail && recipientUserId) {
+      const { data: recipientProfile } = await supabase
+        .from("users")
+        .select("email")
+        .eq("id", recipientUserId)
+        .single()
+      notifyEmail = recipientProfile?.email ?? null
+    }
+
+    // Send email — non-fatal if it fails (request is already in DB)
+    if (notifyEmail) {
+      try {
+        const safeRequesterName = sanitizeHtml(requesterName)
+        const safeYachtDisplay = sanitizeHtml(yachtDisplay)
+        await sendNotifyEmail({
+          to: notifyEmail,
+          subject: `${requesterName} asked you to endorse their work${subjectYacht}`,
+          html: buildHtml(safeRequesterName, safeYachtDisplay, deepLink),
+          text: buildText(requesterName, yachtDisplay, deepLink),
+        });
+      } catch {
+        // Email failure is non-fatal — token is saved, user can resend later
+      }
+    }
+
+    return NextResponse.json({ ok: true, token: request.token, deep_link: deepLink });
+  } catch (err) {
+    return handleApiError(err);
+  }
 }

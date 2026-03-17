@@ -33,7 +33,7 @@ export function WheelACard({ milestones }: WheelACardProps) {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="w-full bg-[var(--card)] rounded-2xl p-5 flex items-center gap-4 text-left hover:bg-[var(--muted)]/30 transition-colors"
+        className="w-full bg-[var(--color-surface)] rounded-2xl p-5 flex items-center gap-4 text-left hover:bg-[var(--color-surface-raised)]/30 transition-colors"
         aria-label="Profile setup details"
       >
         <ProgressWheel
@@ -44,12 +44,12 @@ export function WheelACard({ milestones }: WheelACardProps) {
           label={`${done}/${total}`}
         />
         <div>
-          <p className="font-medium text-[var(--foreground)]">Profile setup</p>
-          <p className="text-sm text-[var(--muted-foreground)]">
+          <p className="font-medium text-[var(--color-text-primary)]">Profile setup</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">
             {done === total ? 'All steps complete' : `${total - done} step${total - done !== 1 ? 's' : ''} remaining`}
           </p>
         </div>
-        <span className="ml-auto text-[var(--muted-foreground)]">›</span>
+        <span className="ml-auto text-[var(--color-text-secondary)]">›</span>
       </button>
 
       <BottomSheet open={open} onClose={() => setOpen(false)} title="Profile setup">
@@ -60,22 +60,22 @@ export function WheelACard({ milestones }: WheelACardProps) {
               <li key={m.key}>
                 {done ? (
                   <div className="flex items-center gap-3 py-2">
-                    <span className="w-6 h-6 rounded-full bg-[var(--teal-500)] flex items-center justify-center shrink-0">
+                    <span className="w-6 h-6 rounded-full bg-[var(--color-interactive)] flex items-center justify-center shrink-0">
                       <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 14 14" fill="none">
                         <path d="M2 7l4 4 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
                     </span>
-                    <span className="text-sm text-[var(--muted-foreground)] line-through">{m.label}</span>
+                    <span className="text-sm text-[var(--color-text-secondary)] line-through">{m.label}</span>
                   </div>
                 ) : (
                   <a
                     href={m.href}
                     onClick={() => setOpen(false)}
-                    className="flex items-center gap-3 py-2 hover:text-[var(--teal-500)] transition-colors"
+                    className="flex items-center gap-3 py-2 hover:text-[var(--color-interactive)] transition-colors"
                   >
-                    <span className="w-6 h-6 rounded-full border-2 border-[var(--border)] shrink-0" />
-                    <span className="text-sm text-[var(--foreground)]">{m.label}</span>
-                    <span className="ml-auto text-[var(--muted-foreground)]">›</span>
+                    <span className="w-6 h-6 rounded-full border-2 border-[var(--color-border)] shrink-0" />
+                    <span className="text-sm text-[var(--color-text-primary)]">{m.label}</span>
+                    <span className="ml-auto text-[var(--color-text-secondary)]">›</span>
                   </a>
                 )}
               </li>

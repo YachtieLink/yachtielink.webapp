@@ -1,0 +1,23 @@
+{
+  "name": "YachtieLink",
+  "short_name": "YachtieLink",
+  "description": "Your professional identity on the water",
+  "start_url": "/app/profile",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

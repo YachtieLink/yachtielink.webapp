@@ -40,23 +40,23 @@ export function YachtsSection({ attachments }: YachtsSectionProps) {
   })
 
   return (
-    <div className="bg-[var(--card)] rounded-2xl p-5">
+    <div className="bg-[var(--color-surface)] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="font-semibold text-[var(--foreground)]">Yachts</h2>
+        <h2 className="font-semibold text-[var(--color-text-primary)]">Yachts</h2>
         <Link
           href="/app/attachment/new"
-          className="text-sm text-[var(--teal-500)] hover:underline"
+          className="text-sm text-[var(--color-interactive)] hover:underline"
         >
           Add
         </Link>
       </div>
 
       {sorted.length === 0 ? (
-        <p className="text-sm text-[var(--muted-foreground)]">
+        <p className="text-sm text-[var(--color-text-secondary)]">
           Add your first yacht to start building your work history.
         </p>
       ) : (
-        <ul className="flex flex-col divide-y divide-[var(--border)]">
+        <ul className="flex flex-col divide-y divide-[var(--color-border)]">
           {sorted.map((att) => {
             const isExpanded = expanded === att.id
             const yacht = att.yachts
@@ -69,21 +69,21 @@ export function YachtsSection({ attachments }: YachtsSectionProps) {
                   aria-expanded={isExpanded}
                 >
                   <div className="min-w-0">
-                    <p className="font-medium text-sm text-[var(--foreground)] truncate">
+                    <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">
                       {yacht?.name ?? 'Unknown yacht'}
                     </p>
-                    <p className="text-xs text-[var(--muted-foreground)] truncate">
+                    <p className="text-xs text-[var(--color-text-secondary)] truncate">
                       {att.role_label} · {formatDateRange(att.started_at, att.ended_at)}
                     </p>
                     {yacht?.yacht_type && (
-                      <p className="text-xs text-[var(--muted-foreground)]">
+                      <p className="text-xs text-[var(--color-text-secondary)]">
                         {yacht.yacht_type}
                         {yacht.flag_state ? ` · ${yacht.flag_state}` : ''}
                       </p>
                     )}
                   </div>
                   <span
-                    className={`text-[var(--muted-foreground)] transition-transform shrink-0 mt-0.5 ${isExpanded ? 'rotate-90' : ''}`}
+                    className={`text-[var(--color-text-secondary)] transition-transform shrink-0 mt-0.5 ${isExpanded ? 'rotate-90' : ''}`}
                   >
                     ›
                   </span>
@@ -94,20 +94,20 @@ export function YachtsSection({ attachments }: YachtsSectionProps) {
                     {yacht && (
                       <Link
                         href={`/app/yacht/${yacht.id}`}
-                        className="text-sm text-[var(--teal-500)] hover:underline"
+                        className="text-sm text-[var(--color-interactive)] hover:underline"
                       >
                         View yacht page →
                       </Link>
                     )}
                     <Link
                       href={`/app/endorsement/request?yacht_id=${yacht?.id}`}
-                      className="text-sm text-[var(--teal-500)] hover:underline"
+                      className="text-sm text-[var(--color-interactive)] hover:underline"
                     >
                       Request endorsements from this yacht →
                     </Link>
                     <Link
                       href={`/app/attachment/${att.id}/edit`}
-                      className="text-sm text-[var(--muted-foreground)] hover:underline"
+                      className="text-sm text-[var(--color-text-secondary)] hover:underline"
                     >
                       Edit attachment
                     </Link>

@@ -79,7 +79,7 @@ export default async function RequestEndorsementPage({
             <Link
               key={att.id}
               href={`/app/endorsement/request?yacht_id=${att.yachts!.id}`}
-              className="bg-[var(--card)] rounded-2xl p-4 flex items-center gap-3 hover:bg-[var(--color-surface-raised)] transition-colors"
+              className="bg-[var(--color-surface)] rounded-2xl p-4 flex items-center gap-3 hover:bg-[var(--color-surface-raised)] transition-colors"
             >
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-sm text-[var(--color-text-primary)]">

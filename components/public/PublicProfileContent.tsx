@@ -1,6 +1,6 @@
 import { EndorsementCard } from './EndorsementCard'
 import { ShareButton } from './ShareButton'
-import QRCode from 'react-qr-code'
+import { PublicQRCode } from './PublicQRCode'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -22,6 +22,8 @@ interface UserProfile {
   show_whatsapp?: boolean
   show_email?: boolean
   show_location?: boolean
+  available_for_work?: boolean
+  available_from?: string | null
 }
 
 interface Attachment {
@@ -71,6 +73,9 @@ export interface PublicProfileContentProps {
   certifications: Certification[]
   endorsements: Endorsement[]
   showQrCode?: boolean
+  isFoundingMember?: boolean
+  isPro?: boolean
+  isLoggedIn?: boolean
   viewerRelationship?: {
     isOwnProfile: boolean
     sharedYachtIds: string[]
@@ -106,12 +111,35 @@ function certStatus(expiryDate: string | null | undefined): { label: string; col
 
 // ── Component ──────────────────────────────────────────────────────────────────
 
+function computeSeaTime(attachments: Attachment[]): string | null {
+  if (attachments.length === 0) return null
+  let totalDays = 0
+  const now = new Date()
+  for (const att of attachments) {
+    if (!att.started_at) continue
+    const start = new Date(att.started_at)
+    const end = att.ended_at ? new Date(att.ended_at) : now
+    const days = Math.max(0, Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)))
+    totalDays += days
+  }
+  if (totalDays === 0) return null
+  const years = Math.floor(totalDays / 365)
+  const months = Math.floor((totalDays % 365) / 30)
+  if (years > 0 && months > 0) return `${years}y ${months}m at sea`
+  if (years > 0) return `${years}y at sea`
+  if (months > 0) return `${months}m at sea`
+  return `${totalDays}d at sea`
+}
+
 export function PublicProfileContent({
   user,
   attachments,
   certifications,
   endorsements,
   showQrCode = false,
+  isFoundingMember = false,
+  isPro: _isPro = false,
+  isLoggedIn,
   viewerRelationship,
 }: PublicProfileContentProps) {
   const displayName = user.display_name ?? user.full_name
@@ -147,11 +175,33 @@ export function PublicProfileContent({
         <h1 className="mt-4 text-2xl font-bold text-[var(--color-text-primary)]">
           {displayName}
         </h1>
+        {isFoundingMember && (
+          <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-900/20 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
+            Founding Member
+          </span>
+        )}
+        {user.available_for_work && (
+          <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-green-50 dark:bg-green-900/20 px-3 py-1 text-xs font-medium text-green-700 dark:text-green-400">
+            <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
+            {user.available_from
+              ? `Available from ${new Date(user.available_from).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
+              : 'Available for work'}
+          </span>
+        )}
         {(user.primary_role || user.departments?.length) && (
           <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
             {[user.primary_role, ...(user.departments ?? [])].filter(Boolean).join(' · ')}
           </p>
         )}
+        {(() => {
+          const seaTime = computeSeaTime(attachments)
+          return seaTime ? (
+            <p className="mt-1 text-xs font-medium text-[var(--color-text-secondary)]">
+              {seaTime} · {attachments.length} yacht{attachments.length !== 1 ? 's' : ''}
+              {endorsements.length > 0 ? ` · ${endorsements.length} endorsement${endorsements.length !== 1 ? 's' : ''}` : ''}
+            </p>
+          ) : null
+        })()}
         <p className="mt-1 text-xs text-[var(--color-text-tertiary)]">
           yachtie.link/u/{user.handle}
         </p>
@@ -188,154 +238,187 @@ export function PublicProfileContent({
         />
       </div>
 
-      {/* ── About ─────────────────────────────────────────────────────────── */}
-      {user.bio && (
-        <section className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-2">
-            About
-          </h2>
-          <p className="text-sm text-[var(--color-text-primary)] leading-relaxed whitespace-pre-line">
-            {user.bio}
-          </p>
-        </section>
-      )}
+      {/* ── Two-column grid (desktop) / single column (mobile) ────────────── */}
+      <div className="lg:grid lg:grid-cols-[2fr_3fr] lg:gap-8 flex flex-col gap-6 lg:gap-y-6">
 
-      {/* ── Contact ───────────────────────────────────────────────────────── */}
-      {hasVisibleContact && (
-        <section className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-2">
-            Contact
-          </h2>
-          <div className="flex flex-col gap-1.5 text-sm text-[var(--color-text-primary)]">
-            {user.show_email && user.email && (
-              <p>{user.email}</p>
-            )}
-            {user.show_phone && user.phone && (
-              <p>{user.phone}</p>
-            )}
-            {user.show_whatsapp && user.whatsapp && (
-              <p>WhatsApp: {user.whatsapp}</p>
-            )}
-            {user.show_location && (user.location_city || user.location_country) && (
-              <p>{[user.location_city, user.location_country].filter(Boolean).join(', ')}</p>
-            )}
-          </div>
-        </section>
-      )}
+        {/* ── Left column: About + Contact + Certifications ─────────────── */}
+        <div className="flex flex-col gap-6">
 
-      {/* ── Employment History ─────────────────────────────────────────────── */}
-      {attachments.length > 0 && (
-        <section className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-3">
-            Employment History
-          </h2>
-          <div className="flex flex-col gap-3">
-            {attachments.map((att) => {
-              const isShared = att.yachts?.id ? sharedYachtIdSet.has(att.yachts.id) : false
-              return (
-              <div key={att.id} className="flex gap-3">
-                <div className={`mt-1 h-2 w-2 shrink-0 rounded-full ${isShared ? 'bg-[var(--color-interactive)] ring-2 ring-[var(--color-interactive)] ring-offset-1 ring-offset-[var(--color-surface)]' : 'bg-[var(--color-interactive)]'}`} />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-[var(--color-text-primary)]">
-                    {att.yachts?.yacht_type === 'Motor Yacht' ? 'MY' : att.yachts?.yacht_type === 'Sailing Yacht' ? 'SY' : ''}{' '}
-                    {att.yachts?.name ?? 'Unknown Yacht'}
-                    {att.role_label && (
-                      <span className="font-normal text-[var(--color-text-secondary)]">
-                        {' — '}{att.role_label}
-                      </span>
-                    )}
-                    {isShared && (
-                      <span className="ml-2 text-xs font-normal text-[var(--color-interactive)]">You worked here</span>
-                    )}
-                  </p>
-                  {(att.started_at || att.ended_at) && (
-                    <p className="text-xs text-[var(--color-text-tertiary)]">
-                      {formatDate(att.started_at)}
-                      {att.started_at && ' — '}
-                      {att.ended_at ? formatDate(att.ended_at) : 'Present'}
-                    </p>
-                  )}
-                  {att.yachts?.flag_state && (
-                    <p className="text-xs text-[var(--color-text-tertiary)]">
-                      {att.yachts.flag_state}
-                      {att.yachts.length_m && ` · ${att.yachts.length_m}m`}
-                    </p>
-                  )}
-                </div>
+          {/* ── About ───────────────────────────────────────────────────── */}
+          {user.bio && (
+            <section className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-2">
+                About
+              </h2>
+              <p className="text-sm text-[var(--color-text-primary)] leading-relaxed whitespace-pre-line">
+                {user.bio}
+              </p>
+            </section>
+          )}
+
+          {/* ── Contact ─────────────────────────────────────────────────── */}
+          {hasVisibleContact && (
+            <section className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-2">
+                Contact
+              </h2>
+              <div className="flex flex-col gap-1.5 text-sm text-[var(--color-text-primary)]">
+                {user.show_email && user.email && (
+                  <p>{user.email}</p>
+                )}
+                {user.show_phone && user.phone && (
+                  <p>{user.phone}</p>
+                )}
+                {user.show_whatsapp && user.whatsapp && (
+                  <p>WhatsApp: {user.whatsapp}</p>
+                )}
+                {user.show_location && (user.location_city || user.location_country) && (
+                  <p>{[user.location_city, user.location_country].filter(Boolean).join(', ')}</p>
+                )}
               </div>
-              )
-            })}
-          </div>
+            </section>
+          )}
+
+          {/* ── Certifications ──────────────────────────────────────────── */}
+          {certifications.length > 0 && (
+            <section className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-3">
+                Certifications
+              </h2>
+              <div className="flex flex-col gap-2">
+                {certifications.map((cert) => {
+                  const name = cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'
+                  const status = certStatus(cert.expires_at)
+                  return (
+                    <div key={cert.id} className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-[var(--color-text-primary)]">
+                          {name}
+                        </p>
+                        {cert.certification_types?.category && (
+                          <p className="text-xs text-[var(--color-text-tertiary)]">
+                            {cert.certification_types.category}
+                          </p>
+                        )}
+                      </div>
+                      {status.label && (
+                        <span className={`shrink-0 text-xs font-medium ${status.color}`}>
+                          {status.label}
+                        </span>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+          )}
+
+        </div>
+
+        {/* ── Right column: Employment History + Endorsements ───────────── */}
+        <div className="flex flex-col gap-6">
+
+          {/* ── Employment History ──────────────────────────────────────── */}
+          {attachments.length > 0 && (
+            <section className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-3">
+                Employment History
+              </h2>
+              <div className="flex flex-col gap-3">
+                {attachments.map((att) => {
+                  const isShared = att.yachts?.id ? sharedYachtIdSet.has(att.yachts.id) : false
+                  return (
+                    <div key={att.id} className="flex gap-3">
+                      <div className={`mt-1 h-2 w-2 shrink-0 rounded-full ${isShared ? 'bg-[var(--color-interactive)] ring-2 ring-[var(--color-interactive)] ring-offset-1 ring-offset-[var(--color-surface)]' : 'bg-[var(--color-interactive)]'}`} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-[var(--color-text-primary)]">
+                          {att.yachts?.yacht_type === 'Motor Yacht' ? 'MY' : att.yachts?.yacht_type === 'Sailing Yacht' ? 'SY' : ''}{' '}
+                          {att.yachts?.name ?? 'Unknown Yacht'}
+                          {att.role_label && (
+                            <span className="font-normal text-[var(--color-text-secondary)]">
+                              {' — '}{att.role_label}
+                            </span>
+                          )}
+                          {isShared && (
+                            <span className="ml-2 text-xs font-normal text-[var(--color-interactive)]">You worked here</span>
+                          )}
+                        </p>
+                        {(att.started_at || att.ended_at) && (
+                          <p className="text-xs text-[var(--color-text-tertiary)]">
+                            {formatDate(att.started_at)}
+                            {att.started_at && ' — '}
+                            {att.ended_at ? formatDate(att.ended_at) : 'Present'}
+                          </p>
+                        )}
+                        {att.yachts?.flag_state && (
+                          <p className="text-xs text-[var(--color-text-tertiary)]">
+                            {att.yachts.flag_state}
+                            {att.yachts.length_m && ` · ${att.yachts.length_m}m`}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* ── Endorsements ────────────────────────────────────────────── */}
+          {endorsements.length > 0 && (
+            <section>
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-3 px-4">
+                Endorsements
+              </h2>
+              <div className="flex flex-col gap-3">
+                {endorsements.map((end) => (
+                  <EndorsementCard
+                    key={end.id}
+                    endorserName={end.endorser?.display_name ?? end.endorser?.full_name ?? 'Anonymous'}
+                    endorserRole={end.endorser_role_label}
+                    endorserPhoto={end.endorser?.profile_photo_url}
+                    yachtName={end.yacht?.name}
+                    date={end.created_at}
+                    content={end.content}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+        </div>
+
+      </div>
+
+      {/* ── CTA for non-logged-in viewers ────────────────────────────────── */}
+      {!isLoggedIn && endorsements.length > 0 && (
+        <section className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-5 text-center">
+          <p className="text-sm text-[var(--color-text-secondary)] mb-3">
+            {displayName} has {endorsements.length} endorsement{endorsements.length !== 1 ? 's' : ''} from colleagues
+            {attachments.length > 0 ? ` across ${attachments.length} yacht${attachments.length !== 1 ? 's' : ''}` : ''}.
+          </p>
+          <a
+            href="/signup"
+            className="inline-flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-2.5 text-sm font-semibold text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
+          >
+            Build your own profile — it&apos;s free
+          </a>
         </section>
       )}
 
-      {/* ── Certifications ────────────────────────────────────────────────── */}
-      {certifications.length > 0 && (
-        <section className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-3">
-            Certifications
-          </h2>
-          <div className="flex flex-col gap-2">
-            {certifications.map((cert) => {
-              const name = cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'
-              const status = certStatus(cert.expires_at)
-              return (
-                <div key={cert.id} className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-[var(--color-text-primary)]">
-                      {name}
-                    </p>
-                    {cert.certification_types?.category && (
-                      <p className="text-xs text-[var(--color-text-tertiary)]">
-                        {cert.certification_types.category}
-                      </p>
-                    )}
-                  </div>
-                  {status.label && (
-                    <span className={`shrink-0 text-xs font-medium ${status.color}`}>
-                      {status.label}
-                    </span>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* ── Endorsements ──────────────────────────────────────────────────── */}
-      {endorsements.length > 0 && (
-        <section>
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-3 px-4">
-            Endorsements
-          </h2>
-          <div className="flex flex-col gap-3">
-            {endorsements.map((end) => (
-              <EndorsementCard
-                key={end.id}
-                endorserName={end.endorser?.display_name ?? end.endorser?.full_name ?? 'Anonymous'}
-                endorserPhoto={end.endorser?.profile_photo_url}
-                yachtName={end.yacht?.name}
-                date={end.created_at}
-                content={end.content}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ── QR Code ───────────────────────────────────────────────────────── */}
+      {/* ── QR Code (full width) ──────────────────────────────────────────── */}
       {showQrCode && (
         <div className="flex justify-start px-4 pb-4">
-          <QRCode
-            value={`https://yachtie.link/u/${user.handle}`}
-            size={80}
-            level="M"
-            bgColor="transparent"
-            fgColor="var(--color-text-tertiary)"
-          />
+          <PublicQRCode handle={user.handle} />
         </div>
       )}
+
+      {/* ── Branding footer ───────────────────────────────────────────────── */}
+      <footer className="text-center pt-4 pb-2">
+        <p className="text-xs text-[var(--color-text-tertiary)]">
+          <a href="/welcome" className="hover:underline">YachtieLink</a> — Professional profiles for yacht crew
+        </p>
+      </footer>
     </div>
   )
 }

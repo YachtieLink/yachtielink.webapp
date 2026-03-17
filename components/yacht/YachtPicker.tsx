@@ -157,7 +157,7 @@ export function YachtPicker({ userId, onSelect }: Props) {
             onClick={() => setMode(m)}
             className={`flex-1 rounded-xl py-2 text-sm font-medium transition-colors ${
               mode === m
-                ? 'bg-[var(--teal-500)] text-white'
+                ? 'bg-[var(--color-interactive)] text-white'
                 : 'bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]'
             }`}
           >
@@ -181,7 +181,7 @@ export function YachtPicker({ userId, onSelect }: Props) {
             <p className="text-xs text-[var(--color-text-secondary)] px-1">
               No results — try a different spelling or{' '}
               <button
-                className="text-[var(--teal-500)] underline"
+                className="text-[var(--color-interactive)] underline"
                 onClick={() => { setMode('create'); setNewName(query) }}
               >
                 add this yacht
@@ -227,7 +227,7 @@ export function YachtPicker({ userId, onSelect }: Props) {
                   onClick={() => setNewType(t)}
                   className={`flex-1 rounded-xl py-2.5 text-sm font-medium transition-colors ${
                     newType === t
-                      ? 'bg-[var(--teal-500)] text-white'
+                      ? 'bg-[var(--color-interactive)] text-white'
                       : 'bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]'
                   }`}
                 >
@@ -273,7 +273,7 @@ export function YachtPicker({ userId, onSelect }: Props) {
             <select
               value={newFlag}
               onChange={(e) => setNewFlag(e.target.value)}
-              className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--teal-500)]"
+              className="w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
             >
               <option value="">Select flag state…</option>
               {FLAG_STATES.map((f) => (
@@ -318,7 +318,7 @@ export function YachtPicker({ userId, onSelect }: Props) {
               {yachtMeta(c) && (
                 <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{yachtMeta(c)}</p>
               )}
-              <p className="text-xs text-[var(--teal-500)] mt-1 font-medium">Use this yacht →</p>
+              <p className="text-xs text-[var(--color-interactive)] mt-1 font-medium">Use this yacht →</p>
             </button>
           ))}
         </div>

@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      const isActive = ['active', 'trialing'].includes(subscription.status);
+      const isActive = ['active', 'trialing', 'past_due', 'unpaid'].includes(subscription.status);
       const interval = subscription.items.data[0]?.price.recurring?.interval;
       const plan = interval === 'year' ? 'annual' : 'monthly';
 
@@ -55,13 +55,17 @@ export async function POST(req: NextRequest) {
           ? new Date(periodEnd * 1000).toISOString()
           : null;
 
-      await supabase.from('users').update({
+      const { error: updateError } = await supabase.from('users').update({
         subscription_status: isActive ? 'pro' : 'free',
         subscription_plan: isActive ? plan : null,
         subscription_ends_at: subscriptionEndsAt,
         show_watermark: !isActive,
         ...(isActive && isFoundingMember ? { founding_member: true } : {}),
       }).eq('id', userId);
+      if (updateError) {
+        console.error('Webhook: failed to update user subscription', updateError);
+        return NextResponse.json({ error: 'DB update failed' }, { status: 500 });
+      }
 
       // Send welcome email + fire analytics event on new subscription
       if (event.type === 'customer.subscription.created' && isActive) {
@@ -92,7 +96,7 @@ export async function POST(req: NextRequest) {
         break;
       }
 
-      await supabase.from('users').update({
+      const { error: deleteError } = await supabase.from('users').update({
         subscription_status: 'free',
         subscription_plan: null,
         subscription_ends_at: null,
@@ -100,6 +104,10 @@ export async function POST(req: NextRequest) {
         custom_subdomain: null,
         template_id: null,
       }).eq('id', userId);
+      if (deleteError) {
+        console.error('Webhook: failed to update user subscription on deletion', deleteError);
+        return NextResponse.json({ error: 'DB update failed' }, { status: 500 });
+      }
 
       trackServerEvent(userId, 'pro.cancelled');
 

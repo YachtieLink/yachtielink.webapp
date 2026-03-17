@@ -960,11 +960,11 @@ function StepDone({
           <li>
             🔗 Your public link:{" "}
             <strong className="text-[var(--color-text-primary)]">
-              yachtielink.com/u/{handle}
+              yachtie.link/u/{handle}
             </strong>
           </li>
           <li>📋 Build your CV in the CV tab</li>
-          <li>⭐ Endorsements appear in the Audience tab</li>
+          <li>⭐ Endorsements appear in the Network tab</li>
         </ul>
       </div>
 

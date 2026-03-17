@@ -1,12 +1,14 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { getUserById, getProfileSections } from '@/lib/queries/profile'
 import { IdentityCard } from '@/components/profile/IdentityCard'
 import { WheelACard, type WheelAMilestones } from '@/components/profile/WheelACard'
 import { AboutSection } from '@/components/profile/AboutSection'
 import { YachtsSection } from '@/components/profile/YachtsSection'
 import { CertsSection } from '@/components/profile/CertsSection'
 import { EndorsementsSection } from '@/components/profile/EndorsementsSection'
+import { ProfileCardList } from '@/components/profile/ProfileCardList'
 
 export default async function ProfilePage() {
   const supabase = await createClient()
@@ -14,52 +16,16 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/welcome')
 
-  // ── Fetch user profile ──────────────────────────────────────────────────────
-  const { data: profile } = await supabase
-    .from('users')
-    .select(`
-      id, full_name, display_name, handle, bio, profile_photo_url,
-      primary_role, departments, onboarding_complete
-    `)
-    .eq('id', user.id)
-    .single()
+  // ── Fetch user profile and profile sections in parallel ──────────────────────
+  const [profile, { attachments, certifications: certs, endorsements }] =
+    await Promise.all([
+      getUserById(user.id),
+      getProfileSections(user.id),
+    ])
 
   if (!profile || !profile.onboarding_complete) {
     redirect('/onboarding')
   }
-
-  // ── Fetch attachments (with yacht data) ─────────────────────────────────────
-  const { data: attachments } = await supabase
-    .from('attachments')
-    .select(`
-      id, role_label, started_at, ended_at,
-      yachts ( id, name, yacht_type, flag_state )
-    `)
-    .eq('user_id', user.id)
-    .is('deleted_at', null)
-    .order('started_at', { ascending: false })
-
-  // ── Fetch certifications ─────────────────────────────────────────────────────
-  const { data: certs } = await supabase
-    .from('certifications')
-    .select(`
-      id, custom_cert_name, issued_at, expires_at, document_url,
-      certification_types ( name, short_name, category )
-    `)
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-
-  // ── Fetch endorsements received ──────────────────────────────────────────────
-  const { data: endorsements } = await supabase
-    .from('endorsements')
-    .select(`
-      id, content, created_at, yacht_id,
-      endorser:endorser_id ( display_name, full_name, handle ),
-      yachts ( name )
-    `)
-    .eq('recipient_id', user.id)
-    .is('deleted_at', null)
-    .order('created_at', { ascending: false })
 
   // ── Compute Wheel A milestones ───────────────────────────────────────────────
   const milestones: WheelAMilestones = {
@@ -82,50 +48,44 @@ export default async function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-4 pb-24">
-      {/* Identity card */}
-      <IdentityCard
-        displayName={profile.display_name ?? profile.full_name}
-        fullName={profile.full_name}
-        handle={profile.handle!}
-        primaryRole={profile.primary_role}
-        departments={profile.departments}
-        photoUrl={profile.profile_photo_url}
-      />
-
-      {/* Progress Wheel A */}
-      <WheelACard milestones={milestones} />
-
-      {/* About */}
-      <AboutSection bio={profile.bio} />
-
-      {/* Yachts */}
-      <YachtsSection attachments={(attachments as any) ?? []} />
-
-      {/* Certifications */}
-      <CertsSection certs={(certs as any) ?? []} />
-
-      {/* Endorsements */}
-      <EndorsementsSection endorsements={(endorsements as any) ?? []} />
+      <ProfileCardList>
+        {[
+          <IdentityCard
+            key="id"
+            displayName={profile.display_name ?? profile.full_name}
+            fullName={profile.full_name}
+            handle={profile.handle!}
+            primaryRole={profile.primary_role}
+            departments={profile.departments}
+            photoUrl={profile.profile_photo_url}
+          />,
+          <WheelACard key="wheel" milestones={milestones} />,
+          <AboutSection key="about" bio={profile.bio} />,
+          <YachtsSection key="yachts" attachments={(attachments as any) ?? []} />,
+          <CertsSection key="certs" certs={(certs as any) ?? []} />,
+          <EndorsementsSection key="end" endorsements={(endorsements as any) ?? []} />,
+        ]}
+      </ProfileCardList>
 
       {/* Floating CTA */}
       {nextStep ? (
         <Link
           href={nextStep.href}
-          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[var(--teal-500)] text-white text-sm font-medium px-6 py-3 rounded-full shadow-lg hover:bg-[var(--teal-600)] transition-colors whitespace-nowrap"
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[var(--color-interactive)] text-white text-sm font-medium px-6 py-3 rounded-full shadow-lg hover:bg-[var(--color-interactive-hover)] transition-colors whitespace-nowrap"
         >
           {nextStep.label} →
         </Link>
       ) : (endorsements?.length ?? 0) < 5 && (attachments?.length ?? 0) > 0 ? (
         <Link
           href="/app/endorsement/request"
-          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[var(--teal-500)] text-white text-sm font-medium px-6 py-3 rounded-full shadow-lg hover:bg-[var(--teal-600)] transition-colors whitespace-nowrap"
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[var(--color-interactive)] text-white text-sm font-medium px-6 py-3 rounded-full shadow-lg hover:bg-[var(--color-interactive-hover)] transition-colors whitespace-nowrap"
         >
           Request endorsements →
         </Link>
       ) : (
         <Link
           href={`/u/${profile.handle}`}
-          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[var(--teal-500)] text-white text-sm font-medium px-6 py-3 rounded-full shadow-lg hover:bg-[var(--teal-600)] transition-colors whitespace-nowrap"
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-[var(--color-interactive)] text-white text-sm font-medium px-6 py-3 rounded-full shadow-lg hover:bg-[var(--color-interactive-hover)] transition-colors whitespace-nowrap"
         >
           Share profile →
         </Link>

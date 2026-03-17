@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
+import { validateBody } from "@/lib/validation/validate";
+import { applyRateLimit } from "@/lib/rate-limit/helpers";
+
+const shareLinkSchema = z.object({
+  yacht_id: z.string().uuid(),
+});
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://yachtie.link";
 
@@ -18,10 +25,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { yacht_id } = (await req.json()) as { yacht_id: string };
-  if (!yacht_id) {
-    return NextResponse.json({ error: "yacht_id is required" }, { status: 400 });
-  }
+  const limited = await applyRateLimit(req, 'endorsementCreate', user.id);
+  if (limited) return limited;
+
+  const result = await validateBody(req, shareLinkSchema);
+  if ('error' in result) return result.error;
+  const { yacht_id } = result.data;
 
   // Check for existing shareable link for this user+yacht
   const { data: existing } = await supabase

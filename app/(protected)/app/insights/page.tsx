@@ -29,17 +29,13 @@ export default async function InsightsPage({ searchParams }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/welcome');
 
-  const [{ data: profile }, proStatus] = await Promise.all([
+  const [{ data: profile }, proStatus, { data: attachments }, { data: certs }] = await Promise.all([
     supabase
       .from('users')
       .select('primary_role, bio, profile_photo_url, subscription_plan, subscription_ends_at, stripe_customer_id')
       .eq('id', user.id)
       .single(),
     getProStatus(user.id),
-  ]);
-
-  // Wheel A completeness
-  const [{ data: attachments }, { data: certs }] = await Promise.all([
     supabase.from('attachments').select('id').eq('user_id', user.id).is('deleted_at', null).limit(1),
     supabase.from('certifications').select('id').eq('user_id', user.id).limit(1),
   ]);
@@ -109,9 +105,9 @@ export default async function InsightsPage({ searchParams }: Props) {
       {upgraded && <InsightsUpgradedToast isPro={proStatus.isPro} />}
 
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-[var(--foreground)]">Insights</h1>
+        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Insights</h1>
         {proStatus.isPro && (
-          <span className="text-xs font-semibold bg-[var(--teal-700)] text-white px-2.5 py-1 rounded-full">
+          <span className="text-xs font-semibold bg-[var(--color-teal-700)] text-white px-2.5 py-1 rounded-full">
             Pro ✓
           </span>
         )}
@@ -126,8 +122,8 @@ export default async function InsightsPage({ searchParams }: Props) {
                 href={`/app/insights?range=${r}`}
                 className={`flex-1 text-center py-2 rounded-xl text-sm font-medium transition-colors ${
                   range === r
-                    ? 'bg-[var(--teal-700)] text-white'
-                    : 'bg-[var(--muted)] text-[var(--foreground)]'
+                    ? 'bg-[var(--color-teal-700)] text-white'
+                    : 'bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]'
                 }`}
               >
                 {r === '7' ? '7 days' : r === '30' ? '30 days' : 'All time'}
@@ -139,30 +135,30 @@ export default async function InsightsPage({ searchParams }: Props) {
           <AnalyticsCard title="PDF Downloads" count={summaryMap['pdf_download'] ?? 0} data={downloadsData} color="#0D9488" />
           <AnalyticsCard title="Link Shares"   count={summaryMap['link_share']   ?? 0} data={sharesData}    color="#14B8A6" />
 
-          <div className="bg-[var(--card)] rounded-2xl p-4">
+          <div className="bg-[var(--color-surface)] rounded-2xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-[var(--foreground)]">Cert Document Manager</p>
+                <p className="text-sm font-semibold text-[var(--color-text-primary)]">Cert Document Manager</p>
                 {expiringCertCount > 0 ? (
                   <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
                     ⚠ {expiringCertCount} cert{expiringCertCount > 1 ? 's' : ''} expiring within 60 days
                   </p>
                 ) : (
-                  <p className="text-xs text-[var(--muted-foreground)] mt-0.5">All certs up to date</p>
+                  <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">All certs up to date</p>
                 )}
               </div>
-              <Link href="/app/certs" className="text-sm font-medium text-[var(--teal-700)] dark:text-[var(--teal-400)]">
+              <Link href="/app/certs" className="text-sm font-medium text-[var(--color-teal-700)] dark:text-[var(--color-teal-400)]">
                 Manage →
               </Link>
             </div>
           </div>
 
-          <div className="bg-[var(--card)] rounded-2xl p-4">
-            <p className="text-sm font-semibold text-[var(--foreground)] mb-0.5">
+          <div className="bg-[var(--color-surface)] rounded-2xl p-4">
+            <p className="text-sm font-semibold text-[var(--color-text-primary)] mb-0.5">
               Crew Pro · {profile?.subscription_plan === 'annual' ? 'Annual' : 'Monthly'}
             </p>
             {proStatus.endsAt && (
-              <p className="text-xs text-[var(--muted-foreground)] mb-3">
+              <p className="text-xs text-[var(--color-text-secondary)] mb-3">
                 Renews {new Date(proStatus.endsAt).toLocaleDateString('en-GB', {
                   day: 'numeric', month: 'short', year: 'numeric',
                 })}
@@ -180,16 +176,16 @@ export default async function InsightsPage({ searchParams }: Props) {
           <TeaserCard title="Cert Document Manager" subtitle="Expiry tracking + email reminders" />
 
           {!profileComplete ? (
-            <div className="bg-[var(--card)] rounded-2xl p-5 text-center">
-              <p className="text-sm font-semibold text-[var(--foreground)] mb-1">
+            <div className="bg-[var(--color-surface)] rounded-2xl p-5 text-center">
+              <p className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">
                 Finish setting up your profile first
               </p>
-              <p className="text-xs text-[var(--muted-foreground)] mb-4">
+              <p className="text-xs text-[var(--color-text-secondary)] mb-4">
                 Complete your profile ({completedCount}/5 steps done) before upgrading — you&apos;ll get more out of Pro analytics with an active profile.
               </p>
               <Link
                 href="/app/profile"
-                className="inline-block px-5 py-2.5 rounded-xl bg-[var(--teal-700)] text-white text-sm font-semibold"
+                className="inline-block px-5 py-2.5 rounded-xl bg-[var(--color-teal-700)] text-white text-sm font-semibold"
               >
                 Complete profile
               </Link>
@@ -205,12 +201,12 @@ export default async function InsightsPage({ searchParams }: Props) {
 
 function TeaserCard({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <div className="bg-[var(--card)] rounded-2xl p-4 flex items-center justify-between opacity-70">
+    <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex items-center justify-between opacity-70">
       <div>
-        <p className="text-sm font-semibold text-[var(--foreground)]">{title}</p>
-        <p className="text-xs text-[var(--muted-foreground)] mt-0.5">{subtitle}</p>
+        <p className="text-sm font-semibold text-[var(--color-text-primary)]">{title}</p>
+        <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{subtitle}</p>
       </div>
-      <span className="text-[var(--muted-foreground)] text-lg ml-3 flex-shrink-0">🔒</span>
+      <span className="text-[var(--color-text-secondary)] text-lg ml-3 flex-shrink-0">🔒</span>
     </div>
   );
 }
@@ -227,10 +223,10 @@ function AnalyticsCard({
   color: string;
 }) {
   return (
-    <div className="bg-[var(--card)] rounded-2xl p-4">
+    <div className="bg-[var(--color-surface)] rounded-2xl p-4">
       <div className="flex items-baseline justify-between mb-3">
-        <p className="text-sm font-semibold text-[var(--foreground)]">{title}</p>
-        <span className="text-2xl font-bold text-[var(--foreground)]">{count}</span>
+        <p className="text-sm font-semibold text-[var(--color-text-primary)]">{title}</p>
+        <span className="text-2xl font-bold text-[var(--color-text-primary)]">{count}</span>
       </div>
       <AnalyticsChart data={data} color={color} />
     </div>

@@ -43,11 +43,11 @@ export default function WelcomePage() {
 
       <p className="text-center text-xs text-[var(--color-text-tertiary)]">
         By continuing you agree to our{" "}
-        <Link href="/legal/terms" className="underline underline-offset-2">
+        <Link href="/terms" className="underline underline-offset-2">
           Terms
         </Link>{" "}
         and{" "}
-        <Link href="/legal/privacy" className="underline underline-offset-2">
+        <Link href="/privacy" className="underline underline-offset-2">
           Privacy Policy
         </Link>
         .

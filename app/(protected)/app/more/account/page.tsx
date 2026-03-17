@@ -148,7 +148,7 @@ export default function AccountPage() {
     return (
       <div className="flex flex-col gap-4">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-14 bg-[var(--muted)] rounded-xl animate-pulse" />
+          <div key={i} className="h-14 bg-[var(--color-surface-raised)] rounded-xl animate-pulse" />
         ))}
       </div>
     )
@@ -163,7 +163,7 @@ export default function AccountPage() {
   }
   const handleHintColor: Record<typeof handleStatus, string> = {
     idle:      '',
-    checking:  'text-[var(--muted-foreground)]',
+    checking:  'text-[var(--color-text-secondary)]',
     available: 'text-green-500',
     taken:     'text-red-500',
     invalid:   'text-red-500',
@@ -172,14 +172,14 @@ export default function AccountPage() {
   return (
     <div className="flex flex-col gap-6 pb-8">
       <div>
-        <h1 className="text-xl font-semibold text-[var(--foreground)]">Account</h1>
-        <p className="text-sm text-[var(--muted-foreground)] mt-1">
+        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Account</h1>
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
           Edit your name, handle, and role.
         </p>
       </div>
 
       {/* ── Identity ────────────────────────────────── */}
-      <div className="bg-[var(--card)] rounded-2xl p-5 flex flex-col gap-4">
+      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
         <Input
           label="Full name"
           value={fullName}
@@ -205,7 +205,7 @@ export default function AccountPage() {
             </p>
           )}
           {handle && (
-            <p className="text-xs text-[var(--muted-foreground)] mt-1">
+            <p className="text-xs text-[var(--color-text-secondary)] mt-1">
               yachtie.link/u/{handle}
             </p>
           )}
@@ -213,8 +213,8 @@ export default function AccountPage() {
       </div>
 
       {/* ── Departments ─────────────────────────────── */}
-      <div className="bg-[var(--card)] rounded-2xl p-5">
-        <p className="text-sm font-medium text-[var(--foreground)] mb-3">Department(s)</p>
+      <div className="bg-[var(--color-surface)] rounded-2xl p-5">
+        <p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">Department(s)</p>
         <div className="flex flex-wrap gap-2">
           {DEPARTMENTS.map((dept) => (
             <button
@@ -222,8 +222,8 @@ export default function AccountPage() {
               onClick={() => toggleDepartment(dept)}
               className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
                 departments.includes(dept)
-                  ? 'bg-[var(--teal-500)] text-white'
-                  : 'bg-[var(--muted)] text-[var(--foreground)] hover:bg-[var(--muted-foreground)]/10'
+                  ? 'bg-[var(--color-interactive)] text-white'
+                  : 'bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] hover:bg-[var(--color-text-secondary)]/10'
               }`}
             >
               {dept}
@@ -234,15 +234,15 @@ export default function AccountPage() {
 
       {/* ── Role ────────────────────────────────────── */}
       {departments.length > 0 && (
-        <div className="bg-[var(--card)] rounded-2xl p-5 flex flex-col gap-3">
-          <p className="text-sm font-medium text-[var(--foreground)]">Primary role</p>
+        <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-3">
+          <p className="text-sm font-medium text-[var(--color-text-primary)]">Primary role</p>
 
           {!useCustomRole ? (
             <>
               <select
                 value={primaryRole}
                 onChange={(e) => setPrimaryRole(e.target.value)}
-                className="w-full bg-[var(--card)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--teal-500)]"
+                className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
               >
                 <option value="">Select role</option>
                 {filteredRoles.map((r) => (
@@ -251,7 +251,7 @@ export default function AccountPage() {
               </select>
               <button
                 onClick={() => { setUseCustomRole(true); setPrimaryRole('') }}
-                className="text-xs text-[var(--teal-500)] hover:underline text-left"
+                className="text-xs text-[var(--color-interactive)] hover:underline text-left"
               >
                 Not listed? Enter custom role
               </button>
@@ -266,7 +266,7 @@ export default function AccountPage() {
               />
               <button
                 onClick={() => { setUseCustomRole(false); setCustomRole('') }}
-                className="text-xs text-[var(--teal-500)] hover:underline text-left"
+                className="text-xs text-[var(--color-interactive)] hover:underline text-left"
               >
                 Choose from list instead
               </button>

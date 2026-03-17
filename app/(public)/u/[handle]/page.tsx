@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: `${name} — ${user.primary_role || 'Yacht Professional'}`,
       description,
-      images: user.profile_photo_url ? [{ url: user.profile_photo_url }] : [],
+      images: [{ url: `/api/og?handle=${handle}`, width: 1200, height: 630 }],
       type: 'profile',
       url: `https://yachtie.link/u/${handle}`,
     },
@@ -54,7 +54,8 @@ export default async function PublicProfilePage({ params }: Props) {
       id, full_name, display_name, handle, primary_role, departments,
       bio, profile_photo_url,
       phone, whatsapp, email, location_country, location_city,
-      show_phone, show_whatsapp, show_email, show_location
+      show_phone, show_whatsapp, show_email, show_location,
+      founding_member, subscription_status
     `)
     .eq('handle', handle.toLowerCase())
     .single()
@@ -211,12 +212,15 @@ export default async function PublicProfilePage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface-raised)]">
-      <div className="mx-auto max-w-[640px] px-4 py-8">
+      <div className="mx-auto max-w-[640px] lg:max-w-4xl px-4 py-8">
         <PublicProfileContent
           user={user as any}
           attachments={(attRes.data as any) ?? []}
           certifications={(certRes.data as any) ?? []}
           endorsements={(endRes.data as any) ?? []}
+          isFoundingMember={user.founding_member === true}
+          isPro={user.subscription_status === 'pro'}
+          isLoggedIn={!!viewer}
           viewerRelationship={viewerRelationship}
         />
       </div>

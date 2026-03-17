@@ -112,7 +112,7 @@ export default function CertEditPage() {
     return (
       <div className="flex flex-col gap-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-14 bg-[var(--muted)] rounded-xl animate-pulse" />
+          <div key={i} className="h-14 bg-[var(--color-surface-raised)] rounded-xl animate-pulse" />
         ))}
       </div>
     )
@@ -121,11 +121,11 @@ export default function CertEditPage() {
   return (
     <div className="flex flex-col gap-6 pb-8">
       <div>
-        <h1 className="text-xl font-semibold text-[var(--foreground)]">Edit certification</h1>
-        <p className="text-sm text-[var(--muted-foreground)] mt-1">{certName}</p>
+        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Edit certification</h1>
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1">{certName}</p>
       </div>
 
-      <div className="bg-[var(--card)] rounded-2xl p-5 flex flex-col gap-4">
+      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
         {isCustom && (
           <Input
             label="Certification name"
@@ -156,24 +156,24 @@ export default function CertEditPage() {
               type="checkbox"
               checked={noExpiry}
               onChange={(e) => { setNoExpiry(e.target.checked); if (e.target.checked) setExpiresAt('') }}
-              className="rounded border-[var(--border)] text-[var(--teal-500)]"
+              className="rounded border-[var(--color-border)] text-[var(--color-interactive)]"
             />
-            <span className="text-sm text-[var(--muted-foreground)]">No expiry / lifetime certification</span>
+            <span className="text-sm text-[var(--color-text-secondary)]">No expiry / lifetime certification</span>
           </label>
         </div>
 
         <div>
-          <label className="text-sm font-medium text-[var(--foreground)]">Supporting document</label>
-          <p className="text-xs text-[var(--muted-foreground)] mb-2">
+          <label className="text-sm font-medium text-[var(--color-text-primary)]">Supporting document</label>
+          <p className="text-xs text-[var(--color-text-secondary)] mb-2">
             {existingDoc ? 'A document is already attached. Upload a new one to replace it.' : 'PDF, JPEG, or PNG · max 10 MB · private'}
           </p>
           <input
             type="file"
             accept=".pdf,image/jpeg,image/png"
             onChange={(e) => setDocFile(e.target.files?.[0] ?? null)}
-            className="text-sm text-[var(--foreground)]"
+            className="text-sm text-[var(--color-text-primary)]"
           />
-          {docFile && <p className="text-xs text-[var(--teal-500)] mt-1">{docFile.name}</p>}
+          {docFile && <p className="text-xs text-[var(--color-interactive)] mt-1">{docFile.name}</p>}
         </div>
       </div>
 
