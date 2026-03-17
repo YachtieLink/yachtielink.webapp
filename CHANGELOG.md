@@ -17,6 +17,134 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-17 — Claude Code (Sonnet 4.6) — Redis swap + launch env setup
+
+### Done
+- Switched rate limiter from `@vercel/kv` → `ioredis` using `REDIS_URL`
+  - Vercel Storage created a Redis Labs database (not Vercel KV) — `@vercel/kv` needs REST API, `ioredis` uses Redis protocol directly
+  - Removed `@vercel/kv`, installed `ioredis`; `REDIS_URL` auto-injected into all envs by Vercel
+  - Singleton client, fail-open when `REDIS_URL` absent, try/catch for runtime failures
+- `npm audit fix` → 0 vulnerabilities
+- Restored `DEV_TEST_EMAIL` / `DEV_TEST_PASSWORD` to `.env.local` after `vercel env pull` wiped them
+- Vercel KV (Redis Labs) connected to project — `REDIS_URL` live in all environments
+
+### Context
+- `vercel env pull` overwrites `.env.local` entirely — local-only vars (dev credentials etc.) get wiped. Re-add after every pull.
+- Redis endpoint: `redis-10245.crce218.eu-central-1-1.ec2.cloud.redislabs.com:10245` (EU Central, free 30 MB tier)
+
+### Next
+- PostHog setup (step 2), Sentry (step 3), SIGNUP_MODE + remaining env vars (step 4), manual QA (step 5), legal review (step 6), merge to main (step 7)
+
+### Flags
+- None
+
+---
+
+## 2026-03-17 — Claude Code (Opus 4.6 + Sonnet subagents) — Phase 1A Cleanup: Polish, Performance & Growth
+
+### Done
+
+**Spec 01 — Critical Bugs (Wave 1)**
+- Fixed legal page links: `/legal/terms` → `/terms`, `/legal/privacy` → `/privacy` in welcome page
+- Fixed theme storage key: `localStorage.getItem('theme')` → `'yl-theme'` across more/settings
+- Replaced all stale CSS vars (`--teal-500`, `--card`, `--muted-foreground`, etc.) → design system tokens across 18+ files
+- Fixed Wizard.tsx: `yachtielink.com` → `yachtie.link`, `Audience tab` → `Network tab`
+- Fixed DeepLinkFlow: literal "checkmark" text → `✓` icon
+- Fixed CookieBanner positioning: now clears tab bar with `bottom-[calc(var(--tab-bar-height)+safe-area)]`
+- Fixed Stripe webhook: captures `.update()` errors and returns 500 on failure (was always 200)
+
+**Spec 02 — Performance Queries (Wave 2)**
+- Created `lib/queries/profile.ts` with `getUserById` and `getUserByHandle` using `React.cache()` for dedup between `generateMetadata` + page
+- Profile page: replaced 7 sequential queries with `Promise.all([getUserById, getProfileSections])`
+- Public profile: cached `getUserByHandle` between metadata + page, parallel section fetches
+- Insights page: merged two sequential `Promise.all` calls into one 4-way
+
+**Spec 03 — Loading Architecture (Wave 2)**
+- Loading skeletons already existed for profile, cv, insights, network, more routes
+
+**Spec 04 — Middleware Auth (Wave 1)**
+- No changes needed — `proxy.ts` already handles session refresh correctly for Next.js 16
+
+**Spec 05 — PWA (Wave 4)**
+- Created `public/manifest.webmanifest` with app name, theme color, icons
+- Created placeholder PWA icons: `icon-192.png`, `icon-512.png`, `apple-touch-icon.png`
+- Added manifest, apple icons, appleWebApp, viewportFit: "cover" to root layout
+- Deleted unused Next.js boilerplate SVGs (file.svg, globe.svg, next.svg, vercel.svg, window.svg)
+
+**Spec 06 — Responsive Layout (Wave 3)**
+- Created `components/nav/icons.tsx` — shared icon SVGs extracted from BottomTabBar
+- Created `components/nav/SidebarNav.tsx` — desktop sidebar (`hidden md:flex`, fixed left, 64px, 5 tabs + YL logo)
+- BottomTabBar: icons imported from shared file, added `md:hidden` for mobile-only
+- App layout: added `<SidebarNav />`, main gets `md:pb-0 md:pl-16`, children wrapped in `max-w-2xl`
+- Public profile: container widened `max-w-[640px] lg:max-w-4xl`, two-column grid at `lg:` breakpoint
+
+**Spec 07 — Animation System (Wave 3)**
+- Added `framer-motion` dependency
+- Created `components/ui/AnimatedCard.tsx` — reusable stagger-in wrapper with `motion.div`
+- Created `components/profile/ProfileCardList.tsx` — client wrapper mapping children through AnimatedCard
+- Profile page cards wrapped in `<ProfileCardList>`
+- BottomSheet: rewrote with AnimatePresence + spring slide-up animation
+- IdentityCard: QR panel with AnimatePresence height animation
+- Toast: spring entrance/exit animations
+- Button: added `active:scale-[0.98] transition-transform` touch feedback
+
+**Spec 08 — Public Profile Enhancements (Wave 4)**
+- Created `app/api/og/route.tsx` — dynamic OG image generation (edge runtime, teal gradient, photo + name + role)
+- OG images now use `/api/og?handle=` instead of raw profile photo URLs
+- EndorsementCard: added `endorserRole` prop showing role below name
+- Public profile: added signup CTA section for non-logged-in viewers with endorsement stats
+- Public profile: added branding footer linking to /welcome
+- `isLoggedIn` prop threaded through from page to component
+
+**Spec 09 — Bundle Optimization (Wave 1)**
+- Removed `Geist_Mono` font import from root layout
+- Replaced `var(--font-geist-mono)` with system monospace stack in globals.css
+- PostHogProvider: lazy-loads `posthog-js` via dynamic import, only on `/app/*` paths
+
+**Spec 10 — Growth Features (Wave 4)**
+- Created `lib/queries/notifications.ts` with `getPendingRequestCount` (React.cache)
+- BottomTabBar: added `networkBadge` prop with red dot indicator on Network tab
+- App layout: fetches pending endorsement request count and passes to BottomTabBar
+- Public profile: added founding member badge (amber), available-for-work status (green pulse), sea time stats
+- `founding_member` and `subscription_status` fields now fetched in public profile query
+
+**Spec 11 — Code Quality (Wave 2)**
+- Added `sanitizeHtml()` on user-supplied values in email template API routes
+- Deleted dead `lib/cors.ts`
+- Route-level error boundary (`app/(protected)/app/error.tsx`) with Sentry capture
+- CV API routes: replaced inline Supabase client with `createServiceClient()`
+- Share-link route: added Zod validation for `yacht_id`
+- CV download route: added rate limiting
+- API routes wired up `handleApiError()` in catch blocks
+
+**Cross-cutting**
+- Comprehensive CSS var migration: all remaining `--foreground`, `--muted`, `--card`, `--destructive`, `--primary`, `--background`, `--border` replaced with design system tokens across entire codebase (18+ additional files beyond Spec 01)
+
+### Context
+- Sprint executed overnight via Opus orchestrator + 12 Sonnet subagents in 4 dependency waves using git worktrees for isolation
+- Wave 1: Specs 01, 04, 09 (no dependencies)
+- Wave 2: Specs 02, 03, 11 (depend on Wave 1 file fixes)
+- Wave 3: Specs 06, 07 (UI components, depend on CSS var fixes)
+- Wave 4: Specs 05, 08, 10 (depend on layout/profile changes)
+- Each wave's worktree branched from `3e82f1a` (merge commit on main), requiring CSS var re-application after each merge
+- Key overlaps resolved: IdentityCard.tsx (3 specs), BottomTabBar.tsx (2 specs), PublicProfileContent.tsx (2 specs), app layout (2 specs)
+- `tsc --noEmit` passes clean after all merges
+
+### Next
+- Founder: review all changes before committing (nothing committed per request)
+- Run `npm run build` for full production build verification
+- Visual QA of key flows: profile page animations, sidebar nav on desktop, public profile enhancements, PWA install
+- Replace placeholder PWA icons with real YachtieLink logo assets
+- Test OG image generation at `/api/og?handle=dev-qa`
+- Verify framer-motion animations feel right on mobile (spring physics tuning)
+
+### Flags
+- PWA icons are teal placeholders — need real brand assets before launch
+- `lib/cors.ts` deleted — was dead code, not imported anywhere
+- Spec 04 (middleware auth) was a no-op: `proxy.ts` already handles everything the spec described
+
+---
+
 ## 2026-03-16 — Claude Code (Sonnet 4.6) — Post-Sprint 8: QA pass + dev account
 
 ### Done
