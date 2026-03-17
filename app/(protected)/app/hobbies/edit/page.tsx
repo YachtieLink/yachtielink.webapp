@@ -21,10 +21,9 @@ export default function HobbiesEditPage() {
   useEffect(() => {
     fetch('/api/user-hobbies')
       .then((r) => r.json())
-      .then((d) => {
-        setHobbies(d.hobbies ?? [])
-        setLoading(false)
-      })
+      .then((d) => { setHobbies(d.hobbies ?? []) })
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }, [])
 
   function addHobby() {
@@ -42,11 +41,16 @@ export default function HobbiesEditPage() {
   async function save() {
     setSaving(true)
     try {
-      await fetch('/api/user-hobbies', {
+      const res = await fetch('/api/user-hobbies', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hobbies: hobbies.map(({ name, emoji }) => ({ name, emoji: emoji || undefined })) }),
       })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+        alert(d.error ?? 'Save failed. Please try again.')
+        return
+      }
       router.push('/app/profile')
     } finally {
       setSaving(false)

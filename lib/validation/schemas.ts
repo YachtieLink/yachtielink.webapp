@@ -137,7 +137,10 @@ export const userEducationSchema = z.object({
   field_of_study: z.string().max(200).trim().optional(),
   started_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
   ended_at: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional().nullable(),
-});
+}).refine(
+  (d) => !d.started_at || !d.ended_at || d.ended_at >= d.started_at,
+  { message: 'End date must be on or after start date', path: ['ended_at'] }
+);
 
 // --- Skills ---
 

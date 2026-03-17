@@ -19,10 +19,16 @@ const PLATFORM_CONFIG: Record<SocialPlatform, { label: string; icon: string; hov
 
 interface SocialLinksRowProps {
   links: SocialLink[]
+  /** light = white icons for use over dark/photo backgrounds */
+  variant?: 'default' | 'light'
 }
 
-export function SocialLinksRow({ links }: SocialLinksRowProps) {
+export function SocialLinksRow({ links, variant = 'default' }: SocialLinksRowProps) {
   if (!links || links.length === 0) return null
+
+  const baseColor = variant === 'light'
+    ? 'text-white/70'
+    : 'text-[var(--color-text-secondary)]'
 
   return (
     <div className="flex items-center gap-3 flex-wrap">
@@ -36,7 +42,7 @@ export function SocialLinksRow({ links }: SocialLinksRowProps) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={config.label}
-            className={`text-[var(--color-text-secondary)] transition-colors ${config.hoverColor} text-lg leading-none`}
+            className={`${baseColor} transition-colors ${config.hoverColor} text-lg leading-none`}
             title={config.label}
           >
             {config.icon}

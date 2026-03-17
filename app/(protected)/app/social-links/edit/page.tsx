@@ -49,11 +49,16 @@ export default function SocialLinksEditPage() {
         .filter((p) => links[p.key]?.trim())
         .map((p) => ({ platform: p.key, url: links[p.key]!.trim() }))
 
-      await fetch('/api/profile/social-links', {
+      const res = await fetch('/api/profile/social-links', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ links: linksArray }),
       })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+        alert(d.error ?? 'Save failed. Please try again.')
+        return
+      }
       router.push('/app/profile')
     } finally {
       setSaving(false)

@@ -1,6 +1,6 @@
 /**
- * PublicProfileContent — Phase 1A Profile Robustness redesign
- * Bumble-style hero photo + accordion sections.
+ * PublicProfileContent — Bumble-style hero photo with identity overlaid,
+ * then scrollable accordion sections below.
  */
 import Image from 'next/image'
 import Link from 'next/link'
@@ -90,7 +90,6 @@ function certStatus(expiryDate: string | null | undefined): { label: string; col
 }
 
 function sectionVisible(visibility: Record<string, boolean>, key: string, hasData: boolean): boolean {
-  // Show if explicitly enabled OR (data exists AND not explicitly disabled)
   return visibility[key] !== false && hasData
 }
 
@@ -122,37 +121,48 @@ export function PublicProfileContent({
 
   const profileUrl = `https://yachtie.link/u/${user.handle}`
   const expiringCount = countExpiringCerts(certifications)
+  const mutualColleagueIds = new Set((viewerRelationship?.mutualColleagues ?? []).map((c) => c.id))
+  const mutualEndorserCount = endorsements.filter(
+    (e: any) => e.endorser?.id && mutualColleagueIds.has(e.endorser.id)
+  ).length
 
-  // Mutual endorser count (endorsers on shared yachts)
-  const mutualEndorserCount = endorsements.filter((e: any) => {
-    // endorser is on a shared yacht if we have a sharedYacht link
-    return sharedYachtIdSet.size > 0
-  }).length
+  const location = [user.location_city, user.location_country].filter(Boolean).join(', ')
 
   return (
+    // ── Outer: stacked on mobile, side-by-side on desktop ────────────────────
     <div className="flex flex-col md:flex-row md:min-h-screen">
 
-      {/* ── PHOTO SECTION (left on desktop, full-width on mobile) ─────────── */}
-      <div className="md:w-2/5 md:sticky md:top-0 md:h-screen md:overflow-hidden shrink-0">
-        <PhotoGallery
-          photos={profilePhotos}
-          profilePhotoUrl={user.profile_photo_url}
-          displayName={displayName}
-        />
-      </div>
+      {/* ── LEFT / TOP: Hero photo panel with identity overlaid ────────────── */}
+      <div className="relative md:w-2/5 md:sticky md:top-0 md:h-screen shrink-0 overflow-hidden">
 
-      {/* ── CONTENT SECTION (right on desktop, below photo on mobile) ──────── */}
-      <div className="flex-1 md:overflow-y-auto">
-        {/* Top bar */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
-          <Link href="/" className="text-sm text-[var(--color-interactive)] hover:underline">
+        {/* Photo fills this panel */}
+        <div className="relative h-[34vh] md:h-full w-full">
+          <PhotoGallery
+            photos={profilePhotos}
+            profilePhotoUrl={user.profile_photo_url}
+            displayName={displayName}
+            fillContainer
+          />
+        </div>
+
+        {/* Strong gradient — dark at top (for buttons) and bottom (for identity) */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Top fade for nav readability */}
+          <div className="h-28 bg-gradient-to-b from-black/50 to-transparent" />
+          {/* Bottom fade for identity readability */}
+          <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+        </div>
+
+        {/* Top bar — absolutely positioned over photo */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-safe-top pt-4 z-10">
+          <Link href="/" className="text-white/90 text-sm font-medium drop-shadow-sm">
             ← YachtieLink
           </Link>
           <div className="flex items-center gap-2">
             {isOwnProfile ? (
               <Link
                 href="/app/profile"
-                className="text-xs px-3 py-1.5 rounded-lg bg-[var(--color-interactive)] text-white hover:bg-[var(--color-interactive-hover)] transition-colors font-medium"
+                className="text-xs px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white font-medium hover:bg-white/30 transition-colors"
               >
                 Edit profile
               </Link>
@@ -167,58 +177,91 @@ export function PublicProfileContent({
           </div>
         </div>
 
-        {/* Identity block */}
-        <div className="px-4 py-3 flex flex-col gap-2">
-          <div>
-            <h1 className="font-semibold text-xl text-[var(--color-text-primary)]">{displayName}</h1>
-            {user.primary_role && (
-              <p className="text-sm text-[var(--color-text-secondary)]">{user.primary_role}</p>
-            )}
-            {user.departments && user.departments.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-1">
-                {user.departments.map((dept) => (
-                  <span key={dept} className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]">
-                    {dept}
-                  </span>
-                ))}
-              </div>
+        {/* Identity — overlaid at bottom of photo */}
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 z-10 flex flex-col gap-2">
+          {/* Name + availability */}
+          <div className="flex items-end justify-between gap-2">
+            <div>
+              <h1 className="text-white text-2xl font-bold leading-tight drop-shadow-md">{displayName}</h1>
+              {user.primary_role && (
+                <p className="text-white/80 text-sm font-medium">{user.primary_role}</p>
+              )}
+            </div>
+            {user.available_for_work && (
+              <span className="shrink-0 flex items-center gap-1 bg-green-500/20 backdrop-blur-sm border border-green-400/40 rounded-full px-2.5 py-1 text-xs font-semibold text-green-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+                Available
+              </span>
             )}
           </div>
 
-          {user.show_location && (user.location_city || user.location_country) && (
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              📍 {[user.location_city, user.location_country].filter(Boolean).join(', ')}
-            </p>
+          {/* Departments */}
+          {user.departments && user.departments.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {user.departments.map((dept) => (
+                <span key={dept} className="text-xs px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-sm text-white/90">
+                  {dept}
+                </span>
+              ))}
+            </div>
           )}
 
-          {/* Social links */}
+          {/* Location */}
+          {user.show_location && location && (
+            <p className="text-white/70 text-sm">📍 {location}</p>
+          )}
+
+          {/* Social links row (white variant on dark bg) */}
           {user.social_links && user.social_links.length > 0 && (
-            <SocialLinksRow links={user.social_links as any} />
+            <SocialLinksRow links={user.social_links as any} variant="light" />
           )}
 
           {/* Badges */}
           <div className="flex flex-wrap gap-2">
             {isFoundingMember && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 dark:bg-amber-900/20 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-400">
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 backdrop-blur-sm border border-amber-400/30 px-2.5 py-0.5 text-xs font-semibold text-amber-300">
                 ⚓ Founding Member
               </span>
             )}
             {isColleague && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-interactive)] px-2.5 py-0.5 text-xs font-medium text-[var(--color-interactive)]">
-                🤝 Colleague
-                {sharedYachtIdSet.size > 1 && ` · ${sharedYachtIdSet.size} yachts`}
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-400/20 backdrop-blur-sm border border-teal-400/30 px-2.5 py-0.5 text-xs font-medium text-teal-300">
+                🤝 Colleague{sharedYachtIdSet.size > 1 ? ` · ${sharedYachtIdSet.size} yachts` : ''}
               </span>
             )}
             {showMutual && firstMutual && (
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] px-2.5 py-0.5 text-xs font-medium text-[var(--color-text-secondary)]">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 px-2.5 py-0.5 text-xs font-medium text-white/70">
                 2nd connection · via {firstMutual.name}
               </span>
             )}
           </div>
         </div>
+      </div>
 
-        {/* Accordion sections */}
-        <div className="flex flex-col gap-2 px-4 pb-24">
+      {/* ── RIGHT / BOTTOM: Scrollable content ────────────────────────────── */}
+      <div className="flex-1 md:overflow-y-auto">
+        <div className="flex flex-col gap-2 px-4 pt-4 pb-24">
+
+          {/* Contact info — only shown when user has opted in */}
+          {(
+            (user.show_email && user.email) ||
+            (user.show_phone && user.phone) ||
+            (user.show_whatsapp && user.whatsapp)
+          ) && (
+            <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-1.5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-1">Contact</p>
+              {user.show_email && user.email && (
+                <a href={`mailto:${user.email}`} className="text-sm text-[var(--color-interactive)] hover:underline">{user.email}</a>
+              )}
+              {user.show_phone && user.phone && (
+                <a href={`tel:${user.phone}`} className="text-sm text-[var(--color-text-primary)]">{user.phone}</a>
+              )}
+              {user.show_whatsapp && user.whatsapp && (
+                <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--color-interactive)] hover:underline">
+                  WhatsApp: {user.whatsapp}
+                </a>
+              )}
+            </div>
+          )}
 
           {/* About */}
           {sectionVisible(sectionVisibility, 'about', !!(user.ai_summary || user.bio)) && (
@@ -243,7 +286,7 @@ export function PublicProfileContent({
                   const isShared = att.yachts?.id ? sharedYachtIdSet.has(att.yachts.id) : false
                   return (
                     <div key={att.id} className="flex gap-3">
-                      <div className={`mt-1 h-2 w-2 shrink-0 rounded-full ${isShared ? 'bg-[var(--color-interactive)] ring-2 ring-[var(--color-interactive)]/30' : 'bg-[var(--color-interactive)]'}`} />
+                      <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--color-interactive)]" />
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-medium text-[var(--color-text-primary)]">
                           {att.yachts?.name ?? 'Unknown Yacht'}
@@ -363,7 +406,6 @@ export function PublicProfileContent({
               title="Extra Skills"
               summary={skillsSummary(skills)}
             >
-              {/* Group by category */}
               {(() => {
                 const grouped = skills.reduce((acc, s) => {
                   const cat = s.category ?? 'other'
@@ -413,23 +455,39 @@ export function PublicProfileContent({
           )}
         </div>
 
-        {/* Bottom CTA */}
-        {!isLoggedIn && (
-          <div className="px-4 pb-8 flex flex-col gap-3">
+        {/* Bottom CTAs */}
+        <div className="px-4 pb-8 flex flex-col gap-3">
+          {!isLoggedIn ? (
+            <>
+              <Link
+                href="/signup"
+                className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
+              >
+                Build your crew profile — it&apos;s free
+              </Link>
+              <Link
+                href="/login"
+                className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+              >
+                Sign in to see how you know {displayName}
+              </Link>
+            </>
+          ) : isOwnProfile ? (
             <Link
-              href="/signup"
-              className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
-            >
-              Build your crew profile — it&apos;s free
-            </Link>
-            <Link
-              href="/login"
+              href="/app/profile"
               className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
             >
-              Sign in to see how you know {displayName}
+              ← Back to my profile
             </Link>
-          </div>
-        )}
+          ) : (
+            <Link
+              href="/app/profile"
+              className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+            >
+              ← Back to dashboard
+            </Link>
+          )}
+        </div>
 
         <footer className="text-center pb-6">
           <p className="text-xs text-[var(--color-text-secondary)]">

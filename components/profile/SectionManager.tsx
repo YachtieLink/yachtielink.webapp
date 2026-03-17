@@ -26,15 +26,23 @@ export function SectionManager({ visibility: initialVisibility, sections }: Sect
 
   async function toggle(section: SectionKey) {
     const newValue = !visibility[section]
-    setVisibility((prev) => ({ ...prev, [section]: newValue }))
+    setVisibility((prev) => ({ ...prev, [section]: newValue })) // optimistic
 
     startTransition(async () => {
-      await fetch('/api/profile/section-visibility', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ section, visible: newValue }),
-      })
-      router.refresh()
+      try {
+        const res = await fetch('/api/profile/section-visibility', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ section, visible: newValue }),
+        })
+        if (!res.ok) {
+          setVisibility((prev) => ({ ...prev, [section]: !newValue })) // roll back
+        } else {
+          router.refresh()
+        }
+      } catch {
+        setVisibility((prev) => ({ ...prev, [section]: !newValue })) // roll back
+      }
     })
   }
 

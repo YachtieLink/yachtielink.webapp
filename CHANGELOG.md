@@ -17,6 +17,41 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-18 — Claude Code (Sonnet 4.6) — Phase 1A post-implementation fixes + audit
+
+### Done
+- **Fixed mutual endorser count bug** in `PublicProfileContent.tsx` — was returning all endorsements when any shared yacht existed; now correctly counts only endorsers whose user ID is in the mutual colleague set
+- **Added error handling to SavedTab** (`AudienceTabs.tsx`) — `Promise.all` fetch now has `.catch()/.finally()` so the tab shows empty state instead of hanging on network failure
+- **Added date validation to education schema** (`lib/validation/schemas.ts`) — `.refine()` ensures `ended_at >= started_at` when both present
+- **Fixed DELETE /api/user-education/[id]** — now returns 404 for non-existent/unowned records instead of silently succeeding
+- **AI summary regeneration** (`/api/profile/ai-summary`) — POST now accepts `force: true` body param to regenerate even after a manual edit; default behaviour (no force) still guards against accidental overwrites
+- **Hardened hobbies bulk-replace** (`/api/user-hobbies`) — snapshots existing rows before delete; restores them if insert fails, preventing data loss
+- **Hardened skills bulk-replace** (`/api/user-skills`) — same rollback pattern as hobbies
+- **Fixed all client-side fetch error handling** (6 files) — second audit pass found every fetch() in Phase 1A client components was missing error handling. Fixed:
+  - `SaveProfileButton.tsx` — optimistic toggle + rollback on non-ok response or network error
+  - `SectionManager.tsx` — optimistic visibility toggle + rollback on failure
+  - `profile/photos/page.tsx` — initial fetch has `.finally(() => setLoading(false))`; delete checks `res.ok` before removing from state
+  - `profile/gallery/page.tsx` — same pattern as photos
+  - `hobbies/edit/page.tsx` — fetch has `.finally()`; save checks `res.ok` and alerts on failure before navigating
+  - `skills/edit/page.tsx` — same pattern as hobbies
+  - `social-links/edit/page.tsx` — save checks `res.ok` and alerts on failure
+
+### Context
+- Two parallel audit agents ran against all Phase 1A additions — API routes audit + TS/component audit
+- The TypeScript `tsc --noEmit` error was a stale `.next/types/routes.d 2.ts` cache artifact — not a real issue
+- Remaining medium issues (gallery sort_order gaps on deletion, `social_links as any` cast, `user as any` at page/component boundary, `role="checkbox"` on button) are non-breaking and acceptable for current sprint
+- Free plan photo limit is still enforced only at API level (server-side), not in client UI — by design for now
+
+### Next
+- Build `/app/education/[id]/edit` page (edit existing education entries)
+- Animation pass — all new components should use `lib/motion.ts` presets
+- Salty empty state illustrations for new sections (photos, education, hobbies, skills, saved)
+- QA dark mode on all new components
+- Mobile responsiveness check at 375px / 768px / 1280px
+
+### Flags
+- None critical
+
 ## 2026-03-18 — Claude Code (Opus 4.6) — Phase 1A Profile Robustness implementation
 
 ### Done

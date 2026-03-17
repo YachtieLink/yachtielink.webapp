@@ -33,18 +33,27 @@ export async function PUT(req: NextRequest) {
     if ('error' in result) return result.error
     const { hobbies } = result.data
 
-    // Delete existing and re-insert in one go
-    await supabase.from('user_hobbies').delete().eq('user_id', user.id)
+    // Snapshot existing for rollback, then delete and re-insert
+    const { data: existing } = await supabase
+      .from('user_hobbies').select('name, emoji, sort_order').eq('user_id', user.id)
+
+    const { error: deleteError } = await supabase
+      .from('user_hobbies').delete().eq('user_id', user.id)
+    if (deleteError) throw deleteError
 
     if (hobbies.length > 0) {
       const rows = hobbies.map((h, idx) => ({
-        user_id: user.id,
-        name: h.name,
-        emoji: h.emoji ?? null,
-        sort_order: idx,
+        user_id: user.id, name: h.name, emoji: h.emoji ?? null, sort_order: idx,
       }))
-      const { error } = await supabase.from('user_hobbies').insert(rows)
-      if (error) throw error
+      const { error: insertError } = await supabase.from('user_hobbies').insert(rows)
+      if (insertError) {
+        if (existing?.length) {
+          await supabase.from('user_hobbies').insert(
+            existing.map((r) => ({ ...r, user_id: user.id }))
+          )
+        }
+        throw insertError
+      }
     }
 
     return NextResponse.json({ ok: true })

@@ -16,9 +16,11 @@ interface PhotoGalleryProps {
   displayName: string
   /** If true, show "+ Add photos" button over the last slot */
   editable?: boolean
+  /** If true, fill parent container height instead of self-sizing */
+  fillContainer?: boolean
 }
 
-export function PhotoGallery({ photos, profilePhotoUrl, displayName, editable }: PhotoGalleryProps) {
+export function PhotoGallery({ photos, profilePhotoUrl, displayName, editable, fillContainer }: PhotoGalleryProps) {
   const [current, setCurrent] = useState(0)
   const touchStartX = useRef<number | null>(null)
 
@@ -29,7 +31,7 @@ export function PhotoGallery({ photos, profilePhotoUrl, displayName, editable }:
 
   if (allPhotos.length === 0) {
     return (
-      <div className="relative w-full aspect-[3/4] md:h-full bg-[var(--color-surface-raised)] flex items-center justify-center">
+      <div className={`relative w-full bg-[var(--color-surface-raised)] flex items-center justify-center ${fillContainer ? 'h-full' : 'aspect-[3/4]'}`}>
         <div className="flex flex-col items-center gap-2 text-[var(--color-text-secondary)]">
           <span className="text-5xl">👤</span>
           {editable && (
@@ -59,8 +61,8 @@ export function PhotoGallery({ photos, profilePhotoUrl, displayName, editable }:
 
   return (
     <div
-      className="relative w-full"
-      style={{ height: 'clamp(320px, 65vh, 600px)' }}
+      className={`relative w-full ${fillContainer ? 'h-full' : ''}`}
+      style={fillContainer ? undefined : { height: 'clamp(320px, 65vh, 600px)' }}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >

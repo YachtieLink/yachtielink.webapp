@@ -22,7 +22,9 @@ export default function ProfilePhotosPage() {
   useEffect(() => {
     fetch('/api/user-photos')
       .then((r) => r.json())
-      .then((d) => { setPhotos(d.photos ?? []); setLoading(false) })
+      .then((d) => { setPhotos(d.photos ?? []) })
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }, [])
 
   async function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -64,8 +66,8 @@ export default function ProfilePhotosPage() {
 
   async function deletePhoto(photo: Photo) {
     if (!confirm('Delete this photo?')) return
-    await fetch(`/api/user-photos/${photo.id}`, { method: 'DELETE' })
-    setPhotos((prev) => prev.filter((p) => p.id !== photo.id))
+    const res = await fetch(`/api/user-photos/${photo.id}`, { method: 'DELETE' })
+    if (res.ok) setPhotos((prev) => prev.filter((p) => p.id !== photo.id))
   }
 
   if (loading) return <div className="p-4 text-[var(--color-text-secondary)]">Loading…</div>
