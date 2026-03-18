@@ -7,4 +7,5 @@ Read `AGENTS.md` first. That file contains all primary instructions, workflow, b
 ## Claude-Specific
 
 - Use subagents for codebase-wide exploration — return summaries to main context rather than reading every file inline.
-- Promote anything from `notes/` that becomes a real decision into the appropriate `docs/` file and log it in `CHANGELOG.md`.
+- `notes/` is for ideation and strategy. Sprint work lives in `sprints/`. If something in `notes/` becomes a real decision, promote it into the appropriate `docs/` file and log it in `CHANGELOG.md`.
+- When creating or closing a junior sprint, update both the sprint's own README and the parent index (`sprints/junior/README.md`).
