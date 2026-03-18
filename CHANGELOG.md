@@ -17,6 +17,98 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-18 — Cowork (Opus 4.6) — Project structure overhaul: sprints, rallies, disciplines, design system
+
+### Done
+
+**Sprint & Rally Structure**
+- Created top-level `sprints/` folder with `major/`, `junior/`, `rallies/` hierarchy
+- Migrated all sprint build plans (5–10), founder notes, phase docs from `notes/` into `sprints/major/`
+- Migrated rally-001 files (7 reports + final proposal) into `sprints/rallies/rally-001-full-audit/`
+- Migrated `specs/` folder into rally-001 (originated from the rally)
+- Created `sprints/major/archive/` with README for completed sprints 5–9
+- Created junior sprint folders: `debug/`, `feature/`, `ui-ux/` each with README + templates
+- Created `rallies/README.md` with three rally types (PR, System, Full Audit) and the two-pass pattern
+- Created master `sprints/README.md` index covering active sprints, rallies, and how to start each
+
+**Discipline Docs**
+- Created `docs/disciplines/` with 6 project-specific discipline files:
+  - `frontend.md` — component conventions, client/server decision tree, security boundary (RLS), page patterns, lib structure
+  - `backend.md` — API routes, Supabase clients, queries, validation, RLS, migrations, bulk rollback pattern
+  - `design.md` — quick reference cheat sheet, defers to design system for depth
+  - `performance.md` — caching (staleTimes, React.cache), query optimisation (Promise.all), prefetching, loading states
+  - `code-review.md` — confidence-based filtering, severity classification (CRITICAL→LOW), review checklist, React/Next.js checks, stubborn bug escalation, build error resolution table, dead code detection tools
+  - `auth-security.md` — auth flow, RLS patterns, storage security, rate limits, GDPR compliance, OWASP Top 10 mapped to our stack, dangerous patterns table
+
+**Design System**
+- Created `docs/design-system/` as the complete visual/interaction reference:
+  - `philosophy.md` — 5 deep design principles (crew first, photo-forward, progressive disclosure, instant good, trust not for sale), the core tension, product invariants
+  - `inspirations.md` — reference products (Notion, Bumble, Linear, Airbnb) with what to take/avoid, anti-inspirations (LinkedIn, yacht crew apps), calibration questions
+  - `style-guide.md` — moved from project root (`yl_style_guide.md`) into design system as canonical location. Full colour palette, typography, animation presets, component styling, shadcn/ui mapping, Salty mascot spec
+  - `flows/` — 5 user journey maps: app-navigation (full route map with ⬜ NOT BUILT markers), onboarding, profile-editing, public-profile, endorsement
+  - `patterns/` — 5 component pattern docs with actual JSX: cards (4 variants), forms (edit page layout, inputs, save patterns, error/feedback decision tree), lists (accordions, bullets, tags, empty states), navigation (headers, back links, tab bar), modals (BottomSheet, Dialog, delete confirmation pattern, toast)
+  - `decisions/` — 9 design decisions seeded from changelog/notes (DM Serif Display, Framer Motion, profile strength framing, hidden empty sections, dark mode via CSS vars, etc.)
+  - `reference/salty_mascot_spec.md` — migrated from notes
+  - `reference/screenshots/` — empty, ready for captures
+
+**AGENTS.md Overhaul**
+- Session Start now reads `sprints/README.md` instead of `yl_build_plan.md`
+- Added discipline auto-select table with 7 disciplines + "load when" triggers
+- Added explicit design system loading instructions for UI tasks
+- Added Sprint Workflow section (major vs junior, fix-in-place heuristic)
+- Added Rally section (two-pass pattern, three rally types, founder-initiated only)
+- Updated Docs Reference table with sprints, disciplines, design system
+- Updated Repository Map with new folder structure
+- Added discipline + design system maintenance rules to Changelog cadence section
+- Relabelled `yl_build_plan.md` as historical record, `notes/` as scratchpad
+
+**CLAUDE.md Updated**
+- Notes/sprints distinction clarified
+- Junior sprint bookkeeping rule added
+
+**Cleanup**
+- Archived ops/ contents (legacy LOG.md, TODO.md, STACK.md) to `archive/ops-legacy/`
+- Cleaned `notes/` — removed migrated files, left only strategy docs (5yr plan, delta analysis)
+- Updated `notes/README.md` with mapping table showing where each file's canonical version lives
+- Created `notes/archive/` folder for founder to manually archive stale notes
+- Created `archive/README.md` explaining what's there and where canonical versions live
+
+**Simulation Test**
+- Ran a Sonnet subagent cold-start simulation on the education/edit task
+- Scored 7/10 — identified 5 gaps, all fixed in follow-up patches
+
+### Context
+- Founder's workflow: fires up Claude Code or Codex, gives it the webapp folder, then jumps into build
+- Previous structure had notes/ doing triple duty (strategy + sprints + rally research) — now separated
+- Discipline docs are populated from actual codebase patterns, not generic advice
+- Design system addresses recurring pain: inconsistent look/feel, LLMs not understanding flows, repeated rejected ideas
+- Generic Claude Code templates from Twitter evaluated — useful patterns (confidence filtering, OWASP checklist, build error table) folded into existing disciplines, rest discarded as inferior to what we built
+
+**Simulation testing & gap fixes (round 2):**
+- Ran 4 parallel Sonnet cold-start simulations (backend, UI/design, performance, PR rally) — scored 7–8.5/10
+- Fixed 5 gaps: mobile responsiveness checklist (frontend.md), PR rally example (rally-002), performance profiling guidance (performance.md), sprint deliverables checklist (sprint-10 README), typography quick reference (navigation.md)
+- Re-ran simulations — scores held or improved
+
+**External skill evaluation:**
+- Evaluated 14 generic Claude Code templates — folded useful patterns (confidence filtering, OWASP, build errors, dead code tools) into code-review.md and auth-security.md
+
+**Business folder setup (parent level):**
+- Created `Strategy/`, `Legal/`, `Finance/`, `Design/`, `Marketing/`, `Operations/` at parent level
+- Created parent-level `AGENTS.md`, `CLAUDE.md`, `CHANGELOG.md`, `README.md`
+- Placed loose files (PDFs, legal review, wireframes, style guide) into new folder structure
+
+### Next
+- `/app/education/[id]/edit` is the next page to build (marked ⬜ NOT BUILT in route map)
+- Capture app screenshots for `reference/screenshots/` during next UI session
+- Clean up parent folder root duplicates (originals already copied to new homes)
+- Delete `ops/` folder (contents archived)
+
+### Flags
+- Parent folder root still has originals alongside copies in new structure — founder can delete originals
+- `ops/` folder still exists (couldn't delete from sandbox) — dead weight
+
+---
+
 ## 2026-03-18 — Claude Code (Sonnet 4.6) — Phase 1A post-implementation fixes + audit
 
 ### Done

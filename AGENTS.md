@@ -14,9 +14,29 @@ Every session, read these first:
 2. `CHANGELOG.md` — last 3 sessions (your external memory)
 3. `docs/yl_system_state.json`
 4. `docs/yl_phase1_execution.md`
-5. `docs/yl_build_plan.md`
+5. `sprints/README.md` — what's active right now (major + junior)
 
-Then read any `docs/` files directly relevant to the task.
+Then drill into the specific sprint you're working on — read its `README.md` and `build_plan.md`. Don't read every sprint upfront; only load what you need for the current task.
+
+**Load discipline context for the session.** Based on the task, read the relevant files from `docs/disciplines/`. Don't load all of them — pick what applies:
+
+| Discipline | File | Load when |
+|------------|------|-----------|
+| Frontend | `docs/disciplines/frontend.md` | Pages, components, layouts, client/server splits |
+| Backend & DB | `docs/disciplines/backend.md` | API routes, queries, migrations, RLS, validation |
+| Design (UI+UX) | `docs/disciplines/design.md` | Quick reference: tokens, responsive, animation, dark mode |
+| Design System | `docs/design-system/README.md` | **Full design reference** — philosophy, inspirations, style guide, flows, patterns, decisions. Start here for any UI work. |
+| Performance | `docs/disciplines/performance.md` | Caching, query optimization, loading states, bundle |
+| Code Review | `docs/disciplines/code-review.md` | Audits, PR reviews, debugging, hardening passes |
+| Auth & Security | `docs/disciplines/auth-security.md` | Auth flows, RLS, storage policies, GDPR, rate limiting |
+
+Most tasks need 1–3 disciplines. A new feature page might need frontend + backend + design. A debugging session might need code-review + the relevant area.
+
+**Any task involving UI:** Load the design system (`docs/design-system/README.md`). Always read `philosophy.md` first, then drill into what you need: `style-guide.md` for tokens, `flows/` for where the page sits, `patterns/` for existing components, `decisions/` for rejected approaches, `inspirations.md` if making aesthetic choices. The design system README has a reading order and a quick-reference table.
+
+The founder can override: "also load performance" or "skip design."
+
+For historical context on completed sprints 1–7, see `docs/yl_build_plan.md`. For schema, features, or other reference material, see the Docs Reference table below.
 
 ---
 
@@ -85,6 +105,46 @@ These guide judgement calls. When a decision feels like it might drift from them
 
 ---
 
+## Sprints & Rallies
+
+All execution work lives in `/sprints/`. Two modes: **sprints** (building) and **rallies** (auditing).
+
+### Sprints
+
+**Major sprints** — phased roadmap work (Phase 1A → 1B → 1C → 2 → 3). Each gets a folder under `sprints/major/` with a `README.md` and `build_plan.md`. These are the planned features that take ground.
+
+**Junior sprints** — reactive work outside the main phase. Three types:
+- `junior/debug/` — bug fixes, error investigation
+- `junior/feature/` — quick feature additions that can't wait for the next major sprint
+- `junior/ui-ux/` — layout, styling, visual polish
+
+**Fix-in-place vs junior sprint:** Not every bug needs a sprint. If it's a quick fix (a few lines, same area you're working in, takes minutes), just fix it and log it in `CHANGELOG.md`. Only create a junior sprint when the issue is unrelated to your current work, needs real investigation, or would pull you off-track for more than a few minutes. The test: if you'd context-switch to deal with it, it's a junior sprint. If you'd fix it without breaking stride, just fix it.
+
+**When done:** Update the sprint's README status, move the row from Active to Completed in the relevant index, and log it in `CHANGELOG.md`.
+
+### Rallies
+
+A rally is investigate-then-plan. No code changes — the output is a plan that feeds into sprints.
+
+**Every rally follows two passes:**
+1. **Pass 1 — Deep analysis.** Thorough investigation of the scope. Understand the problem fully before thinking about solutions.
+2. **Pass 2 — Challenge and refine.** Review pass 1 with fresh eyes. Push back on shallow conclusions, catch what was missed, find deeper issues.
+3. **Build the plan** from both passes.
+
+Rallies scale to fit the problem — the two-pass discipline stays the same:
+
+- **PR rally** — analyze everything a PR touched, surface bugs/regressions, build a fix plan. Scoped and fast.
+- **System rally** — deep-dive on one subsystem (e.g. auth flow, performance, data model). Medium scope.
+- **Full audit** — multi-agent, multi-angle review of the whole app. Pass 1 uses parallel agents with different angles; pass 2 uses challenger agents. Heavy.
+
+**Founder-initiated only.** Don't start a rally unless the founder asks for one. If you think an audit would help, suggest it — don't just run one.
+
+**Mechanics:** Read `sprints/rallies/README.md` for templates, workflow, and examples. See `sprints/rallies/rally-001-full-audit/` for a completed full audit.
+
+**After a rally:** The plan becomes the work. Findings feed into major sprint scope, junior sprint bugs, or both. Link resulting sprints back to the rally's README.
+
+---
+
 ## Things to avoid
 
 - Making changes without reading the existing code first
@@ -117,7 +177,10 @@ A real Supabase account exists for automated testing. No code bypasses — it go
 | Doc | Purpose |
 |-----|---------|
 | `docs/yl_system_state.json` | Current phase, build target, what's active |
-| `docs/yl_build_plan.md` | Sprint-by-sprint execution sequence |
+| `docs/yl_build_plan.md` | Historical sprint record (sprints 1–7) |
+| `sprints/README.md` | Active sprint + rally index — what's live, what's next |
+| `docs/disciplines/*.md` | Project-specific conventions by discipline (frontend, backend, design, etc.) |
+| `docs/design-system/` | Flows, component patterns, design decisions, visual reference |
 | `docs/yl_phase1_execution.md` | Phase 1 principles and mechanics |
 | `docs/yl_schema.md` | Database schema and RLS rules |
 | `docs/yl_features.md` | Feature definitions, phase assignments, rationale |
@@ -125,7 +188,7 @@ A real Supabase account exists for automated testing. No code bypasses — it go
 | `docs/yl_moderation.md` | Trust, integrity, and moderation mechanics |
 | `CHANGELOG.md` | Running project log — update throughout the session, not just at the end |
 
-If docs conflict, follow `yl_system_state.json`, `yl_phase1_execution.md`, and `yl_build_plan.md` for current scope. `docs/canonical/` is a historical baseline from 2026-02-11 — don't overwrite root docs with it without founder review. `notes/` is scratchpad, not instruction.
+If docs conflict, follow `yl_system_state.json`, `yl_phase1_execution.md`, and the active sprint's `build_plan.md` for current scope. `docs/canonical/` is a historical baseline from 2026-02-11 — don't overwrite root docs with it without founder review. `notes/` is scratchpad, not instruction.
 
 ---
 
@@ -138,6 +201,10 @@ If docs conflict, follow `yl_system_state.json`, `yl_phase1_execution.md`, and `
 - Any significant file created or changed
 - Any flag raised to the founder
 - At session end — confirm it's complete
+
+**Keep discipline docs current.** If you establish a new pattern, change an existing convention, or add a new utility/component that future sessions should know about, update the relevant `docs/disciplines/*.md` file before closing out. These docs are only useful if they reflect the codebase as it is now, not as it was when they were written.
+
+**Keep the design system current.** If you add a new page, update the route map in `docs/design-system/flows/app-navigation.md`. If you create a new component pattern, add it to the relevant `patterns/` file. If you make or reject a design choice, log it in `decisions/`. If you take screenshots during a UI session, drop them in `reference/screenshots/`.
 
 **CRITICAL — before every `git commit`:**
 You MUST update `CHANGELOG.md` to reflect all work being committed BEFORE running `git commit`. This is a blocking pre-commit requirement. If the changelog does not cover the changes in the commit, stop and update it first. No exceptions — this has been missed repeatedly.
@@ -154,9 +221,15 @@ yachtielink.webapp/
 ├── lib/                 # Shared utilities
 ├── public/              # Static assets
 ├── docs/                # Planning docs — root level is the working set
-│   └── canonical/       # Historical baseline 2026-02-11 — do not edit
-├── notes/               # Scratchpad — not instructions
-├── ops/                 # Operational logs and archived notes
+│   ├── canonical/       # Historical baseline 2026-02-11 — do not edit
+│   ├── disciplines/     # Project conventions: frontend, backend, design, perf, review, auth
+│   └── design-system/   # Flows, patterns, decisions, screenshots
+├── sprints/             # Active sprint work — start here for current tasks
+│   ├── major/           # Phased roadmap sprints (1A, 1B, etc)
+│   ├── junior/          # Reactive sprints: debug/, feature/, ui-ux/
+│   └── rallies/         # Audit sessions: parallel agents, proposals
+├── notes/               # Scratchpad — strategy docs only (sprint/rally files superseded by /sprints/)
+├── archive/             # Legacy files — superseded originals, kept for reference
 ├── AGENTS.md            # This file — primary instructions for all agents
 ├── CLAUDE.md            # Claude Code-specific config — defers here
 ├── CHANGELOG.md         # Cross-agent handover log
