@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { RequestActions } from './RequestActions'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -288,15 +289,7 @@ function EndorsementsTab({
           </span>
         </h2>
         {endorsementsReceived.length === 0 ? (
-          <div className="bg-[var(--color-surface)] rounded-2xl p-5 text-center">
-            <p className="text-sm text-[var(--color-text-secondary)] mb-3">No endorsements yet.</p>
-            <Link
-              href="/app/endorsement/request"
-              className="text-sm text-[var(--color-interactive)] font-medium hover:underline"
-            >
-              Request endorsements →
-            </Link>
-          </div>
+          <EmptyState title="No endorsements yet" actionLabel="Request endorsements" actionHref="/app/endorsement/request" />
         ) : (
           <div className="flex flex-col gap-3">
             {endorsementsReceived.map((e) => {
@@ -527,18 +520,11 @@ function SavedTab() {
 function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
   if (colleagues.length === 0) {
     return (
-      <div className="bg-[var(--color-surface)] rounded-2xl p-6 text-center">
-        <p className="text-sm text-[var(--color-text-secondary)] mb-3">
-          Your colleague list will populate once you and a crewmate have both attached the same
-          yacht to your profiles.
-        </p>
-        <Link
-          href="/app/attachment/new"
-          className="text-sm text-[var(--color-interactive)] font-medium hover:underline"
-        >
-          Add a yacht →
-        </Link>
-      </div>
+      <EmptyState
+        title="Your colleague list will populate once you and a crewmate have both attached the same yacht"
+        actionLabel="Add a yacht"
+        actionHref="/app/attachment/new"
+      />
     )
   }
 

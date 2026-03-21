@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 interface AboutSectionProps {
   bio?: string | null
@@ -24,9 +25,7 @@ export function AboutSection({ bio }: AboutSectionProps) {
           {bio}
         </p>
       ) : (
-        <p className="text-sm text-[var(--color-text-secondary)]">
-          Add a short bio to tell people about yourself.
-        </p>
+        <EmptyState variant="inline" title="No bio yet" />
       )}
     </div>
   )
