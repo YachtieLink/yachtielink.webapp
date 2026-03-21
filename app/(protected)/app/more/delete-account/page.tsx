@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { BackButton } from '@/components/ui/BackButton';
 
 export default function DeleteAccountPage() {
   const router = useRouter();
@@ -37,12 +38,9 @@ export default function DeleteAccountPage() {
 
   return (
     <div className="flex flex-col max-w-sm mx-auto px-4 py-8 pb-24">
-      <Link
-        href="/app/more"
-        className="text-sm text-[var(--color-text-secondary)] mb-6 inline-flex items-center gap-1"
-      >
-        ← Back
-      </Link>
+      <div className="mb-6">
+        <BackButton href="/app/more" />
+      </div>
 
       <h1 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">Delete Your Account</h1>
       <p className="text-sm text-[var(--color-text-secondary)] mb-6 leading-relaxed">

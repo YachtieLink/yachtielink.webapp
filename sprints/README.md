@@ -9,7 +9,10 @@ This is the canonical home for all execution work — building (sprints) and aud
 | Type | Sprint | Status | Focus |
 |------|--------|--------|-------|
 | Major | [Phase 1A — Sprint 10](./major/phase-1a/sprint-10/README.md) | 🔨 In Progress | Profile robustness, photo-forward UX |
-| Major | [Sprint 11 — Feature Roadmap](./major/sprint-11/README.md) | 📋 Planned | Community roadmap, Pro voting |
+| Major | [Phase 1A — Sprint 10.1](./major/phase-1a/sprint-10.1/README.md) | 📋 Draft | Close Phase 1A — education edit, saved profiles, animation, QA |
+| Major | [Phase 1B — Sprint 11](./major/phase-1b/sprint-11/README.md) | 📋 Draft | Crew landing pages, Salty, section colours, OG images |
+| Major | [Phase 1B — Sprint 12](./major/phase-1b/sprint-12/README.md) | 📋 Draft | Yacht graph, colleague network, sea time |
+| Major | [Phase 1B — Sprint 13](./major/phase-1b/sprint-13/README.md) | 📋 Draft | Launch polish, marketing page, production env, QA |
 
 > Junior sprints in flight → see [junior/README.md](./junior/README.md)
 

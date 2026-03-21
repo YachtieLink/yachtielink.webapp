@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { validateBody } from '@/lib/validation/validate'
 import { aiSummaryEditSchema } from '@/lib/validation/schemas'
@@ -7,6 +8,8 @@ import { handleApiError } from '@/lib/api/errors'
 import OpenAI from 'openai'
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+
+const aiSummaryRequestSchema = z.object({ force: z.boolean().optional() })
 
 // POST — generate AI summary from profile data
 export async function POST(req: NextRequest) {
@@ -20,7 +23,8 @@ export async function POST(req: NextRequest) {
 
     // Optional: force=true bypasses the edited-summary guard
     const body = await req.json().catch(() => ({}))
-    const force = body?.force === true
+    const parsed = aiSummaryRequestSchema.safeParse(body)
+    const force = parsed.success ? (parsed.data.force === true) : false
 
     // Fetch bio + attachments + top endorsement excerpts
     const [profileRes, attachRes, endorseRes] = await Promise.all([

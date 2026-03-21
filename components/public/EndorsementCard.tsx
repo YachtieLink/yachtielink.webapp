@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { cardHover } from '@/lib/motion'
 import Image from 'next/image'
 
 interface EndorsementCardProps {
@@ -35,7 +37,7 @@ export function EndorsementCard({
   })
 
   return (
-    <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <motion.div {...cardHover} className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
       {/* Endorser info */}
       <div className="flex items-center gap-3 mb-3">
         {endorserPhoto ? (
@@ -80,6 +82,6 @@ export function EndorsementCard({
           {expanded ? 'Show less' : 'Read more'}
         </button>
       )}
-    </div>
+    </motion.div>
   )
 }

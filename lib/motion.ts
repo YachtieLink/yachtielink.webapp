@@ -71,6 +71,18 @@ export const scrollReveal: Variants = {
   },
 };
 
+/** Duration-based ease for accordion/expand animations where spring overshoot is undesirable */
+export const easeGentle: Transition = {
+  duration: 0.25,
+  ease: "easeOut",
+};
+
+/** Viewport options for scroll-triggered reveals */
+export const scrollRevealViewport = {
+  once: true,
+  margin: "-50px" as const,
+};
+
 /* ─── Scale pop (badges, counts, success) ─── */
 
 export const popIn: Variants = {

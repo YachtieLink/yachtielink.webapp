@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 interface Endorsement {
   id: string
@@ -35,9 +36,7 @@ export function EndorsementsSection({ endorsements, currentUserId }: Endorsement
     return (
       <div className="bg-[var(--color-surface)] rounded-2xl p-5">
         <h2 className="font-semibold text-[var(--color-text-primary)] mb-3">Endorsements</h2>
-        <p className="text-sm text-[var(--color-text-secondary)]">
-          Endorsements add context to your work history.
-        </p>
+        <EmptyState variant="inline" title="No endorsements yet" />
       </div>
     )
   }

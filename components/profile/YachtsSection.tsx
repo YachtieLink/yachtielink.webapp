@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 interface Attachment {
   id: string
@@ -52,9 +53,7 @@ export function YachtsSection({ attachments }: YachtsSectionProps) {
       </div>
 
       {sorted.length === 0 ? (
-        <p className="text-sm text-[var(--color-text-secondary)]">
-          Add your first yacht to start building your work history.
-        </p>
+        <EmptyState variant="inline" title="No yacht experience added" actionLabel="Add a yacht" actionHref="/app/attachment/new" />
       ) : (
         <ul className="flex flex-col divide-y divide-[var(--color-border)]">
           {sorted.map((att) => {

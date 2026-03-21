@@ -1,3 +1,7 @@
+'use client'
+
+import { motion } from 'framer-motion'
+import { popIn } from '@/lib/motion'
 import Link from 'next/link'
 
 interface ProfileStrengthProps {
@@ -12,18 +16,18 @@ export function ProfileStrength({ score, label, nextPrompt, nextHref }: ProfileS
   const dash = (score / 100) * circumference
 
   const arcColor = score <= 30
-    ? 'var(--color-text-secondary)'
+    ? 'var(--color-strength-low)'
     : score <= 60
-    ? '#E5A832'
+    ? 'var(--color-strength-mid)'
     : score <= 85
-    ? '#0D7377'
-    : '#22c55e'
+    ? 'var(--color-strength-high)'
+    : 'var(--color-strength-full)'
 
   return (
     <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
       <div className="flex items-center gap-4">
         {/* SVG donut */}
-        <div className="shrink-0">
+        <motion.div variants={popIn} initial="hidden" animate="visible" className="shrink-0">
           <svg width="72" height="72" viewBox="0 0 72 72">
             <circle cx="36" cy="36" r="28" fill="none" stroke="var(--color-border)" strokeWidth="6" />
             <circle
@@ -42,7 +46,7 @@ export function ProfileStrength({ score, label, nextPrompt, nextHref }: ProfileS
               {score}%
             </text>
           </svg>
-        </div>
+        </motion.div>
 
         <div className="min-w-0">
           <p className="font-semibold text-[var(--color-text-primary)]">Profile Strength</p>

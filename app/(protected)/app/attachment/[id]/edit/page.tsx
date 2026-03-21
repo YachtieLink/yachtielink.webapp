@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button, Input } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+import { BackButton } from '@/components/ui/BackButton'
 
 interface Attachment {
   id: string
@@ -106,12 +107,9 @@ export default function AttachmentEditPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-      <button
-        onClick={() => router.back()}
-        className="text-sm text-[var(--color-text-secondary)] mb-6 flex items-center gap-1"
-      >
-        ← Back
-      </button>
+      <div className="mb-6">
+        <BackButton href="/app/profile" />
+      </div>
 
       <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Edit attachment</h1>
       <p className="text-sm text-[var(--color-text-secondary)] mb-6">

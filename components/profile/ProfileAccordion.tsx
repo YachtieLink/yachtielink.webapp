@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { easeGentle } from '@/lib/motion'
 import Link from 'next/link'
 
 interface ProfileAccordionProps {
@@ -37,7 +38,7 @@ export function ProfileAccordion({
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-base text-[var(--color-text-primary)]">{title}</span>
+            <span className="font-serif text-base text-[var(--color-text-primary)]">{title}</span>
             {editHref && (
               <Link
                 href={editHref}
@@ -52,7 +53,7 @@ export function ProfileAccordion({
         </div>
         <motion.span
           animate={{ rotate: open ? 90 : 0 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
+          transition={easeGentle}
           className="shrink-0 text-[var(--color-text-secondary)] mt-0.5"
           aria-hidden
         >
@@ -67,7 +68,7 @@ export function ProfileAccordion({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
+            transition={easeGentle}
             className="overflow-hidden"
           >
             <div className="px-4 pb-4 pt-1 border-t border-[var(--color-border)]">
