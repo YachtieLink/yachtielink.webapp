@@ -2,9 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui'
+import { Textarea } from '@/components/ui/Textarea'
 import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/skeleton'
+import { PageTransition } from '@/components/ui/PageTransition'
 
 const MAX_CHARS = 500
 
@@ -15,6 +19,7 @@ export default function AboutEditPage() {
   const [bio, setBio]  = useState('')
   const [saving, setSaving] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     async function load() {
@@ -57,56 +62,66 @@ export default function AboutEditPage() {
   const overLimit = remaining < 0
 
   return (
-    <div className="flex flex-col gap-6 pb-24">
+    <PageTransition className="flex flex-col gap-6 pb-24">
       <div>
-        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">About</h1>
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">About</h1>
         <p className="text-sm text-[var(--color-text-secondary)] mt-1">
           Tell people about your background and experience.
         </p>
       </div>
 
-      {!loaded ? (
-        <div className="h-40 bg-[var(--color-surface-raised)] rounded-xl animate-pulse" />
-      ) : (
-        <>
-          <div className="relative">
-            <textarea
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              placeholder="e.g. Experienced Chief Stewardess with 8 seasons on motor yachts across the Med and Caribbean…"
-              rows={8}
-              className={`w-full bg-[var(--color-surface)] border rounded-xl px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)] transition-shadow ${
-                overLimit ? 'border-red-500' : 'border-[var(--color-border)]'
-              }`}
-            />
-            <span
-              className={`absolute bottom-3 right-4 text-xs ${
-                overLimit ? 'text-red-500' : 'text-[var(--color-text-secondary)]'
-              }`}
-            >
-              {remaining}
-            </span>
-          </div>
+      <AnimatePresence mode="wait">
+        {!loaded ? (
+          <motion.div
+            key="skeleton"
+            exit={prefersReducedMotion ? undefined : { opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <Skeleton className="h-40 w-full rounded-xl" />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col gap-6"
+          >
+            <div className="flex flex-col gap-1">
+              <Textarea
+                label="Bio"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="e.g. Experienced Chief Stewardess with 8 seasons on motor yachts across the Med and Caribbean…"
+                rows={8}
+                error={overLimit ? `${Math.abs(remaining)} characters over limit` : undefined}
+                className="resize-none"
+              />
+              <p className={`text-xs text-right ${overLimit ? 'text-[var(--color-error)]' : 'text-[var(--color-text-secondary)]'}`}>
+                {remaining}
+              </p>
+            </div>
 
-          <div className="flex gap-3">
-            <Button
-              variant="secondary"
-              onClick={() => router.back()}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              loading={saving}
-              disabled={overLimit}
-              className="flex-1"
-            >
-              Save
-            </Button>
-          </div>
-        </>
-      )}
-    </div>
+            <div className="flex gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => router.back()}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSave}
+                loading={saving}
+                disabled={overLimit}
+                className="flex-1"
+              >
+                Save
+              </Button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </PageTransition>
   )
 }

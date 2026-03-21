@@ -92,7 +92,7 @@ export default async function ProfilePage() {
 
       {/* Page title */}
       <div className="flex items-center justify-between px-1">
-        <h1 className="font-serif text-lg text-[var(--color-text-primary)]">My Profile</h1>
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">My Profile</h1>
         <Link
           href={`/u/${profile.handle}`}
           className="text-xs text-[var(--color-interactive)] hover:underline"

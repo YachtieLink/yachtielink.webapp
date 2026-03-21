@@ -12,7 +12,7 @@ export default function CvLoading() {
         </div>
       </div>
       {/* Public profile preview skeleton */}
-      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 space-y-4">
+      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] p-4 space-y-4">
         <Skeleton className="h-3 w-36" />
         <div className="flex items-center gap-3">
           <Skeleton className="h-16 w-16 rounded-full" />

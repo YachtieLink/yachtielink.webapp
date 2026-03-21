@@ -42,7 +42,7 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
   }
 
   return (
-    <div className="bg-[var(--color-surface)] rounded-2xl p-5 border border-[var(--color-teal-700)]/20">
+    <div className="bg-[var(--color-surface)] rounded-2xl p-4 border border-[var(--color-border)] md:mx-5">
       <div className="flex items-center gap-2 mb-1">
         <span className="text-lg font-bold text-[var(--color-text-primary)]">Crew Pro</span>
         {hasFoundingSlots ? (

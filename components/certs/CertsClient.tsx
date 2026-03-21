@@ -33,7 +33,7 @@ function formatDate(dateStr: string | null | undefined): string {
 function StatusBadge({ status }: { status: ReturnType<typeof getExpiryStatus> }) {
   if (status === 'no-expiry') return <span className="text-xs text-[var(--color-text-secondary)]">No expiry</span>;
   if (status === 'expired') return <span className="text-xs text-red-600 dark:text-red-400 font-medium">● Expired</span>;
-  if (status === 'expiring') return <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">⚠ Expiring soon</span>;
+  if (status === 'expiring') return <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--color-amber-100)] text-[var(--color-amber-700)]">⚠ Expiring soon</span>;
   return <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">● Valid</span>;
 }
 
@@ -113,7 +113,7 @@ export function CertsClient({
         </div>
       ) : (
         filtered.map(({ cert, status }) => (
-          <div key={cert.id} className="bg-[var(--color-surface)] rounded-2xl p-4">
+          <div key={cert.id} className="bg-[var(--color-surface)] rounded-2xl p-4 border-l-4 border-[var(--color-amber-500)]">
             <div className="flex items-start justify-between gap-2 mb-1">
               <div className="flex-1">
                 <p className="text-sm font-semibold text-[var(--color-text-primary)]">

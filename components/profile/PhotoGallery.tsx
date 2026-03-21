@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { AnimatePresence, motion } from 'framer-motion'
 
 interface Photo {
   id: string
@@ -66,14 +67,25 @@ export function PhotoGallery({ photos, profilePhotoUrl, displayName, editable, f
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <Image
-        src={allPhotos[current]}
-        alt={displayName}
-        fill
-        className="object-cover"
-        priority={current === 0}
-        unoptimized
-      />
+      <AnimatePresence mode="sync">
+        <motion.div
+          key={current}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.35, ease: 'easeInOut' }}
+          className="absolute inset-0"
+        >
+          <Image
+            src={allPhotos[current]}
+            alt={displayName}
+            fill
+            className="object-cover"
+            priority={current === 0}
+            unoptimized
+          />
+        </motion.div>
+      </AnimatePresence>
 
       {/* Gradient overlay for dots legibility */}
       <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
@@ -86,7 +98,7 @@ export function PhotoGallery({ photos, profilePhotoUrl, displayName, editable, f
               key={i}
               onClick={() => setCurrent(i)}
               aria-label={`Photo ${i + 1}`}
-              className={`w-1.5 h-1.5 rounded-full transition-all ${
+              className={`w-2.5 h-2.5 rounded-full transition-all ${
                 i === current ? 'bg-white scale-125' : 'bg-white/50'
               }`}
             />
@@ -100,7 +112,7 @@ export function PhotoGallery({ photos, profilePhotoUrl, displayName, editable, f
           {current > 0 && (
             <button
               onClick={() => setCurrent((v) => v - 1)}
-              className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 hover:bg-black/60 rounded-full items-center justify-center text-white transition-colors"
+              className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white shadow-md rounded-full items-center justify-center text-[var(--color-text-primary)] transition-colors"
               aria-label="Previous photo"
             >
               ‹
@@ -109,7 +121,7 @@ export function PhotoGallery({ photos, profilePhotoUrl, displayName, editable, f
           {current < allPhotos.length - 1 && (
             <button
               onClick={() => setCurrent((v) => v + 1)}
-              className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 bg-black/40 hover:bg-black/60 rounded-full items-center justify-center text-white transition-colors"
+              className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white shadow-md rounded-full items-center justify-center text-[var(--color-text-primary)] transition-colors"
               aria-label="Next photo"
             >
               ›

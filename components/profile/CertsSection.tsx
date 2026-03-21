@@ -32,7 +32,7 @@ function expiryStatus(expiresAt: string | null): 'valid' | 'expiring-soon' | 'ex
 
 const STATUS_STYLES: Record<string, string> = {
   valid:          'bg-green-500/10 text-green-600 dark:text-green-400',
-  'expiring-soon':'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  'expiring-soon':'bg-[var(--color-amber-100)] text-[var(--color-amber-700)]',
   expired:        'bg-red-500/10 text-red-500',
   'no-expiry':    'bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]',
 }
@@ -66,7 +66,7 @@ export function CertsSection({ certs }: CertsSectionProps) {
             const status = expiryStatus(cert.expires_at)
 
             return (
-              <li key={cert.id} className="py-3 flex items-start justify-between gap-3">
+              <li key={cert.id} className="py-3 pl-3 flex items-start justify-between gap-3 border-l-4 border-[var(--color-amber-500)]">
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{name}</p>
                   {cert.issued_at && (

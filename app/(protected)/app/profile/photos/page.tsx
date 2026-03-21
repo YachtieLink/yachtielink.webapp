@@ -6,6 +6,9 @@ import { BackButton } from '@/components/ui/BackButton'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { uploadUserPhoto } from '@/lib/storage/upload'
+import { Button } from '@/components/ui/Button'
+import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface Photo {
   id: string
@@ -15,6 +18,7 @@ interface Photo {
 
 export default function ProfilePhotosPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const [photos, setPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
@@ -39,7 +43,7 @@ export default function ProfilePhotosPage() {
       if (!user) return
 
       const result = await uploadUserPhoto(user.id, file)
-      if (!result.ok) { alert(result.error); return }
+      if (!result.ok) { toast(result.error, 'error'); return }
       const photoUrl = result.url
 
       const res = await fetch('/api/user-photos', {
@@ -49,7 +53,7 @@ export default function ProfilePhotosPage() {
       })
       if (!res.ok) {
         const d = await res.json()
-        alert(d.error ?? 'Upload failed')
+        toast(d.error ?? 'Upload failed', 'error')
         return
       }
       const { photo } = await res.json()
@@ -66,13 +70,27 @@ export default function ProfilePhotosPage() {
     if (res.ok) setPhotos((prev) => prev.filter((p) => p.id !== photo.id))
   }
 
-  if (loading) return <div className="p-4 text-[var(--color-text-secondary)]">Loading…</div>
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-4 pb-24">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-9 w-9 rounded-xl" />
+          <Skeleton className="h-6 w-24" />
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} className="aspect-square rounded-xl" />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-4 pb-24">
       <div className="flex items-center gap-3">
         <BackButton href="/app/profile" />
-        <h1 className="font-semibold text-lg text-[var(--color-text-primary)]">Photos</h1>
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Photos</h1>
       </div>
 
       <p className="text-sm text-[var(--color-text-secondary)]">Your first photo is your main profile picture. Free: up to 6 photos · Pro: up to 9.</p>
@@ -86,7 +104,7 @@ export default function ProfilePhotosPage() {
             )}
             <button
               onClick={() => deletePhoto(photo)}
-              className="absolute top-1 right-1 bg-black/50 hover:bg-red-600 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+              className="absolute top-1 right-1 bg-black/50 hover:bg-[var(--color-error)] text-white text-xs w-6 h-6 rounded-full flex items-center justify-center transition-colors"
               aria-label="Delete photo"
             >
               ×

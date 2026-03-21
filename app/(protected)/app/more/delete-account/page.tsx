@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { BackButton } from '@/components/ui/BackButton';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 
 export default function DeleteAccountPage() {
   const router = useRouter();
@@ -56,33 +58,34 @@ export default function DeleteAccountPage() {
           <li>Endorsements you&apos;ve written will show &ldquo;[Deleted User]&rdquo;</li>
           <li>Your Pro subscription (if active) is cancelled</li>
         </ul>
-        <p className="text-sm font-semibold text-red-500 pt-1">This cannot be undone.</p>
+        <p className="text-sm font-semibold text-[var(--color-error)] pt-1">This cannot be undone.</p>
       </div>
 
       <div className="mb-6">
-        <label className="text-sm text-[var(--color-text-secondary)] mb-2 block">
+        <p className="text-sm text-[var(--color-text-secondary)] mb-2">
           Type <span className="font-mono font-semibold text-[var(--color-text-primary)]">{REQUIRED}</span> to confirm:
-        </label>
-        <input
+        </p>
+        <Input
           type="text"
           value={confirmation}
           onChange={(e) => setConfirmation(e.target.value)}
           placeholder={REQUIRED}
-          className="w-full px-4 py-3 rounded-xl bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] text-sm border border-[var(--color-border)] focus:outline-none focus:ring-2 focus:ring-red-500"
         />
       </div>
 
       {error && (
-        <p className="text-sm text-red-500 mb-4">{error}</p>
+        <p className="text-sm text-[var(--color-error)] mb-4">{error}</p>
       )}
 
-      <button
+      <Button
+        variant="destructive"
         onClick={handleDelete}
         disabled={!confirmed || loading}
-        className="w-full py-3 rounded-xl text-sm font-semibold bg-red-500 text-white disabled:opacity-40 disabled:cursor-not-allowed hover:bg-red-600 transition-colors mb-3"
+        loading={loading}
+        className="w-full mb-3"
       >
         {loading ? 'Deleting…' : 'Delete Account'}
-      </button>
+      </Button>
 
       <Link
         href="/app/more"

@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button, Input } from '@/components/ui'
+import { Select } from '@/components/ui/Select'
 import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/skeleton'
 
 // ISO 3166-1 alpha-2 country names (abbreviated list — extend as needed)
 // Full list should be fetched from a reference or bundled separately in Sprint 6+
@@ -164,8 +166,9 @@ export default function ProfileSettingsPage() {
   if (!loaded) {
     return (
       <div className="flex flex-col gap-4">
+        <Skeleton className="h-6 w-40" />
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-14 bg-[var(--color-surface-raised)] rounded-xl animate-pulse" />
+          <Skeleton key={i} className="h-12 w-full rounded-xl" />
         ))}
       </div>
     )
@@ -174,7 +177,7 @@ export default function ProfileSettingsPage() {
   return (
     <div className="flex flex-col gap-6 pb-24">
       <div>
-        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Contact info</h1>
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Contact info</h1>
         <p className="text-sm text-[var(--color-text-secondary)] mt-1">
           All fields are hidden on your public profile by default. Toggle to show.
         </p>
@@ -236,27 +239,26 @@ export default function ProfileSettingsPage() {
         <hr className="border-[var(--color-border)]" />
 
         <div className="flex flex-col gap-2">
-          <div>
-            <label className="text-sm font-medium text-[var(--color-text-primary)]">Location</label>
-            <div className="flex gap-2 mt-1.5">
-              <select
-                value={form.location_country}
-                onChange={(e) => set('location_country', e.target.value)}
-                className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-              >
-                <option value="">Country</option>
-                {COUNTRIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
-              <input
-                type="text"
-                value={form.location_city}
-                onChange={(e) => set('location_city', e.target.value)}
-                placeholder="City"
-                className="flex-1 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2.5 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-              />
-            </div>
+          <div className="flex gap-2">
+            <Select
+              label="Country"
+              value={form.location_country}
+              onChange={(e) => set('location_country', e.target.value)}
+              className="flex-1"
+            >
+              <option value="">Select country</option>
+              {COUNTRIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </Select>
+            <Input
+              label="City"
+              type="text"
+              value={form.location_city}
+              onChange={(e) => set('location_city', e.target.value)}
+              placeholder="City"
+              className="flex-1"
+            />
           </div>
           <ToggleRow
             label="Show location on profile"

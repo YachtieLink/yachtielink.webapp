@@ -119,7 +119,7 @@ export function AudienceTabs({
   const progressPct = (endorsementCount / 5) * 100
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
+    <div className="min-h-screen bg-[var(--color-navy-50)] -mx-4 px-4 md:-mx-6 md:px-6 pt-8 pb-24">
 
       {/* Request endorsements CTA */}
       <Link
@@ -160,7 +160,16 @@ export function AudienceTabs({
                 : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
             }`}
           >
-            {tab === 'endorsements' ? 'Endorsements' : tab === 'colleagues' ? 'Colleagues' : 'Saved'}
+            {tab === 'endorsements' ? 'Endorsements' : tab === 'colleagues' ? (
+              <span className="flex items-center justify-center gap-1.5">
+                Colleagues
+                {colleagues.length > 0 && (
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[var(--color-navy-100)] text-[var(--color-navy-700)]">
+                    {colleagues.length}
+                  </span>
+                )}
+              </span>
+            ) : 'Saved'}
           </button>
         ))}
       </div>
@@ -286,8 +295,8 @@ function EndorsementsTab({
       <section>
         <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide mb-3">
           Endorsements{' '}
-          <motion.span variants={popIn} initial="hidden" animate="visible" className="normal-case font-normal text-[var(--color-text-tertiary)]">
-            ({endorsementsReceived.length})
+          <motion.span variants={popIn} initial="hidden" animate="visible" className="normal-case font-medium text-xs px-2 py-0.5 rounded-full bg-[var(--color-coral-100)] text-[var(--color-coral-700)]">
+            {endorsementsReceived.length}
           </motion.span>
         </h2>
         {endorsementsReceived.length === 0 ? (

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
+import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 
 const QRCode = dynamic(() => import('react-qr-code').then(m => m.default), { ssr: false })
@@ -91,44 +92,30 @@ export function CvActions({ handle, hasPdf, pdfGeneratedAt, isPro }: CvActionsPr
   return (
     <div className="flex flex-col gap-3">
       {/* Share + PDF row */}
-      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-3">
           Actions
         </h2>
         <div className="flex flex-col gap-2">
-          {/* Share link */}
-          <button
-            onClick={copyLink}
-            className="w-full rounded-lg bg-[var(--color-interactive)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-inverse)] hover:bg-[var(--color-interactive-hover)] transition-colors"
-          >
+          {/* Share link — primary action */}
+          <Button onClick={copyLink} className="w-full">
             Share Profile Link
-          </button>
+          </Button>
 
           {/* PDF actions */}
           {pdfReady ? (
             <div className="flex gap-2">
-              <button
-                onClick={downloadPdf}
-                className="flex-1 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-overlay)] transition-colors"
-              >
+              <Button variant="outline" onClick={downloadPdf} className="flex-1">
                 Download PDF
-              </button>
-              <button
-                onClick={generatePdf}
-                disabled={generating}
-                className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-overlay)] transition-colors disabled:opacity-50"
-              >
+              </Button>
+              <Button variant="outline" onClick={generatePdf} loading={generating}>
                 {generating ? 'Generating…' : 'Regenerate'}
-              </button>
+              </Button>
             </div>
           ) : (
-            <button
-              onClick={generatePdf}
-              disabled={generating}
-              className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-overlay)] transition-colors disabled:opacity-50"
-            >
+            <Button variant="outline" onClick={generatePdf} loading={generating} className="w-full">
               {generating ? 'Generating PDF…' : 'Generate PDF Snapshot'}
-            </button>
+            </Button>
           )}
           {pdfGeneratedAt && (
             <p className="text-xs text-[var(--color-text-tertiary)]">
@@ -173,7 +160,7 @@ export function CvActions({ handle, hasPdf, pdfGeneratedAt, isPro }: CvActionsPr
       </div>
 
       {/* Template selector */}
-      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-3">
           PDF Template
         </h2>
@@ -228,7 +215,7 @@ export function CvActions({ handle, hasPdf, pdfGeneratedAt, isPro }: CvActionsPr
       {/* Edit profile link */}
       <Link
         href="/app/profile"
-        className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-overlay)] transition-colors text-center"
+        className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-overlay)] transition-colors text-center"
       >
         Edit Profile
       </Link>

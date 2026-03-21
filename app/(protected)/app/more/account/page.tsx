@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, Select } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 
 const DEPARTMENTS = [
@@ -165,8 +165,8 @@ export default function AccountPage() {
     idle:      '',
     checking:  'text-[var(--color-text-secondary)]',
     available: 'text-green-500',
-    taken:     'text-red-500',
-    invalid:   'text-red-500',
+    taken:     'text-[var(--color-error)]',
+    invalid:   'text-[var(--color-error)]',
   }
 
   return (
@@ -239,16 +239,15 @@ export default function AccountPage() {
 
           {!useCustomRole ? (
             <>
-              <select
+              <Select
                 value={primaryRole}
                 onChange={(e) => setPrimaryRole(e.target.value)}
-                className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
               >
                 <option value="">Select role</option>
                 {filteredRoles.map((r) => (
                   <option key={r.id} value={r.id}>{r.name}</option>
                 ))}
-              </select>
+              </Select>
               <button
                 onClick={() => { setUseCustomRole(true); setPrimaryRole('') }}
                 className="text-xs text-[var(--color-interactive)] hover:underline text-left"

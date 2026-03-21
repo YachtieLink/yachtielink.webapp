@@ -4,9 +4,11 @@
  */
 import Image from 'next/image'
 import Link from 'next/link'
+import { MapPin } from 'lucide-react'
 import { ShareButton } from './ShareButton'
 import { EndorsementCard } from './EndorsementCard'
 import { ShowMoreButton } from './ShowMoreButton'
+import { HeroSection } from './HeroSection'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { PhotoGallery } from '@/components/profile/PhotoGallery'
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
@@ -134,11 +136,34 @@ export function PublicProfileContent({
     // ── Outer: stacked on mobile, side-by-side on desktop ────────────────────
     <div className="flex flex-col md:flex-row md:min-h-screen">
 
-      {/* ── LEFT / TOP: Hero photo panel with identity overlaid ────────────── */}
-      <div className="relative md:w-2/5 md:sticky md:top-0 md:h-screen shrink-0 overflow-hidden">
+      {/* ── MOBILE: Animated hero (client component, md:hidden) ────────────── */}
+      <HeroSection
+        displayName={displayName}
+        primaryRole={user.primary_role}
+        departments={user.departments}
+        location={location}
+        showLocation={user.show_location}
+        availableForWork={user.available_for_work}
+        isFoundingMember={isFoundingMember}
+        isOwnProfile={isOwnProfile}
+        isLoggedIn={isLoggedIn}
+        isColleague={isColleague}
+        sharedYachtCount={sharedYachtIdSet.size}
+        showMutual={showMutual}
+        firstMutualName={firstMutual?.name}
+        socialLinks={user.social_links}
+        profilePhotos={profilePhotos}
+        profilePhotoUrl={user.profile_photo_url}
+        profileUrl={profileUrl}
+        savedUserId={user.id}
+        savedStatus={savedStatus}
+      />
+
+      {/* ── LEFT: Desktop hero photo panel (hidden on mobile) ─────────────── */}
+      <div className="relative hidden md:block md:w-2/5 md:sticky md:top-0 md:h-screen shrink-0 overflow-hidden">
 
         {/* Photo fills this panel */}
-        <div className="relative h-[34vh] md:h-full w-full">
+        <div className="relative h-full w-full">
           <PhotoGallery
             photos={profilePhotos}
             profilePhotoUrl={user.profile_photo_url}
@@ -184,7 +209,7 @@ export function PublicProfileContent({
           {/* Name + availability */}
           <div className="flex items-end justify-between gap-2">
             <div>
-              <h1 className="text-white font-serif text-2xl leading-tight drop-shadow-md">{displayName}</h1>
+              <h1 className="text-white font-serif text-3xl md:text-4xl leading-tight drop-shadow-md">{displayName}</h1>
               {user.primary_role && (
                 <p className="text-white/80 text-sm font-medium">{user.primary_role}</p>
               )}
@@ -210,7 +235,7 @@ export function PublicProfileContent({
 
           {/* Location */}
           {user.show_location && location && (
-            <p className="text-white/70 text-sm">📍 {location}</p>
+            <p className="text-white/70 text-sm flex items-center gap-1"><MapPin size={14} />{location}</p>
           )}
 
           {/* Social links row (white variant on dark bg) */}
@@ -241,7 +266,7 @@ export function PublicProfileContent({
 
       {/* ── RIGHT / BOTTOM: Scrollable content ────────────────────────────── */}
       <div className="flex-1 md:overflow-y-auto">
-        <div className="flex flex-col gap-2 px-4 pt-4 pb-24">
+        <div className="flex flex-col gap-4 px-4 pt-4 pb-24">
 
           {/* Contact info — only shown when user has opted in */}
           {(
@@ -249,7 +274,7 @@ export function PublicProfileContent({
             (user.show_phone && user.phone) ||
             (user.show_whatsapp && user.whatsapp)
           ) && (
-            <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-1.5">
+            <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-1.5 border border-[var(--color-border-subtle)]">
               <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-1">Contact</p>
               {user.show_email && user.email && (
                 <a href={`mailto:${user.email}`} className="text-sm text-[var(--color-interactive)] hover:underline">{user.email}</a>
@@ -537,6 +562,18 @@ export function PublicProfileContent({
           </p>
         </footer>
       </div>
+
+      {/* ── Sticky bottom CTA for non-logged-in viewers (mobile only) ───────── */}
+      {!isLoggedIn && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-t border-[var(--color-border-subtle)] z-40 md:hidden">
+          <Link
+            href="/welcome"
+            className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
+          >
+            Build your crew profile
+          </Link>
+        </div>
+      )}
     </div>
   )
 }

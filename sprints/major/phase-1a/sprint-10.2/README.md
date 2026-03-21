@@ -28,11 +28,22 @@ The 2026-03-21 five-agent audit found the app looks like a tutorial project, not
 
 ## Architecture: Two Layers
 
-### Layer 1: The Backbone (Parts 1–3)
-Build the component infrastructure. After this, it's physically hard to build an inconsistent page because the components enforce the system.
+### Layer 1: The Backbone (Parts 0–3)
+Fix known bugs, build the component infrastructure. After this, it's physically hard to build an inconsistent page because the components enforce the system.
 
-### Layer 2: The Polish (Parts 4–7)
+### Layer 2: The Polish (Parts 4–8)
 Apply the backbone to every surface. Introduce color, fix sizing, add the interactions that make it feel premium.
+
+---
+
+## Part 0: Pre-Work Bug Fixes
+
+**Goal:** Fix confirmed bugs from audits before the rewrite begins, so they don't compound.
+
+- **Theme localStorage key mismatch:** Audit `yl-theme` vs `theme` — pick one, update all references
+- **Welcome page legal links:** Verify paths resolve correctly
+- **CookieBanner z-index:** Fix overlap with BottomTabBar (CookieBanner must sit above it)
+- **`var(--teal-N)` audit:** 10+ components reference bare `--teal-N` instead of `--color-teal-N` — fix all instances for dark mode compatibility
 
 ---
 
@@ -40,40 +51,47 @@ Apply the backbone to every surface. Introduce color, fix sizing, add the intera
 
 **Goal:** One source of truth for every interactive element. If it's a button, it's `<Button>`. If it's an input, it's `<Input>`. No exceptions.
 
-### 1A. Unify token system
-**Decision: Legacy `var(--color-*)` tokens are the standard.**
-- 90% of the app uses them
-- shadcn bridge mapping stays for when shadcn components get used
-- Button.tsx gets rewritten to use `var(--color-*)` tokens (currently uses shadcn `bg-primary`)
+### 1A. Token unification
+**Decision: Button keeps shadcn tokens.** They already bridge correctly via globals.css. Changing them risks breaking 8 existing imports for zero user-facing benefit. The real fix is making everything else USE the Button.
+
 - Input.tsx error state: `border-red-500` → `border-[var(--color-error)]`
 - Toast.tsx success: `bg-emerald-600` → `bg-[var(--color-success)]`
 
 ### 1B. Missing components
-- `Textarea.tsx` — matches Input pattern (label, hint, error, tokens)
-- `Select.tsx` — matches Input pattern (label, hint, error, rounded-xl, tokens)
-- `FormField.tsx` — wrapper for label + description + error + children (DRY for date inputs, custom fields)
-- `IconButton.tsx` — square button for icon-only actions (share, save, close)
+Create in `components/ui/`:
+- `Textarea.tsx` — matches Input pattern (label, hint, error, tokens, `focus-visible:` not `focus:`)
+- `Select.tsx` — matches Input pattern (label, hint, error, rounded-xl, tokens, `focus-visible:` not `focus:`)
+- `FormField.tsx` — generic wrapper: label + optional description + error message + children slot. DRY for date inputs, file inputs, and any non-standard field that can't use Input/Textarea/Select directly. Interface: `{ label?: string; description?: string; error?: string; required?: boolean; children: React.ReactNode; htmlFor?: string }`
+- `IconButton.tsx` — wraps `<Button variant="icon">` with enforced square sizing and `aria-label` requirement. Interface: `{ icon: React.ReactNode; label: string; size?: 'sm' | 'md' | 'lg'; variant?: Variant }`. Renders `<Button variant="icon" aria-label={label} size={size}>{icon}</Button>`.
+- `Badge.tsx` — extends shadcn Badge with a `colorScheme` prop mapping to section colors. Variants: `default | coral | navy | amber | sand | teal | success | warning | destructive`. Each maps to the appropriate `bg-[var(--color-{section}-100)] text-[var(--color-{section}-700)]` pair. Replaces all hand-coded badge color classes throughout the app.
+- `ProfileAvatar.tsx` — wraps shadcn Avatar with hash-based fallback color. Props: `{ name: string; src?: string | null; size?: 'sm' | 'md' | 'lg' }`. Fallback renders initials on a deterministic background color (coral-200, navy-200, amber-200, teal-200 — hashed from name). Sizes: sm=`h-8 w-8`, md=`h-10 w-10`, lg=`h-12 w-12`.
 
 ### 1C. Button variants expansion
 Add to existing Button.tsx:
-- `outline` variant — border + transparent bg, used for secondary actions
-- `link` variant — looks like a text link, behaves like a button
-- `icon` variant — square, for icon-only buttons
+- `outline` variant — `border border-[var(--color-border)] bg-transparent text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]`
+- `link` variant — `bg-transparent text-[var(--color-interactive)] hover:underline p-0 h-auto font-medium`
+- `icon` variant — `p-0 h-10 w-10 rounded-xl` (square, no text padding)
+
+**Post-change verification:** Grep all existing Button imports and visually confirm they still render correctly. The new variants don't change existing variant behavior, but confirm the type union expansion doesn't cause TS errors at call sites.
 
 ### 1D. Fix EmptyState
 - Card variant: add `border border-[var(--color-border)]` to match real cards
 - Use `bg-[var(--color-surface-raised)]` not `bg-[var(--color-surface)]`
-- Add optional `accentColor` prop for section-colored empty states (Sprint 11 Salty mounting point)
+- Add optional `accentColor?: SectionColor` prop (from `lib/section-colors.ts`) that tints the icon/illustration with the section's accent color. Default remains neutral.
 
 ### 1E. Extract navigation config
 - Create `lib/nav-config.ts` with shared `tabs` array, `Tab` interface
-- Import in both `BottomTabBar.tsx` and `SidebarNav.tsx`
+- **Icons stay in their respective nav component files** — the existing paired custom SVGs (outline + filled from `./icons.tsx`) are kept. `nav-config.ts` exports route/label/matchPrefix data only. `NavTab` interface uses `icon: React.ComponentType` and `activeIcon: React.ComponentType`, imported from the existing `./icons` files.
 - Fix SidebarNav active state opacity syntax
 
 ### 1F. Dark mode token gaps
 - Add `.dark` overrides for `--color-success`, `--color-warning`, `--color-error`
-- Add `.dark` overrides for coral, navy, amber section colors (200-level shades per style guide)
+- Add `.dark` overrides for coral, navy, amber, **teal**, sand section colors (200-level shades per style guide)
 - Fix `--color-text-inverse` for dark mode usage
+
+### 1G. Accessibility in new components
+- All new components (Textarea, Select, FormField) use `focus-visible:` not `focus:` for keyboard-only focus rings
+- `prefers-reduced-motion` media query support added in Part 7 animations
 
 ---
 
@@ -97,13 +115,20 @@ Add to existing Button.tsx:
 - **Card accents:** Colored left border on key cards (`border-l-4 border-[var(--color-coral-500)]` on endorsement cards)
 - **Tab bar icons:** Active tab icon uses section color, not teal
 - **Empty states:** Icon/illustration fill uses section color
-- **Badges/pills:** Section-colored backgrounds (cert status, endorsement count)
+- **Badges/pills:** Use `<Badge colorScheme="coral">` (from Part 1B) instead of hand-coded classes
 - **Chart colors:** Already mapped (`--chart-1` through `--chart-5`) — verify they use section colors
 
 ### Implementation
 - Create `lib/section-colors.ts` — maps section names to their color tokens
-- Create `SectionProvider` context (optional) or pass via props
-- Update navigation: active tab icon tint per section
+- **Use a Tailwind class lookup map** (not inline styles) for dynamic section colors. This keeps JIT happy:
+  ```ts
+  export const sectionClassMap: Record<SectionColor, { text: string; bg: string; border: string }> = {
+    teal:  { text: 'text-[var(--color-teal-700)]',  bg: 'bg-[var(--color-teal-50)]',  border: 'border-[var(--color-teal-700)]' },
+    coral: { text: 'text-[var(--color-coral-500)]', bg: 'bg-[var(--color-coral-50)]', border: 'border-[var(--color-coral-500)]' },
+    // ...
+  }
+  ```
+- Update navigation: active tab icon tint per section (via class map, not inline style)
 - Update cards: add left-border accent variant
 - Update empty states: section-colored icon
 
@@ -114,31 +139,63 @@ Add to existing Button.tsx:
 **Goal:** Every form in the app uses the same components and patterns. No more drift.
 
 ### 3A. Auth pages (5 files)
+
+**Files:**
+1. `app/(auth)/login/page.tsx`
+2. `app/(auth)/signup/page.tsx`
+3. `app/(auth)/reset-password/page.tsx`
+4. `app/(auth)/update-password/page.tsx`
+5. `app/(auth)/welcome/page.tsx`
+
+**Changes per file:**
 - Replace all raw `<input>` with `<Input>` (gains: label, hint, error, a11y, focus-visible, dark mode)
 - Replace all raw `<button>` with `<Button>` (gains: loading spinner, press animation, dark mode, consistent styling)
 - Add password visibility toggle (eye icon via Input's `suffix` prop)
-- Replace hardcoded error alerts with token-based pattern
-- Add `export const metadata` to each page
+- Replace hardcoded error alert classes with token-based: `bg-[var(--color-error)]/10 text-[var(--color-error)]`
 - Add `PageTransition` wrapper
 - Fix welcome page: dark mode brand name color, increase tagline size
 - Fix invite-only page: use font-serif, add BackButton, fix email
 
-### 3B. Profile edit pages (12+ files)
-- Replace ALL raw `<input>`, `<select>`, `<textarea>`, `<button>` with components
-- Replace `alert()` → `useToast()` on 5 pages
-- Add success toast on save for 7 pages that silently navigate
-- Replace "Loading..." text with `<Skeleton>` blocks on 5 pages
-- Fix cert edit delete: text link → `<Button variant="destructive">`
+**Note:** These are `'use client'` pages — skip `export const metadata` (not worth adding layout.tsx per auth route just for a title).
+
+### 3B. Profile edit pages (13 files)
+
+**Complete file list:**
+1. `app/(protected)/app/profile/page.tsx` — main profile view
+2. `app/(protected)/app/profile/photo/page.tsx` — profile photo edit
+3. `app/(protected)/app/profile/photos/page.tsx` — photo management / reorder
+4. `app/(protected)/app/profile/gallery/page.tsx` — gallery view
+5. `app/(protected)/app/profile/settings/page.tsx` — profile settings
+6. `app/(protected)/app/about/edit/page.tsx` — bio/about edit
+7. `app/(protected)/app/hobbies/edit/page.tsx` — hobbies edit
+8. `app/(protected)/app/skills/edit/page.tsx` — skills edit
+9. `app/(protected)/app/social-links/edit/page.tsx` — social links edit
+10. `app/(protected)/app/education/[id]/edit/page.tsx` — education entry edit
+11. `app/(protected)/app/certification/[id]/edit/page.tsx` — certification edit
+12. `app/(protected)/app/endorsement/[id]/edit/page.tsx` — endorsement edit
+13. `app/(protected)/app/attachment/[id]/edit/page.tsx` — attachment edit
+
+**Changes per file:**
+- Replace ALL raw `<input>`, `<select>`, `<textarea>`, `<button>` with `<Input>`, `<Select>`, `<Textarea>`, `<Button>`
+- Replace `alert()` → `useToast()` (affects: hobbies, skills, social-links, photos, gallery)
+- Add success toast on save for pages that silently navigate (affects: education, hobbies, skills, social-links, about, certification, endorsement)
+- Replace `Loading…` text with `<Skeleton>` blocks (affects: about, education, certification, endorsement, attachment)
+- Fix cert edit delete: text link → `<Button variant="destructive" size="sm">`
 - Fix attachment pages: remove `min-h-screen` custom wrapper, use standard layout, fix title/label sizing
 
 ### 3C. Standardize across all forms
-- Page title: `text-xl font-semibold text-[var(--color-text-primary)]` (DM Sans, not serif)
-- Form label: `text-sm font-medium text-[var(--color-text-primary)]`
-- Input height: `h-12` (48px) — consistent with auth pages
-- Gap: `gap-4` between form fields
-- Disabled opacity: `0.5` everywhere
-- BackButton placement: always in `flex items-center gap-3` row with page title
-- Bottom padding: `pb-24` on all pages (already done in 10.1 for most)
+
+| Property | Value |
+|---|---|
+| Page title | `text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]` (DM Sans — matches style guide 28px/700/-0.02em) |
+| Section heading | `tracking-[-0.01em]` |
+| Form label | `text-sm font-medium text-[var(--color-text-primary)]` |
+| Input height | `h-12` (48px) |
+| Gap | `gap-4` between form fields |
+| Disabled opacity | Via `<Button>` component (built in) |
+| BackButton placement | `<div className="flex items-center gap-3"><BackButton href="..." /><h1>...</h1></div>` |
+| Bottom padding | `pb-24` on all pages |
+| Required indicator | `*` in label text |
 
 ---
 
@@ -146,41 +203,56 @@ Add to existing Button.tsx:
 
 **Goal:** The public profile is the product. It must look premium.
 
-### 4A. Hero scroll behavior (parallax shrink)
-- Start at `h-[60vh]` on first load
-- As user scrolls down, hero smoothly shrinks to `h-[34vh]` and stays
-- Implementation: `useScroll()` + `useTransform()` from Framer Motion
-- Profile name + role overlay pins to bottom of hero during shrink
-- On fresh load / scroll-to-top, hero re-expands
-- Desktop: sticky left panel stays at 40% — no height animation needed (already works)
+### 4A. Hero scroll behavior (parallax shrink → framed card)
+
+**Architecture:** `PublicProfileContent.tsx` is a server component. Extract the hero into `components/public/HeroSection.tsx` with `'use client'`. Parent passes photo URLs and profile data as props.
+
+**The interaction (mobile only, desktop stays at sticky 40%):**
+- **60vh (initial load):** Full-bleed, edge-to-edge photo — immersive Bumble-style
+- **As user scrolls (0–200px):** Photo container smoothly gains margins + rounded corners + border, transitioning from full-bleed to a framed portrait card
+- **34vh (scrolled):** Photo sits in a `rounded-2xl` card with `mx-4` margins and `border border-[var(--color-border-subtle)]`
+
+**Animated properties (all via `useTransform` mapped to scrollY 0→200):**
+- `height`: 60vh → 34vh
+- `marginInline`: 0px → 16px
+- `borderRadius`: 0px → 16px
+- `border`: transparent → `var(--color-border-subtle)`
+
+**User preference toggle:**
+- "Immersive profile photo" toggle in profile settings page
+- Stored in `section_visibility` JSONB (key: `immersive_hero`, default: `true`)
+- **Schema note:** `section_visibility` JSONB column already exists on the `users` table (added in migration `20260317000021`). It accepts arbitrary keys — no migration needed. The API endpoint at `app/api/profile/section-visibility/route.ts` already handles PATCH updates to this field.
+- When off: photo starts and stays at 34vh framed card — no scroll animation
+- Pass preference as prop to `HeroSection`
 
 ### 4B. Section gaps + contrast
 - Content gap: `gap-2` → `gap-4`
-- Background: Increase contrast between page bg and card bg, or add subtle card borders
-- Accordion cards: `shadow-sm` → `shadow-md` for clearer elevation
+- Background: Add subtle card border `border border-[var(--color-border-subtle)]`
+- Accordion cards: keep `shadow-sm` (adding border provides enough contrast)
 
 ### 4C. Accordion quality
 - Chevron: replace `›` text character with Lucide `ChevronRight` icon (smooth rotation)
 - Title: `text-base` → `text-lg` for stronger hierarchy (keep font-serif)
 - Expanded content: `pt-1` → `pt-3` for breathing room above divider
-- Add active/press state on accordion header (subtle scale or bg change)
+- Add active/press state: `active:scale-[0.99] transition-transform`
+- **Note:** Actual old_string for card wrapper is `"bg-[var(--color-surface)] rounded-2xl shadow-sm overflow-hidden"` (has `overflow-hidden`, no `p-4`)
 
 ### 4D. Endorsement cards
-- Border radius: `rounded-lg` → `rounded-2xl` (match everything else)
+- Border radius: `rounded-lg` → `rounded-2xl` (match everything else — update cards pattern doc too)
 - Text color: `text-secondary` → `text-primary` (testimonial words are the most important thing)
-- Avatar: `h-8 w-8` → `h-10 w-10` (trust signal needs to be recognizable)
-- Fallback avatar: hash-based background color for initials (like Slack/Notion)
-- Left border: add `border-l-4 border-[var(--color-coral-500)]` (section color!)
+- Avatar: replace inline fallback with `<ProfileAvatar>` component (from Part 1B)
+- Left border: add `border-l-4 border-[var(--color-coral-500)]` (section color)
 - Quote marks: style as decorative element (large quote above, or left-border accent)
 
 ### 4E. Photo gallery
 - Add crossfade transition between photos (Framer Motion AnimatePresence)
-- Dot indicators: `w-1.5 h-1.5` → `w-2 h-2` (easier to tap)
+- Dot indicators: `w-1.5 h-1.5` → `w-2.5 h-2.5` (easier to tap)
 - Desktop arrows: `w-8 h-8` → `w-10 h-10`, change to `bg-white/80 shadow-md` (Airbnb style)
 - Empty state: replace emoji with proper illustration placeholder
 
 ### 4F. Social link icons
 - Replace all emoji icons with proper SVGs (Lucide where available, custom for platforms)
+- **Type change:** `SocialLinksRow` icon type changes from `string` to `React.ReactNode` — update the `PLATFORM_CONFIG` interface accordingly
 - Instagram: Lucide `Instagram`
 - LinkedIn: Lucide `Linkedin`
 - YouTube: Lucide `Youtube`
@@ -198,13 +270,19 @@ Add to existing Button.tsx:
 - For non-logged-in users: make "Build your crew profile" CTA sticky at bottom of viewport
 - Use `fixed bottom-0` with a backdrop-blur treatment
 
+### 4I. Photo reorder fix
+- `app/(protected)/app/profile/photos/page.tsx` — photo reorder is currently broken
+- Verify `sort_order` field on `user_photos` table and that the API supports PATCH updates
+- Ensure drag-and-drop works on mobile (touch events) or wire up/down buttons to PATCH endpoint
+- Test: reorder photos, reload, confirm order persists
+
 ---
 
 ## Part 5: Main App Pages
 
 ### 5A. CV page rewrite
 - Add page title ("Your CV & Share Links")
-- Change ALL `rounded-lg` → `rounded-2xl` on cards
+- Change card container `rounded-lg` → `rounded-2xl` (**only card wrappers**, not inner button radii)
 - Replace hand-rolled radio buttons with proper radio group
 - Add QR code toggle animation
 - Restructure: primary actions (share, download) prominent, secondary (regenerate, edit) smaller
@@ -220,15 +298,22 @@ Add to existing Button.tsx:
 - Apply to More page theme toggle
 - Saved profiles folder pills stay as horizontal scroll pills (different use case — filters, not tabs)
 
-### 5D. Missing loading.tsx files
-- Create `loading.tsx` for: network, insights, cv, more
-- Use `<Skeleton>` component consistently
-- Replace hand-rolled `animate-pulse` divs in account page with `<Skeleton>`
+### 5D. Loading states
+- **Already exist:** `loading.tsx` files for network, insights, cv, more, profile, network/saved
+- **Fix:** Replace any hand-rolled `animate-pulse` divs in these files with `<Skeleton>` component
+- **No new `loading.tsx` files needed** — they were created in a prior sprint
 
 ### 5E. Delete account page
 - Match standard layout (remove custom `max-w-sm`)
 - Use `<Button variant="destructive">` instead of hand-rolled red button
-- Use shadcn `Dialog` for confirmation instead of native `window.confirm`
+- **Note:** No `window.confirm` exists here. The existing confirmation pattern (type "DELETE MY ACCOUNT") is good — keep it. Just swap the styled button.
+- **Correct button text:** "Delete Account" (not "Delete my account")
+
+### 5F. Bento grid layouts
+- **Profile page:** Photo card large (2-col span), stat cards side-by-side
+- **Insights page:** One big chart card + 2–3 small stat cards
+- Implementation: CSS Grid with `grid-cols-2` and `col-span-2` for featured cards
+- Desktop: `max-w-2xl mx-auto` for centered content width
 
 ---
 
@@ -250,19 +335,20 @@ Add to existing Button.tsx:
 - Pro feature cards: `border-l-4 border-[var(--color-sand-300)]`
 
 ### 6C. Sand warmth touches
-- Pro badge: `bg-[var(--color-sand-100)] text-[var(--color-sand-400)]`
+- Pro badge: use `<Badge colorScheme="sand">`
 - Insights "Pro" pill: sand-tinted
 - Welcome page: subtle sand gradient accent (not overwhelming)
 
 ### 6D. Badge/pill colors by section
-- Cert status "Valid": keep green
-- Cert status "Expiring": `bg-[var(--color-amber-100)] text-[var(--color-amber-700)]`
-- Endorsement count badge: `bg-[var(--color-coral-100)] text-[var(--color-coral-700)]`
-- Colleague count: `bg-[var(--color-navy-100)] text-[var(--color-navy-700)]`
+Use `<Badge>` component with `colorScheme` prop throughout:
+- Cert status "Valid": keep green (`<Badge colorScheme="success">`)
+- Cert status "Expiring": `<Badge colorScheme="amber">`
+- Endorsement count: `<Badge colorScheme="coral">`
+- Colleague count: `<Badge colorScheme="navy">`
 
 ### 6E. Dark mode section colors
 - Use 200-level shades per style guide: coral-200, navy-200, amber-200
-- Verify contrast on dark surface (#0f172a)
+- **Contrast validation:** Run all dark-mode section color hex values through WCAG AA contrast checker against dark surface `#0f172a` BEFORE implementation. Minimum 4.5:1 for body text, 3:1 for large text and UI components.
 - Card accent borders: use 500-level (brighter) in dark mode
 
 ---
@@ -273,14 +359,15 @@ Add to existing Button.tsx:
 - Every page gets `<PageTransition>` wrapper (currently only 4 pages have it)
 - Auth pages get entrance animation
 - Edit pages get entrance animation
+- **`prefers-reduced-motion` support:** Wrap all new animations in `@media (prefers-reduced-motion: no-preference)` or use Framer Motion's `useReducedMotion()` hook. When reduced motion is preferred, skip entrance animations and crossfades — show content immediately.
 
 ### 7B. Skeleton → content crossfade
-- When async data loads, crossfade from skeleton to content (not instant swap)
-- Use `AnimatePresence` with `mode="wait"`
+- For pages using `loading.tsx`: Next.js Suspense handles the transition automatically — no extra code needed
+- For client-side loading states (edit pages): wrap in `AnimatePresence mode="wait"` with opacity fade
 
 ### 7C. Button press feedback
 - Verify all `<Button>` instances have `active:scale-[0.97]` (built into component)
-- Add subtle press feedback to accordion headers
+- Add subtle press feedback to accordion headers: `active:scale-[0.99] transition-transform`
 
 ### 7D. ShowMoreButton animation
 - Add `AnimatePresence` + height animation when content reveals
@@ -291,74 +378,131 @@ Add to existing Button.tsx:
 
 ---
 
+## Part 8: Documentation Updates
+
+- Update cards pattern doc: `rounded-lg` → `rounded-2xl` to match style guide
+- Update style guide hero height: 65vh → 60vh (post-implementation)
+- Verify all doc references match implemented values
+
+---
+
 ## Build Order
 
 ```
-Part 1: Component Foundation (Wave 0 — blocks everything)
-  1A Token unification
-  1B Missing components (Textarea, Select, FormField, IconButton)
-  1C Button variants
-  1D EmptyState fix
-  1E Nav config extraction
-  1F Dark mode token gaps
+Part 0: Pre-Work Bug Fixes (~1 hour)
+  Theme key, legal links, CookieBanner z-index, var(--teal-N) audit
 
-Part 2: Section Color System (can parallel with Part 3)
-  2A Color assignments + lib/section-colors.ts
+Part 1: Component Foundation (Wave 0 — blocks everything, ~1 day)
+  1A Token unification (Input, Toast)
+  1B Missing components (Textarea, Select, FormField, IconButton, Badge, ProfileAvatar)
+  1C Button variants (outline, link, icon) + verify existing call sites
+  1D EmptyState fix + accentColor prop
+  1E Nav config extraction (route/label data only)
+  1F Dark mode token gaps (including teal)
+  1G Accessibility audit on new components
+
+Part 2: Section Color System (~0.5 day, can parallel with Part 3)
+  2A Color assignments + lib/section-colors.ts + sectionClassMap
   2B Implementation across nav, cards, empty states
 
-Part 3: Form System Rewrite (can parallel with Part 2)
-  3A Auth pages (5 files)
-  3B Profile edit pages (12+ files)
-  3C Standardization pass
+Part 3: Form System Rewrite (~2 days, can parallel with Part 2)
+  3A Auth pages (5 files — enumerated above)
+  3B Profile edit pages (13 files — enumerated above)
+  3C Standardization pass (28px/700 titles, tracking, gaps)
 
-Part 4: Public Profile Overhaul
-  4A Hero scroll (parallax shrink)
-  4B-4H All other public profile fixes
+Part 4: Public Profile Overhaul (~1.5 days)
+  4A Hero parallax shrink → framed card (extract HeroSection.tsx client component)
+  4B–4H Visual fixes
+  4I Photo reorder fix
 
-Part 5: Main App Pages
-  5A-5E All main page fixes
+Part 5: Main App Pages (~1.5 days)
+  5A–5E Page-specific fixes
+  5F Bento grid layouts (profile, insights)
 
-Part 6: Color & Warmth Pass (after Parts 2-5 establish the structure)
-  6A-6E Apply section colors everywhere
+Part 6: Color & Warmth Application Pass (~1 day)
+  6A–6E Apply section colors everywhere (using Badge component + section class map)
 
-Part 7: Animation & Interaction Polish (final pass)
-  7A-7E Entrance animations, crossfades, press feedback
+Part 7: Animation & Interaction Polish (~0.5 day)
+  7A–7E Animations with prefers-reduced-motion support
+
+Part 8: Documentation Updates (~0.5 hour)
 ```
 
-**Estimated effort:**
-- Part 1: 1 day
-- Part 2: 0.5 days
-- Part 3: 2 days (most files)
-- Part 4: 1.5 days
-- Part 5: 1 day
-- Part 6: 1 day
-- Part 7: 0.5 days
-- **Total: ~7-8 days with parallel agents**
+**Estimated effort: ~8–9 days with parallel agents**
 
 ---
 
 ## Exit Criteria
 
-- Zero raw `<button>`, `<input>`, `<select>`, `<textarea>` in page files
-- Zero `alert()` calls
+### Automated checks (run these commands)
+```bash
+# Zero raw HTML form elements in page files (excludes component definitions)
+grep -rn '<button\b' app/ --include='*.tsx' | grep -v 'components/' | grep -v 'node_modules'
+grep -rn '<input\b' app/ --include='*.tsx' | grep -v 'components/' | grep -v 'node_modules'
+grep -rn '<select\b' app/ --include='*.tsx' | grep -v 'components/' | grep -v 'node_modules'
+grep -rn '<textarea\b' app/ --include='*.tsx' | grep -v 'components/' | grep -v 'node_modules'
+# Expected: zero results for all four
+
+# Zero alert() calls
+grep -rn 'alert(' app/ --include='*.tsx' | grep -v 'node_modules' | grep -v '// '
+# Expected: zero results
+
+# Zero hardcoded red classes in non-component files
+grep -rn 'bg-red-\|border-red-\|text-red-' app/ --include='*.tsx' | grep -v 'components/ui/' | grep -v 'node_modules'
+# Expected: zero results (all error styling via tokens)
+
+# Confirm section color adoption
+grep -rn 'color-coral-\|color-navy-\|color-amber-\|color-sand-' components/ app/ --include='*.tsx' -l | wc -l
+# Expected: >= 15 files
+
+# Zero bare --teal-N references (should all be --color-teal-N)
+grep -rn 'var(--teal-' app/ components/ --include='*.tsx' --include='*.css'
+# Expected: zero results
+
+# Build passes
+npm run build
+# Expected: zero errors
+
+# TypeScript passes
+npx tsc --noEmit
+# Expected: zero errors
+```
+
+### Manual checks
+- Visual check passes at 375px and 1280px, both themes
+- Dark mode correct on every modified page (use browser DevTools → Rendering → Emulate `prefers-color-scheme: dark`)
 - Every save flow shows a success toast
 - Every async page shows `<Skeleton>` loading
 - All cards use `rounded-2xl`
 - All inputs use `rounded-xl`
-- Coral, navy, amber, sand tokens visible in at least 15 components
-- Section color tints on Network, Insights, CV pages
-- Public profile hero scroll behavior working
+- Section color tints visible on Network, Insights, CV pages
+- Public profile hero scroll behavior working (60vh → 34vh framed card)
 - Photo gallery has crossfade transitions
+- Photo reorder works and persists
 - Social links use SVG icons
-- Dark mode correct on every page
-- `npm run build` zero errors
-- Visual check passes at 375px and 1280px, both themes
+- `prefers-reduced-motion` disables animations gracefully
+
+### Dark mode contrast validation
+Before marking Part 6E complete, verify these hex values against `#0f172a` background:
+| Token | Dark value | Min ratio | Use |
+|-------|-----------|-----------|-----|
+| `--color-coral-200` | `#F9A99C` | 4.5:1 | Badge text |
+| `--color-coral-500` | `#F9A99C` | 3:1 | Border accent |
+| `--color-navy-200` | `#A8BAD3` | 4.5:1 | Badge text |
+| `--color-navy-500` | `#A8BAD3` | 3:1 | Border accent |
+| `--color-amber-200` | `#FBD97D` | 4.5:1 | Badge text |
+| `--color-amber-500` | `#FBD97D` | 3:1 | Border accent |
+| `--color-success` | `#34d399` | 4.5:1 | Status text |
+| `--color-error` | `#f87171` | 4.5:1 | Error text |
+
+Tool: https://webaim.org/resources/contrastchecker/ or `npx wcag-contrast`
 
 ---
 
 ## Risks
 
-- Part 4A (hero parallax shrink) is the most complex single feature — isolate it so it doesn't block other work
-- Section colors in dark mode need careful contrast testing
+- Part 4A (hero parallax shrink) is the most complex single feature — isolate it in its own client component so it doesn't block other work
+- Section colors in dark mode need contrast validation BEFORE implementation (see exit criteria table)
 - Replacing raw inputs with components may change spacing — need visual diff per page
 - Attachment pages are structurally different — may need partial rewrite rather than component swap
+- Photo reorder (Part 4I) may need investigation — treat as a spike with 2-hour timebox, escalate if the API doesn't support sort_order updates

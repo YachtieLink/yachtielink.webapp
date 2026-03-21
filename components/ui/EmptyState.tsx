@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+import type { SectionColor } from '@/lib/section-colors'
+
 interface EmptyStateProps {
   /** Emoji or React node displayed above the title */
   icon?: React.ReactNode
@@ -16,6 +18,8 @@ interface EmptyStateProps {
    * 'inline' — renders just the text content (for use inside an existing card)
    */
   variant?: 'card' | 'inline'
+  /** Optional section accent color for the icon tint */
+  accentColor?: SectionColor
 }
 
 export function EmptyState({
@@ -25,6 +29,7 @@ export function EmptyState({
   actionLabel,
   actionHref,
   variant = 'card',
+  accentColor,
 }: EmptyStateProps) {
   const content = (
     <>
@@ -49,7 +54,7 @@ export function EmptyState({
   }
 
   return (
-    <div className="bg-[var(--color-surface)] rounded-2xl p-6 text-center">
+    <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-2xl p-6 text-center">
       {content}
     </div>
   )

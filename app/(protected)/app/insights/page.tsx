@@ -6,6 +6,7 @@
  */
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { Lock } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { getProStatus } from '@/lib/stripe/pro';
 import { AnalyticsChart } from '@/components/insights/AnalyticsChart';
@@ -102,13 +103,13 @@ export default async function InsightsPage({ searchParams }: Props) {
   }
 
   return (
-    <PageTransition className="flex flex-col gap-4 pb-24">
+    <PageTransition className="flex flex-col gap-4 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-coral-50)]">
       {upgraded && <InsightsUpgradedToast isPro={proStatus.isPro} />}
 
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-serif text-[var(--color-text-primary)]">Insights</h1>
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Insights</h1>
         {proStatus.isPro && (
-          <span className="text-xs font-semibold bg-[var(--color-teal-700)] text-white px-2.5 py-1 rounded-full">
+          <span className="text-xs font-semibold bg-[var(--color-sand-100)] text-[var(--color-sand-400)] px-2.5 py-1 rounded-full">
             Pro ✓
           </span>
         )}
@@ -202,12 +203,15 @@ export default async function InsightsPage({ searchParams }: Props) {
 
 function TeaserCard({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex items-center justify-between opacity-70">
-      <div>
+    <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex items-center justify-between">
+      <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-[var(--color-text-primary)]">{title}</p>
-        <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{subtitle}</p>
+        <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">{subtitle}</p>
       </div>
-      <span className="text-[var(--color-text-secondary)] text-lg ml-3 flex-shrink-0">🔒</span>
+      <span className="shrink-0 flex items-center gap-1.5 text-xs font-medium text-[var(--color-sand-400)] bg-[var(--color-sand-100)] px-2.5 py-1 rounded-full ml-3">
+        <Lock size={12} />
+        Pro
+      </span>
     </div>
   );
 }

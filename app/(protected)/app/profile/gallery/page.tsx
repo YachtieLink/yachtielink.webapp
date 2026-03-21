@@ -5,6 +5,8 @@ import { BackButton } from '@/components/ui/BackButton'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { uploadGalleryItem } from '@/lib/storage/upload'
+import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface GalleryItem {
   id: string
@@ -14,6 +16,7 @@ interface GalleryItem {
 }
 
 export default function WorkGalleryPage() {
+  const { toast } = useToast()
   const [items, setItems] = useState<GalleryItem[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
@@ -38,14 +41,18 @@ export default function WorkGalleryPage() {
       if (!user) return
 
       const result = await uploadGalleryItem(user.id, file)
-      if (!result.ok) { alert(result.error); return }
+      if (!result.ok) { toast(result.error, 'error'); return }
 
       const res = await fetch('/api/user-gallery', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image_url: result.url, sort_order: items.length }),
       })
-      if (!res.ok) { const d = await res.json(); alert(d.error ?? 'Upload failed'); return }
+      if (!res.ok) {
+        const d = await res.json()
+        toast(d.error ?? 'Upload failed', 'error')
+        return
+      }
       const { item } = await res.json()
       setItems((prev) => [...prev, item])
     } finally {
@@ -60,13 +67,27 @@ export default function WorkGalleryPage() {
     if (res.ok) setItems((prev) => prev.filter((i) => i.id !== id))
   }
 
-  if (loading) return <div className="p-4 text-[var(--color-text-secondary)]">Loading…</div>
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-4 pb-24">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-9 w-9 rounded-xl" />
+          <Skeleton className="h-6 w-32" />
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {[...Array(9)].map((_, i) => (
+            <Skeleton key={i} className="aspect-square rounded-xl" />
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-4 pb-24">
       <div className="flex items-center gap-3">
         <BackButton href="/app/profile" />
-        <h1 className="font-semibold text-lg text-[var(--color-text-primary)]">Work Gallery</h1>
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Work Gallery</h1>
       </div>
 
       <p className="text-sm text-[var(--color-text-secondary)]">Showcase your work — engine rooms, table settings, deck work, interiors. Free: 12 photos · Pro: 30.</p>
@@ -77,7 +98,7 @@ export default function WorkGalleryPage() {
             <Image src={item.image_url} alt={item.caption ?? 'Gallery photo'} fill className="object-cover" unoptimized />
             <button
               onClick={() => deleteItem(item.id)}
-              className="absolute top-1 right-1 bg-black/50 hover:bg-red-600 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center transition-colors"
+              className="absolute top-1 right-1 bg-black/50 hover:bg-[var(--color-error)] text-white text-xs w-6 h-6 rounded-full flex items-center justify-center transition-colors"
               aria-label="Remove photo"
             >
               ×

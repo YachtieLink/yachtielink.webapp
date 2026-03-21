@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronRight } from 'lucide-react'
 import { easeGentle } from '@/lib/motion'
 import Link from 'next/link'
 
@@ -30,15 +31,15 @@ export function ProfileAccordion({
   if (hidden) return null
 
   return (
-    <div className="bg-[var(--color-surface)] rounded-2xl shadow-sm overflow-hidden">
+    <div className="bg-[var(--color-surface)] rounded-2xl shadow-sm overflow-hidden border border-[var(--color-border-subtle)]">
       <button
-        className="w-full text-left p-4 flex items-start gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-interactive)]"
+        className="w-full text-left p-4 flex items-start gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-interactive)] active:scale-[0.99] transition-transform"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-serif text-base text-[var(--color-text-primary)]">{title}</span>
+            <span className="font-serif text-lg text-[var(--color-text-primary)]">{title}</span>
             {editHref && (
               <Link
                 href={editHref}
@@ -57,7 +58,7 @@ export function ProfileAccordion({
           className="shrink-0 text-[var(--color-text-secondary)] mt-0.5"
           aria-hidden
         >
-          ›
+          <ChevronRight size={18} />
         </motion.span>
       </button>
 
@@ -71,7 +72,7 @@ export function ProfileAccordion({
             transition={easeGentle}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 pt-1 border-t border-[var(--color-border)]">
+            <div className="px-4 pb-4 pt-3 border-t border-[var(--color-border)]">
               {children}
             </div>
           </motion.div>

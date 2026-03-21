@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BackButton } from '@/components/ui/BackButton'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
 
 export default function EducationNewPage() {
   const router = useRouter()
@@ -59,69 +61,56 @@ export default function EducationNewPage() {
       </div>
 
       <form onSubmit={save} className="flex flex-col gap-4">
-        <div>
-          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Institution *</label>
-          <input
-            value={form.institution}
-            onChange={(e) => update('institution', e.target.value)}
-            placeholder="e.g. UKSA, Maritime Academy"
-            className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            maxLength={200}
-          />
-        </div>
+        <Input
+          label="Institution *"
+          value={form.institution}
+          onChange={(e) => update('institution', e.target.value)}
+          placeholder="e.g. UKSA, Maritime Academy"
+          maxLength={200}
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Qualification</label>
-          <input
-            value={form.qualification}
-            onChange={(e) => update('qualification', e.target.value)}
-            placeholder="e.g. BSc Marine Engineering, STCW Basic"
-            className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            maxLength={200}
-          />
-        </div>
+        <Input
+          label="Qualification"
+          value={form.qualification}
+          onChange={(e) => update('qualification', e.target.value)}
+          placeholder="e.g. BSc Marine Engineering, STCW Basic"
+          maxLength={200}
+        />
 
-        <div>
-          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Field of Study</label>
-          <input
-            value={form.field_of_study}
-            onChange={(e) => update('field_of_study', e.target.value)}
-            placeholder="e.g. Nautical Science"
-            className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            maxLength={200}
-          />
-        </div>
+        <Input
+          label="Field of Study"
+          value={form.field_of_study}
+          onChange={(e) => update('field_of_study', e.target.value)}
+          placeholder="e.g. Nautical Science"
+          maxLength={200}
+        />
 
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Start date</label>
-            <input
-              type="date"
-              value={form.started_at}
-              onChange={(e) => update('started_at', e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">End date</label>
-            <input
-              type="date"
-              value={form.ended_at}
-              onChange={(e) => update('ended_at', e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            />
-          </div>
+          <Input
+            label="Start date"
+            type="date"
+            value={form.started_at}
+            onChange={(e) => update('started_at', e.target.value)}
+          />
+          <Input
+            label="End date"
+            type="date"
+            value={form.ended_at}
+            onChange={(e) => update('ended_at', e.target.value)}
+          />
         </div>
 
         {error && <p className="text-sm text-[var(--color-error)]">{error}</p>}
 
-        <button
+        <Button
           type="submit"
           disabled={saving}
-          className="w-full py-3 rounded-xl bg-[var(--color-interactive)] text-white font-medium disabled:opacity-60 hover:bg-[var(--color-interactive-hover)] transition-colors"
+          loading={saving}
+          className="w-full"
+          size="lg"
         >
           {saving ? 'Saving…' : 'Add education'}
-        </button>
+        </Button>
       </form>
     </div>
   )

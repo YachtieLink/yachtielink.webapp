@@ -3,9 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { fadeUp } from '@/lib/motion'
 import { createClient } from '@/lib/supabase/client'
+import { PageTransition } from '@/components/ui/PageTransition'
 import { ManagePortalButton } from '@/components/insights/ManagePortalButton'
 
 type Theme = 'system' | 'light' | 'dark'
@@ -22,7 +21,7 @@ function SettingsRow({
   danger?: boolean
 }) {
   const cls = `flex items-center justify-between px-5 py-4 hover:bg-[var(--color-surface-raised)]/30 transition-colors ${
-    danger ? 'text-red-500' : 'text-[var(--color-text-primary)]'
+    danger ? 'text-[var(--color-error)]' : 'text-[var(--color-text-primary)]'
   }`
 
   if (href) {
@@ -114,7 +113,7 @@ export default function MorePage() {
   }
 
   return (
-    <motion.div variants={fadeUp} initial="hidden" animate="visible" className="flex flex-col pb-24">
+    <PageTransition className="flex flex-col pb-24">
       {/* ── Appearance ─────────────────────────────── */}
       <SectionHeader title="Appearance" />
       <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden">
@@ -229,7 +228,7 @@ export default function MorePage() {
       <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden">
         <button
           onClick={handleSignOut}
-          className="w-full flex items-center justify-between px-5 py-4 text-sm text-red-500 hover:bg-[var(--color-surface-raised)]/30 transition-colors"
+          className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--color-error)] hover:bg-[var(--color-surface-raised)]/30 transition-colors"
         >
           Sign out
         </button>
@@ -238,6 +237,6 @@ export default function MorePage() {
       <p className="text-center text-xs text-[var(--color-text-secondary)] mt-6 mb-2">
         YachtieLink · Phase 1A
       </p>
-    </motion.div>
+    </PageTransition>
   )
 }

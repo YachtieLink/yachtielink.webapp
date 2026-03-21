@@ -121,7 +121,7 @@ export default function ProfilePhotoPage() {
   return (
     <div className="flex flex-col gap-6 pb-24">
       <div>
-        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Profile photo</h1>
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Profile photo</h1>
         <p className="text-sm text-[var(--color-text-secondary)] mt-1">
           JPEG, PNG, or WebP · max 5 MB · square crop
         </p>

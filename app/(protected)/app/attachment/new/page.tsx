@@ -120,12 +120,14 @@ export default function AttachmentNewPage() {
     return (
       <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
         <div className="mb-6">
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={() => setStep('yacht')}
-            className="text-sm text-[var(--color-interactive)] hover:underline"
+            className="px-0 text-[var(--color-interactive)]"
           >
             ← {yacht?.name}
-          </button>
+          </Button>
         </div>
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Your role</h1>
         <p className="text-sm text-[var(--color-text-secondary)] mb-6">
@@ -217,12 +219,14 @@ export default function AttachmentNewPage() {
   return (
     <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
       <div className="mb-6">
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setStep('role')}
-          className="text-sm text-[var(--color-interactive)] hover:underline"
+          className="px-0 text-[var(--color-interactive)]"
         >
           ← {roleLabel}
-        </button>
+        </Button>
       </div>
       <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Dates</h1>
       <p className="text-sm text-[var(--color-text-secondary)] mb-6">
