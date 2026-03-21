@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { sendNotifyEmail } from '@/lib/email/notify'
 import { sanitizeHtml } from '@/lib/validation/sanitize'
+import { handleApiError } from '@/lib/api/errors'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://yachtie.link'
 
@@ -14,36 +15,40 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id: token } = await params
-  const supabase = await createClient()
+  try {
+    const { id: token } = await params
+    const supabase = await createClient()
 
-  const { data: request, error } = await supabase
-    .from('endorsement_requests')
-    .select(`
-      id, token, requester_id, yacht_id, recipient_email,
-      status, expires_at, created_at, accepted_at, cancelled_at,
-      requester:users!requester_id(display_name, full_name, profile_photo_url),
-      yacht:yachts!yacht_id(id, name, yacht_type, length_meters, flag_state, year_built)
-    `)
-    .eq('token', token)
-    .single()
+    const { data: request, error } = await supabase
+      .from('endorsement_requests')
+      .select(`
+        id, token, requester_id, yacht_id, recipient_email,
+        status, expires_at, created_at, accepted_at, cancelled_at,
+        requester:users!requester_id(display_name, full_name, profile_photo_url),
+        yacht:yachts!yacht_id(id, name, yacht_type, length_meters, flag_state, year_built)
+      `)
+      .eq('token', token)
+      .single()
 
-  if (error || !request) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    if (error || !request) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
+
+    // Cancelled
+    if (request.cancelled_at || request.status === 'cancelled') {
+      return NextResponse.json({ error: 'This request was cancelled' }, { status: 410 })
+    }
+
+    // Expired
+    const isExpired = new Date(request.expires_at) < new Date()
+    if (isExpired) {
+      return NextResponse.json({ expired: true, request }, { status: 200 })
+    }
+
+    return NextResponse.json({ request })
+  } catch (e) {
+    return handleApiError(e)
   }
-
-  // Cancelled
-  if (request.cancelled_at || request.status === 'cancelled') {
-    return NextResponse.json({ error: 'This request was cancelled' }, { status: 410 })
-  }
-
-  // Expired
-  const isExpired = new Date(request.expires_at) < new Date()
-  if (isExpired) {
-    return NextResponse.json({ expired: true, request }, { status: 200 })
-  }
-
-  return NextResponse.json({ request })
 }
 
 // ─── PUT /api/endorsement-requests/:id ────────────────────────────────────────
@@ -57,100 +62,104 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
-  let body: z.infer<typeof updateRequestBodySchema>
   try {
-    const raw = await req.json()
-    const parsed = updateRequestBodySchema.safeParse(raw)
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
-    }
-    body = parsed.data
-  } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
-  }
-  const { action } = body
+    const { id } = await params
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // 'decline' is performed by the recipient, not the requester
-  if (action === 'decline') {
+    let body: z.infer<typeof updateRequestBodySchema>
+    try {
+      const raw = await req.json()
+      const parsed = updateRequestBodySchema.safeParse(raw)
+      if (!parsed.success) {
+        return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+      }
+      body = parsed.data
+    } catch {
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    }
+    const { action } = body
+
+    // 'decline' is performed by the recipient, not the requester
+    if (action === 'decline') {
+      const { data: request, error: loadError } = await supabase
+        .from('endorsement_requests')
+        .select('id, recipient_user_id, status')
+        .eq('id', id)
+        .eq('recipient_user_id', user.id)
+        .single()
+
+      if (loadError || !request) {
+        return NextResponse.json({ error: 'Not found' }, { status: 404 })
+      }
+
+      const { error } = await supabase
+        .from('endorsement_requests')
+        .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
+        .eq('id', id)
+
+      if (error) return NextResponse.json({ error: 'Failed to decline' }, { status: 500 })
+      return NextResponse.json({ ok: true })
+    }
+
+    // Load request (must belong to current user as requester)
     const { data: request, error: loadError } = await supabase
       .from('endorsement_requests')
-      .select('id, recipient_user_id, status')
+      .select('id, token, requester_id, recipient_email, yacht_id, status, cancelled_at')
       .eq('id', id)
-      .eq('recipient_user_id', user.id)
+      .eq('requester_id', user.id)
       .single()
 
     if (loadError || !request) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
 
-    const { error } = await supabase
-      .from('endorsement_requests')
-      .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
-      .eq('id', id)
+    if (action === 'cancel') {
+      const { data: updated, error } = await supabase
+        .from('endorsement_requests')
+        .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
+        .eq('id', id)
+        .select()
+        .single()
 
-    if (error) return NextResponse.json({ error: 'Failed to decline' }, { status: 500 })
-    return NextResponse.json({ ok: true })
-  }
-
-  // Load request (must belong to current user as requester)
-  const { data: request, error: loadError } = await supabase
-    .from('endorsement_requests')
-    .select('id, token, requester_id, recipient_email, yacht_id, status, cancelled_at')
-    .eq('id', id)
-    .eq('requester_id', user.id)
-    .single()
-
-  if (loadError || !request) {
-    return NextResponse.json({ error: 'Not found' }, { status: 404 })
-  }
-
-  if (action === 'cancel') {
-    const { data: updated, error } = await supabase
-      .from('endorsement_requests')
-      .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (error) return NextResponse.json({ error: 'Failed to cancel' }, { status: 500 })
-    return NextResponse.json({ request: updated })
-  }
-
-  // action === 'resend' — rate limit check then re-send email with existing token
-  const { data: todayCount } = await supabase.rpc('endorsement_requests_today', { p_user_id: user.id })
-  const { data: profile } = await supabase.from('users').select('subscription_status').eq('id', user.id).single()
-  const limit = profile?.subscription_status === 'pro' ? 20 : 10
-  if ((todayCount ?? 0) >= limit) {
-    return NextResponse.json({ error: 'Rate limit exceeded', limit, used: todayCount }, { status: 429 })
-  }
-
-  try {
-    const { data: requester } = await supabase.from('users').select('display_name, full_name').eq('id', user.id).single()
-    const { data: yacht } = await supabase.from('yachts').select('name').eq('id', request.yacht_id).single()
-    const requesterName = requester?.display_name ?? requester?.full_name ?? 'A colleague'
-    const yachtName = yacht?.name ?? ''
-    const deepLink = `${APP_URL}/r/${request.token}`
-    const subjectYacht = yachtName ? ` on ${yachtName}` : ''
-    const safeRequesterName = sanitizeHtml(requesterName)
-    const safeYachtName = sanitizeHtml(yachtName)
-    if (request.recipient_email) {
-      await sendNotifyEmail({
-        to: request.recipient_email,
-        subject: `${requesterName} asked you to endorse their work${subjectYacht}`,
-        html: buildResendHtml(safeRequesterName, safeYachtName, deepLink),
-        text: `${requesterName} is asking for an endorsement. Write one here: ${deepLink}`,
-      })
+      if (error) return NextResponse.json({ error: 'Failed to cancel' }, { status: 500 })
+      return NextResponse.json({ request: updated })
     }
-  } catch (e) {
-    console.error('Resend email failed:', e)
-  }
 
-  return NextResponse.json({ ok: true, token: request.token })
+    // action === 'resend' — rate limit check then re-send email with existing token
+    const { data: todayCount } = await supabase.rpc('endorsement_requests_today', { p_user_id: user.id })
+    const { data: profile } = await supabase.from('users').select('subscription_status').eq('id', user.id).single()
+    const limit = profile?.subscription_status === 'pro' ? 20 : 10
+    if ((todayCount ?? 0) >= limit) {
+      return NextResponse.json({ error: 'Rate limit exceeded', limit, used: todayCount }, { status: 429 })
+    }
+
+    try {
+      const { data: requester } = await supabase.from('users').select('display_name, full_name').eq('id', user.id).single()
+      const { data: yacht } = await supabase.from('yachts').select('name').eq('id', request.yacht_id).single()
+      const requesterName = requester?.display_name ?? requester?.full_name ?? 'A colleague'
+      const yachtName = yacht?.name ?? ''
+      const deepLink = `${APP_URL}/r/${request.token}`
+      const subjectYacht = yachtName ? ` on ${yachtName}` : ''
+      const safeRequesterName = sanitizeHtml(requesterName)
+      const safeYachtName = sanitizeHtml(yachtName)
+      if (request.recipient_email) {
+        await sendNotifyEmail({
+          to: request.recipient_email,
+          subject: `${requesterName} asked you to endorse their work${subjectYacht}`,
+          html: buildResendHtml(safeRequesterName, safeYachtName, deepLink),
+          text: `${requesterName} is asking for an endorsement. Write one here: ${deepLink}`,
+        })
+      }
+    } catch (e) {
+      console.error('Resend email failed:', e)
+    }
+
+    return NextResponse.json({ ok: true, token: request.token })
+  } catch (e) {
+    return handleApiError(e)
+  }
 }
 
 function buildResendHtml(requesterName: string, yachtName: string, deepLink: string) {

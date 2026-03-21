@@ -99,7 +99,7 @@ export function SidebarNav() {
             <span className="relative h-5 w-5">
               {isActive ? tab.activeIcon : tab.icon}
               {showBadge && (
-                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500" />
+                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[var(--color-error)]" />
               )}
             </span>
             <span>{tab.label}</span>

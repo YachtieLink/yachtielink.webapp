@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { AudienceTabs } from '@/components/audience/AudienceTabs'
+import { PageTransition } from '@/components/ui/PageTransition'
 
 interface ColleagueRow {
   colleague_id: string
@@ -20,7 +21,7 @@ interface Yacht {
   name: string
 }
 
-export default async function AudiencePage() {
+export default async function NetworkPage() {
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
@@ -137,6 +138,7 @@ export default async function AudiencePage() {
   const requestsSent = (requestsSentRes.data as unknown as RequestSent[]) ?? []
 
   return (
+    <PageTransition>
     <AudienceTabs
       endorsementsReceived={endorsementsReceived}
       requestsReceived={requestsReceived}
@@ -144,5 +146,6 @@ export default async function AudiencePage() {
       colleagues={colleagues}
       mostRecentYachtId={mostRecentYachtId}
     />
+    </PageTransition>
   )
 }

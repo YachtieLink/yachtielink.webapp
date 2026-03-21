@@ -6,10 +6,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ShareButton } from './ShareButton'
 import { EndorsementCard } from './EndorsementCard'
+import { ShowMoreButton } from './ShowMoreButton'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { PhotoGallery } from '@/components/profile/PhotoGallery'
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { SaveProfileButton } from '@/components/profile/SaveProfileButton'
+import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import {
   aboutSummary,
   experienceSummary,
@@ -182,7 +184,7 @@ export function PublicProfileContent({
           {/* Name + availability */}
           <div className="flex items-end justify-between gap-2">
             <div>
-              <h1 className="text-white text-2xl font-bold leading-tight drop-shadow-md">{displayName}</h1>
+              <h1 className="text-white font-serif text-2xl leading-tight drop-shadow-md">{displayName}</h1>
               {user.primary_role && (
                 <p className="text-white/80 text-sm font-medium">{user.primary_role}</p>
               )}
@@ -265,6 +267,7 @@ export function PublicProfileContent({
 
           {/* About */}
           {sectionVisible(sectionVisibility, 'about', !!(user.ai_summary || user.bio)) && (
+            <ScrollReveal>
             <ProfileAccordion
               title="About"
               summary={aboutSummary(user.ai_summary, user.bio)}
@@ -273,10 +276,12 @@ export function PublicProfileContent({
                 {user.ai_summary || user.bio}
               </p>
             </ProfileAccordion>
+            </ScrollReveal>
           )}
 
           {/* Experience */}
           {sectionVisible(sectionVisibility, 'experience', attachments.length > 0) && (
+            <ScrollReveal>
             <ProfileAccordion
               title="Experience"
               summary={experienceSummary(attachments)}
@@ -309,10 +314,12 @@ export function PublicProfileContent({
                 })}
               </div>
             </ProfileAccordion>
+            </ScrollReveal>
           )}
 
           {/* Endorsements */}
           {sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) && (
+            <ScrollReveal>
             <ProfileAccordion
               title="Endorsements"
               summary={endorsementsSummary(endorsements.length, mutualEndorserCount)}
@@ -330,16 +337,28 @@ export function PublicProfileContent({
                   />
                 ))}
                 {endorsements.length > 5 && (
-                  <p className="text-sm text-[var(--color-interactive)] text-center pt-1">
-                    {endorsements.length - 5} more endorsements
-                  </p>
+                  <ShowMoreButton label={`${endorsements.length - 5} more endorsements`}>
+                    {endorsements.slice(5).map((end: any) => (
+                      <EndorsementCard
+                        key={end.id}
+                        endorserName={end.endorser?.display_name ?? end.endorser?.full_name ?? 'Anonymous'}
+                        endorserRole={end.endorser_role_label}
+                        endorserPhoto={end.endorser?.profile_photo_url}
+                        yachtName={end.yacht?.name}
+                        date={end.created_at}
+                        content={end.content}
+                      />
+                    ))}
+                  </ShowMoreButton>
                 )}
               </div>
             </ProfileAccordion>
+            </ScrollReveal>
           )}
 
           {/* Certifications */}
           {sectionVisible(sectionVisibility, 'certifications', certifications.length > 0) && (
+            <ScrollReveal>
             <ProfileAccordion
               title="Certifications"
               summary={certificationsSummary(certifications.length, expiringCount)}
@@ -359,10 +378,12 @@ export function PublicProfileContent({
                 })}
               </div>
             </ProfileAccordion>
+            </ScrollReveal>
           )}
 
           {/* Education */}
           {sectionVisible(sectionVisibility, 'education', education.length > 0) && (
+            <ScrollReveal>
             <ProfileAccordion
               title="Education"
               summary={educationSummary(education)}
@@ -382,10 +403,12 @@ export function PublicProfileContent({
                 ))}
               </div>
             </ProfileAccordion>
+            </ScrollReveal>
           )}
 
           {/* Hobbies */}
           {sectionVisible(sectionVisibility, 'hobbies', hobbies.length > 0) && (
+            <ScrollReveal>
             <ProfileAccordion
               title="Hobbies"
               summary={hobbiesSummary(hobbies)}
@@ -398,10 +421,12 @@ export function PublicProfileContent({
                 ))}
               </div>
             </ProfileAccordion>
+            </ScrollReveal>
           )}
 
           {/* Skills */}
           {sectionVisible(sectionVisibility, 'skills', skills.length > 0) && (
+            <ScrollReveal>
             <ProfileAccordion
               title="Extra Skills"
               summary={skillsSummary(skills)}
@@ -427,10 +452,12 @@ export function PublicProfileContent({
                 ))
               })()}
             </ProfileAccordion>
+            </ScrollReveal>
           )}
 
           {/* Gallery */}
           {sectionVisible(sectionVisibility, 'gallery', gallery.length > 0) && (
+            <ScrollReveal>
             <ProfileAccordion
               title="Gallery"
               summary={gallerySummary(gallery.length)}
@@ -449,9 +476,24 @@ export function PublicProfileContent({
                 ))}
               </div>
               {gallery.length > 9 && (
-                <p className="text-sm text-[var(--color-interactive)] text-center pt-2">{gallery.length - 9} more photos</p>
+                <ShowMoreButton label={`${gallery.length - 9} more photos`}>
+                  <div className="grid grid-cols-3 gap-1.5 pt-1.5">
+                    {gallery.slice(9).map((item) => (
+                      <div key={item.id} className="relative aspect-square rounded-lg overflow-hidden bg-[var(--color-surface-raised)]">
+                        <Image
+                          src={item.image_url}
+                          alt={item.caption ?? 'Gallery photo'}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </ShowMoreButton>
               )}
             </ProfileAccordion>
+            </ScrollReveal>
           )}
         </div>
 

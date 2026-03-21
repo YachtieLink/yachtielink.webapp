@@ -4,14 +4,13 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET() {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("profiles")
+  const { error } = await supabase
+    .from("users")
     .select("id")
     .limit(1);
 
   return NextResponse.json({
     ok: !error,
-    error: error?.message ?? null,
-    data,
+    error: error ? "Database check failed" : null,
   });
 }

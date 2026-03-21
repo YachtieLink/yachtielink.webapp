@@ -44,6 +44,8 @@ export async function POST(req: NextRequest) {
     admin.storage.from('cert-documents').remove([`${user.id}/`]),
     admin.storage.from('cv-uploads').remove([`${user.id}/`]),
     admin.storage.from('pdf-exports').remove([`${user.id}/`]),
+    admin.storage.from('user-photos').remove([`${user.id}/`]),
+    admin.storage.from('user-gallery').remove([`${user.id}/`]),
   ]);
 
   // 3. Anonymise user record (preserve endorsement graph — don't hard-delete)

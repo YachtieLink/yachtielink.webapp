@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
+import { uploadGalleryItem } from '@/lib/storage/upload'
 
 interface GalleryItem {
   id: string
@@ -36,17 +37,13 @@ export default function WorkGalleryPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const ext = file.name.split('.').pop() ?? 'jpg'
-      const path = `${user.id}/${crypto.randomUUID()}.${ext}`
-      const { error } = await supabase.storage.from('user-gallery').upload(path, file)
-      if (error) { alert(error.message); return }
-
-      const { data: urlData } = supabase.storage.from('user-gallery').getPublicUrl(path)
+      const result = await uploadGalleryItem(user.id, file)
+      if (!result.ok) { alert(result.error); return }
 
       const res = await fetch('/api/user-gallery', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image_url: urlData.publicUrl, sort_order: items.length }),
+        body: JSON.stringify({ image_url: result.url, sort_order: items.length }),
       })
       if (!res.ok) { const d = await res.json(); alert(d.error ?? 'Upload failed'); return }
       const { item } = await res.json()

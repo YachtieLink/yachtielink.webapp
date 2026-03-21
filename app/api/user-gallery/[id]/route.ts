@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { validateBody } from '@/lib/validation/validate'
 import { updateGalleryItemSchema } from '@/lib/validation/schemas'
 import { handleApiError } from '@/lib/api/errors'
+import { extractStoragePath } from '@/lib/storage/upload'
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -45,8 +46,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
       .single()
     if (!item) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-    const url = new URL(item.image_url)
-    const storagePath = url.pathname.split('/object/public/user-gallery/')[1]
+    const storagePath = extractStoragePath(item.image_url, 'user-gallery')
     if (storagePath) {
       await supabase.storage.from('user-gallery').remove([storagePath])
     }

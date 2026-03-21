@@ -238,3 +238,113 @@ export async function getPdfExportUrl(storagePath: string): Promise<string | nul
   if (error || !data?.signedUrl) return null
   return data.signedUrl
 }
+
+// ─────────────────────────────────────────
+// User photos (multi-photo profile gallery)
+// ─────────────────────────────────────────
+
+const MAX_USER_PHOTO_PX = 1200
+
+export async function uploadUserPhoto(
+  userId: string,
+  file: File,
+): Promise<UploadPhotoResult> {
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    return { ok: false, error: 'Only JPEG, PNG, or WebP images are allowed.' }
+  }
+  if (file.size > MAX_PHOTO_BYTES) {
+    return { ok: false, error: 'Photo must be under 5 MB.' }
+  }
+
+  let blob: Blob
+  try {
+    blob = await resizeImage(file, MAX_USER_PHOTO_PX)
+  } catch {
+    return { ok: false, error: 'Could not process image.' }
+  }
+
+  const ext = blob.type === 'image/webp' ? 'webp' : 'jpeg'
+  const path = `${userId}/${crypto.randomUUID()}.${ext}`
+
+  const supabase = createClient()
+  const { error } = await supabase.storage
+    .from('user-photos')
+    .upload(path, blob, { contentType: blob.type, upsert: false })
+
+  if (error) return { ok: false, error: error.message }
+
+  const { data } = supabase.storage.from('user-photos').getPublicUrl(path)
+  return { ok: true, url: `${data.publicUrl}?t=${Date.now()}` }
+}
+
+export async function deleteUserPhoto(photoUrl: string): Promise<void> {
+  const url = new URL(photoUrl)
+  const storagePath = url.pathname.split('/object/public/user-photos/')[1]
+  if (!storagePath) return
+  const supabase = createClient()
+  await supabase.storage.from('user-photos').remove([storagePath])
+}
+
+// ─────────────────────────────────────────
+// User gallery (work samples)
+// ─────────────────────────────────────────
+
+export async function uploadGalleryItem(
+  userId: string,
+  file: File,
+): Promise<UploadPhotoResult> {
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    return { ok: false, error: 'Only JPEG, PNG, or WebP images are allowed.' }
+  }
+  if (file.size > MAX_PHOTO_BYTES) {
+    return { ok: false, error: 'Photo must be under 5 MB.' }
+  }
+
+  let blob: Blob
+  try {
+    blob = await resizeImage(file, MAX_USER_PHOTO_PX)
+  } catch {
+    return { ok: false, error: 'Could not process image.' }
+  }
+
+  const ext = blob.type === 'image/webp' ? 'webp' : 'jpeg'
+  const path = `${userId}/${crypto.randomUUID()}.${ext}`
+
+  const supabase = createClient()
+  const { error } = await supabase.storage
+    .from('user-gallery')
+    .upload(path, blob, { contentType: blob.type, upsert: false })
+
+  if (error) return { ok: false, error: error.message }
+
+  const { data } = supabase.storage.from('user-gallery').getPublicUrl(path)
+  return { ok: true, url: `${data.publicUrl}?t=${Date.now()}` }
+}
+
+export async function deleteGalleryItem(imageUrl: string): Promise<void> {
+  const url = new URL(imageUrl)
+  const storagePath = url.pathname.split('/object/public/user-gallery/')[1]
+  if (!storagePath) return
+  const supabase = createClient()
+  await supabase.storage.from('user-gallery').remove([storagePath])
+}
+
+// ─────────────────────────────────────────
+// Server-side storage path extraction
+// ─────────────────────────────────────────
+
+/**
+ * Extract the storage path from a public URL for a given bucket.
+ * Use in API routes with the server supabase client.
+ */
+export function extractStoragePath(publicUrl: string, bucket: string): string | null {
+  try {
+    const url = new URL(publicUrl)
+    const marker = `/object/public/${bucket}/`
+    const idx = url.pathname.indexOf(marker)
+    if (idx === -1) return null
+    return url.pathname.slice(idx + marker.length)
+  } catch {
+    return null
+  }
+}
