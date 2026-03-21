@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { staggerContainer, fadeUp, cardHover, popIn } from '@/lib/motion'
 import { RequestActions } from './RequestActions'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Button } from '@/components/ui/Button'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -62,6 +63,7 @@ interface ColleagueProfile {
   full_name: string
   profile_photo_url: string | null
   primary_role: string | null
+  handle: string | null
 }
 
 interface ColleagueEntry {
@@ -119,7 +121,7 @@ export function AudienceTabs({
   const progressPct = (endorsementCount / 5) * 100
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
+    <div className="min-h-screen bg-[var(--color-navy-50)] -mx-4 px-4 md:-mx-6 md:px-6 pt-8 pb-24">
 
       {/* Request endorsements CTA */}
       <Link
@@ -160,7 +162,16 @@ export function AudienceTabs({
                 : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
             }`}
           >
-            {tab === 'endorsements' ? 'Endorsements' : tab === 'colleagues' ? 'Colleagues' : 'Saved'}
+            {tab === 'endorsements' ? 'Endorsements' : tab === 'colleagues' ? (
+              <span className="flex items-center justify-center gap-1.5">
+                Colleagues
+                {colleagues.length > 0 && (
+                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[var(--color-navy-100)] text-[var(--color-navy-700)]">
+                    {colleagues.length}
+                  </span>
+                )}
+              </span>
+            ) : 'Saved'}
           </button>
         ))}
       </div>
@@ -208,7 +219,7 @@ function ReceivedRequestCard({ req }: { req: RequestReceived }) {
   if (declined) return null
 
   return (
-    <div className="bg-[var(--color-surface)] rounded-2xl p-4">
+    <div className="card-soft rounded-2xl p-4">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
           {req.requester?.profile_photo_url ? (
@@ -235,11 +246,8 @@ function ReceivedRequestCard({ req }: { req: RequestReceived }) {
       </div>
       {isPending && (
         <div className="mt-3 flex items-center gap-4">
-          <Link
-            href={`/r/${req.token}`}
-            className="text-sm text-[var(--color-interactive)] font-medium hover:underline"
-          >
-            Write endorsement →
+          <Link href={`/r/${req.token}`}>
+            <Button variant="outline" size="sm">Write endorsement</Button>
           </Link>
           <button
             onClick={handleDecline}
@@ -286,8 +294,8 @@ function EndorsementsTab({
       <section>
         <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide mb-3">
           Endorsements{' '}
-          <motion.span variants={popIn} initial="hidden" animate="visible" className="normal-case font-normal text-[var(--color-text-tertiary)]">
-            ({endorsementsReceived.length})
+          <motion.span variants={popIn} initial="hidden" animate="visible" className="normal-case font-medium text-xs px-2 py-0.5 rounded-full bg-[var(--color-coral-100)] text-[var(--color-coral-700)]">
+            {endorsementsReceived.length}
           </motion.span>
         </h2>
         {endorsementsReceived.length === 0 ? (
@@ -302,7 +310,7 @@ function EndorsementsTab({
                 year: 'numeric',
               })
               return (
-                <motion.div key={e.id} variants={fadeUp} {...cardHover} className="bg-[var(--color-surface)] rounded-2xl p-4 border-l-2 border-[var(--color-interactive)]">
+                <motion.div key={e.id} variants={fadeUp} {...cardHover} className="card-soft rounded-2xl p-4 border-l-2 border-[var(--color-interactive)]">
                   <p className="text-sm text-[var(--color-text-primary)] leading-relaxed mb-2">
                     &ldquo;{excerpt(e.content)}&rdquo;
                   </p>
@@ -328,7 +336,7 @@ function EndorsementsTab({
             {requestsSent.map((req) => {
               const recipient = req.recipient_email ?? req.recipient_phone ?? 'Unknown'
               return (
-                <div key={req.id} className="bg-[var(--color-surface)] rounded-2xl p-4">
+                <div key={req.id} className="card-soft rounded-2xl p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
@@ -368,7 +376,7 @@ function SavedTab() {
   return (
     <Link
       href="/app/network/saved"
-      className="bg-[var(--color-surface)] rounded-2xl p-5 flex items-center gap-3 hover:bg-[var(--color-surface-raised)] transition-colors"
+      className="card-soft rounded-2xl p-4 flex items-center gap-3 hover:bg-[var(--color-surface-raised)] transition-colors"
     >
       <span className="text-2xl">🔖</span>
       <div className="flex-1">
@@ -405,43 +413,45 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
             key={entry.colleague_id}
             variants={fadeUp}
             {...cardHover}
-            className="bg-[var(--color-surface)] rounded-2xl p-4 flex items-center gap-3"
+            className="card-soft rounded-2xl p-4 flex items-center gap-3"
           >
-            <div className="w-11 h-11 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
-              {profile.profile_photo_url ? (
-                <Image
-                  src={profile.profile_photo_url}
-                  alt={name}
-                  width={44}
-                  height={44}
-                  className="object-cover w-full h-full"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-base font-semibold text-[var(--color-text-secondary)]">
-                  {name[0]?.toUpperCase()}
-                </div>
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">{name}</p>
-              {profile.primary_role && (
-                <p className="text-xs text-[var(--color-text-secondary)] truncate">
-                  {profile.primary_role}
-                </p>
-              )}
-              {entry.sharedYachtNames.length > 0 && (
-                <p className="text-xs text-[var(--color-interactive)] truncate mt-0.5">
-                  {entry.sharedYachtNames.length === 1
-                    ? entry.sharedYachtNames[0]
-                    : `${entry.sharedYachtNames[0]} +${entry.sharedYachtNames.length - 1} more`}
-                </p>
-              )}
-            </div>
+            <Link href={profile.handle ? `/u/${profile.handle}` : '#'} className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="w-11 h-11 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
+                {profile.profile_photo_url ? (
+                  <Image
+                    src={profile.profile_photo_url}
+                    alt={name}
+                    width={44}
+                    height={44}
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-base font-semibold text-[var(--color-text-secondary)]">
+                    {name[0]?.toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">{name}</p>
+                {profile.primary_role && (
+                  <p className="text-xs text-[var(--color-text-secondary)] truncate">
+                    {profile.primary_role}
+                  </p>
+                )}
+                {entry.sharedYachtNames.length > 0 && (
+                  <p className="text-xs text-[var(--color-interactive)] truncate mt-0.5">
+                    {entry.sharedYachtNames.length === 1
+                      ? entry.sharedYachtNames[0]
+                      : `${entry.sharedYachtNames[0]} +${entry.sharedYachtNames.length - 1} more`}
+                  </p>
+                )}
+              </div>
+            </Link>
             <Link
               href={`/app/endorsement/request?colleague_id=${entry.colleague_id}&yacht_id=${entry.shared_yachts[0]}`}
-              className="shrink-0 text-xs text-[var(--color-interactive)] font-medium px-3 py-1.5 rounded-full border border-[var(--color-interactive)] hover:bg-[var(--color-interactive)]/5 transition-colors"
+              className="shrink-0"
             >
-              Endorse
+              <Button variant="outline" size="sm">Endorse</Button>
             </Link>
           </motion.div>
         )

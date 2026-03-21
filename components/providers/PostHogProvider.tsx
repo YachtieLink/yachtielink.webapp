@@ -7,8 +7,8 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
 
   useEffect(() => {
-    // Skip PostHog on public/auth pages
-    if (!pathname.startsWith('/app')) return
+    // Skip PostHog on auth pages and non-page routes
+    if (pathname.startsWith('/api') || pathname.startsWith('/_next')) return
 
     // Dynamic import — only loads the bundle when needed
     import('posthog-js').then((posthog) => {

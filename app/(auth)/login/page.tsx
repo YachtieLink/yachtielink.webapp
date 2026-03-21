@@ -3,7 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { PageTransition } from "@/components/ui/PageTransition";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -13,6 +17,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -38,7 +43,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-12 bg-[var(--color-surface)]">
+    <PageTransition className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-12 bg-[var(--color-surface)]">
       <div className="text-center">
         <h1 className="text-2xl font-serif text-[var(--color-text-primary)]">
           Sign in
@@ -55,39 +60,27 @@ export default function LoginPage() {
         {error && (
           <p
             role="alert"
-            className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400"
+            className="rounded-lg bg-[var(--color-error)]/10 px-4 py-3 text-sm text-[var(--color-error)]"
           >
             {error}
           </p>
         )}
 
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="email"
-            className="text-sm font-medium text-[var(--color-text-primary)]"
-          >
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-interactive)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
-            placeholder="you@example.com"
-          />
-        </div>
+        <Input
+          label="Email"
+          type="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+        />
 
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium text-[var(--color-text-primary)]"
-            >
+            <span className="text-sm font-medium text-[var(--color-text-primary)]">
               Password
-            </label>
+            </span>
             <Link
               href="/reset-password"
               className="text-xs text-[var(--color-interactive)] hover:underline"
@@ -95,25 +88,28 @@ export default function LoginPage() {
               Forgot password?
             </Link>
           </div>
-          <input
-            id="password"
-            type="password"
+          <Input
+            type={showPassword ? "text" : "password"}
             autoComplete="current-password"
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-interactive)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
             placeholder="••••••••"
+            suffix={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            }
           />
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex h-12 w-full items-center justify-center rounded-xl bg-[var(--color-teal-700)] text-sm font-semibold text-white transition-colors hover:bg-[var(--color-teal-800)] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading ? "Signing in…" : "Sign in"}
-        </button>
+        <Button type="submit" loading={loading} className="w-full">
+          Sign in
+        </Button>
       </form>
 
       <p className="text-sm text-[var(--color-text-secondary)]">
@@ -125,6 +121,6 @@ export default function LoginPage() {
           Create one
         </Link>
       </p>
-    </div>
+    </PageTransition>
   );
 }

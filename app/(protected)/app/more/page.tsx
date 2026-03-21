@@ -3,27 +3,40 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { fadeUp } from '@/lib/motion'
 import { createClient } from '@/lib/supabase/client'
+import { PageTransition } from '@/components/ui/PageTransition'
 import { ManagePortalButton } from '@/components/insights/ManagePortalButton'
-
-type Theme = 'system' | 'light' | 'dark'
+import { Button } from '@/components/ui/Button'
+import { useToast } from '@/components/ui/Toast'
 
 function SettingsRow({
   label,
   href,
   sublabel,
   danger,
+  onClick,
 }: {
   label: string
   href?: string
   sublabel?: string
   danger?: boolean
+  onClick?: () => void
 }) {
   const cls = `flex items-center justify-between px-5 py-4 hover:bg-[var(--color-surface-raised)]/30 transition-colors ${
-    danger ? 'text-red-500' : 'text-[var(--color-text-primary)]'
+    danger ? 'text-[var(--color-error)]' : 'text-[var(--color-text-primary)]'
   }`
+
+  if (onClick) {
+    return (
+      <button onClick={onClick} className={`${cls} w-full text-left`}>
+        <div>
+          <p className="text-sm">{label}</p>
+          {sublabel && <p className="text-xs text-[var(--color-text-secondary)]">{sublabel}</p>}
+        </div>
+        <span className="text-[var(--color-text-secondary)] text-lg">›</span>
+      </button>
+    )
+  }
 
   if (href) {
     return (
@@ -49,7 +62,7 @@ function SettingsRow({
 
 function SectionHeader({ title }: { title: string }) {
   return (
-    <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] px-1 pt-4 pb-1">
+    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] px-1 pt-4 pb-1">
       {title}
     </p>
   )
@@ -58,17 +71,11 @@ function SectionHeader({ title }: { title: string }) {
 export default function MorePage() {
   const router   = useRouter()
   const supabase = createClient()
-  const [theme, setTheme] = useState<Theme>('system')
+  const { toast } = useToast()
   const [isPro, setIsPro] = useState(false)
   const [subPlan, setSubPlan] = useState<string | null>(null)
   const [subEndsAt, setSubEndsAt] = useState<string | null>(null)
   const [hasStripeCustomer, setHasStripeCustomer] = useState(false)
-
-  // Read current theme from localStorage on mount
-  useEffect(() => {
-    const stored = localStorage.getItem('yl-theme') as Theme | null
-    setTheme(stored ?? 'system')
-  }, [])
 
   // Fetch subscription status
   useEffect(() => {
@@ -92,50 +99,38 @@ export default function MorePage() {
     fetchSub()
   }, [supabase])
 
-  function applyTheme(t: Theme) {
-    setTheme(t)
-    localStorage.setItem('yl-theme', t)
-    const root = document.documentElement
-    if (t === 'dark') {
-      root.classList.add('dark')
-    } else if (t === 'light') {
-      root.classList.remove('dark')
-    } else {
-      // system
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-      root.classList.toggle('dark', prefersDark)
-    }
-  }
-
   async function handleSignOut() {
     await supabase.auth.signOut()
     router.push('/welcome')
     router.refresh()
   }
 
+  async function handleExport() {
+    try {
+      const res = await fetch('/api/account/export')
+      if (!res.ok) throw new Error('Export failed')
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'yachtielink-data.json'
+      a.click()
+      URL.revokeObjectURL(url)
+      toast('Data exported', 'success')
+    } catch {
+      toast('Could not export data', 'error')
+    }
+  }
+
   return (
-    <motion.div variants={fadeUp} initial="hidden" animate="visible" className="flex flex-col pb-24">
+    <PageTransition className="flex flex-col pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-sand-100)]">
+      {/* Page title */}
+      <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)] px-1 pt-2 pb-2">Settings</h1>
+
       {/* ── Appearance ─────────────────────────────── */}
       <SectionHeader title="Appearance" />
-      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden">
-        <div className="px-5 py-4">
-          <p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">Theme</p>
-          <div className="flex gap-2">
-            {(['system', 'light', 'dark'] as Theme[]).map((t) => (
-              <button
-                key={t}
-                onClick={() => applyTheme(t)}
-                className={`flex-1 py-2 rounded-lg text-sm capitalize transition-colors ${
-                  theme === t
-                    ? 'bg-[var(--color-interactive)] text-white'
-                    : 'bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] hover:bg-[var(--color-text-secondary)]/10'
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-        </div>
+      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden px-5 py-4">
+        <p className="text-sm text-[var(--color-text-secondary)]">Dark mode coming soon</p>
       </div>
 
       {/* ── Account ────────────────────────────────── */}
@@ -163,7 +158,7 @@ export default function MorePage() {
         />
         <SettingsRow
           label="Download my data"
-          href="/api/account/export"
+          onClick={handleExport}
           sublabel="Export all your data as JSON (GDPR)"
         />
         <SettingsRow
@@ -211,6 +206,11 @@ export default function MorePage() {
       <SectionHeader title="Help" />
       <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
         <SettingsRow
+          label="Feature Roadmap"
+          href="/app/more/roadmap"
+          sublabel="See what's coming and what's shipped"
+        />
+        <SettingsRow
           label="Send feedback"
           href="mailto:hello@yachtie.link?subject=YachtieLink feedback"
           sublabel="hello@yachtie.link"
@@ -225,19 +225,15 @@ export default function MorePage() {
       </div>
 
       {/* ── Sign out ───────────────────────────────── */}
-      <SectionHeader title="" />
-      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden">
-        <button
-          onClick={handleSignOut}
-          className="w-full flex items-center justify-between px-5 py-4 text-sm text-red-500 hover:bg-[var(--color-surface-raised)]/30 transition-colors"
-        >
+      <div className="mt-6">
+        <Button variant="destructive" className="w-full" onClick={handleSignOut}>
           Sign out
-        </button>
+        </Button>
       </div>
 
       <p className="text-center text-xs text-[var(--color-text-secondary)] mt-6 mb-2">
         YachtieLink · Phase 1A
       </p>
-    </motion.div>
+    </PageTransition>
   )
 }

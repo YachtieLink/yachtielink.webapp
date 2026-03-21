@@ -5,7 +5,7 @@ import { userPhotoSchema, reorderPhotosSchema } from '@/lib/validation/schemas'
 import { handleApiError } from '@/lib/api/errors'
 import { trackServerEvent } from '@/lib/analytics/server'
 
-const FREE_LIMIT = 6
+const FREE_LIMIT = 3
 const PRO_LIMIT = 9
 
 export async function GET() {
@@ -35,10 +35,10 @@ export async function POST(req: NextRequest) {
     // Check subscription for limit
     const { data: profile } = await supabase
       .from('users')
-      .select('subscription_plan')
+      .select('subscription_status')
       .eq('id', user.id)
       .single()
-    const isPro = profile?.subscription_plan === 'pro'
+    const isPro = profile?.subscription_status === 'pro'
     const limit = isPro ? PRO_LIMIT : FREE_LIMIT
 
     const { count } = await supabase

@@ -4,9 +4,11 @@
  */
 import Image from 'next/image'
 import Link from 'next/link'
+import { MapPin, ChevronLeft, Pencil } from 'lucide-react'
 import { ShareButton } from './ShareButton'
 import { EndorsementCard } from './EndorsementCard'
 import { ShowMoreButton } from './ShowMoreButton'
+import { HeroSection } from './HeroSection'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { PhotoGallery } from '@/components/profile/PhotoGallery'
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
@@ -134,11 +136,34 @@ export function PublicProfileContent({
     // ── Outer: stacked on mobile, side-by-side on desktop ────────────────────
     <div className="flex flex-col md:flex-row md:min-h-screen">
 
-      {/* ── LEFT / TOP: Hero photo panel with identity overlaid ────────────── */}
-      <div className="relative md:w-2/5 md:sticky md:top-0 md:h-screen shrink-0 overflow-hidden">
+      {/* ── MOBILE: Animated hero (client component, md:hidden) ────────────── */}
+      <HeroSection
+        displayName={displayName}
+        primaryRole={user.primary_role}
+        departments={user.departments}
+        location={location}
+        showLocation={user.show_location}
+        availableForWork={user.available_for_work}
+        isFoundingMember={isFoundingMember}
+        isOwnProfile={isOwnProfile}
+        isLoggedIn={isLoggedIn}
+        isColleague={isColleague}
+        sharedYachtCount={sharedYachtIdSet.size}
+        showMutual={showMutual}
+        firstMutualName={firstMutual?.name}
+        socialLinks={user.social_links}
+        profilePhotos={profilePhotos}
+        profilePhotoUrl={user.profile_photo_url}
+        profileUrl={profileUrl}
+        savedUserId={user.id}
+        savedStatus={savedStatus}
+      />
+
+      {/* ── LEFT: Desktop hero photo panel (hidden on mobile) ─────────────── */}
+      <div className="relative hidden md:block md:w-2/5 md:sticky md:top-0 md:h-screen shrink-0 overflow-hidden">
 
         {/* Photo fills this panel */}
-        <div className="relative h-[34vh] md:h-full w-full">
+        <div className="relative h-full w-full">
           <PhotoGallery
             photos={profilePhotos}
             profilePhotoUrl={user.profile_photo_url}
@@ -155,18 +180,23 @@ export function PublicProfileContent({
           <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
         </div>
 
-        {/* Top bar — absolutely positioned over photo */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-safe-top pt-4 z-10">
-          <Link href="/" className="text-white/90 text-sm font-medium drop-shadow-sm">
-            ← YachtieLink
+        {/* Top bar — icon-only buttons over photo */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-3 pt-[env(safe-area-inset-top,0.75rem)] z-10">
+          <Link
+            href="/"
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-black/25 backdrop-blur-md text-white hover:bg-black/40 transition-colors"
+            aria-label="Go back"
+          >
+            <ChevronLeft size={20} />
           </Link>
           <div className="flex items-center gap-2">
             {isOwnProfile ? (
               <Link
                 href="/app/profile"
-                className="text-xs px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white font-medium hover:bg-white/30 transition-colors"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-black/25 backdrop-blur-md text-white hover:bg-black/40 transition-colors"
+                aria-label="Edit profile"
               >
-                Edit profile
+                <Pencil size={16} />
               </Link>
             ) : isLoggedIn ? (
               <SaveProfileButton
@@ -175,42 +205,41 @@ export function PublicProfileContent({
                 initialFolderId={savedStatus?.folder_id}
               />
             ) : null}
-            <ShareButton url={profileUrl} name={displayName} />
+            <ShareButton url={profileUrl} name={displayName} variant="compact" />
           </div>
         </div>
 
         {/* Identity — overlaid at bottom of photo */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 z-10 flex flex-col gap-2">
-          {/* Name + availability */}
-          <div className="flex items-end justify-between gap-2">
-            <div>
-              <h1 className="text-white font-serif text-2xl leading-tight drop-shadow-md">{displayName}</h1>
-              {user.primary_role && (
-                <p className="text-white/80 text-sm font-medium">{user.primary_role}</p>
-              )}
-            </div>
-            {user.available_for_work && (
-              <span className="shrink-0 flex items-center gap-1 bg-green-500/20 backdrop-blur-sm border border-green-400/40 rounded-full px-2.5 py-1 text-xs font-semibold text-green-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                Available
-              </span>
-            )}
-          </div>
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 z-10 flex flex-col gap-3">
+          {/* Availability badge */}
+          {user.available_for_work && (
+            <span className="self-start flex items-center gap-1.5 bg-green-500/25 backdrop-blur-md border border-green-400/40 rounded-full px-3 py-1 text-xs font-semibold text-green-300 tracking-wide uppercase">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              Available for work
+            </span>
+          )}
 
-          {/* Departments */}
-          {user.departments && user.departments.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {user.departments.map((dept) => (
-                <span key={dept} className="text-xs px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-sm text-white/90">
-                  {dept}
-                </span>
-              ))}
-            </div>
+          {/* Name — large, confident */}
+          <h1 className="text-white font-serif text-4xl md:text-5xl leading-[1.1] drop-shadow-lg tracking-tight">{displayName}</h1>
+
+          {/* Role + Department — unified line */}
+          {(user.primary_role || (user.departments && user.departments.length > 0)) && (
+            <p className="text-white/90 text-base font-medium drop-shadow-sm">
+              {user.primary_role}
+              {user.primary_role && user.departments && user.departments.length > 0 && (
+                <span className="text-white/50 mx-2">·</span>
+              )}
+              {user.departments && user.departments.length > 0 && (
+                <span className="text-white/70">{user.departments.join(', ')}</span>
+              )}
+            </p>
           )}
 
           {/* Location */}
           {user.show_location && location && (
-            <p className="text-white/70 text-sm">📍 {location}</p>
+            <p className="text-white/60 text-sm flex items-center gap-1.5 font-medium">
+              <MapPin size={13} className="text-white/50" />{location}
+            </p>
           )}
 
           {/* Social links row (white variant on dark bg) */}
@@ -241,7 +270,7 @@ export function PublicProfileContent({
 
       {/* ── RIGHT / BOTTOM: Scrollable content ────────────────────────────── */}
       <div className="flex-1 md:overflow-y-auto">
-        <div className="flex flex-col gap-2 px-4 pt-4 pb-24">
+        <div className="flex flex-col gap-4 px-4 pt-4 pb-24">
 
           {/* Contact info — only shown when user has opted in */}
           {(
@@ -249,7 +278,7 @@ export function PublicProfileContent({
             (user.show_phone && user.phone) ||
             (user.show_whatsapp && user.whatsapp)
           ) && (
-            <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-1.5">
+            <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-1.5 border border-[var(--color-border-subtle)]">
               <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-1">Contact</p>
               {user.show_email && user.email && (
                 <a href={`mailto:${user.email}`} className="text-sm text-[var(--color-interactive)] hover:underline">{user.email}</a>
@@ -537,6 +566,18 @@ export function PublicProfileContent({
           </p>
         </footer>
       </div>
+
+      {/* ── Sticky bottom CTA for non-logged-in viewers (mobile only) ───────── */}
+      {!isLoggedIn && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-t border-[var(--color-border-subtle)] z-40 md:hidden">
+          <Link
+            href="/welcome"
+            className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
+          >
+            Build your crew profile
+          </Link>
+        </div>
+      )}
     </div>
   )
 }

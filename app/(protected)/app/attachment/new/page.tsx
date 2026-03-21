@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { YachtPicker, type YachtOption } from '@/components/yacht/YachtPicker'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, DatePicker } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+import { BackButton } from '@/components/ui/BackButton'
 
 type Step = 'yacht' | 'role' | 'dates'
 
@@ -93,13 +94,10 @@ export default function AttachmentNewPage() {
   // ── step: yacht ─────────────────────────────────────────────────
   if (step === 'yacht') {
     return (
-      <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-        <button
-          onClick={() => router.back()}
-          className="text-sm text-[var(--color-text-secondary)] mb-6 flex items-center gap-1"
-        >
-          ← Back
-        </button>
+      <div className="min-h-screen bg-[var(--color-surface)] pt-8 pb-24">
+        <div className="mb-6">
+          <BackButton href="/app/profile" />
+        </div>
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Add a yacht</h1>
         <p className="text-sm text-[var(--color-text-secondary)] mb-6">
           Find the vessel in our database or add it if it&apos;s not there yet.
@@ -120,13 +118,17 @@ export default function AttachmentNewPage() {
   // ── step: role ──────────────────────────────────────────────────
   if (step === 'role') {
     return (
-      <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-        <button
-          onClick={() => setStep('yacht')}
-          className="text-sm text-[var(--color-text-secondary)] mb-6 flex items-center gap-1"
-        >
-          ← {yacht?.name}
-        </button>
+      <div className="min-h-screen bg-[var(--color-surface)] pt-8 pb-24">
+        <div className="mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setStep('yacht')}
+            className="px-0 text-[var(--color-interactive)]"
+          >
+            ← {yacht?.name}
+          </Button>
+        </div>
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Your role</h1>
         <p className="text-sm text-[var(--color-text-secondary)] mb-6">
           What was your role on {yacht?.name}?
@@ -216,52 +218,47 @@ export default function AttachmentNewPage() {
   // ── step: dates ─────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-      <button
-        onClick={() => setStep('role')}
-        className="text-sm text-[var(--color-text-secondary)] mb-6 flex items-center gap-1"
-      >
-        ← {roleLabel}
-      </button>
+      <div className="mb-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setStep('role')}
+          className="px-0 text-[var(--color-interactive)]"
+        >
+          ← {roleLabel}
+        </Button>
+      </div>
       <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Dates</h1>
       <p className="text-sm text-[var(--color-text-secondary)] mb-6">
         When did you work on {yacht?.name}?
       </p>
 
       <div className="flex flex-col gap-4">
-        <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-            Start date *
-          </label>
-          <Input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            max={new Date().toISOString().split('T')[0]}
-          />
-        </div>
+        <DatePicker
+          label="Start date *"
+          value={startDate || null}
+          onChange={(v) => setStartDate(v ?? '')}
+          includeDay
+          maxYear={new Date().getFullYear()}
+        />
 
         <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-xs font-medium text-[var(--color-text-secondary)]">
-              End date
-            </label>
-            <label className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
-              <input
-                type="checkbox"
-                checked={isCurrent}
-                onChange={(e) => setIsCurrent(e.target.checked)}
-                className="rounded"
-              />
-              Currently working here
-            </label>
-          </div>
+          <label className="flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-[var(--color-surface-raised)] cursor-pointer min-h-[44px]">
+            <input
+              type="checkbox"
+              checked={isCurrent}
+              onChange={(e) => setIsCurrent(e.target.checked)}
+              className="w-5 h-5 rounded accent-[var(--color-teal-700)]"
+            />
+            <span className="text-sm text-[var(--color-text-primary)]">Currently working here</span>
+          </label>
           {!isCurrent && (
-            <Input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              min={startDate}
-              max={new Date().toISOString().split('T')[0]}
+            <DatePicker
+              label="End date"
+              value={endDate || null}
+              onChange={(v) => setEndDate(v ?? '')}
+              includeDay
+              maxYear={new Date().getFullYear()}
             />
           )}
         </div>

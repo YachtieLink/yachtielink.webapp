@@ -43,10 +43,10 @@ export function EndorsementsSection({ endorsements, currentUserId }: Endorsement
 
   return (
     <div className="bg-[var(--color-surface)] rounded-2xl p-5">
-      <h2 className="font-semibold text-[var(--color-text-primary)] mb-3">
-        Endorsements{' '}
-        <span className="font-normal text-[var(--color-text-secondary)] text-sm">
-          ({endorsements.length})
+      <h2 className="font-semibold text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
+        Endorsements
+        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--color-coral-100)] text-[var(--color-coral-700)]">
+          {endorsements.length}
         </span>
       </h2>
 

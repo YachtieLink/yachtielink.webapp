@@ -16,46 +16,17 @@ import {
   MoreIcon,
   MoreIconFilled,
 } from "./icons";
+import { tabs as navTabs } from "@/lib/nav-config";
+import { sectionColors, sectionClassMap } from "@/lib/section-colors";
 
-interface Tab {
-  label: string;
-  href: string;
-  icon: React.ReactNode;
-  activeIcon: React.ReactNode;
-}
-
-const tabs: Tab[] = [
-  {
-    label: "My Profile",
-    href: "/app/profile",
-    icon: <ProfileIcon />,
-    activeIcon: <ProfileIconFilled />,
-  },
-  {
-    label: "CV",
-    href: "/app/cv",
-    icon: <CvIcon />,
-    activeIcon: <CvIconFilled />,
-  },
-  {
-    label: "Insights",
-    href: "/app/insights",
-    icon: <InsightsIcon />,
-    activeIcon: <InsightsIconFilled />,
-  },
-  {
-    label: "Network",
-    href: "/app/network",
-    icon: <NetworkIcon />,
-    activeIcon: <NetworkIconFilled />,
-  },
-  {
-    label: "More",
-    href: "/app/more",
-    icon: <MoreIcon />,
-    activeIcon: <MoreIconFilled />,
-  },
-];
+/** Icons keyed by route — kept here because they're JSX (paired outline + filled SVGs) */
+const tabIcons: Record<string, { icon: React.ReactNode; activeIcon: React.ReactNode }> = {
+  "/app/profile":  { icon: <ProfileIcon />,  activeIcon: <ProfileIconFilled /> },
+  "/app/cv":       { icon: <CvIcon />,       activeIcon: <CvIconFilled /> },
+  "/app/insights": { icon: <InsightsIcon />,  activeIcon: <InsightsIconFilled /> },
+  "/app/network":  { icon: <NetworkIcon />,   activeIcon: <NetworkIconFilled /> },
+  "/app/more":     { icon: <MoreIcon />,      activeIcon: <MoreIconFilled /> },
+};
 
 export function BottomTabBar() {
   const pathname = usePathname();
@@ -64,7 +35,7 @@ export function BottomTabBar() {
 
   // Prefetch all tab routes on mount for instant navigation
   useEffect(() => {
-    tabs.forEach((tab) => router.prefetch(tab.href));
+    navTabs.forEach((tab) => router.prefetch(tab.href));
   }, [router]);
 
   return (
@@ -73,8 +44,11 @@ export function BottomTabBar() {
       className="md:hidden fixed bottom-0 left-0 right-0 z-50 bottom-tab-bar border-t border-[var(--color-border)] bg-[var(--color-surface)]"
     >
       <ul className="flex h-16 items-stretch">
-        {tabs.map((tab) => {
-          const isActive = pathname.startsWith(tab.href);
+        {navTabs.map((tab) => {
+          const isActive = pathname.startsWith(tab.matchPrefix);
+          const icons = tabIcons[tab.href];
+          const sectionColor = sectionColors[tab.section] ?? "teal";
+          const activeClass = sectionClassMap[sectionColor].text;
           return (
             <li key={tab.href} className="flex flex-1">
               <Link
@@ -84,13 +58,13 @@ export function BottomTabBar() {
                   text-[10px] font-medium transition-colors active:scale-[0.98] transition-transform
                   ${
                     isActive
-                      ? "text-[var(--color-interactive)]"
+                      ? activeClass
                       : "text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
                   }
                 `}
               >
                 <span className="relative h-6 w-6">
-                  {isActive ? tab.activeIcon : tab.icon}
+                  {isActive ? icons?.activeIcon : icons?.icon}
                   {tab.href === '/app/network' && networkBadge > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[var(--color-error)]" />
                   )}

@@ -14,6 +14,7 @@ interface UserProfile {
   display_name: string | null
   profile_photo_url: string | null
   primary_role: string | null
+  handle: string | null
 }
 
 interface Yacht {
@@ -75,7 +76,7 @@ export default async function NetworkPage() {
     colleagueIds.length > 0
       ? supabase
           .from('users')
-          .select('id, full_name, display_name, profile_photo_url, primary_role')
+          .select('id, full_name, display_name, profile_photo_url, primary_role, handle')
           .in('id', colleagueIds)
       : Promise.resolve({ data: [] }),
     allYachtIds.length > 0
@@ -138,7 +139,8 @@ export default async function NetworkPage() {
   const requestsSent = (requestsSentRes.data as unknown as RequestSent[]) ?? []
 
   return (
-    <PageTransition>
+    <PageTransition className="flex flex-col gap-4">
+      <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Network</h1>
     <AudienceTabs
       endorsementsReceived={endorsementsReceived}
       requestsReceived={requestsReceived}

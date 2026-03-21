@@ -1,11 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { uploadCertDocument } from '@/lib/storage/upload'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, DatePicker } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/skeleton'
+import { PageTransition } from '@/components/ui/PageTransition'
+import { BackButton } from '@/components/ui/BackButton'
 
 export default function CertEditPage() {
   const router    = useRouter()
@@ -16,6 +20,7 @@ export default function CertEditPage() {
   const [loaded, setLoaded]       = useState(false)
   const [saving, setSaving]       = useState(false)
   const [deleting, setDeleting]   = useState(false)
+  const prefersReducedMotion = useReducedMotion()
   const [certName, setCertName]   = useState('')
   const [isCustom, setIsCustom]   = useState(false)
   const [customName, setCustomName] = useState('')
@@ -24,6 +29,7 @@ export default function CertEditPage() {
   const [noExpiry, setNoExpiry]   = useState(false)
   const [existingDoc, setExistingDoc] = useState<string | null>(null)
   const [docFile, setDocFile]     = useState<File | null>(null)
+  const docFileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     async function load() {
@@ -108,91 +114,112 @@ export default function CertEditPage() {
     }
   }
 
-  if (!loaded) {
-    return (
-      <div className="flex flex-col gap-4">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-14 bg-[var(--color-surface-raised)] rounded-xl animate-pulse" />
-        ))}
-      </div>
-    )
-  }
-
   return (
-    <div className="flex flex-col gap-6 pb-24">
-      <div>
-        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Edit certification</h1>
-        <p className="text-sm text-[var(--color-text-secondary)] mt-1">{certName}</p>
-      </div>
+    <PageTransition>
+      <AnimatePresence mode="wait">
+        {!loaded ? (
+          <motion.div
+            key="skeleton"
+            exit={prefersReducedMotion ? undefined : { opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col gap-4"
+          >
+            <Skeleton className="h-6 w-40" />
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-xl" />
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col gap-6 pb-24"
+          >
+            <div className="flex items-center gap-3">
+              <BackButton href="/app/profile" />
+              <div>
+                <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Edit certification</h1>
+                <p className="text-sm text-[var(--color-text-secondary)] mt-1">{certName}</p>
+              </div>
+            </div>
 
-      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
-        {isCustom && (
-          <Input
-            label="Certification name"
-            value={customName}
-            onChange={(e) => setCustomName(e.target.value)}
-            required
-          />
+            <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
+              {isCustom && (
+                <Input
+                  label="Certification name"
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  required
+                />
+              )}
+
+              <DatePicker
+                label="Issued date"
+                value={issuedAt || null}
+                onChange={(v) => setIssuedAt(v ?? '')}
+                hint="Optional"
+                maxYear={new Date().getFullYear()}
+              />
+
+              <div className="flex flex-col gap-2">
+                <DatePicker
+                  label="Expiry date"
+                  value={expiresAt || null}
+                  onChange={(v) => setExpiresAt(v ?? '')}
+                  disabled={noExpiry}
+                />
+                <label className="flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-[var(--color-surface-raised)] cursor-pointer min-h-[44px]">
+                  <input
+                    type="checkbox"
+                    checked={noExpiry}
+                    onChange={(e) => { setNoExpiry(e.target.checked); if (e.target.checked) setExpiresAt('') }}
+                    className="w-5 h-5 rounded accent-[var(--color-teal-700)]"
+                  />
+                  <span className="text-sm text-[var(--color-text-primary)]">No expiry / lifetime certification</span>
+                </label>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-[var(--color-text-primary)]">Supporting document</label>
+                <p className="text-xs text-[var(--color-text-secondary)] mb-2">
+                  {existingDoc ? 'A document is already attached. Upload a new one to replace it.' : 'PDF, JPEG, or PNG · max 10 MB · private'}
+                </p>
+                <Button variant="outline" size="sm" onClick={() => docFileRef.current?.click()}>
+                  {docFile ? docFile.name : existingDoc ? 'Replace file' : 'Choose file'}
+                </Button>
+                <input
+                  ref={docFileRef}
+                  type="file"
+                  accept=".pdf,image/jpeg,image/png"
+                  onChange={(e) => setDocFile(e.target.files?.[0] ?? null)}
+                  className="hidden"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <Button variant="secondary" onClick={() => router.back()} className="flex-1">
+                Cancel
+              </Button>
+              <Button onClick={handleSave} loading={saving} className="flex-1">
+                Save
+              </Button>
+            </div>
+
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDelete}
+              loading={deleting}
+              className="w-full"
+            >
+              Remove certification
+            </Button>
+          </motion.div>
         )}
-
-        <Input
-          label="Issued date"
-          type="date"
-          value={issuedAt}
-          onChange={(e) => setIssuedAt(e.target.value)}
-          hint="Optional"
-        />
-
-        <div className="flex flex-col gap-2">
-          <Input
-            label="Expiry date"
-            type="date"
-            value={expiresAt}
-            onChange={(e) => setExpiresAt(e.target.value)}
-            disabled={noExpiry}
-          />
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={noExpiry}
-              onChange={(e) => { setNoExpiry(e.target.checked); if (e.target.checked) setExpiresAt('') }}
-              className="rounded border-[var(--color-border)] text-[var(--color-interactive)]"
-            />
-            <span className="text-sm text-[var(--color-text-secondary)]">No expiry / lifetime certification</span>
-          </label>
-        </div>
-
-        <div>
-          <label className="text-sm font-medium text-[var(--color-text-primary)]">Supporting document</label>
-          <p className="text-xs text-[var(--color-text-secondary)] mb-2">
-            {existingDoc ? 'A document is already attached. Upload a new one to replace it.' : 'PDF, JPEG, or PNG · max 10 MB · private'}
-          </p>
-          <input
-            type="file"
-            accept=".pdf,image/jpeg,image/png"
-            onChange={(e) => setDocFile(e.target.files?.[0] ?? null)}
-            className="text-sm text-[var(--color-text-primary)]"
-          />
-          {docFile && <p className="text-xs text-[var(--color-interactive)] mt-1">{docFile.name}</p>}
-        </div>
-      </div>
-
-      <div className="flex gap-3">
-        <Button variant="secondary" onClick={() => router.back()} className="flex-1">
-          Cancel
-        </Button>
-        <Button onClick={handleSave} loading={saving} className="flex-1">
-          Save
-        </Button>
-      </div>
-
-      <button
-        onClick={handleDelete}
-        disabled={deleting}
-        className="text-sm text-red-500 hover:underline text-center"
-      >
-        {deleting ? 'Removing…' : 'Remove certification'}
-      </button>
-    </div>
+      </AnimatePresence>
+    </PageTransition>
   )
 }

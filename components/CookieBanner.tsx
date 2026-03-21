@@ -18,8 +18,8 @@ export function CookieBanner() {
     <div className="fixed bottom-[calc(var(--tab-bar-height,4rem)+env(safe-area-inset-bottom,0px))] left-0 right-0 p-4 bg-[var(--color-surface)] border-t border-[var(--color-border)] z-50">
       <div className="max-w-2xl mx-auto flex items-center justify-between gap-4">
         <p className="text-sm text-[var(--color-text-secondary)]">
-          We use essential cookies for authentication. No tracking cookies.{' '}
-          <Link href="/privacy" className="underline">Privacy Policy</Link>
+          We use cookies for authentication and anonymous analytics to improve the product.{' '}
+          <Link href="/privacy" className="underline">Learn more</Link>
         </p>
         <button
           onClick={() => { localStorage.setItem('cookie_consent', 'true'); setVisible(false); }}

@@ -1,6 +1,6 @@
 # Sprint 13 — Launch Polish + Marketing
 
-> **DRAFT** — This sprint plan is a draft outline. Scope, deliverables, and build plan are subject to change before work begins.
+> **DRAFT** — Scope refined from initial outline. Build plan at `build_plan.md`. Subject to change before work begins.
 
 **Phase:** 1B
 **Status:** 📋 Draft
@@ -9,128 +9,122 @@
 
 ## Goal
 
-Ship YachtieLink to the world. Marketing landing page, production environment fully configured, manual QA signed off, and a public feature roadmap for community engagement. After this sprint, the product is live.
+Ship YachtieLink to the world. Build the marketing landing page, configure the production environment, run manual QA, and sign off on launch readiness. After this sprint, the product is live for invited crew.
 
 ## Scope
 
-In:
-- Marketing landing page at `/` (value prop, how it works, social proof, CTA)
-- Vercel production environment setup (env vars, KV, Sentry, PostHog, domain)
-- Manual QA pass (OAuth, Stripe, endorsement emails, mobile Safari)
-- Feature roadmap page (lighter version of old Sprint 11 plan)
-- Legal page final review
-- Launch checklist sign-off
+**In — Code:**
+- Marketing landing page at `/` (hero, value props, how it works, social proof, CTA)
+- Public layout (header/footer for marketing + legal pages)
+- Static feature roadmap page (hardcoded cards, no database)
+- SEO: sitemap.ts, robots.ts, meta tags
+- Cookie banner update (reflect PostHog/Sentry usage)
 
-Out:
-- Recruiter features (Phase 2)
-- AI enhancements — endorsement writing assistant, cert OCR, profile suggestions (post-launch)
-- Multilingual support (post-launch)
-- NLP search (future phase)
-- Native app / PWA
+**In — Ops (founder tasks):**
+- Vercel production env vars (PostHog, Sentry, Stripe, Supabase, Redis, Resend, OpenAI)
+- Custom domain + SSL (yachtie.link)
+- Stripe production mode + webhook endpoint
+- Cron job verification in production
+
+**In — Human tasks:**
+- Manual QA pass (auth, Stripe, core flows, Sprint 12 yacht graph, cross-browser)
+- Legal sign-off (terms/privacy business address, final review)
+
+**Out:**
+- Database-backed roadmap with voting/submissions (overkill at 20-50 users — static page sufficient)
+- Blog / help center (not needed for soft launch)
+- Dark mode (sidelined in Sprint 10.3)
+- PWA / native app
+- Recruiter features, AI enhancements, multilingual support (post-launch)
 
 ## Dependencies
 
 - Sprint 10.1, Sprint 11, Sprint 12 all complete
-- Domain configured (yachtie.link or yachtielink.com)
-- Stripe account in production mode
-- Legal review of `/terms` and `/privacy` completed
-- PostHog and Sentry projects created with credentials
+- Domain purchased and DNS accessible (yachtie.link)
+- Stripe account in production mode (founder task)
+- PostHog + Sentry projects created with credentials (founder task)
+- Legal review completed (founder task — blocker for public launch)
+
+## What Already Exists (No Build Needed)
+
+PostHog, Sentry, error boundaries, rate limiting, GDPR export/deletion, OG images, QR codes, invite-only mode, cron jobs, cookie banner, security headers, legal pages, Stripe integration, custom subdomains — all production-ready. Just need env vars configured.
 
 ## Key Deliverables
 
 ### Marketing Landing Page — `/`
-- ⬜ Hero section: headline, sub-headline, CTA to sign up, hero image/animation
-- ⬜ "How it works" section: 3-step visual (build profile → attach yachts → get endorsed)
-- ⬜ Value props: portable identity, colleague graph, trusted endorsements, CV export
-- ⬜ Social proof section: sample profile preview, endorsement quotes, crew count
-- ⬜ Section-coloured visual rhythm (coral, navy, amber sections — matching profile colours)
-- ⬜ DM Serif Display for hero headlines
-- ⬜ Responsive: mobile-first, scroll animations, sticky CTA on mobile
-- ⬜ Footer: links to terms, privacy, roadmap, social links
-- ⬜ Salty cameo (subtle, onbrand)
+- ⬜ Root route serves marketing page for unauthenticated users; redirects authenticated users to `/app/profile`
+- ⬜ Hero section: headline, sub-headline, CTA, profile preview/illustration
+- ⬜ "How it works" 3-step section (profile → yachts → endorsements)
+- ⬜ Value props: portable identity, yacht graph, trusted endorsements, sea time
+- ⬜ Social proof: live crew count, endorsement quote snippet
+- ⬜ Section colours, scroll animations, DM Serif Display headlines
+- ⬜ Responsive: mobile-first, sticky CTA on mobile
+- ⬜ Public header (logo + sign up/log in) + footer (terms, privacy, roadmap)
+- ⬜ Salty cameo (subtle)
 
-### Production Environment
-- ⬜ Vercel project linked and configured
-- ⬜ Environment variables set:
-  - `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`
-  - `SENTRY_DSN`, `SENTRY_AUTH_TOKEN`
-  - `KV_REST_API_URL`, `KV_REST_API_TOKEN`
-  - `CRON_SECRET`
-  - `SIGNUP_MODE` (start with `invite` → switch to `public` at launch)
-  - Stripe keys (production mode)
-  - Supabase keys (production)
-  - Resend API key
-  - OpenAI API key
-- ⬜ Vercel KV database created (`yachtielink-ratelimit`)
-- ⬜ Custom domain configured with SSL
-- ⬜ CORS configured for production domain
-- ⬜ Cron jobs verified (cert expiry, analytics nudges)
+### SEO & Meta
+- ⬜ `sitemap.ts` — dynamic, includes public profiles
+- ⬜ `robots.ts` — blocks `/app/`, `/api/`, allows public pages
+- ⬜ Landing page OG meta tags + Twitter card
+
+### Static Feature Roadmap
+- ⬜ `/app/more/roadmap` — hardcoded cards, planned/shipped badges
+- ⬜ "Have an idea? Email us" (no database, no voting)
+- ⬜ SettingsRow entry in More page
+
+### Cookie Banner Update
+- ⬜ Text reflects PostHog (localStorage analytics) and Sentry (error tracking)
+- ⬜ "Learn more" link to `/privacy`
+
+### Production Environment (Ops)
+- ⬜ All env vars set in Vercel (PostHog, Sentry, Stripe prod, Supabase prod, Redis, Resend, OpenAI, CRON_SECRET)
+- ⬜ Custom domain + SSL configured
+- ⬜ Stripe production webhook endpoint created
+- ⬜ Cron jobs verified in production
+- ⬜ `SIGNUP_MODE=invite` set for soft launch
 
 ### Manual QA Pass
-- ⬜ Apple OAuth — signup, login, logout, re-login
-- ⬜ Google OAuth — signup, login, logout, re-login
-- ⬜ Email/password — signup with verification, login, reset password
-- ⬜ Stripe — upgrade to Pro (monthly), verify access, cancel, downgrade
-- ⬜ Stripe — upgrade to Pro (annual), portal access
-- ⬜ Endorsement request email — send, receive, click deep link, write endorsement
-- ⬜ Cert expiry email — trigger cron, verify email sent
-- ⬜ Mobile Safari — full flow (signup → onboarding → profile → public profile → share)
-- ⬜ Mobile Chrome — same flow
-- ⬜ Desktop Chrome — same flow
-- ⬜ CV upload → parse → review → profile population
-- ⬜ Profile PDF export (free with watermark, Pro without)
-- ⬜ Data export (GDPR)
-- ⬜ Account deletion flow
-- ⬜ Cookie banner renders and persists choice
+- ⬜ Auth flows (Apple OAuth, Google OAuth, email/password)
+- ⬜ Stripe (upgrade, cancel, portal, founding member pricing)
+- ⬜ Core flows (onboarding, CV upload, endorsement request + deep link, PDF export)
+- ⬜ Sprint 12 features (yacht graph browsing, colleague explorer, sea time, mutual colleagues)
+- ⬜ **Graph browsing: 3+ hops without dead ends** (profile → yacht → crew → their yacht → crew)
+- ⬜ Cross-browser (Mobile Safari, Mobile Chrome, Desktop Chrome, Desktop Safari)
+- ⬜ Data export + account deletion (GDPR)
+- ⬜ Cookie banner + invite-only mode
 
-### Feature Roadmap (Lightweight)
-- ⬜ `/app/more/roadmap` — read-only roadmap page showing planned features
-- ⬜ Simple card layout: feature name, status (planned/in-progress/shipped), description
-- ⬜ Pro users: upvote button on planned features
-- ⬜ Feature request submission (Pro only, simple text form)
-- ⬜ Data: `roadmap_items` and `roadmap_votes` tables (from original Sprint 11 build plan)
-- ⬜ Admin manages items via Supabase dashboard (no admin UI needed at launch)
-
-### Legal
-- ⬜ Final review of `/terms` content (currently flagged [LEGAL REVIEW NEEDED])
-- ⬜ Final review of `/privacy` content (currently flagged [LEGAL REVIEW NEEDED])
-- ⬜ Verify cookie banner covers actual tracking (PostHog, Sentry)
-
-### Launch Checklist
-- ⬜ All routes load without errors (smoke test)
-- ⬜ OG images generate for sample profiles
-- ⬜ QR codes scan correctly
-- ⬜ Rate limiting works (test from multiple IPs)
-- ⬜ Error boundaries catch and report to Sentry
-- ⬜ PostHog events firing in production
-- ⬜ Invite-only mode works (test `SIGNUP_MODE=invite`)
-- ⬜ Switch to public mode when ready
+### Legal Sign-off
+- ⬜ Business address added to terms/privacy
+- ⬜ Founder review and sign-off
+- ⬜ **Blocker:** must be complete before switching to `public` mode
 
 ## Exit Criteria
 
-- Marketing page live at root domain
-- Production environment fully operational
-- All manual QA items pass
-- Feature roadmap accessible from More tab
-- Legal pages reviewed and approved
-- Invite-only mode tested and ready for soft launch
-- Launch checklist 100% green
+- Marketing page live at root domain, responsive, with scroll animations
+- Public header/footer on all unauthenticated pages
+- SEO: sitemap and robots.txt serving correctly
+- Static roadmap accessible from More tab
+- Cookie banner accurately reflects tracking
+- All QA checklist items pass
+- Production env fully operational (PostHog, Sentry, Stripe, crons)
+- Legal pages signed off
+- `SIGNUP_MODE=invite` tested and working
+- Ready for soft launch to 20-50 crew
 
 ## Estimated Effort
 
-5–7 days
+**Code work:** ~4 days
+**Ops + QA + legal:** ~2-3 days
+**Total:** 5-7 days
 
 ## Notes
 
-> **Feature roadmap is a lighter version of the original Sprint 11.** The full build plan (with feature_requests, feature_request_votes tables, complex voting logic) is in `sprints/major/sprint-11/build_plan.md`. For launch, we're doing a simpler version — roadmap_items + roadmap_votes only, admin via Supabase dashboard.
+**Most infrastructure is already built.** The codebase exploration revealed that PostHog, Sentry, rate limiting, GDPR, OG images, QR codes, invite mode, cron jobs, and Stripe are all production-ready. Sprint 13 is mostly a marketing page build + ops configuration + QA.
 
-**Launch strategy:** Start with `SIGNUP_MODE=invite` for a controlled soft launch to 20-50 crew. Gather feedback for 1-2 weeks. Fix critical issues. Then switch to `public` mode before Med season hiring ramps up (June 2026).
+**Static roadmap is a deliberate choice.** The full Sprint 11 roadmap plan (4 tables, 19 components, Pro voting, feature requests) is a 5-7 day sprint on its own. For 20-50 soft launch users, a hardcoded page is honest and fast. Upgrade to DB-backed when user count justifies structured feedback.
 
-**Legal:** The terms and privacy pages have content but are flagged for legal review. This must happen before public launch — it's a blocker, not a nice-to-have. Budget time for revisions.
+**Launch strategy:** Start with `SIGNUP_MODE=invite` for a controlled soft launch. Invite 20-50 crew via `?invite` param links. Gather feedback for 1-2 weeks. Fix critical issues via junior sprints. Then switch to `public` mode before Med season hiring ramps up (June 2026).
 
-**Post-launch priorities (not in this sprint):**
-- AI features: endorsement writing assistant, cert OCR, profile suggestions, multilingual requests
-- Recruiter profiles + search
-- Availability broadcast
-- Messaging / contacts
-- Posts / timeline
+**Legal is a blocker.** The terms and privacy pages have content but the business address is a placeholder. This must be resolved before public launch — it's not a nice-to-have.
+
+See `build_plan.md` for the full implementation specification.

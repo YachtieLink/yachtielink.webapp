@@ -37,7 +37,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               transition-colors
               ${
                 error
-                  ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                  ? "border-[var(--color-error)] focus:border-[var(--color-error)] focus:ring-[var(--color-error)]/20"
                   : "border-[var(--color-border)] focus:border-[var(--color-interactive)] focus:ring-[var(--color-interactive)]/20"
               }
               ${suffix ? "pr-10" : ""}
@@ -60,7 +60,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <p
             id={`${inputId}-error`}
             role="alert"
-            className="text-xs text-red-600 dark:text-red-400"
+            className="text-xs text-[var(--color-error)]"
           >
             {error}
           </p>

@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { PageTransition } from "@/components/ui/PageTransition";
 
 export default function UpdatePasswordPage() {
   const router = useRouter();
@@ -10,6 +14,8 @@ export default function UpdatePasswordPage() {
 
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,7 +48,7 @@ export default function UpdatePasswordPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-12 bg-[var(--color-surface)]">
+    <PageTransition className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-12 bg-[var(--color-surface)]">
       <div className="text-center">
         <h1 className="text-2xl font-serif text-[var(--color-text-primary)]">
           Choose a new password
@@ -59,58 +65,54 @@ export default function UpdatePasswordPage() {
         {error && (
           <p
             role="alert"
-            className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400"
+            className="rounded-lg bg-[var(--color-error)]/10 px-4 py-3 text-sm text-[var(--color-error)]"
           >
             {error}
           </p>
         )}
 
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-[var(--color-text-primary)]"
-          >
-            New password
-          </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-interactive)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
-            placeholder="••••••••"
-          />
-        </div>
+        <Input
+          label="New password"
+          type={showPassword ? "text" : "password"}
+          autoComplete="new-password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          suffix={
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          }
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="confirm"
-            className="text-sm font-medium text-[var(--color-text-primary)]"
-          >
-            Confirm password
-          </label>
-          <input
-            id="confirm"
-            type="password"
-            autoComplete="new-password"
-            required
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            className="h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-interactive)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
-            placeholder="••••••••"
-          />
-        </div>
+        <Input
+          label="Confirm password"
+          type={showConfirm ? "text" : "password"}
+          autoComplete="new-password"
+          required
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+          placeholder="••••••••"
+          suffix={
+            <button
+              type="button"
+              onClick={() => setShowConfirm(!showConfirm)}
+              className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+            >
+              {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          }
+        />
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex h-12 w-full items-center justify-center rounded-xl bg-[var(--color-teal-700)] text-sm font-semibold text-white transition-colors hover:bg-[var(--color-teal-800)] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading ? "Updating…" : "Update password"}
-        </button>
+        <Button type="submit" loading={loading} className="w-full">
+          Update password
+        </Button>
       </form>
-    </div>
+    </PageTransition>
   );
 }
