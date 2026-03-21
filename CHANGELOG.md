@@ -17,6 +17,90 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-21 — Claude Code (Opus 4.6) — Sprint 10.2 + 10.3: Design System & Page Layout
+
+### Done
+
+**Sprint 10.2 — Design System Components:**
+- New components: Button variants (outline/link/icon), Input, Select, Textarea, FormField, IconButton, SectionBadge, ProfileAvatar
+- Section color system: unique tab colors (teal/amber/coral/navy/sand)
+- Nav refactor: shared nav-config, section-colored active states
+- Token migration: all hardcoded colors → CSS custom properties
+- Dark mode tokens: 20+ variable overrides in globals.css
+- Full-bleed backgrounds on CV, Insights, Network pages
+- Insights: removed blur on teaser cards, readable text with inline Pro badge
+- Layout: consistent container padding (px-4 md:px-6)
+
+**Sprint 10.3 — Page Layout, IA & Polish (15 parts):**
+
+*Foundation:*
+- Typography standardized: 28px bold tracking-tight titles, section headers unified
+- Soft card glass treatment (card-soft) on tinted background pages
+- Spacing fixes: removed double bottom padding (160px → proper), toast position uses CSS vars
+- Dark mode sidelined: force light mode, theme toggle replaced with "coming soon"
+
+*Profile page redesign:*
+- Hero card: photo + name + role + URL with copy + Preview/Share buttons (client component extraction)
+- Profile strength card with smart CTA (photos → bio → endorsements → certs)
+- 2-col section grid with toggle switches replacing flat list
+- Empty states with icons (Heart/Wrench/Camera) replacing "Add →" hyperlinks
+- Removed accordion sections from profile dashboard
+- Teal-50 full-bleed background
+
+*CV page:*
+- Bento button hierarchy: Share primary, Generate/Upload secondary, QR/Edit ghost
+- Lock icons on Pro templates, router.push replacing window.location.href
+
+*Insights page:*
+- Crew Pro CTA as sticky bottom overlay with expandable feature list
+- Bento grid for Pro analytics (profile views hero + 2-col metrics)
+- Error toast on checkout failure
+
+*Network page:*
+- Colleague cards link to /u/{handle}, endorsement text links → proper buttons
+- Page title added
+
+*More page:*
+- Card-based sections with divide-y, sand background full-bleed
+- Sign out as destructive button, download data via fetch+blob
+
+*Features:*
+- Photo drag-to-reorder with @dnd-kit, multi-upload support
+- Photo limits: free 3/pro 9, gallery limits: free 3/pro 15
+- Custom month/year DatePicker replacing all native date inputs
+- 44px checkbox tap targets for "currently working here" / "no expiry"
+- Cert category picker with Lucide icons in 2-col grid
+- Hobbies emoji auto-suggest with 60+ mappings, manual override support
+- Skills suggestion chips per category with quick-add
+- Styled file upload replacing raw input[type=file]
+- BackButton standardized with 44px tap target across all sub-pages
+
+*Bug fixes:*
+- expiry_date → expires_at column mismatch (insights, cron, certs)
+- subscription_plan → subscription_status check on photo/gallery APIs
+- pt-safe-top non-existent utility replaced with env(safe-area-inset-top)
+
+*Public profile:*
+- Hero identity: larger name (text-4xl), unified "Role · Dept" line
+- Top bar: icon-only circular buttons (back/edit/share) replacing labelled pills
+
+### Context
+- Sprint 10.3 spec at `sprints/major/phase-1a/sprint-10.3/README.md`
+- Three-agent review findings at `sprints/major/phase-1a/sprint-10.3/parts/review_findings.md`
+- Desktop layout deferred to Phase 1B
+- Public profile redirect when viewing own profile is pre-existing behavior
+
+### Next
+- Visual QA pass on real mobile device (375px)
+- Phase 1B: desktop layout optimization
+- Sprint 11: auth pages, welcome page redesign
+
+### Flags
+- Insights page redirects to profile for non-Pro dev account — pre-existing, not a regression
+- RequestActions useToast error in server logs — SSR context issue, works on client
+
+---
+
 ## 2026-03-21 — Claude Code (Opus 4.6) — Sprint 10.1: Close & Polish Phase 1A
 
 ### Done

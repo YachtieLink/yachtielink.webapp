@@ -8,15 +8,26 @@ You are a senior software engineer working on a production Next.js application. 
 
 ## Session Start
 
-Every session, read these first:
+Every session, read in this order:
 
-1. This file
+### Tier 1 — Always (orientation, ~5 files, <500 lines)
+1. This file (AGENTS.md)
 2. `CHANGELOG.md` — last 3 sessions (your external memory)
-3. `docs/yl_system_state.json`
-4. `docs/yl_phase1_execution.md`
-5. `sprints/README.md` — what's active right now (major + junior)
+3. `docs/ops/lessons-learned.md` — don't repeat known mistakes
+4. `docs/ops/feedback.md` — standing behavioral corrections
+5. Your agent profile: `docs/agents/claude-code.md` or `docs/agents/codex.md`
 
-Then drill into the specific sprint you're working on — read its `README.md` and `build_plan.md`. Don't read every sprint upfront; only load what you need for the current task.
+### Tier 2 — Task-specific (load what you need)
+6. Module state files for modules you'll touch (`docs/modules/<module>.md`)
+7. `sprints/README.md` + active sprint README and build_plan
+8. Discipline docs for the task type (see table below)
+9. Last 1-2 session logs if continuing previous work (`sessions/`)
+
+### Tier 3 — Deep context (only if needed)
+10. Module decision/activity logs (`docs/modules/<module>.decisions.md` / `.activity.md`)
+11. `docs/yl_decisions.json` if making a product decision
+12. Design system docs if doing UI work (`docs/design-system/README.md`)
+13. `docs/yl_system_state.json` and `docs/yl_phase1_execution.md` for phase context
 
 **Load discipline context for the session.** Based on the task, read the relevant files from `docs/disciplines/`. Don't load all of them — pick what applies:
 
@@ -209,7 +220,30 @@ If docs conflict, follow `yl_system_state.json`, `yl_phase1_execution.md`, and t
 **CRITICAL — before every `git commit`:**
 You MUST update `CHANGELOG.md` to reflect all work being committed BEFORE running `git commit`. This is a blocking pre-commit requirement. If the changelog does not cover the changes in the commit, stop and update it first. No exceptions — this has been missed repeatedly.
 
+**CRITICAL — before every `git commit`:**
+You MUST also update module state files (`docs/modules/`) for any modules you touched. Both CHANGELOG.md AND relevant module state files must be current before committing.
+
 Format: reverse chronological, one entry per session, with Done / Context / Next / Flags sections. If a session ends unexpectedly or you commit mid-session, the log should already reflect what happened.
+
+---
+
+## Module state cadence
+
+`docs/modules/<module>.md` files are living documents. Update them as work happens.
+
+**Update after:**
+- Any change to a module's features, status, or key files
+- Any new known issue or resolved issue
+- Any architectural decision that affects the module
+
+**Before every `git commit`:**
+You MUST update the module state file(s) for any modules you touched. This is blocking, same as the CHANGELOG rule.
+
+**Append to activity logs:**
+After any meaningful change to a module, append a one-line entry to `docs/modules/<module>.activity.md`. Format: `**YYYY-MM-DD** — Agent Name: What changed`.
+
+**Append to decision logs:**
+After any product or architectural decision affecting a module, append to `docs/modules/<module>.decisions.md`. Format: `**YYYY-MM-DD** — D-xxx: Decision summary. Rationale. — Who`.
 
 ---
 
