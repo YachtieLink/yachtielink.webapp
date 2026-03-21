@@ -8,7 +8,7 @@ Major sprints are the planned, phased work that builds the core YachtieLink prod
 
 ```
 Phase 1A  →  Profile robustness, photo-forward UX, CV parsing polish
-Phase 1B  →  TBD
+Phase 1B  →  Public polish, yacht graph, launch readiness (DRAFT)
 Phase 1C  →  TBD
 Phase 2   →  TBD
 Phase 3   →  TBD
@@ -49,7 +49,8 @@ Anything worth capturing for next time.
 
 ## Active Phases
 
-- [Phase 1A](./phase-1a/README.md) — Profile robustness sprint (Sprint 10 + onwards)
+- [Phase 1A](./phase-1a/README.md) — Profile robustness sprint (Sprint 10 + 10.1)
+- [Phase 1B](./phase-1b/README.md) — Public polish, yacht graph & launch (Sprints 11–13) — **DRAFT**
 
 ## Archive
 
