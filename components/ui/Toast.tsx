@@ -59,7 +59,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       <div
         aria-live="polite"
         aria-atomic="false"
-        className="pointer-events-none fixed bottom-24 left-0 right-0 z-50 flex flex-col items-center gap-2 px-4"
+        className="pointer-events-none fixed left-0 right-0 z-50 flex flex-col items-center gap-2 px-4"
+        style={{ bottom: 'calc(var(--tab-bar-height, 64px) + env(safe-area-inset-bottom, 0px) + 1rem)' }}
       >
         <AnimatePresence>
           {toasts.map((t) => (
@@ -81,8 +82,8 @@ function ToastItem({
   const prefersReducedMotion = useReducedMotion();
 
   const colourMap: Record<ToastType, string> = {
-    success: "bg-emerald-600 text-white",
-    error:   "bg-red-600 text-white",
+    success: "bg-[var(--color-success)] text-white",
+    error:   "bg-[var(--color-error)] text-white",
     info:    "bg-[var(--color-teal-700)] text-white",
   };
 

@@ -18,7 +18,8 @@ export default async function CvPage() {
   if (!profile) redirect('/onboarding')
 
   return (
-    <PageTransition className="flex flex-col gap-4 pb-24">
+    <PageTransition className="flex flex-col gap-4 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-amber-50)]">
+      <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">CV &amp; Sharing</h1>
       <CvActions
         handle={profile.handle!}
         hasPdf={!!profile.latest_pdf_path}

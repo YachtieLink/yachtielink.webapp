@@ -6,13 +6,14 @@
  * enough paying users to justify the developer account costs.
  */
 import Link from "next/link";
+import { PageTransition } from "@/components/ui/PageTransition";
 
 export default function WelcomePage() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-12 bg-[var(--color-surface)]">
+    <PageTransition className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-12 bg-[var(--color-surface)]">
       {/* Logo / wordmark placeholder */}
       <div className="text-center">
-        <h1 className="text-3xl font-serif tracking-tight text-[var(--color-teal-800)] dark:text-[var(--color-teal-100)]">
+        <h1 className="text-3xl font-serif tracking-tight text-[var(--color-text-primary)]">
           YachtieLink
         </h1>
         <p className="mt-2 text-sm text-[var(--color-text-secondary)]">
@@ -52,6 +53,6 @@ export default function WelcomePage() {
         </Link>
         .
       </p>
-    </div>
+    </PageTransition>
   );
 }

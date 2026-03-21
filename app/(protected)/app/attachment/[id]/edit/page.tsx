@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, DatePicker } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { BackButton } from '@/components/ui/BackButton'
+import { Skeleton } from '@/components/ui/skeleton'
+import { PageTransition } from '@/components/ui/PageTransition'
 
 interface Attachment {
   id: string
@@ -30,6 +33,7 @@ export default function AttachmentEditPage() {
   const [deleting, setDeleting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [loading, setLoading] = useState(true)
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     supabase
@@ -89,107 +93,116 @@ export default function AttachmentEditPage() {
     router.push('/app/profile')
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[var(--color-surface)] flex items-center justify-center">
-        <p className="text-sm text-[var(--color-text-secondary)]">Loading…</p>
-      </div>
-    )
-  }
-
-  if (!attachment) {
-    return (
-      <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8">
-        <p className="text-sm text-[var(--color-text-secondary)]">Attachment not found.</p>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-      <div className="mb-6">
-        <BackButton href="/app/profile" />
-      </div>
-
-      <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Edit attachment</h1>
-      <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-        {attachment.yachts?.name ?? 'Yacht'}
-      </p>
-
-      <div className="flex flex-col gap-4">
-        <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-            Role
-          </label>
-          <Input
-            value={roleLabel}
-            onChange={(e) => setRoleLabel(e.target.value)}
-            placeholder="Your role on this yacht"
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-            Start date
-          </label>
-          <Input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            max={new Date().toISOString().split('T')[0]}
-          />
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-xs font-medium text-[var(--color-text-secondary)]">
-              End date
-            </label>
-            <label className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
-              <input
-                type="checkbox"
-                checked={isCurrent}
-                onChange={(e) => setIsCurrent(e.target.checked)}
-                className="rounded"
-              />
-              Currently working here
-            </label>
-          </div>
-          {!isCurrent && (
-            <Input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              min={startDate}
-              max={new Date().toISOString().split('T')[0]}
-            />
-          )}
-        </div>
-
-        <Button
-          onClick={handleSave}
-          disabled={!roleLabel.trim() || !startDate || saving}
-          className="w-full mt-2"
-          size="lg"
-        >
-          {saving ? 'Saving…' : 'Save changes'}
-        </Button>
-
-        <div className="border-t border-[var(--color-border)] pt-4 mt-2">
-          <p className="text-xs text-[var(--color-text-secondary)] mb-3">
-            Removing this attachment won&apos;t delete any endorsements you&apos;ve received for this yacht.
-          </p>
-          <Button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="w-full"
-            size="lg"
-            variant={confirmDelete ? 'destructive' : 'ghost'}
+    <PageTransition>
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div
+            key="skeleton"
+            exit={prefersReducedMotion ? undefined : { opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col gap-4 pb-24"
           >
-            {deleting ? 'Removing…' : confirmDelete ? 'Tap again to confirm removal' : 'Remove this yacht'}
-          </Button>
-        </div>
-      </div>
-    </div>
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-9 w-9 rounded-xl" />
+              <Skeleton className="h-6 w-40" />
+            </div>
+            <Skeleton className="h-12 w-full rounded-xl" />
+            <Skeleton className="h-12 w-full rounded-xl" />
+            <Skeleton className="h-12 w-full rounded-xl" />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+          >
+            {!attachment ? (
+              <div className="min-h-screen bg-[var(--color-surface)] pt-8">
+                <p className="text-sm text-[var(--color-text-secondary)]">Attachment not found.</p>
+              </div>
+            ) : (
+              <div className="min-h-screen bg-[var(--color-surface)] pt-8 pb-24">
+                <div className="mb-6">
+                  <BackButton href="/app/profile" />
+                </div>
+
+                <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)] mb-1">Edit attachment</h1>
+                <p className="text-sm text-[var(--color-text-secondary)] mb-6">
+                  {attachment.yachts?.name ?? 'Yacht'}
+                </p>
+
+                <div className="flex flex-col gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
+                      Role
+                    </label>
+                    <Input
+                      value={roleLabel}
+                      onChange={(e) => setRoleLabel(e.target.value)}
+                      placeholder="Your role on this yacht"
+                    />
+                  </div>
+
+                  <DatePicker
+                    label="Start date"
+                    value={startDate || null}
+                    onChange={(v) => setStartDate(v ?? '')}
+                    includeDay
+                    maxYear={new Date().getFullYear()}
+                  />
+
+                  <div>
+                    <label className="flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-[var(--color-surface-raised)] cursor-pointer min-h-[44px]">
+                      <input
+                        type="checkbox"
+                        checked={isCurrent}
+                        onChange={(e) => setIsCurrent(e.target.checked)}
+                        className="w-5 h-5 rounded accent-[var(--color-teal-700)]"
+                      />
+                      <span className="text-sm text-[var(--color-text-primary)]">Currently working here</span>
+                    </label>
+                    {!isCurrent && (
+                      <DatePicker
+                        label="End date"
+                        value={endDate || null}
+                        onChange={(v) => setEndDate(v ?? '')}
+                        includeDay
+                        maxYear={new Date().getFullYear()}
+                      />
+                    )}
+                  </div>
+
+                  <Button
+                    onClick={handleSave}
+                    disabled={!roleLabel.trim() || !startDate || saving}
+                    className="w-full mt-2"
+                    size="lg"
+                  >
+                    {saving ? 'Saving…' : 'Save changes'}
+                  </Button>
+
+                  <div className="border-t border-[var(--color-border)] pt-4 mt-2">
+                    <p className="text-xs text-[var(--color-text-secondary)] mb-3">
+                      Removing this attachment won&apos;t delete any endorsements you&apos;ve received for this yacht.
+                    </p>
+                    <Button
+                      onClick={handleDelete}
+                      disabled={deleting}
+                      className="w-full"
+                      size="lg"
+                      variant={confirmDelete ? 'destructive' : 'ghost'}
+                    >
+                      {deleting ? 'Removing…' : confirmDelete ? 'Tap again to confirm removal' : 'Remove this yacht'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </PageTransition>
   )
 }

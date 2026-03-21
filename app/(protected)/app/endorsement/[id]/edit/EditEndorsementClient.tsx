@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { WriteEndorsementForm } from '@/components/endorsement/WriteEndorsementForm'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/Button'
+import { BackButton } from '@/components/ui/BackButton'
 import { useToast } from '@/components/ui/Toast'
 
 interface ExistingEndorsement {
@@ -63,7 +64,10 @@ export function EditEndorsementClient({
 
   return (
     <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-      <h1 className="text-xl font-bold text-[var(--color-text-primary)] mb-6">Edit endorsement</h1>
+      <div className="flex items-center gap-3 mb-6">
+        <BackButton href="/app/network" />
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Edit endorsement</h1>
+      </div>
 
       <WriteEndorsementForm
         recipientId={recipientId}
@@ -76,12 +80,13 @@ export function EditEndorsementClient({
 
       {/* Delete section */}
       <div className="mt-8 pt-6 border-t border-[var(--color-border)]">
-        <button
+        <Button
+          variant="destructive"
+          size="sm"
           onClick={() => setDeleteSheetOpen(true)}
-          className="text-sm text-red-400 hover:text-red-300 transition-colors font-medium"
         >
           Delete endorsement
-        </button>
+        </Button>
       </div>
 
       <BottomSheet

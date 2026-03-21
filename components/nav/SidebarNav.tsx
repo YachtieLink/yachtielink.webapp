@@ -16,46 +16,17 @@ import {
   MoreIcon,
   MoreIconFilled,
 } from './icons'
+import { tabs as navTabs } from '@/lib/nav-config'
+import { sectionColors, sectionClassMap } from '@/lib/section-colors'
 
-interface Tab {
-  label: string
-  href: string
-  icon: React.ReactNode
-  activeIcon: React.ReactNode
+/** Icons keyed by route — kept here because they're JSX (paired outline + filled SVGs) */
+const tabIcons: Record<string, { icon: React.ReactNode; activeIcon: React.ReactNode }> = {
+  '/app/profile':  { icon: <ProfileIcon />,  activeIcon: <ProfileIconFilled /> },
+  '/app/cv':       { icon: <CvIcon />,       activeIcon: <CvIconFilled /> },
+  '/app/insights': { icon: <InsightsIcon />,  activeIcon: <InsightsIconFilled /> },
+  '/app/network':  { icon: <NetworkIcon />,   activeIcon: <NetworkIconFilled /> },
+  '/app/more':     { icon: <MoreIcon />,      activeIcon: <MoreIconFilled /> },
 }
-
-const tabs: Tab[] = [
-  {
-    label: 'My Profile',
-    href: '/app/profile',
-    icon: <ProfileIcon />,
-    activeIcon: <ProfileIconFilled />,
-  },
-  {
-    label: 'CV',
-    href: '/app/cv',
-    icon: <CvIcon />,
-    activeIcon: <CvIconFilled />,
-  },
-  {
-    label: 'Insights',
-    href: '/app/insights',
-    icon: <InsightsIcon />,
-    activeIcon: <InsightsIconFilled />,
-  },
-  {
-    label: 'Network',
-    href: '/app/network',
-    icon: <NetworkIcon />,
-    activeIcon: <NetworkIconFilled />,
-  },
-  {
-    label: 'More',
-    href: '/app/more',
-    icon: <MoreIcon />,
-    activeIcon: <MoreIconFilled />,
-  },
-]
 
 export function SidebarNav() {
   const pathname = usePathname()
@@ -64,7 +35,7 @@ export function SidebarNav() {
 
   // Prefetch all tab routes on mount for instant navigation
   useEffect(() => {
-    tabs.forEach((tab) => router.prefetch(tab.href))
+    navTabs.forEach((tab) => router.prefetch(tab.href))
   }, [router])
 
   return (
@@ -78,8 +49,11 @@ export function SidebarNav() {
       </div>
 
       {/* Tab links */}
-      {tabs.map((tab) => {
-        const isActive = pathname.startsWith(tab.href)
+      {navTabs.map((tab) => {
+        const isActive = pathname.startsWith(tab.matchPrefix)
+        const icons = tabIcons[tab.href]
+        const sectionColor = sectionColors[tab.section] ?? 'teal'
+        const classes = sectionClassMap[sectionColor]
         const showBadge = tab.href === '/app/network' && networkBadge > 0
         return (
           <Link
@@ -91,13 +65,13 @@ export function SidebarNav() {
               text-[9px] font-medium transition-colors
               ${
                 isActive
-                  ? 'text-[var(--color-interactive)] bg-[var(--color-interactive)]/10'
+                  ? `${classes.text} ${classes.bgSubtle}`
                   : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-overlay)]'
               }
             `}
           >
             <span className="relative h-5 w-5">
-              {isActive ? tab.activeIcon : tab.icon}
+              {isActive ? icons?.activeIcon : icons?.icon}
               {showBadge && (
                 <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[var(--color-error)]" />
               )}

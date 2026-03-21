@@ -3,7 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { PageTransition } from "@/components/ui/PageTransition";
 
 export default function SignupPage() {
   const searchParams = useSearchParams();
@@ -12,6 +16,7 @@ export default function SignupPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
@@ -47,7 +52,7 @@ export default function SignupPage() {
 
   if (done) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-12 bg-[var(--color-surface)]">
+      <PageTransition className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 py-12 bg-[var(--color-surface)]">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-teal-100)] dark:bg-[var(--color-teal-800)]">
           <svg
             className="h-8 w-8 text-[var(--color-teal-700)] dark:text-[var(--color-teal-200)]"
@@ -73,12 +78,12 @@ export default function SignupPage() {
             . Click it to activate your account.
           </p>
         </div>
-      </div>
+      </PageTransition>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-12 bg-[var(--color-surface)]">
+    <PageTransition className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-12 bg-[var(--color-surface)]">
       <div className="text-center">
         <h1 className="text-2xl font-serif text-[var(--color-text-primary)]">
           Create your account
@@ -95,58 +100,45 @@ export default function SignupPage() {
         {error && (
           <p
             role="alert"
-            className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400"
+            className="rounded-lg bg-[var(--color-error)]/10 px-4 py-3 text-sm text-[var(--color-error)]"
           >
             {error}
           </p>
         )}
 
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="email"
-            className="text-sm font-medium text-[var(--color-text-primary)]"
-          >
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-interactive)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
-            placeholder="you@example.com"
-          />
-        </div>
+        <Input
+          label="Email"
+          type="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium text-[var(--color-text-primary)]"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="h-12 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-interactive)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
-            placeholder="At least 8 characters"
-          />
-        </div>
+        <Input
+          label="Password"
+          type={showPassword ? "text" : "password"}
+          autoComplete="new-password"
+          required
+          minLength={8}
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="At least 8 characters"
+          suffix={
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)]"
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+          }
+        />
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="flex h-12 w-full items-center justify-center rounded-xl bg-[var(--color-teal-700)] text-sm font-semibold text-white transition-colors hover:bg-[var(--color-teal-800)] disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading ? "Creating account…" : "Create account"}
-        </button>
+        <Button type="submit" loading={loading} className="w-full">
+          Create account
+        </Button>
       </form>
 
       <p className="text-sm text-[var(--color-text-secondary)]">
@@ -158,6 +150,6 @@ export default function SignupPage() {
           Sign in
         </Link>
       </p>
-    </div>
+    </PageTransition>
   );
 }

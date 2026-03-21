@@ -9,9 +9,11 @@ interface ProfileStrengthProps {
   label: string       // 'Getting started' | 'Looking good' | 'Standing out' | 'All squared away'
   nextPrompt: string
   nextHref?: string
+  /** Button text for the CTA — defaults to "Go →" */
+  ctaLabel?: string
 }
 
-export function ProfileStrength({ score, label, nextPrompt, nextHref }: ProfileStrengthProps) {
+export function ProfileStrength({ score, label, nextPrompt, nextHref, ctaLabel }: ProfileStrengthProps) {
   const circumference = 2 * Math.PI * 28 // r=28
   const dash = (score / 100) * circumference
 
@@ -62,7 +64,7 @@ export function ProfileStrength({ score, label, nextPrompt, nextHref }: ProfileS
               href={nextHref}
               className="shrink-0 text-xs font-medium text-[var(--color-interactive)] hover:underline"
             >
-              Go →
+              {ctaLabel ?? 'Go →'}
             </Link>
           )}
         </div>

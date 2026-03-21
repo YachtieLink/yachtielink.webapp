@@ -1,5 +1,7 @@
 # Sprint 10.2: UXUI & Frontend Rewrite — Detailed Build Plan
 
+> **Single source of truth.** All review fixes from `review_1_fixes.md` and `review_2_resolutions.md` have been merged into this document. Those files are audit trails only — do not read them for build instructions.
+
 ## Context
 
 The design system docs describe a warm, colorful, Notion-inspired experience with coral/navy/amber section colors, sand warmth, photo-forward profiles, and consistent component usage. The implementation ignores all of it — 53 raw buttons, 34 raw inputs, zero uses of the section color palette, emoji icons, `alert()` for errors, and four competing button patterns.
@@ -22,6 +24,25 @@ This build plan brings the implementation to match the spec.
 
 ---
 
+## Part 0: Pre-Work Bug Fixes
+
+### 0A. Theme localStorage key mismatch
+Audit all references to `yl-theme` and `theme` in localStorage. Pick one, update all references.
+
+### 0B. Welcome page legal links
+Verify paths resolve correctly — check `href` values against actual route structure.
+
+### 0C. CookieBanner z-index
+CookieBanner overlaps BottomTabBar. Fix z-index layering so CookieBanner sits above.
+
+### 0D. Bare `--teal-N` token audit
+10+ components reference `var(--teal-N)` instead of `var(--color-teal-N)`. Find and fix all:
+```bash
+grep -rn 'var(--teal-' app/ components/ --include='*.tsx' --include='*.css'
+```
+
+---
+
 ## Part 1: Component Foundation
 
 ### 1A. Fix Button.tsx token system
@@ -38,11 +59,18 @@ The Button currently uses shadcn tokens (`bg-primary`, `text-primary-foreground`
     "border border-[var(--color-border)] bg-transparent text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]",
   link:
     "bg-transparent text-[var(--color-interactive)] hover:underline p-0 h-auto font-medium",
+  icon:
+    "p-0 h-10 w-10 rounded-xl",
 ```
 
 Update the `Variant` type (line 4):
 ```tsx
-type Variant = "primary" | "secondary" | "ghost" | "destructive" | "outline" | "link";
+type Variant = "primary" | "secondary" | "ghost" | "destructive" | "outline" | "link" | "icon";
+```
+
+**Post-change verification:** After adding variants, grep all existing Button imports and visually confirm they still render correctly:
+```bash
+grep -rn "from.*Button" app/ components/ --include='*.tsx' | grep -v node_modules
 ```
 
 ### 1B. Fix Input.tsx error tokens
@@ -130,12 +158,12 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             bg-[var(--color-surface)]
             text-[var(--color-text-primary)]
             placeholder:text-[var(--color-text-tertiary)]
-            focus:outline-none focus:ring-2
+            focus-visible:outline-none focus-visible:ring-2
             transition-colors resize-y
             ${
               error
-                ? "border-[var(--color-error)] focus:border-[var(--color-error)] focus:ring-[var(--color-error)]/20"
-                : "border-[var(--color-border)] focus:border-[var(--color-interactive)] focus:ring-[var(--color-interactive)]/20"
+                ? "border-[var(--color-error)] focus-visible:border-[var(--color-error)] focus-visible:ring-[var(--color-error)]/20"
+                : "border-[var(--color-border)] focus-visible:border-[var(--color-interactive)] focus-visible:ring-[var(--color-interactive)]/20"
             }
             ${className}
           `}
@@ -201,12 +229,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             h-12 w-full rounded-xl border px-4 text-sm appearance-none
             bg-[var(--color-surface)]
             text-[var(--color-text-primary)]
-            focus:outline-none focus:ring-2
+            focus-visible:outline-none focus-visible:ring-2
             transition-colors
             ${
               error
-                ? "border-[var(--color-error)] focus:border-[var(--color-error)] focus:ring-[var(--color-error)]/20"
-                : "border-[var(--color-border)] focus:border-[var(--color-interactive)] focus:ring-[var(--color-interactive)]/20"
+                ? "border-[var(--color-error)] focus-visible:border-[var(--color-error)] focus-visible:ring-[var(--color-error)]/20"
+                : "border-[var(--color-border)] focus-visible:border-[var(--color-interactive)] focus-visible:ring-[var(--color-interactive)]/20"
             }
             ${className}
           `}
@@ -238,34 +266,231 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
 Select.displayName = "Select";
 ```
 
+### 1F-2. Create FormField.tsx
+
+**File:** `components/ui/FormField.tsx`
+
+```tsx
+import { useId } from "react";
+
+interface FormFieldProps {
+  label?: string;
+  description?: string;
+  error?: string;
+  required?: boolean;
+  htmlFor?: string;
+  children: React.ReactNode;
+}
+
+export function FormField({ label, description, error, required, htmlFor, children }: FormFieldProps) {
+  const reactId = useId();
+  const fieldId = htmlFor ?? reactId;
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      {label && (
+        <label
+          htmlFor={fieldId}
+          className="text-sm font-medium text-[var(--color-text-primary)]"
+        >
+          {label}
+          {required && <span className="text-[var(--color-error)] ml-0.5">*</span>}
+        </label>
+      )}
+
+      {description && (
+        <p className="text-xs text-[var(--color-text-tertiary)]">{description}</p>
+      )}
+
+      {children}
+
+      {error && (
+        <p role="alert" className="text-xs text-[var(--color-error)]">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+```
+
+### 1F-3. Create IconButton.tsx
+
+**File:** `components/ui/IconButton.tsx`
+
+```tsx
+import { Button } from "./Button";
+import type { ButtonHTMLAttributes } from "react";
+
+type Variant = "primary" | "secondary" | "ghost" | "destructive" | "outline";
+type Size = "sm" | "md" | "lg";
+
+interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {
+  /** The icon element to render */
+  icon: React.ReactNode;
+  /** Required accessible label — screen readers use this */
+  label: string;
+  variant?: Variant;
+  size?: Size;
+  loading?: boolean;
+}
+
+export function IconButton({ icon, label, variant = "ghost", size = "md", ...props }: IconButtonProps) {
+  return (
+    <Button variant="icon" size={size} aria-label={label} {...props}>
+      {icon}
+    </Button>
+  );
+}
+```
+
+### 1F-4. Create Badge.tsx
+
+**File:** `components/ui/Badge.tsx`
+
+```tsx
+import { cn } from "@/lib/utils";
+import type { SectionColor } from "@/lib/section-colors";
+
+type ColorScheme = SectionColor | "success" | "warning" | "destructive" | "default";
+
+interface BadgeProps {
+  children: React.ReactNode;
+  colorScheme?: ColorScheme;
+  className?: string;
+}
+
+const colorClasses: Record<ColorScheme, string> = {
+  default:     "bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]",
+  teal:        "bg-[var(--color-teal-100)] text-[var(--color-teal-700)]",
+  coral:       "bg-[var(--color-coral-100)] text-[var(--color-coral-700)]",
+  navy:        "bg-[var(--color-navy-100)] text-[var(--color-navy-700)]",
+  amber:       "bg-[var(--color-amber-100)] text-[var(--color-amber-700)]",
+  sand:        "bg-[var(--color-sand-100)] text-[var(--color-sand-400)]",
+  success:     "bg-[var(--color-success)]/15 text-[var(--color-success)]",
+  warning:     "bg-[var(--color-warning)]/15 text-[var(--color-warning)]",
+  destructive: "bg-[var(--color-error)]/15 text-[var(--color-error)]",
+};
+
+export function Badge({ children, colorScheme = "default", className }: BadgeProps) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+        colorClasses[colorScheme],
+        className,
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+```
+
+### 1F-5. Create ProfileAvatar.tsx
+
+**File:** `components/ui/ProfileAvatar.tsx`
+
+```tsx
+import { cn } from "@/lib/utils";
+
+type Size = "sm" | "md" | "lg";
+
+interface ProfileAvatarProps {
+  name: string;
+  src?: string | null;
+  size?: Size;
+  className?: string;
+}
+
+const sizeClasses: Record<Size, string> = {
+  sm: "h-8 w-8 text-xs",
+  md: "h-10 w-10 text-sm",
+  lg: "h-12 w-12 text-base",
+};
+
+const fallbackColors = [
+  "bg-[var(--color-coral-200)]",
+  "bg-[var(--color-navy-200)]",
+  "bg-[var(--color-amber-200)]",
+  "bg-[var(--color-teal-200)]",
+];
+
+function hashName(name: string): number {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return Math.abs(hash);
+}
+
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((w) => w[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+export function ProfileAvatar({ name, src, size = "md", className }: ProfileAvatarProps) {
+  const sizeClass = sizeClasses[size];
+
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={name}
+        className={cn("rounded-full object-cover", sizeClass, className)}
+      />
+    );
+  }
+
+  const bgColor = fallbackColors[hashName(name) % fallbackColors.length];
+
+  return (
+    <div
+      className={cn(
+        "rounded-full flex items-center justify-center font-medium text-white",
+        sizeClass,
+        bgColor,
+        className,
+      )}
+      aria-label={name}
+    >
+      {getInitials(name)}
+    </div>
+  );
+}
+```
+
 ### 1G. Extract nav config
 
 **File:** `lib/nav-config.ts`
 
-```ts
-import {
-  User, FileText, BarChart3, Users, MoreHorizontal,
-} from 'lucide-react'
-import type { LucideIcon } from 'lucide-react'
+**Note:** Nav components use paired custom SVGs (outline + filled) from `./icons.tsx`. Do NOT replace with Lucide single-icons — that would break the active/inactive visual distinction. `nav-config.ts` exports route/label data only.
 
+```ts
 export interface NavTab {
   label: string
   href: string
-  icon: LucideIcon
   /** Used to match active route */
   matchPrefix: string
+  /** Section color key for active state tinting */
+  section: string
 }
 
 export const tabs: NavTab[] = [
-  { label: 'My Profile', href: '/app/profile', icon: User, matchPrefix: '/app/profile' },
-  { label: 'CV',         href: '/app/cv',      icon: FileText, matchPrefix: '/app/cv' },
-  { label: 'Insights',   href: '/app/insights', icon: BarChart3, matchPrefix: '/app/insights' },
-  { label: 'Network',    href: '/app/network',  icon: Users, matchPrefix: '/app/network' },
-  { label: 'More',       href: '/app/more',     icon: MoreHorizontal, matchPrefix: '/app/more' },
+  { label: 'My Profile', href: '/app/profile',  matchPrefix: '/app/profile',  section: 'profile' },
+  { label: 'CV',         href: '/app/cv',        matchPrefix: '/app/cv',       section: 'cv' },
+  { label: 'Insights',   href: '/app/insights',  matchPrefix: '/app/insights', section: 'insights' },
+  { label: 'Network',    href: '/app/network',   matchPrefix: '/app/network',  section: 'network' },
+  { label: 'More',       href: '/app/more',      matchPrefix: '/app/more',     section: 'profile' },
 ]
 ```
 
-Then refactor both `BottomTabBar.tsx` and `SidebarNav.tsx` to import from this file instead of defining their own arrays. Keep the layout-specific rendering (horizontal vs vertical) in each component.
+Then refactor both `BottomTabBar.tsx` and `SidebarNav.tsx` to import from this file instead of defining their own arrays. **Icon components stay in their respective nav files** — import `icon`/`activeIcon` from the existing `./icons` files. Keep the layout-specific rendering (horizontal vs vertical) in each component.
 
 ### 1H. Dark mode token gaps
 
@@ -297,7 +522,13 @@ Then refactor both `BottomTabBar.tsx` and `SidebarNav.tsx` to import from this f
 --color-sand-200: #2d2a21;
 --color-sand-300: #D4C4A8;
 --color-sand-400: #D4C4A8;
+
+/* Teal dark mode overrides (missing — would stay at light #F0FDFC on dark bg) */
+--color-teal-50:  #0a2424;
+--color-teal-100: #0f3636;
 ```
+
+**Contrast validation required:** Before committing these values, verify all dark-mode hex values against `#0f172a` using https://webaim.org/resources/contrastchecker/. Minimum 4.5:1 for body text, 3:1 for UI components.
 
 ### 1I. Update barrel exports
 
@@ -306,6 +537,10 @@ Then refactor both `BottomTabBar.tsx` and `SidebarNav.tsx` to import from this f
 ```ts
 export { Textarea } from './Textarea'
 export { Select } from './Select'
+export { FormField } from './FormField'
+export { IconButton } from './IconButton'
+export { Badge } from './Badge'
+export { ProfileAvatar } from './ProfileAvatar'
 ```
 
 ---
@@ -399,18 +634,16 @@ export function getSectionTokens(section: string): SectionColorTokens {
 
 ### 2B. Apply section colors to navigation
 
-In both `BottomTabBar.tsx` and `SidebarNav.tsx`, the active tab currently uses teal for everything. Update so the active icon tint uses the section's accent color:
+In both `BottomTabBar.tsx` and `SidebarNav.tsx`, the active tab currently uses teal for everything. Update so the active icon tint uses the section's accent color via the **Tailwind class map** (not inline styles):
 
 ```tsx
-// In the active tab rendering:
-import { getSectionTokens } from '@/lib/section-colors'
+import { sectionClassMap, sectionColors } from '@/lib/section-colors'
 
-// For each tab, get the section color:
-const tokens = getSectionTokens(tab.matchPrefix.split('/').pop() ?? '')
-// Active state uses: style={{ color: tokens.accent500 }}
+// For each tab, look up the section color class:
+const section = sectionColors[tab.section] ?? 'teal'
+const classes = sectionClassMap[section]
+// Active state icon class: classes.text (e.g. 'text-[var(--color-navy-500)]')
 ```
-
-**Note:** This requires converting the static Tailwind classes to inline styles for the color, since CSS vars can't be dynamically selected via Tailwind classes. Alternative: use a small lookup of Tailwind classes per section.
 
 ### 2C. Apply section colors to cards
 
@@ -450,9 +683,16 @@ className="... bg-[var(--color-amber-50)]"
 
 ## Part 3: Form System Rewrite
 
-### 3A. Auth pages — pattern
+### 3A. Auth pages (5 files)
 
-For each auth page (login, signup, reset-password, update-password), the transformation is:
+**Files:**
+1. `app/(auth)/login/page.tsx`
+2. `app/(auth)/signup/page.tsx`
+3. `app/(auth)/reset-password/page.tsx`
+4. `app/(auth)/update-password/page.tsx`
+5. `app/(auth)/welcome/page.tsx`
+
+For each auth page, the transformation is:
 
 **Raw input → Input component:**
 ```tsx
@@ -520,7 +760,22 @@ const [showPassword, setShowPassword] = useState(false)
 />
 ```
 
-### 3B. Profile edit pages — pattern
+### 3B. Profile edit pages (13 files)
+
+**Complete file list:**
+1. `app/(protected)/app/profile/page.tsx` — main profile view
+2. `app/(protected)/app/profile/photo/page.tsx` — profile photo edit
+3. `app/(protected)/app/profile/photos/page.tsx` — photo management / reorder
+4. `app/(protected)/app/profile/gallery/page.tsx` — gallery view
+5. `app/(protected)/app/profile/settings/page.tsx` — profile settings
+6. `app/(protected)/app/about/edit/page.tsx` — bio/about edit
+7. `app/(protected)/app/hobbies/edit/page.tsx` — hobbies edit
+8. `app/(protected)/app/skills/edit/page.tsx` — skills edit
+9. `app/(protected)/app/social-links/edit/page.tsx` — social links edit
+10. `app/(protected)/app/education/[id]/edit/page.tsx` — education entry edit
+11. `app/(protected)/app/certification/[id]/edit/page.tsx` — certification edit
+12. `app/(protected)/app/endorsement/[id]/edit/page.tsx` — endorsement edit
+13. `app/(protected)/app/attachment/[id]/edit/page.tsx` — attachment edit
 
 **Replace `alert()` with toast:**
 ```tsx
@@ -603,7 +858,8 @@ Apply these consistently to ALL form pages:
 
 | Property | Value |
 |---|---|
-| Page title | `<h1 className="text-xl font-semibold text-[var(--color-text-primary)]">` |
+| Page title | `<h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">` (DM Sans, per style guide: 28px/700/-0.02em) |
+| Section heading | Add `tracking-[-0.01em]` |
 | Root gap | `gap-4` |
 | Bottom padding | `pb-24` |
 | BackButton placement | `<div className="flex items-center gap-3"><BackButton href="..." /><h1>...</h1></div>` |
@@ -614,33 +870,54 @@ Apply these consistently to ALL form pages:
 
 ## Part 4: Public Profile Overhaul
 
-### 4A. Hero parallax shrink
+### 4A. Hero parallax shrink → framed card
 
-**File to modify:** `components/public/PublicProfileContent.tsx`
+**Architecture:** `PublicProfileContent.tsx` is a server component — it has no `'use client'` directive. Extract the hero into a new client component.
 
-Add to the mobile hero section:
+**New file:** `components/public/HeroSection.tsx` (`'use client'`)
+**Modified file:** `components/public/PublicProfileContent.tsx` — import and render `<HeroSection>`, pass photo URLs and profile data as props.
 
 ```tsx
+// components/public/HeroSection.tsx
 'use client'
 import { useScroll, useTransform, motion } from 'framer-motion'
-import { useRef } from 'react'
 
-// Inside the component:
-const heroRef = useRef<HTMLDivElement>(null)
-const { scrollY } = useScroll()
+interface HeroSectionProps {
+  photos: string[]
+  name: string
+  role?: string
+  immersiveHero?: boolean // from section_visibility JSONB
+}
 
-// Map scroll 0-200px to height 60vh-34vh
-const heroHeight = useTransform(scrollY, [0, 200], ['60vh', '34vh'])
+export function HeroSection({ photos, name, role, immersiveHero = true }: HeroSectionProps) {
+  const { scrollY } = useScroll()
 
-// Mobile hero:
-<motion.div
-  ref={heroRef}
-  style={{ height: heroHeight }}
-  className="relative w-full overflow-hidden md:hidden"
->
-  {/* Photo content */}
-</motion.div>
+  // Animated properties (scroll 0→200px)
+  const heroHeight = useTransform(scrollY, [0, 200], ['60vh', '34vh'])
+  const marginInline = useTransform(scrollY, [0, 200], ['0px', '16px'])
+  const borderRadius = useTransform(scrollY, [0, 200], ['0px', '16px'])
+
+  // When immersiveHero is off, skip animation — fixed framed card
+  if (!immersiveHero) {
+    return (
+      <div className="relative h-[34vh] mx-4 rounded-2xl border border-[var(--color-border-subtle)] overflow-hidden md:hidden">
+        {/* Photo content + name overlay */}
+      </div>
+    )
+  }
+
+  return (
+    <motion.div
+      style={{ height: heroHeight, marginInline, borderRadius }}
+      className="relative w-full overflow-hidden md:hidden"
+    >
+      {/* Photo content + name overlay */}
+    </motion.div>
+  )
+}
 ```
+
+**Schema note:** `section_visibility` JSONB column already exists on the `users` table (migration `20260317000021`). It accepts arbitrary keys — no migration needed. The API at `app/api/profile/section-visibility/route.ts` handles PATCH updates. Add `immersive_hero: true` as default.
 
 **Desktop stays the same** — sticky left panel at 40% doesn't need height animation.
 
@@ -656,10 +933,10 @@ className="... gap-4 ..."
 Card contrast — add subtle border:
 ```tsx
 // ProfileAccordion.tsx card wrapper:
-// Before:
-className="bg-[var(--color-surface)] rounded-2xl p-4 shadow-sm"
+// Before (note: has overflow-hidden, no p-4):
+className="bg-[var(--color-surface)] rounded-2xl shadow-sm overflow-hidden"
 // After:
-className="bg-[var(--color-surface)] border border-[var(--color-border-subtle)] rounded-2xl p-4 shadow-sm"
+className="bg-[var(--color-surface)] border border-[var(--color-border-subtle)] rounded-2xl shadow-sm overflow-hidden"
 ```
 
 ### 4C. Accordion quality
@@ -711,13 +988,11 @@ className="... border-l-4 border-[var(--color-coral-500)] ..."
 // Before: h-8 w-8
 // After: h-10 w-10
 
-// Fallback avatar with hash-based color:
-function avatarColor(name: string): string {
-  const colors = ['bg-[var(--color-coral-200)]', 'bg-[var(--color-navy-200)]', 'bg-[var(--color-amber-200)]', 'bg-[var(--color-teal-200)]']
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return colors[Math.abs(hash) % colors.length]
-}
+// Avatar — use ProfileAvatar component from Part 1:
+// Before: inline hash-based fallback
+// After:
+import { ProfileAvatar } from '@/components/ui/ProfileAvatar'
+<ProfileAvatar name={endorserName} src={endorserAvatar} size="md" />
 ```
 
 ### 4E. Photo gallery transitions
@@ -941,41 +1216,51 @@ className="... active:scale-[0.99] transition-transform"
 
 ## File Change Summary
 
-### New files (6):
+### New files (10):
 - `components/ui/Textarea.tsx`
 - `components/ui/Select.tsx`
+- `components/ui/FormField.tsx`
+- `components/ui/IconButton.tsx`
+- `components/ui/Badge.tsx`
+- `components/ui/ProfileAvatar.tsx`
+- `components/public/HeroSection.tsx` (extracted client component)
 - `lib/nav-config.ts`
 - `lib/section-colors.ts`
-- `app/(protected)/app/network/loading.tsx`
-- `app/(protected)/app/insights/loading.tsx`
-- `app/(protected)/app/cv/loading.tsx`
 
 ### Modified files (~50+):
-- `components/ui/Button.tsx` — add outline + link variants
+- `components/ui/Button.tsx` — add outline, link, icon variants
 - `components/ui/Input.tsx` — fix error tokens
 - `components/ui/Toast.tsx` — fix color tokens
-- `components/ui/EmptyState.tsx` — fix card variant
-- `components/ui/index.ts` — add exports
-- `components/nav/BottomTabBar.tsx` — use nav-config
-- `components/nav/SidebarNav.tsx` — use nav-config, fix opacity syntax
-- `app/globals.css` — dark mode status + section color overrides
+- `components/ui/EmptyState.tsx` — fix card variant, add accentColor prop
+- `components/ui/index.ts` — add exports for 6 new components
+- `components/nav/BottomTabBar.tsx` — use nav-config, section color active tint
+- `components/nav/SidebarNav.tsx` — use nav-config, fix opacity syntax, section color active tint
+- `app/globals.css` — dark mode status + section color + teal overrides
 - `app/(auth)/login/page.tsx` — full rewrite to use components
 - `app/(auth)/signup/page.tsx` — full rewrite
 - `app/(auth)/reset-password/page.tsx` — full rewrite
 - `app/(auth)/update-password/page.tsx` — full rewrite
 - `app/(auth)/welcome/page.tsx` — use Button component, fix dark mode
 - `app/(public)/invite-only/page.tsx` — fix brand, add BackButton
-- All 12+ profile edit pages — component swap + toast + skeleton
-- `components/public/PublicProfileContent.tsx` — hero parallax, gaps, name size, CTA
-- `components/profile/ProfileAccordion.tsx` — chevron icon, title size, padding
-- `components/public/EndorsementCard.tsx` — radius, colors, avatar, border
+- 13 profile edit pages (enumerated in Part 3B) — component swap + toast + skeleton
+- `components/public/PublicProfileContent.tsx` — extract hero, gaps, name size, CTA
+- `components/profile/ProfileAccordion.tsx` — chevron icon, title size, padding, press feedback
+- `components/public/EndorsementCard.tsx` — radius, colors, ProfileAvatar, border
 - `components/profile/PhotoGallery.tsx` — transitions, dots, arrows
-- `components/profile/SocialLinksRow.tsx` — SVG icons
-- `components/cv/CvActions.tsx` — card radius
-- `app/(protected)/app/insights/page.tsx` — locked card pattern
-- `app/(protected)/app/more/delete-account/page.tsx` — use Button + Dialog
-- `components/audience/AudienceTabs.tsx` — section color badges
-- `components/profile/CertsSection.tsx` — section color badges
+- `components/profile/SocialLinksRow.tsx` — SVG icons (type change: string → React.ReactNode)
+- `components/cv/CvActions.tsx` — card container radius only (not button radius)
+- `app/(protected)/app/insights/page.tsx` — locked card pattern, bento grid
+- `app/(protected)/app/more/delete-account/page.tsx` — use Button (keep existing confirm pattern)
+- `components/audience/AudienceTabs.tsx` — use Badge component
+- `components/profile/CertsSection.tsx` — use Badge component
+
+### Loading.tsx files — already exist, no new ones needed:
+- `app/(protected)/app/cv/loading.tsx`
+- `app/(protected)/app/insights/loading.tsx`
+- `app/(protected)/app/more/loading.tsx`
+- `app/(protected)/app/network/loading.tsx`
+- `app/(protected)/app/profile/loading.tsx`
+- `app/(protected)/app/network/saved/loading.tsx`
 
 ### Deleted files: none
 
@@ -983,7 +1268,7 @@ className="... active:scale-[0.99] transition-transform"
 
 ## Verification Plan
 
-After each Part:
+### After each Part:
 1. `npx tsc --noEmit` — zero errors
 2. `npm run build` — successful build
 3. Visual check at 375px (mobile) and 1280px (desktop)
@@ -992,10 +1277,33 @@ After each Part:
 6. Check toast appears on save
 7. Check skeleton loading states render
 
-Final verification:
-- Navigate every route in the app
-- Toggle dark mode on every page
-- Verify at 375px viewport
-- Grep for `alert(` — should be zero results
-- Grep for `bg-red-` — should only be in approved locations
-- Grep for `rounded-lg` in page files — should only be in non-card contexts
+### Final automated checks:
+```bash
+# Zero raw HTML form elements in page files (excludes component definitions)
+grep -rn '<button\b' app/ --include='*.tsx' | grep -v 'components/' | grep -v 'node_modules'
+grep -rn '<input\b' app/ --include='*.tsx' | grep -v 'components/' | grep -v 'node_modules'
+grep -rn '<select\b' app/ --include='*.tsx' | grep -v 'components/' | grep -v 'node_modules'
+grep -rn '<textarea\b' app/ --include='*.tsx' | grep -v 'components/' | grep -v 'node_modules'
+# Expected: zero results for all four
+
+# Zero alert() calls
+grep -rn 'alert(' app/ --include='*.tsx' | grep -v 'node_modules' | grep -v '// '
+# Expected: zero results
+
+# Zero hardcoded red classes in non-component files
+grep -rn 'bg-red-\|border-red-\|text-red-' app/ --include='*.tsx' | grep -v 'components/ui/' | grep -v 'node_modules'
+# Expected: zero results
+
+# Confirm section color adoption (>= 15 files)
+grep -rn 'color-coral-\|color-navy-\|color-amber-\|color-sand-' components/ app/ --include='*.tsx' -l | wc -l
+
+# Zero bare --teal-N references (should all be --color-teal-N)
+grep -rn 'var(--teal-' app/ components/ --include='*.tsx' --include='*.css'
+# Expected: zero results
+
+# Build + typecheck
+npx tsc --noEmit && npm run build
+```
+
+### Dark mode contrast validation:
+Before marking Part 6E complete, verify all dark-mode section color hex values against `#0f172a` background. See README exit criteria for the full table with required ratios.

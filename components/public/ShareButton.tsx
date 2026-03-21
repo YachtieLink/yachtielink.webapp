@@ -5,9 +5,11 @@ import { useState } from 'react'
 interface ShareButtonProps {
   url: string
   name: string
+  /** 'default' = teal pill for inline use, 'compact' = frosted glass for overlays */
+  variant?: 'default' | 'compact'
 }
 
-export function ShareButton({ url, name }: ShareButtonProps) {
+export function ShareButton({ url, name, variant = 'default' }: ShareButtonProps) {
   const [copied, setCopied] = useState(false)
 
   async function handleShare() {
@@ -33,15 +35,21 @@ export function ShareButton({ url, name }: ShareButtonProps) {
     }
   }
 
+  const compactClass = "flex items-center justify-center w-10 h-10 rounded-full bg-black/25 backdrop-blur-md text-white hover:bg-black/40 transition-colors"
+  const defaultClass = "mt-3 inline-flex items-center gap-1.5 rounded-full bg-[var(--color-interactive)] px-5 py-2 text-sm font-medium text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
+
+  const iconSize = variant === 'compact' ? 17 : 16
+
   return (
     <button
       onClick={handleShare}
-      className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[var(--color-interactive)] px-5 py-2 text-sm font-medium text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
+      className={variant === 'compact' ? compactClass : defaultClass}
+      aria-label={copied ? 'Link copied' : 'Share profile'}
     >
-      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <svg className={`h-[${iconSize}px] w-[${iconSize}px]`} style={{ width: iconSize, height: iconSize }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.935-2.186 2.25 2.25 0 0 0-3.935 2.186Z" />
       </svg>
-      {copied ? 'Link copied!' : 'Share Profile'}
+      {variant !== 'compact' && (copied ? 'Copied!' : 'Share')}
     </button>
   )
 }

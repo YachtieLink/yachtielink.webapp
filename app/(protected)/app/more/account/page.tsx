@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, Select } from '@/components/ui'
+import { BackButton } from '@/components/ui/BackButton'
 import { useToast } from '@/components/ui/Toast'
 
 const DEPARTMENTS = [
@@ -165,17 +166,20 @@ export default function AccountPage() {
     idle:      '',
     checking:  'text-[var(--color-text-secondary)]',
     available: 'text-green-500',
-    taken:     'text-red-500',
-    invalid:   'text-red-500',
+    taken:     'text-[var(--color-error)]',
+    invalid:   'text-[var(--color-error)]',
   }
 
   return (
     <div className="flex flex-col gap-6 pb-24">
-      <div>
-        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Account</h1>
-        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-          Edit your name, handle, and role.
-        </p>
+      <div className="flex items-center gap-3">
+        <BackButton href="/app/more" />
+        <div>
+          <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Account</h1>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+            Edit your name, handle, and role.
+          </p>
+        </div>
       </div>
 
       {/* ── Identity ────────────────────────────────── */}
@@ -239,16 +243,15 @@ export default function AccountPage() {
 
           {!useCustomRole ? (
             <>
-              <select
+              <Select
                 value={primaryRole}
                 onChange={(e) => setPrimaryRole(e.target.value)}
-                className="w-full bg-[var(--color-surface)] border border-[var(--color-border)] rounded-lg px-3 py-2.5 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
               >
                 <option value="">Select role</option>
                 {filteredRoles.map((r) => (
                   <option key={r.id} value={r.id}>{r.name}</option>
                 ))}
-              </select>
+              </Select>
               <button
                 onClick={() => { setUseCustomRole(true); setPrimaryRole('') }}
                 className="text-xs text-[var(--color-interactive)] hover:underline text-left"

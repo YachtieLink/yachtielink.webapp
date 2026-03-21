@@ -2,11 +2,19 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { BackButton } from '@/components/ui/BackButton'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { DatePicker } from '@/components/ui/DatePicker'
+import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/skeleton'
+import { PageTransition } from '@/components/ui/PageTransition'
 
 export default function EducationEditPage() {
   const router = useRouter()
   const params = useParams<{ id: string }>()
+  const { toast } = useToast()
   const [form, setForm] = useState({
     institution: '',
     qualification: '',
@@ -19,6 +27,7 @@ export default function EducationEditPage() {
   const [error, setError] = useState('')
   const [loaded, setLoaded] = useState(false)
   const [notFound, setNotFound] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     async function load() {
@@ -66,6 +75,7 @@ export default function EducationEditPage() {
         setError(d.error ?? 'Failed to save')
         return
       }
+      toast('Education saved.', 'success')
       router.push('/app/profile')
     } finally {
       setSaving(false)
@@ -77,8 +87,10 @@ export default function EducationEditPage() {
     setDeleting(true)
     try {
       const res = await fetch(`/api/user-education/${params.id}`, { method: 'DELETE' })
-      if (res.ok) router.push('/app/profile')
-      else {
+      if (res.ok) {
+        toast('Education entry deleted.', 'success')
+        router.push('/app/profile')
+      } else {
         const d = await res.json()
         setError(d.error ?? 'Failed to delete')
       }
@@ -87,109 +99,113 @@ export default function EducationEditPage() {
     }
   }
 
-  if (!loaded) {
-    return (
-      <div className="flex flex-col gap-4 pb-24">
-        <div className="h-6 w-32 rounded bg-[var(--color-surface-raised)] animate-pulse" />
-        <div className="flex flex-col gap-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-10 rounded-xl bg-[var(--color-surface-raised)] animate-pulse" />
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  if (notFound) {
-    return (
-      <div className="flex flex-col gap-4 pb-24">
-        <BackButton href="/app/profile" />
-        <p className="text-sm text-[var(--color-text-secondary)]">Education record not found.</p>
-      </div>
-    )
-  }
-
   return (
-    <div className="flex flex-col gap-4 pb-24">
-      <div className="flex items-center gap-3">
-        <BackButton href="/app/profile" />
-        <h1 className="font-semibold text-lg text-[var(--color-text-primary)]">Edit Education</h1>
-      </div>
+    <PageTransition>
+      <AnimatePresence mode="wait">
+        {!loaded ? (
+          <motion.div
+            key="skeleton"
+            exit={prefersReducedMotion ? undefined : { opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col gap-4 pb-24"
+          >
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-9 w-9 rounded-xl" />
+              <Skeleton className="h-6 w-40" />
+            </div>
+            <div className="flex flex-col gap-4">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-12 w-full rounded-xl" />
+              ))}
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col gap-4 pb-24"
+          >
+            {notFound ? (
+              <>
+                <BackButton href="/app/profile" />
+                <p className="text-sm text-[var(--color-text-secondary)]">Education record not found.</p>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-3">
+                  <BackButton href="/app/profile" />
+                  <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Edit Education</h1>
+                </div>
 
-      <form onSubmit={save} className="flex flex-col gap-4">
-        <div>
-          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Institution *</label>
-          <input
-            value={form.institution}
-            onChange={(e) => update('institution', e.target.value)}
-            placeholder="e.g. UKSA, Maritime Academy"
-            className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            maxLength={200}
-          />
-        </div>
+                <form onSubmit={save} className="flex flex-col gap-4">
+                  <Input
+                    label="Institution *"
+                    value={form.institution}
+                    onChange={(e) => update('institution', e.target.value)}
+                    placeholder="e.g. UKSA, Maritime Academy"
+                    maxLength={200}
+                    error={error && !form.institution.trim() ? error : undefined}
+                  />
 
-        <div>
-          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Qualification</label>
-          <input
-            value={form.qualification}
-            onChange={(e) => update('qualification', e.target.value)}
-            placeholder="e.g. BSc Marine Engineering, STCW Basic"
-            className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            maxLength={200}
-          />
-        </div>
+                  <Input
+                    label="Qualification"
+                    value={form.qualification}
+                    onChange={(e) => update('qualification', e.target.value)}
+                    placeholder="e.g. BSc Marine Engineering, STCW Basic"
+                    maxLength={200}
+                  />
 
-        <div>
-          <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Field of Study</label>
-          <input
-            value={form.field_of_study}
-            onChange={(e) => update('field_of_study', e.target.value)}
-            placeholder="e.g. Nautical Science"
-            className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            maxLength={200}
-          />
-        </div>
+                  <Input
+                    label="Field of Study"
+                    value={form.field_of_study}
+                    onChange={(e) => update('field_of_study', e.target.value)}
+                    placeholder="e.g. Nautical Science"
+                    maxLength={200}
+                  />
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">Start date</label>
-            <input
-              type="date"
-              value={form.started_at}
-              onChange={(e) => update('started_at', e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">End date</label>
-            <input
-              type="date"
-              value={form.ended_at}
-              onChange={(e) => update('ended_at', e.target.value)}
-              className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            />
-          </div>
-        </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <DatePicker
+                      label="Start date"
+                      value={form.started_at || null}
+                      onChange={(v) => update('started_at', v ?? '')}
+                      maxYear={new Date().getFullYear()}
+                    />
+                    <DatePicker
+                      label="End date"
+                      value={form.ended_at || null}
+                      onChange={(v) => update('ended_at', v ?? '')}
+                    />
+                  </div>
 
-        {error && <p className="text-sm text-[var(--color-error)]">{error}</p>}
+                  {error && form.institution.trim() && (
+                    <p className="text-sm text-[var(--color-error)]">{error}</p>
+                  )}
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="w-full py-3 rounded-xl bg-[var(--color-interactive)] text-white font-medium disabled:opacity-60 hover:bg-[var(--color-interactive-hover)] transition-colors"
-        >
-          {saving ? 'Saving…' : 'Save changes'}
-        </button>
+                  <Button
+                    type="submit"
+                    loading={saving}
+                    className="w-full"
+                  >
+                    Save changes
+                  </Button>
 
-        <button
-          type="button"
-          onClick={handleDelete}
-          disabled={deleting}
-          className="w-full py-3 rounded-xl border border-[var(--color-error)] text-[var(--color-error)] font-medium hover:bg-[var(--color-error)]/10 transition-colors disabled:opacity-60"
-        >
-          {deleting ? 'Deleting…' : 'Delete this entry'}
-        </button>
-      </form>
-    </div>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDelete}
+                    loading={deleting}
+                    className="w-full"
+                  >
+                    Delete this entry
+                  </Button>
+                </form>
+              </>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </PageTransition>
   )
 }

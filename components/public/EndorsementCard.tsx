@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { cardHover } from '@/lib/motion'
-import Image from 'next/image'
+import { ProfileAvatar } from '@/components/ui/ProfileAvatar'
 
 interface EndorsementCardProps {
   endorserName: string
@@ -37,22 +37,10 @@ export function EndorsementCard({
   })
 
   return (
-    <motion.div {...cardHover} className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <motion.div {...cardHover} className="rounded-2xl border border-[var(--color-border)] border-l-4 border-l-[var(--color-coral-500)] bg-[var(--color-surface)] p-4">
       {/* Endorser info */}
       <div className="flex items-center gap-3 mb-3">
-        {endorserPhoto ? (
-          <Image
-            src={endorserPhoto}
-            alt={endorserName}
-            width={32}
-            height={32}
-            className="h-8 w-8 rounded-full object-cover"
-          />
-        ) : (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-surface-overlay)] text-xs font-medium text-[var(--color-text-secondary)]">
-            {endorserName.charAt(0).toUpperCase()}
-          </div>
-        )}
+        <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
             {endorserName}
@@ -70,7 +58,7 @@ export function EndorsementCard({
       </div>
 
       {/* Content */}
-      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed whitespace-pre-line">
+      <p className="text-sm text-[var(--color-text-primary)] leading-relaxed whitespace-pre-line">
         &ldquo;{displayText}&rdquo;
       </p>
 

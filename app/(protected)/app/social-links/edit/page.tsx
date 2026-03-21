@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { BackButton } from '@/components/ui/BackButton'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/skeleton'
+import { PageTransition } from '@/components/ui/PageTransition'
 
 const PLATFORMS = [
   { key: 'instagram', label: 'Instagram',  placeholder: 'https://instagram.com/yourhandle' },
@@ -18,9 +24,11 @@ type Platform = typeof PLATFORMS[number]['key']
 
 export default function SocialLinksEditPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const [links, setLinks] = useState<Partial<Record<Platform, string>>>({})
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     // Load from user profile
@@ -56,48 +64,72 @@ export default function SocialLinksEditPage() {
       })
       if (!res.ok) {
         const d = await res.json().catch(() => ({}))
-        alert(d.error ?? 'Save failed. Please try again.')
+        toast(d.error ?? 'Save failed. Please try again.', 'error')
         return
       }
+      toast('Social links saved.', 'success')
       router.push('/app/profile')
     } finally {
       setSaving(false)
     }
   }
 
-  if (loading) return <div className="p-4 text-[var(--color-text-secondary)]">Loading…</div>
-
   return (
-    <div className="flex flex-col gap-4 pb-24">
-      <div className="flex items-center gap-3">
-        <BackButton href="/app/profile" />
-        <h1 className="font-semibold text-lg text-[var(--color-text-primary)]">Social Links</h1>
-      </div>
+    <PageTransition>
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div
+            key="skeleton"
+            exit={prefersReducedMotion ? undefined : { opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col gap-4 pb-24"
+          >
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-9 w-9 rounded-xl" />
+              <Skeleton className="h-6 w-28" />
+            </div>
+            {[...Array(7)].map((_, i) => (
+              <Skeleton key={i} className="h-12 w-full rounded-xl" />
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="content"
+            initial={prefersReducedMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+            className="flex flex-col gap-4 pb-24"
+          >
+            <div className="flex items-center gap-3">
+              <BackButton href="/app/profile" />
+              <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Social Links</h1>
+            </div>
 
-      <p className="text-sm text-[var(--color-text-secondary)]">Add links to your social profiles or website. Only filled ones show on your profile.</p>
+            <p className="text-sm text-[var(--color-text-secondary)]">Add links to your social profiles or website. Only filled ones show on your profile.</p>
 
-      <form onSubmit={save} className="flex flex-col gap-3">
-        {PLATFORMS.map((p) => (
-          <div key={p.key}>
-            <label className="block text-sm font-medium text-[var(--color-text-primary)] mb-1">{p.label}</label>
-            <input
-              type="url"
-              value={links[p.key] ?? ''}
-              onChange={(e) => setLink(p.key, e.target.value)}
-              placeholder={p.placeholder}
-              className="w-full px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            />
-          </div>
-        ))}
+            <form onSubmit={save} className="flex flex-col gap-3">
+              {PLATFORMS.map((p) => (
+                <Input
+                  key={p.key}
+                  label={p.label}
+                  type="url"
+                  value={links[p.key] ?? ''}
+                  onChange={(e) => setLink(p.key, e.target.value)}
+                  placeholder={p.placeholder}
+                />
+              ))}
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="w-full py-3 rounded-xl bg-[var(--color-interactive)] text-white font-medium disabled:opacity-60 hover:bg-[var(--color-interactive-hover)] transition-colors mt-2"
-        >
-          {saving ? 'Saving…' : 'Save links'}
-        </button>
-      </form>
-    </div>
+              <Button
+                type="submit"
+                loading={saving}
+                className="w-full mt-2"
+              >
+                Save links
+              </Button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </PageTransition>
   )
 }

@@ -37,8 +37,8 @@ export default async function AppLayout({
       <SidebarNav />
 
       {/* Page content — padded so it clears the tab bar on mobile, sidebar on desktop */}
-      <main className="flex-1 pb-tab-bar md:pb-0 md:pl-16">
-        <div className="mx-auto max-w-2xl">
+      <main className="flex-1 md:pl-16">
+        <div className="mx-auto max-w-2xl px-4 md:px-6">
           {children}
         </div>
       </main>

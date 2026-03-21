@@ -5,6 +5,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { BackButton } from '@/components/ui/BackButton'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
 
 interface SavedUser {
   id: string
@@ -154,32 +157,34 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
       {/* New folder input */}
       {showNewFolder && (
         <div className="flex gap-2">
-          <input
+          <Input
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
             placeholder="Folder name"
-            className="flex-1 px-3 py-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
             maxLength={50}
             onKeyDown={(e) => e.key === 'Enter' && createFolder()}
+            className="flex-1"
           />
-          <button
+          <Button
             onClick={createFolder}
-            className="px-4 py-2 rounded-xl bg-[var(--color-interactive)] text-white text-sm font-medium"
+            size="sm"
           >
             Create
-          </button>
+          </Button>
         </div>
       )}
 
       {/* Active folder actions */}
       {activeFolder && (
         <div className="flex justify-end">
-          <button
+          <Button
+            variant="link"
+            size="sm"
             onClick={() => deleteFolder(activeFolder)}
-            className="text-xs text-[var(--color-error)] hover:underline"
+            className="text-xs text-[var(--color-error)]"
           >
             Delete folder
-          </button>
+          </Button>
         </div>
       )}
 
@@ -208,16 +213,16 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
               </Link>
               {/* Folder move dropdown */}
               {folders.length > 0 && (
-                <select
+                <Select
                   value={entry.folder_id ?? ''}
                   onChange={(e) => moveToFolder(entry.id, e.target.value || null)}
-                  className="text-xs bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-lg px-2 py-1 text-[var(--color-text-secondary)] shrink-0"
+                  className="shrink-0 h-8 text-xs px-2"
                 >
                   <option value="">No folder</option>
                   {folders.map((f) => (
                     <option key={f.id} value={f.id}>{f.emoji ? `${f.emoji} ` : ''}{f.name}</option>
                   ))}
-                </select>
+                </Select>
               )}
               <button
                 onClick={() => unsave(u.id)}
