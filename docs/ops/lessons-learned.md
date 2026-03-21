@@ -1,0 +1,401 @@
+# Lessons Learned -- YachtieLink Operational Knowledge
+
+**What this is:** A catalog of every non-obvious gotcha, trap, failure, and workaround discovered during YachtieLink development. Extracted from the full CHANGELOG, rally audits, and sprint retrospectives.
+
+**All agents must read this file at session start.** It prevents you from repeating mistakes that have already cost time.
+
+**How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
+
+**Current count:** 48 lessons
+
+---
+
+## Supabase Storage Buckets Must Be Created Manually
+
+**What happened:** After running the migration that defined storage bucket policies, photo uploads failed because the buckets themselves (`user-photos`, `user-gallery`) did not exist. The migration creates RLS policies but does not create buckets.
+**Fix:** Create buckets manually in the Supabase dashboard (Storage tab) before testing upload flows.
+**Pattern to avoid:** Never assume a migration handles storage bucket creation. Buckets are a dashboard operation. Always document which buckets need manual creation in the Flags section of your CHANGELOG entry.
+
+---
+
+## Photo Upload Buckets Must Be Public for CDN URLs to Work
+
+**What happened:** Photo URLs stored in the database used Supabase Storage CDN paths (`supabase.storage.from('user-photos').getPublicUrl()`). When the bucket was set to private, these URLs returned 403 errors on render.
+**Fix:** `user-photos` and `user-gallery` buckets must be set to public read. Private buckets like `cert-documents` must use signed URLs generated at render time (`getCertDocumentUrl()` with 1-hour expiry).
+**Pattern to avoid:** Never store signed URLs in the database -- they expire. Store storage paths and generate signed URLs at render time. Public buckets get CDN URLs stored directly.
+
+---
+
+## RLS Policies on Storage Are Separate from Table-Level RLS
+
+**What happened:** Table-level RLS was in place for all user data tables, but storage bucket RLS was missing. Users could potentially access other users' uploaded files even though they couldn't access the table rows.
+**Fix:** Storage bucket RLS extracts identifiers from the file path (e.g., `(string_to_array(name, '/'))[1]::uuid`) and checks ownership against the `auth.uid()`. Added explicit storage RLS in migration `20260321000001_fix_storage_buckets.sql`.
+**Pattern to avoid:** Every time you create a storage bucket, you need two things: the bucket itself (dashboard) and RLS policies (migration). They are independent systems.
+
+---
+
+## `expiry_date` vs `expires_at` Column Mismatch
+
+**What happened:** The certifications table used `expires_at` as the column name, but multiple files (insights page, cron job, cert components) referenced `expiry_date`. This caused silent failures -- queries returned null for the expiry field, and cron jobs silently skipped all certs.
+**Fix:** Grep the entire codebase for both column names and standardize on `expires_at` (the actual DB column). Fixed in insights, cron/cert-expiry, and cert components.
+**Pattern to avoid:** When referencing a database column, always verify the exact name in the migration file or `yl_schema.md`. Never guess from memory. Column name mismatches cause silent failures, not errors.
+
+---
+
+## `subscription_plan` vs `subscription_status` Field Name Confusion
+
+**What happened:** Photo and gallery API routes checked `subscription_plan` to determine Pro status, but the actual column is `subscription_status`. The check always evaluated to false, so all users were treated as free-tier regardless of their actual plan.
+**Fix:** Standardize on `subscription_status` (the DB column) for plan checks. Use the `getProStatus()` helper from `lib/stripe/pro.ts` which checks both status and expiry date.
+**Pattern to avoid:** Always use the `getProStatus()` helper for Pro status checks. Never query subscription columns directly -- the helper encapsulates the logic correctly.
+
+---
+
+## `pt-safe-top` Does Not Exist as a Tailwind Utility
+
+**What happened:** A component used `pt-safe-top` expecting it to handle the iOS safe area inset at the top. This class does not exist in Tailwind CSS -- it was hallucinated.
+**Fix:** Replace with `pt-[env(safe-area-inset-top)]` and ensure `viewport-fit=cover` is set in the viewport meta tag (required for `env(safe-area-inset-*)` to resolve on iOS).
+**Pattern to avoid:** Do not invent Tailwind utility names. If you need a safe area inset, use the `env()` CSS function with arbitrary value syntax in Tailwind: `pt-[env(safe-area-inset-top)]`.
+
+---
+
+## `.next/types/routes.d 2.ts` Cache Artifact Causes False TypeScript Errors
+
+**What happened:** `tsc --noEmit` reported errors from a file called `.next/types/routes.d 2.ts`. This was an iCloud sync conflict duplicate (note the space in "d 2") -- not a real TypeScript issue. The codebase was clean.
+**Fix:** Delete any files in `.next/types/` that contain spaces or " 2" suffixes. These are iCloud or macOS Finder copy artifacts.
+**Pattern to avoid:** When you see TypeScript errors from `.next/` with unusual filenames, check for copy artifacts before investigating the code. Ghost "2" directories were cleaned up across the project.
+
+---
+
+## Gallery sort_order Gaps Accumulate on Deletion
+
+**What happened:** When gallery items are deleted, their `sort_order` values are removed but remaining items are not re-indexed. Over time, sort_order values become sparse (e.g., 1, 3, 7, 12) which can cause unexpected ordering behavior when new items are inserted.
+**Fix:** Documented as a known non-breaking issue. A cleanup function could re-index sort_order values, but it is not critical.
+**Pattern to avoid:** If you build any ordered list with a `sort_order` column and support deletion, decide upfront whether to re-index on delete or accept gaps.
+
+---
+
+## `admin.ts` Needed `import 'server-only'` Guard
+
+**What happened:** `lib/supabase/admin.ts` creates a Supabase client with the service role key. Without a server-only guard, this module could theoretically be imported by a client component, exposing the service role key in the browser bundle.
+**Fix:** Added `import 'server-only'` at the top of `admin.ts`. This causes a build error if any client component imports it.
+**Pattern to avoid:** Any file that uses `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, or any other server-only secret must have `import 'server-only'` at the top.
+
+---
+
+## AI Summary Uses OpenAI Despite the Env Var Name `OPENAI_API_KEY`
+
+**What happened:** The AI summary feature was described as using "Claude API" in early planning, but the actual implementation uses OpenAI's GPT-4o-mini. The env var is `OPENAI_API_KEY`. Agents confused by the history might look for an Anthropic key.
+**Fix:** The project standardized on OpenAI as the single AI vendor. All AI features (CV parsing, content moderation, summaries) use `OPENAI_API_KEY`.
+**Pattern to avoid:** When working with AI features, check the actual import in the code (`openai` package) -- do not rely on feature descriptions in planning docs which may reference earlier vendor choices.
+
+---
+
+## Free Plan Photo Limits Enforced Server-Side Only
+
+**What happened:** Free users are limited to 3 photos and 3 gallery items. This is enforced in the API routes (server-side) but the client UI does not show the limit or disable the upload button when the limit is reached. Users can attempt uploads that will fail.
+**Fix:** Documented as by-design for the current phase. The API rejects over-limit uploads with a clear error, but the client should eventually show remaining capacity and disable the button.
+**Pattern to avoid:** When building tiered limits, decide whether enforcement is server-only or client+server. Server-only is safer but creates a worse UX.
+
+---
+
+## `any` Casts Exist at Component Boundaries
+
+**What happened:** Several places use `as any` to pass data between server and client components: `social_links as any` on the user object, `user as any` when passing from page to PublicProfileContent. These hide type mismatches.
+**Fix:** These are documented as acceptable debt for the current phase but should be replaced with proper typed interfaces.
+**Pattern to avoid:** When passing data from server to client components, define a shared TypeScript interface rather than using `as any`. The `as any` silently hides field mismatches that would otherwise be caught at build time.
+
+---
+
+## `role="checkbox"` on Button Elements Is an Accessibility Issue
+
+**What happened:** Toggle switches in the profile section manager used `<button role="checkbox">` which is technically valid ARIA but confusing for screen readers compared to a proper checkbox or switch control.
+**Fix:** Documented as non-breaking. Should be refactored to use `role="switch"` with `aria-checked` for toggle-style controls.
+**Pattern to avoid:** When building toggle controls, use `role="switch"` with `aria-checked`, not `role="checkbox"` on a button. Better yet, use a proper `<input type="checkbox">` with custom styling.
+
+---
+
+## Endorser Mutual Count Logic Bug
+
+**What happened:** The mutual endorser count on the public profile was returning all endorsements when any shared yacht existed between the viewer and the profile owner. It was not correctly filtering to only endorsers whose user ID appeared in the mutual colleague set.
+**Fix:** Fixed in `PublicProfileContent.tsx` to correctly count only endorsers whose `endorser_id` is in the intersection of both users' colleague sets.
+**Pattern to avoid:** When computing mutual relationships, always filter the final result set against the actual intersection, not just check for existence of any overlap.
+
+---
+
+## Hobbies/Skills Bulk-Replace Needs Rollback Protection
+
+**What happened:** The hobbies and skills APIs use a bulk-replace pattern: delete all existing rows, then insert new ones. If the insert fails (e.g., validation error, DB timeout), the user loses all their data.
+**Fix:** Snapshot existing rows before delete. If insert fails, restore the snapshot. This rollback pattern is implemented in both `/api/user-hobbies` and `/api/user-skills`.
+**Pattern to avoid:** Never delete-then-insert without a rollback mechanism. Either snapshot-and-restore, use a transaction, or use upsert.
+
+---
+
+## Every Client-Side `fetch()` Was Missing Error Handling in Phase 1A
+
+**What happened:** A second audit pass found that every single `fetch()` call in Phase 1A client components was missing error handling. Network failures would leave the UI in a broken state -- loading spinners that never stop, optimistic updates that never roll back.
+**Fix:** Added error handling to all 7 affected files: SaveProfileButton (optimistic rollback), SectionManager (optimistic rollback), photos/gallery pages (.finally() for loading state), hobbies/skills edit pages (.finally() + res.ok check), social-links edit page (res.ok check + alert).
+**Pattern to avoid:** Every client-side `fetch()` must have: (1) a `.catch()` or try/catch for network errors, (2) a `res.ok` check for HTTP errors, (3) a `.finally()` to clean up loading state. Use optimistic rollback for toggle/save operations.
+
+---
+
+## DM Serif Display Renders Differently Per OS
+
+**What happened:** DM Serif Display was chosen as the display/headline font. It renders with noticeably different weight and spacing on macOS vs Windows vs Android due to different font rendering engines and hinting.
+**Fix:** Test on Windows/Android if possible. The font is loaded at weight 400 only -- do not apply synthetic bold (font-weight: 700) as it will look wrong on Windows.
+**Pattern to avoid:** When choosing Google Fonts for a cross-platform app, always test rendering on at least macOS + Windows. Serif fonts are especially variable across platforms.
+
+---
+
+## WheelACard Was Replaced but Not Deleted (Dead Code)
+
+**What happened:** Sprint 10 replaced WheelACard with ProfileStrength on the profile page. But the WheelACard component file remained in the codebase, along with its imports in test files.
+**Fix:** The component was eventually identified as dead code during an audit. It should have been deleted in the same commit that replaced it.
+**Pattern to avoid:** When replacing a component, search the codebase for all imports of the old component and either update or delete them. Use `grep -r "WheelACard"` (or the Grep tool) before committing.
+
+---
+
+## Migration Must Be Applied via Supabase Dashboard or `supabase db push`
+
+**What happened:** Multiple sprints created migration files that were committed to git but not applied to the production database. Features that depended on new tables/columns/RPCs would fail silently or 500 in production.
+**Fix:** After creating a migration, always apply it. Use `npx supabase db push` (after linking) or paste SQL into the Supabase dashboard SQL editor. Document in the Flags section which migrations need applying.
+**Pattern to avoid:** A migration file in `supabase/migrations/` is NOT automatically applied. You must explicitly push it or run it manually. Always flag unapplied migrations.
+
+---
+
+## Supabase RPC Functions Need GRANT EXECUTE
+
+**What happened:** All public RPC functions (handle_available, search_yachts, etc.) were created but missing `GRANT EXECUTE ON FUNCTION ... TO anon, authenticated`. The functions existed but returned null when called through the Supabase client, causing silent failures -- e.g., the handle availability check always returned null, keeping the Continue button permanently disabled.
+**Fix:** Created migration `20260314000010_grant_rpc_execute.sql` to grant execute on all public RPCs. This is a database-only fix -- no redeploy needed.
+**Pattern to avoid:** Every `CREATE FUNCTION` in a migration must be followed by `GRANT EXECUTE ON FUNCTION ... TO anon, authenticated` (or whichever roles need it). Without the grant, the function exists but is inaccessible through the Supabase client.
+
+---
+
+## `vercel env pull` Overwrites `.env.local` Entirely
+
+**What happened:** Running `vercel env pull` to sync Vercel env vars wiped out local-only variables (`DEV_TEST_EMAIL`, `DEV_TEST_PASSWORD`, staging Supabase keys). These are not in Vercel and were lost.
+**Fix:** Re-add local-only vars after every `vercel env pull`. Keep a backup of local-only vars somewhere safe.
+**Pattern to avoid:** Never assume `vercel env pull` merges. It overwrites. Keep a separate note of any env vars that exist only in `.env.local` and are not in Vercel.
+
+---
+
+## Stripe API `current_period_end` Location Changed
+
+**What happened:** The Stripe webhook handler read `subscription.current_period_end` from the top-level subscription object. In Stripe API version `2026-02-25.clover`, this field moved to `subscription.items.data[0].current_period_end`.
+**Fix:** Added a fallback that checks both locations. The webhook now reads from `items.data[0]` first, falls back to top-level.
+**Pattern to avoid:** When working with Stripe webhooks, always check the actual payload shape for your API version. Stripe moves fields between versions. Add fallback logic for critical fields.
+
+---
+
+## Rate Limiter Crashes When KV URL Is Missing or Placeholder
+
+**What happened:** The rate limiter used `@vercel/kv` which requires `KV_REST_API_URL`. In local dev and unlinked Vercel deploys, this was a placeholder string. The KV client tried to connect and threw ENOTFOUND, causing every protected API route to return 500.
+**Fix:** Rate limiter now fails open -- if `KV_REST_API_URL` is missing or connection fails, the request is allowed through (with a console.warn). Also switched from `@vercel/kv` to `ioredis` using `REDIS_URL`.
+**Pattern to avoid:** Any external service integration (KV, Redis, analytics) must fail open in development. Wrap the client in a try/catch with a graceful fallback. Never let a missing optional service 500 your entire API.
+
+---
+
+## `@vercel/kv` vs `ioredis` -- Different Protocols
+
+**What happened:** Vercel Storage created a Redis Labs database (standard Redis protocol), but `@vercel/kv` expects a REST API (`KV_REST_API_URL`). The packages are not interchangeable.
+**Fix:** Switched to `ioredis` which uses the Redis protocol directly via `REDIS_URL`. Singleton client, fail-open when URL absent.
+**Pattern to avoid:** Verify which protocol your Redis provider uses before choosing a client library. Vercel KV (REST) !== Redis Labs (Redis protocol) !== Upstash (REST).
+
+---
+
+## Server-Side Self-Fetch Fails on Preview Deployments
+
+**What happened:** The endorsement deep link page (`/r/[token]`) fetched its own API route server-side using `NEXT_PUBLIC_APP_URL`. On Vercel preview deployments, this URL pointed to the production domain (`yachtie.link`), which did not have the new routes yet. Result: 404 on every deep link in preview.
+**Fix:** Replaced HTTP self-fetch with a direct Supabase query. The page now queries the database directly instead of calling its own API.
+**Pattern to avoid:** Never self-fetch your own API routes server-side. Use direct database queries or shared server-side helpers. Self-fetch introduces URL resolution problems, adds network latency, and breaks on preview deployments.
+
+---
+
+## RLS Missing for Endorsement Token Lookup
+
+**What happened:** The `/r/[token]` page tried to read `endorsement_requests` with the anon key, but no RLS policy allowed anon reads. The query silently returned empty results.
+**Fix:** Created a `SECURITY DEFINER` RPC (`get_endorsement_request_by_token`) that bypasses RLS and returns exactly one matching row. Granted to `anon` and `authenticated`.
+**Pattern to avoid:** When building public-facing pages that query gated tables, you need either a public RLS policy or a `SECURITY DEFINER` function. Direct table access with anon key will silently return nothing if no RLS policy matches.
+
+---
+
+## Endorsement Request `recipient_user_id` Never Set at Insert Time
+
+**What happened:** When creating an endorsement request, the `recipient_user_id` was never populated even when the recipient already had an account. The RLS policy that checked `recipient_user_id = auth.uid()` never matched, so recipients could not see their pending requests in the Audience tab.
+**Fix:** At insert time, look up the recipient by email and set `recipient_user_id` immediately. Also created a trigger (`on_user_created_link_endorsements`) that backlinks requests when a new user signs up matching a recipient email. Plus a one-off backfill migration.
+**Pattern to avoid:** When inserting a row that references another user by email, always try to resolve the `user_id` at insert time. Do not rely solely on triggers for future matches -- the current state must be correct too.
+
+---
+
+## RPC Parameter Names Must Match Exactly
+
+**What happened:** The endorsement creation route called `are_coworkers_on_yacht` with parameters `p_user_a`, `p_user_b`, `p_yacht_id`. The actual function expected `user_a`, `user_b`, `yacht`. Every endorsement submission returned 403 ("not coworkers").
+**Fix:** Matched the parameter names to the function signature.
+**Pattern to avoid:** PostgreSQL RPC parameter names are part of the function signature. When calling an RPC, read the function definition in the migration file and use the exact parameter names.
+
+---
+
+## Supabase Joined Columns Are Inferred as Arrays
+
+**What happened:** When using Supabase's PostgREST joins (e.g., `select('*, yachts(*)')`), TypeScript infers the joined columns as arrays even when the relationship is one-to-one. Casting directly to a type fails; you must cast through `unknown` first.
+**Fix:** Use `as unknown as YachtType` for joined columns from Supabase queries.
+**Pattern to avoid:** Supabase TypeScript types for joins are arrays by default. Always cast through `unknown` first: `data.yacht as unknown as Yacht`, never `data.yacht as Yacht`.
+
+---
+
+## shadcn/ui Button Conflicts with Custom Button on macOS
+
+**What happened:** shadcn/ui wants to create `components/ui/button.tsx` (lowercase), but macOS filesystem is case-insensitive. Our custom `Button.tsx` (uppercase) occupies the same path. Running `npx shadcn add` for components that depend on button would overwrite our custom component.
+**Fix:** When running `npx shadcn add [component]`, always answer "n" to the button.tsx overwrite prompt. Dialog and Sheet close buttons were inlined instead of importing shadcn's button.
+**Pattern to avoid:** On macOS, `button.tsx` and `Button.tsx` are the same file. Always decline shadcn's button overwrite. If adding shadcn components that depend on button, inline or remap the dependency.
+
+---
+
+## Zod v4 Uses `issues` Not `errors` on ZodError
+
+**What happened:** The validation helper accessed `error.errors` to format Zod validation failures. In Zod v4, the property is `error.issues`, not `error.errors`. Validation errors returned empty arrays.
+**Fix:** Updated `validate.ts` to use `error.issues`.
+**Pattern to avoid:** Check the actual Zod version installed (`package.json`) and read its API. Zod v3 uses `.errors`, Zod v4 uses `.issues`. Do not rely on memory.
+
+---
+
+## `@sentry/nextjs` v10 Dropped Config Options
+
+**What happened:** `withSentryConfig` was called with `hideSourceMaps` and `disableLogger` options. In `@sentry/nextjs` v10, these options were removed, causing build warnings/errors.
+**Fix:** Removed the dropped options from `withSentryConfig` call.
+**Pattern to avoid:** When integrating third-party SDKs, check the installed version's docs for config options. Major version bumps often remove or rename options.
+
+---
+
+## `pdf-parse` v2 Has a Different API than v1
+
+**What happened:** Code used `const pdf = require('pdf-parse')` (v1 default export pattern). In v2, the API changed to `new PDFParse({ data: Uint8Array })` -- a class constructor, not a function.
+**Fix:** Updated to v2 class pattern.
+**Pattern to avoid:** Always check the installed major version of a dependency and read its current API. Do not copy code snippets from Stack Overflow or LLM training data that may reference older versions.
+
+---
+
+## Dark Mode Was Sidelined Late -- Force Light Mode Approach
+
+**What happened:** Dark mode was planned from launch, with CSS custom properties and `.dark` class overrides throughout. However, late in Phase 1A, testing revealed inconsistencies across dozens of components -- raw teal variables not dark-mode-aware, components using hardcoded colors, etc. The effort to fix everything exceeded the sprint budget.
+**Fix:** Force light mode: `html` element always gets light class, theme toggle replaced with "coming soon" text. Dark mode tokens remain in `globals.css` ready for Phase 1B.
+**Pattern to avoid:** If you plan dark mode, enforce it from day one with lint rules or a design system check. Retrofitting dark mode onto dozens of components that used raw color values is expensive. All color references should go through semantic tokens that have dark overrides.
+
+---
+
+## Stripe Webhook Always Returned 200 Even on DB Failure
+
+**What happened:** The Stripe webhook handler returned 200 regardless of whether the database update succeeded. If the DB update failed (e.g., timeout, constraint violation), the subscription change was silently lost and Stripe would not retry (it only retries on non-2xx).
+**Fix:** Return 500 if the critical DB update fails, so Stripe retries the webhook.
+**Pattern to avoid:** Webhook handlers must return error status codes when processing fails. Returning 200 tells the sender "all good, don't retry" -- which means data loss if processing actually failed.
+
+---
+
+## Theme localStorage Key Mismatch
+
+**What happened:** `app/layout.tsx` read the theme from `localStorage.getItem('yl-theme')` but `app/(protected)/app/more/page.tsx` wrote it to `localStorage.setItem('theme', ...)`. Different keys, so theme preference never persisted across reloads.
+**Fix:** Standardized on `yl-theme` as the key in all locations.
+**Pattern to avoid:** When multiple files read/write the same localStorage key, grep for both the read and write to ensure they match. Prefix localStorage keys with the app name to avoid collisions.
+
+---
+
+## CookieBanner Overlapped BottomTabBar
+
+**What happened:** Both the cookie consent banner and the bottom tab bar were `fixed bottom-0 z-50`. On first visit, the banner covered the tab bar, making navigation impossible until the banner was dismissed.
+**Fix:** Positioned banner above tab bar: `bottom-[calc(var(--tab-bar-height)+var(--safe-area-bottom))]`.
+**Pattern to avoid:** When adding fixed-position UI elements at the bottom of the screen, account for other fixed elements (tab bar, safe area). Use CSS calc with CSS custom properties.
+
+---
+
+## Legal Page Links Were Wrong Paths
+
+**What happened:** The welcome page linked to `/legal/terms` and `/legal/privacy`, but the actual routes are `/terms` and `/privacy`. This produced 404s on the first page new users see.
+**Fix:** Changed href values to `/terms` and `/privacy`.
+**Pattern to avoid:** When linking to pages, verify the actual route path in the `app/` directory structure. Do not guess route paths.
+
+---
+
+## Stale CSS Variables After Design System Migration
+
+**What happened:** After migrating to the teal/sand design system, many components still referenced old CSS variables (`--teal-500`, `--card`, `--muted-foreground`, `--foreground`, etc.) that were renamed or removed. These caused invisible styling failures -- wrong colors, missing borders, transparent text.
+**Fix:** Comprehensive grep-and-replace across 18+ files. Replaced all raw palette vars with semantic tokens that have dark-mode overrides.
+**Pattern to avoid:** After any design token rename, run a codebase-wide search for every old token name. CSS variable references do not cause build errors -- they silently fall back to nothing.
+
+---
+
+## `Math.random()` for IDs Causes Hydration Mismatch
+
+**What happened:** `Input.tsx` generated element IDs using `Math.random()`. Server and client renders produced different IDs, causing React hydration mismatch warnings.
+**Fix:** Replaced with `useId()` from React.
+**Pattern to avoid:** Never use `Math.random()` or `Date.now()` for IDs in React components. Use `useId()` for stable server/client IDs.
+
+---
+
+## iCloud Sync Creates Conflict Duplicate Files
+
+**What happened:** Working on the project from iCloud Drive caused macOS to create duplicate files with " 2" suffixes (e.g., `routes.d 2.ts`, ghost " 2" directories). These appeared as phantom TypeScript errors and confusing directory listings.
+**Fix:** Cleaned up 64 conflict duplicate files in one session. Added awareness to check for these periodically.
+**Pattern to avoid:** When the project lives on iCloud Drive, be aware of sync conflict duplicates. If you see files or directories with " 2" suffixes, they are artifacts -- delete them.
+
+---
+
+## Stripe Client Must Use Lazy Proxy to Avoid Build-Time Errors
+
+**What happened:** Importing the Stripe SDK at module level (`new Stripe(process.env.STRIPE_SECRET_KEY)`) throws at build time because env vars are not available during `next build`.
+**Fix:** `lib/stripe/client.ts` uses a lazy proxy pattern -- the Stripe instance is only created on first access, not at import time.
+**Pattern to avoid:** Any SDK that reads env vars in its constructor must use lazy initialization. Do not `new Client(process.env.KEY)` at module scope.
+
+---
+
+## `router.push` vs `window.location.href` for Client Navigation
+
+**What happened:** Several places used `window.location.href = '/some/path'` for navigation. This triggers a full page reload, losing client state and causing a flash of white.
+**Fix:** Replaced with `router.push('/some/path')` from Next.js router for client-side navigation.
+**Pattern to avoid:** In Next.js, always use `router.push()` for same-app navigation. Only use `window.location.href` for external URLs or when you explicitly need a full reload (e.g., after Stripe checkout return).
+
+---
+
+## PDF `isPro` Was Hardcoded to `false`
+
+**What happened:** In `generate-pdf/route.ts`, the `isPro` flag was hardcoded to `false`, so all users received the free-tier PDF template regardless of their actual subscription. This existed from Sprint 6 through Sprint 8.
+**Fix:** Changed to `isPro: profile?.subscription_status === 'pro'` and added `subscription_status` to the profile select query.
+**Pattern to avoid:** Never hardcode feature flags. If you use a placeholder during development, add a `// TODO: replace with real check` comment and grep for it before shipping.
+
+---
+
+## Onboarding Copy Bug: Wrong Domain and Tab Name
+
+**What happened:** The onboarding "Done" step showed `yachtielink.com/u/{handle}` (wrong domain -- actual is `yachtie.link`) and referenced "Audience tab" (actual label is "Network tab").
+**Fix:** Corrected both strings in `Wizard.tsx`.
+**Pattern to avoid:** Copy that references URLs or UI labels must be verified against the actual app. Domain names and tab labels change during development -- hardcoded strings do not update themselves.
+
+---
+
+## DeepLinkFlow Showed Literal "checkmark" Text
+
+**What happened:** The already-endorsed state in DeepLinkFlow rendered the string "checkmark" as literal text instead of a checkmark icon.
+**Fix:** Replaced with a proper SVG/emoji checkmark.
+**Pattern to avoid:** When using icons, always verify you are rendering a component or emoji, not a description string.
+
+---
+
+## Sequential Queries on Profile Page: 7 Round Trips
+
+**What happened:** The rally audit found the profile page made 7 sequential Supabase round trips. On marina WiFi (150-300ms latency), this meant 1-2 seconds of blank screen.
+**Fix:** Wrapped independent queries in `Promise.all()`, used `React.cache()` for request-level dedup between `generateMetadata` and page function, and extracted `getUserById`/`getUserByHandle` shared helpers.
+**Pattern to avoid:** After auth check, all independent data fetches should be in `Promise.all()`. If `generateMetadata` and the page function need the same data, wrap the query in `React.cache()`.
+
+---
+
+## The App Was Mobile-Only, Not Mobile-First
+
+**What happened:** The rally audit found zero responsive breakpoints (`sm:`, `md:`, `lg:`, `xl:`) in any application component. On desktop, the IdentityCard stretched to 2560px on an ultrawide monitor. The app was unusable on desktop.
+**Fix:** Added `SidebarNav` for desktop (`hidden md:flex`), `md:hidden` on BottomTabBar, `max-w-2xl` content constraint, two-column layout on public profile at `lg:`.
+**Pattern to avoid:** Build responsive from the start. Even if the primary target is mobile, add `max-w-2xl` to the main content area and basic `md:` breakpoints from day one. Retrofitting responsive layout across dozens of pages is expensive.
+
+---
+
+## Next.js 16 Deprecated `middleware.ts` Convention
+
+**What happened:** Next.js 16 deprecated the `middleware` file convention in favor of `proxy`. The file and export name needed renaming.
+**Fix:** Renamed `middleware.ts` to `proxy.ts`, renamed the `middleware` export to `proxy`.
+**Pattern to avoid:** Check Next.js version-specific conventions when upgrading. File-convention changes are not flagged by TypeScript -- they silently stop working.
