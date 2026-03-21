@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import { BackButton } from '@/components/ui/BackButton';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy — YachtieLink',
@@ -7,9 +7,12 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
+    <div className="min-h-screen bg-[var(--color-surface)]">
     <div className="max-w-2xl mx-auto px-6 py-12 pb-24">
-      <Link href="/welcome" className="inline-block mb-6 text-sm text-[var(--color-interactive)] hover:underline">← Back to sign in</Link>
-      <h1 className="text-2xl font-bold mb-2">Privacy Policy</h1>
+      <div className="flex items-center gap-3 mb-6">
+        <BackButton href="/welcome" />
+      </div>
+      <h1 className="font-serif text-2xl mb-2">Privacy Policy</h1>
       <p className="text-sm text-[var(--color-text-secondary)] mb-8">Last updated: 16 March 2026</p>
 
       <section className="prose prose-sm max-w-none space-y-8 text-[var(--color-text-primary)]">
@@ -136,6 +139,7 @@ export default function PrivacyPage() {
         </div>
 
       </section>
+    </div>
     </div>
   );
 }

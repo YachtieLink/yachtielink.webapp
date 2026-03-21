@@ -7,6 +7,7 @@ import { uploadYachtCoverPhoto } from '@/lib/storage/yacht'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import Image from 'next/image'
+import { BackButton } from '@/components/ui/BackButton'
 
 export default function YachtPhotoPage() {
   const router = useRouter()
@@ -55,12 +56,9 @@ export default function YachtPhotoPage() {
 
   return (
     <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-      <button
-        onClick={() => router.back()}
-        className="text-sm text-[var(--color-text-secondary)] mb-6 flex items-center gap-1"
-      >
-        ← Back
-      </button>
+      <div className="mb-6">
+        <BackButton href={`/app/yacht/${params.id}`} />
+      </div>
 
       <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Cover photo</h1>
       <p className="text-sm text-[var(--color-text-secondary)] mb-6">

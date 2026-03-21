@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { BackButton } from '@/components/ui/BackButton'
 import { EmptyState } from '@/components/ui/EmptyState'
 
 interface SavedUser {
@@ -94,7 +95,7 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
     return (
       <>
         <div className="flex items-center gap-3">
-          <Link href="/app/network" className="text-sm text-[var(--color-interactive)] hover:underline">← Back</Link>
+          <BackButton href="/app/network" />
           <h1 className="font-semibold text-lg text-[var(--color-text-primary)]">Saved Profiles</h1>
         </div>
         <EmptyState
@@ -109,7 +110,7 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
   return (
     <>
       <div className="flex items-center gap-3">
-        <Link href="/app/network" className="text-sm text-[var(--color-interactive)] hover:underline">← Back</Link>
+        <BackButton href="/app/network" />
         <h1 className="font-semibold text-lg text-[var(--color-text-primary)]">Saved Profiles</h1>
         <span className="text-sm text-[var(--color-text-secondary)]">({profiles.length})</span>
       </div>

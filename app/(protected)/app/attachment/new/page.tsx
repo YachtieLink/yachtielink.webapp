@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { YachtPicker, type YachtOption } from '@/components/yacht/YachtPicker'
 import { Button, Input } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+import { BackButton } from '@/components/ui/BackButton'
 
 type Step = 'yacht' | 'role' | 'dates'
 
@@ -94,12 +95,9 @@ export default function AttachmentNewPage() {
   if (step === 'yacht') {
     return (
       <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-        <button
-          onClick={() => router.back()}
-          className="text-sm text-[var(--color-text-secondary)] mb-6 flex items-center gap-1"
-        >
-          ← Back
-        </button>
+        <div className="mb-6">
+          <BackButton href="/app/profile" />
+        </div>
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Add a yacht</h1>
         <p className="text-sm text-[var(--color-text-secondary)] mb-6">
           Find the vessel in our database or add it if it&apos;s not there yet.
@@ -121,12 +119,14 @@ export default function AttachmentNewPage() {
   if (step === 'role') {
     return (
       <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-        <button
-          onClick={() => setStep('yacht')}
-          className="text-sm text-[var(--color-text-secondary)] mb-6 flex items-center gap-1"
-        >
-          ← {yacht?.name}
-        </button>
+        <div className="mb-6">
+          <button
+            onClick={() => setStep('yacht')}
+            className="text-sm text-[var(--color-interactive)] hover:underline"
+          >
+            ← {yacht?.name}
+          </button>
+        </div>
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Your role</h1>
         <p className="text-sm text-[var(--color-text-secondary)] mb-6">
           What was your role on {yacht?.name}?
@@ -216,12 +216,14 @@ export default function AttachmentNewPage() {
   // ── step: dates ─────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-      <button
-        onClick={() => setStep('role')}
-        className="text-sm text-[var(--color-text-secondary)] mb-6 flex items-center gap-1"
-      >
-        ← {roleLabel}
-      </button>
+      <div className="mb-6">
+        <button
+          onClick={() => setStep('role')}
+          className="text-sm text-[var(--color-interactive)] hover:underline"
+        >
+          ← {roleLabel}
+        </button>
+      </div>
       <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Dates</h1>
       <p className="text-sm text-[var(--color-text-secondary)] mb-6">
         When did you work on {yacht?.name}?

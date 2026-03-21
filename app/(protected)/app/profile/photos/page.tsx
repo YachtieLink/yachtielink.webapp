@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { BackButton } from '@/components/ui/BackButton'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { uploadUserPhoto } from '@/lib/storage/upload'
@@ -71,7 +71,7 @@ export default function ProfilePhotosPage() {
   return (
     <div className="flex flex-col gap-4 pb-24">
       <div className="flex items-center gap-3">
-        <Link href="/app/profile" className="text-sm text-[var(--color-interactive)] hover:underline">← Back</Link>
+        <BackButton href="/app/profile" />
         <h1 className="font-semibold text-lg text-[var(--color-text-primary)]">Photos</h1>
       </div>
 

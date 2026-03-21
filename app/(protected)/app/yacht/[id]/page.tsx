@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { BackButton } from '@/components/ui/BackButton'
 import { createClient } from '@/lib/supabase/server'
 
 interface PageProps {
@@ -81,12 +82,9 @@ export default async function YachtDetailPage({ params }: PageProps) {
 
       <div className="px-4 pt-5">
         {/* Back */}
-        <Link
-          href="/app/profile"
-          className="text-sm text-[var(--color-text-secondary)] mb-4 flex items-center gap-1"
-        >
-          ← Back
-        </Link>
+        <div className="mb-4">
+          <BackButton href="/app/profile" />
+        </div>
 
         {/* Header */}
         <div className="flex items-start justify-between mb-1">

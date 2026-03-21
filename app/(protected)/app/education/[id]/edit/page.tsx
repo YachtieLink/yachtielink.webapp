@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import Link from 'next/link'
+import { BackButton } from '@/components/ui/BackButton'
 
 export default function EducationEditPage() {
   const router = useRouter()
@@ -103,7 +103,7 @@ export default function EducationEditPage() {
   if (notFound) {
     return (
       <div className="flex flex-col gap-4 pb-24">
-        <Link href="/app/profile" className="text-sm text-[var(--color-interactive)] hover:underline">← Back</Link>
+        <BackButton href="/app/profile" />
         <p className="text-sm text-[var(--color-text-secondary)]">Education record not found.</p>
       </div>
     )
@@ -112,7 +112,7 @@ export default function EducationEditPage() {
   return (
     <div className="flex flex-col gap-4 pb-24">
       <div className="flex items-center gap-3">
-        <Link href="/app/profile" className="text-sm text-[var(--color-interactive)] hover:underline">← Back</Link>
+        <BackButton href="/app/profile" />
         <h1 className="font-semibold text-lg text-[var(--color-text-primary)]">Edit Education</h1>
       </div>
 
