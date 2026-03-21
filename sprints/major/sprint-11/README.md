@@ -1,7 +1,9 @@
-# Sprint 11 — Feature Roadmap
+# Sprint 11 — Feature Roadmap (SUPERSEDED)
+
+> **SUPERSEDED:** This sprint has been deprioritised in favour of crew-facing polish (beautiful profiles, yacht graph, launch readiness). The feature roadmap is now a lighter deliverable inside [Sprint 13 — Launch Polish](../phase-1b/sprint-13/README.md). The build plan in this folder is still valid reference material for the roadmap tables and voting logic.
 
 **Phase:** TBD (likely 1B)
-**Status:** 📋 Planned
+**Status:** 🔁 Superseded → see Phase 1B Sprint 13
 **Started:** —
 
 ## Goal

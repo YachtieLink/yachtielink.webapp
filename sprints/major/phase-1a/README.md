@@ -20,6 +20,7 @@ Full context → [context.md](./context.md)
 | Sprint | Status | Focus |
 |--------|--------|-------|
 | [Sprint 10](./sprint-10/README.md) | 🔨 In Progress | Phase 1A core build |
+| [Sprint 10.1](./sprint-10.1/README.md) | 📋 Draft | Close Phase 1A — education edit, saved profiles, animation pass, QA |
 
 ---
 
