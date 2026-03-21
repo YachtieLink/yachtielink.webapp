@@ -17,6 +17,43 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-21 — Claude Code (Opus 4.6) — Sprint 10.1: Close & Polish Phase 1A
+
+### Done
+
+**Wave 0 — Unblocked dependencies:**
+- Created `EmptyState` component (card + inline variants) — Salty mounting point for Sprint 11
+- Added `GET /api/user-education/[id]` and `PATCH /api/saved-profiles/[id]` routes
+- Created migration `20260321000001_fix_storage_buckets.sql` — bucket creation (user-photos, user-gallery), yacht-photos RLS fix (ex-crew write block), `get_sea_time()` SECURITY DEFINER consistency
+- Replaced 6 ad-hoc empty states with EmptyState component
+
+**Wave 1 — Full polish pass (4 parallel agents + main thread):**
+- **A1:** Education edit page (`/app/education/[id]/edit`) — load, edit, save, delete with loading skeleton and not-found handling
+- **A2:** Saved profiles promoted to `/app/network/saved` — server-side data fetching, folder CRUD, move-to-folder, empty state; SavedTab in AudienceTabs replaced with link card
+- **B:** Dark mode — ProfileStrength arc colours use `--color-strength-*` CSS vars, Insights chart colours use `--chart-*` vars, SidebarNav badge uses `--color-error`
+- **C:** Animation pass — `easeGentle` + `scrollRevealViewport` added to `lib/motion.ts`; ProfileAccordion/IdentityCard/Toast/BottomSheet wired to shared presets; `fadeUp` on page wrappers, `staggerContainer` on card lists, `scrollReveal` on public profile, `cardHover` on cards, `popIn` on badge counts
+- **D:** Typography — DM Serif Display applied to profile names, section headings, page titles, auth pages (weight 400, no synthetic bold)
+- **E:** Route cleanup — `/app/audience` deleted, function renamed to `NetworkPage`, `pb-8` → `pb-24` on 6 edit pages, ghost " 2" directories removed
+- **F:** API hardening — try/catch + handleApiError on stripe/portal, endorsement-requests, cron routes; Zod validation on DELETE /api/saved-profiles and POST /api/profile/ai-summary; health endpoint fixed to query `users` table with sanitised errors
+- **G:** Storage — `uploadUserPhoto`, `uploadGalleryItem`, `deleteUserPhoto`, `deleteGalleryItem`, `extractStoragePath` added to `lib/storage/upload.ts`; photos/gallery pages refactored; account deletion cleans user-photos and user-gallery; PDF generation deletes previous export
+- **I:** admin.ts guarded with `import 'server-only'`; PublicProfileContent "N more" text made functional expand buttons
+
+### Context
+- Sprint 10.1 addresses all findings from the 2026-03-21 six-agent audit + verification audit
+- Phase 1A is now code-complete on `feat/ui-refresh-phase1`
+
+### Next
+- Run `npm run build` — verify zero errors before merge
+- Merge `feat/ui-refresh-phase1` → `main`, tag `v1.0-phase-1a`
+- **Pre-launch blocker:** Privacy page needs registered business address (TODO in /privacy/page.tsx)
+- Phase 1B begins with Sprint 11
+
+### Flags
+- DM Serif Display renders differently per OS — test on Windows/Android if possible
+- Animation agent created `PageTransition` and `ScrollReveal` wrapper components for server component pages — verify these work correctly at runtime
+
+---
+
 ## 2026-03-18 — Cowork (Opus 4.6) — Project structure overhaul: sprints, rallies, disciplines, design system
 
 ### Done
