@@ -1,9 +1,9 @@
 # YachtieLink — Storage Plan
 
-**Version:** 1.0
-**Date:** 2026-03-14
+**Version:** 2.0
+**Date:** 2026-03-21 (updated from 2026-03-14)
 **Status:** Active
-**Applies to:** Phase 1A
+**Applies to:** Phase 1A + 1B
 
 Supabase Storage is used for user-generated file uploads. This document covers bucket definitions, path conventions, RLS policies, size/type limits, and future bucket planning.
 
@@ -127,11 +127,140 @@ Never store signed URLs in the database — they expire. Store only the raw path
 
 ---
 
-## Future buckets (planned)
+### `yacht-photos`
 
-| Bucket | Sprint | Visibility | Notes |
-|--------|--------|------------|-------|
-| `yacht-photos` | Sprint 4 | Public | Single cover photo per yacht. Upload gated to users with an active or past attachment to that yacht. Path: `yacht-photos/{yacht_id}/cover.{ext}`. Full multi-photo gallery (multiple images, contributor attribution, ordering, deletion) promoted to Phase 1B Sprint 11. |
+| Property | Value |
+|----------|-------|
+| Visibility | **Public** |
+| Max file size | 5 MB |
+| Allowed types | `image/jpeg`, `image/png`, `image/webp` |
+| Path pattern | `yacht-photos/{yacht_id}/cover.{ext}` |
+| Sprint added | Sprint 4 |
+| Migration | `20260314000011_yacht_sprint4.sql` |
+
+**Why public?** Yacht cover photos are shown on public profiles and yacht detail pages.
+
+**Path convention:** `{yacht_id}/cover.{ext}` — one cover photo per yacht, upload overwrites.
+
+**RLS summary:**
+- Anyone can read
+- INSERT/UPDATE/DELETE gated to authenticated users with an `attachments` record for that yacht
+- ⚠️ **Known issue:** RLS does not filter `deleted_at IS NULL` — ex-crew with soft-deleted attachments can still write. Fix planned for Sprint 10.1.
+
+---
+
+### `user-photos`
+
+| Property | Value |
+|----------|-------|
+| Visibility | **Public** |
+| Max file size | **⚠️ NOT SET — needs 5 MB limit in migration** |
+| Allowed types | **⚠️ NOT RESTRICTED — needs `image/jpeg`, `image/png`, `image/webp`** |
+| Path pattern | `user-photos/{user_id}/{uuid}.{ext}` |
+| Sprint added | Sprint 10 |
+| Migration | `20260317000021_profile_robustness.sql` (RLS policies only — **bucket not created in SQL**) |
+
+**Why public?** Profile photos are displayed on public profiles.
+
+**Path convention:** `{user_id}/{uuid}.{ext}` — multiple files per user. Free: 6 max, Pro: 9 max (enforced in API route).
+
+**RLS summary:**
+- Anyone can read
+- Only owner can INSERT/DELETE
+
+**⚠️ Known issues (fix in Sprint 10.1):**
+1. Bucket is not created in migration SQL — relies on manual dashboard creation. Must add `INSERT INTO storage.buckets`.
+2. No `file_size_limit` or `allowed_mime_types` set — any file type up to 50 MB accepted.
+3. No client-side compression — raw phone photos uploaded directly (5-8 MB each).
+4. **Not included in account deletion cleanup** — `POST /api/account/delete` misses this bucket.
+
+---
+
+### `user-gallery`
+
+| Property | Value |
+|----------|-------|
+| Visibility | **Public** |
+| Max file size | **⚠️ NOT SET — needs 5 MB limit in migration** |
+| Allowed types | **⚠️ NOT RESTRICTED — needs `image/jpeg`, `image/png`, `image/webp`** |
+| Path pattern | `user-gallery/{user_id}/{uuid}.{ext}` |
+| Sprint added | Sprint 10 |
+| Migration | `20260317000021_profile_robustness.sql` (RLS policies only — **bucket not created in SQL**) |
+
+**Why public?** Gallery work samples are shown on public profiles.
+
+**Path convention:** `{user_id}/{uuid}.{ext}` — multiple files per user. Free: 12 max, Pro: 30 max (enforced in API route).
+
+**RLS summary:**
+- Anyone can read
+- Only owner can INSERT/DELETE
+
+**⚠️ Known issues (fix in Sprint 10.1):** Same as `user-photos` above — no bucket creation in SQL, no limits, no compression, missing from account delete.
+
+---
+
+## Storage Cost Estimate
+
+**Provider:** Supabase (Pro plan, $25/mo base)
+- 100 GB storage included, $0.021/GB overage
+- 250 GB bandwidth included, $0.09/GB overage
+
+| Users | Est. Storage | Monthly Cost (over $25 base) |
+|-------|-------------|------------------------------|
+| 100 | ~5 GB | $0 |
+| 500 | ~25 GB | $0 |
+| 1,000 | ~55 GB | $0 |
+| 2,000 | ~110 GB | ~$23 (mostly bandwidth) |
+| 5,000 | ~275 GB | ~$94 |
+| 10,000 | ~550 GB | ~$212 |
+
+Assumes ~55 MB/user average with compression. Without compression (current state), multiply by 2-3x.
+
+**Bandwidth is the bigger cost driver at scale.** Public bucket CDN hits from profile views accumulate faster than storage.
+
+---
+
+## Provider Migration Strategy
+
+> **Decision (2026-03-21):** Continue with Supabase Storage for MVP. The abstraction layer in `lib/storage/` must be completed so we can migrate to another provider (Vercel Blob, AWS S3, Cloudflare R2) if costs or performance require it.
+
+**Current state:** Partial abstraction. `lib/storage/upload.ts` covers profile-photos, cert-documents, cv-uploads, pdf-exports. `lib/storage/yacht.ts` covers yacht-photos. But `user-photos` and `user-gallery` bypass the abstraction — pages call `supabase.storage` directly.
+
+**Sprint 10.1 action items:**
+1. Add `uploadUserPhoto()`, `deleteUserPhoto()`, `uploadGalleryItem()`, `deleteGalleryItem()` to `lib/storage/upload.ts`
+2. Refactor `profile/photos/page.tsx` and `profile/gallery/page.tsx` to use the helpers
+3. Refactor `DELETE /api/user-photos/[id]` and `DELETE /api/user-gallery/[id]` to use deletion helpers
+4. Add `user-photos` and `user-gallery` cleanup to `POST /api/account/delete`
+
+**Future (post-launch if needed):** Extract `lib/storage/` into a provider-agnostic interface:
+```ts
+interface StorageProvider {
+  upload(bucket: string, path: string, file: File, opts?: UploadOpts): Promise<string>
+  delete(bucket: string, path: string): Promise<void>
+  getPublicUrl(bucket: string, path: string): string
+  getSignedUrl(bucket: string, path: string, expiresIn: number): Promise<string>
+}
+```
+Swap implementation from Supabase to Vercel Blob / S3 / R2 without touching any page or API code. Not needed now — all calls already go through `lib/storage/`, just need to finish wiring the last two buckets.
+
+---
+
+## Cleanup & Garbage Collection
+
+| Bucket | On replace | On record delete | On account delete |
+|--------|-----------|-----------------|-------------------|
+| `profile-photos` | Overwrite (same path) | N/A | ✅ Cleaned |
+| `cert-documents` | Overwrite (same path) | ⚠️ Orphaned (cert row soft-deleted, file persists) | ✅ Cleaned |
+| `cv-uploads` | Overwrite (same path) | N/A | ✅ Cleaned |
+| `pdf-exports` | **⚠️ Accumulates** (new timestamped file each time) | N/A | ✅ Cleaned |
+| `yacht-photos` | Overwrite (same path) | N/A (yacht not deletable) | ⚠️ Never cleaned (shared resource) |
+| `user-photos` | N/A (unique paths) | ✅ Storage object deleted | ❌ **Missing from account delete** |
+| `user-gallery` | N/A (unique paths) | ✅ Storage object deleted | ❌ **Missing from account delete** |
+
+**Sprint 10.1 fixes:**
+- Add `user-photos` + `user-gallery` to account delete cleanup
+- Delete previous PDF before writing new one in `generate-pdf` route
+- Add client-side image compression for `user-photos` and `user-gallery` uploads (Canvas resize to max 1200px, WebP 0.85 — same pattern as profile avatar)
 
 ---
 
@@ -170,4 +299,4 @@ Or apply directly in the Supabase SQL Editor (copy the migration file contents a
 
 ---
 
-*Updated when new buckets are added or policies change. Current buckets: 4 (profile-photos, cert-documents, cv-uploads, pdf-exports). Next update: Sprint 4 (yacht-photos).*
+*Updated when new buckets are added or policies change. Current buckets: 7 (profile-photos, cert-documents, cv-uploads, pdf-exports, yacht-photos, user-photos, user-gallery). Next update: Sprint 10.1 (fix bucket creation, limits, compression, cleanup).*

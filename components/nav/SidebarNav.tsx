@@ -1,7 +1,9 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { useNetworkBadge } from '@/lib/hooks/useNetworkBadge'
 import {
   ProfileIcon,
   ProfileIconFilled,
@@ -55,12 +57,15 @@ const tabs: Tab[] = [
   },
 ]
 
-interface SidebarNavProps {
-  networkBadge?: number
-}
-
-export function SidebarNav({ networkBadge }: SidebarNavProps) {
+export function SidebarNav() {
   const pathname = usePathname()
+  const router = useRouter()
+  const networkBadge = useNetworkBadge()
+
+  // Prefetch all tab routes on mount for instant navigation
+  useEffect(() => {
+    tabs.forEach((tab) => router.prefetch(tab.href))
+  }, [router])
 
   return (
     <nav
@@ -75,7 +80,7 @@ export function SidebarNav({ networkBadge }: SidebarNavProps) {
       {/* Tab links */}
       {tabs.map((tab) => {
         const isActive = pathname.startsWith(tab.href)
-        const showBadge = tab.href === '/app/network' && (networkBadge ?? 0) > 0
+        const showBadge = tab.href === '/app/network' && networkBadge > 0
         return (
           <Link
             key={tab.href}
@@ -94,7 +99,7 @@ export function SidebarNav({ networkBadge }: SidebarNavProps) {
             <span className="relative h-5 w-5">
               {isActive ? tab.activeIcon : tab.icon}
               {showBadge && (
-                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500" />
+                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[var(--color-error)]" />
               )}
             </span>
             <span>{tab.label}</span>

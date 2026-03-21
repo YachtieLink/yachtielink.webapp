@@ -3,7 +3,10 @@
 import { useState, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { staggerContainer, fadeUp, cardHover, popIn } from '@/lib/motion'
 import { RequestActions } from './RequestActions'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -110,7 +113,7 @@ export function AudienceTabs({
   colleagues,
   mostRecentYachtId,
 }: AudienceTabsProps) {
-  const [activeTab, setActiveTab] = useState<'endorsements' | 'colleagues'>('endorsements')
+  const [activeTab, setActiveTab] = useState<'endorsements' | 'colleagues' | 'saved'>('endorsements')
 
   const endorsementCount = Math.min(endorsementsReceived.length, 5)
   const progressPct = (endorsementCount / 5) * 100
@@ -147,7 +150,7 @@ export function AudienceTabs({
 
       {/* Segment control */}
       <div className="flex bg-[var(--color-surface-raised)] rounded-xl p-1 mb-6">
-        {(['endorsements', 'colleagues'] as const).map((tab) => (
+        {(['endorsements', 'colleagues', 'saved'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -157,7 +160,7 @@ export function AudienceTabs({
                 : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
             }`}
           >
-            {tab === 'endorsements' ? 'Endorsements' : 'Colleagues'}
+            {tab === 'endorsements' ? 'Endorsements' : tab === 'colleagues' ? 'Colleagues' : 'Saved'}
           </button>
         ))}
       </div>
@@ -169,8 +172,10 @@ export function AudienceTabs({
           requestsReceived={requestsReceived}
           requestsSent={requestsSent}
         />
-      ) : (
+      ) : activeTab === 'colleagues' ? (
         <ColleaguesTab colleagues={colleagues} />
+      ) : (
+        <SavedTab />
       )}
     </div>
   )
@@ -281,22 +286,14 @@ function EndorsementsTab({
       <section>
         <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide mb-3">
           Endorsements{' '}
-          <span className="normal-case font-normal text-[var(--color-text-tertiary)]">
+          <motion.span variants={popIn} initial="hidden" animate="visible" className="normal-case font-normal text-[var(--color-text-tertiary)]">
             ({endorsementsReceived.length})
-          </span>
+          </motion.span>
         </h2>
         {endorsementsReceived.length === 0 ? (
-          <div className="bg-[var(--color-surface)] rounded-2xl p-5 text-center">
-            <p className="text-sm text-[var(--color-text-secondary)] mb-3">No endorsements yet.</p>
-            <Link
-              href="/app/endorsement/request"
-              className="text-sm text-[var(--color-interactive)] font-medium hover:underline"
-            >
-              Request endorsements →
-            </Link>
-          </div>
+          <EmptyState title="No endorsements yet" actionLabel="Request endorsements" actionHref="/app/endorsement/request" />
         ) : (
-          <div className="flex flex-col gap-3">
+          <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="flex flex-col gap-3">
             {endorsementsReceived.map((e) => {
               const endorserName =
                 e.endorser?.display_name ?? e.endorser?.full_name ?? 'Anonymous'
@@ -305,7 +302,7 @@ function EndorsementsTab({
                 year: 'numeric',
               })
               return (
-                <div key={e.id} className="bg-[var(--color-surface)] rounded-2xl p-4 border-l-2 border-[var(--color-interactive)]">
+                <motion.div key={e.id} variants={fadeUp} {...cardHover} className="bg-[var(--color-surface)] rounded-2xl p-4 border-l-2 border-[var(--color-interactive)]">
                   <p className="text-sm text-[var(--color-text-primary)] leading-relaxed mb-2">
                     &ldquo;{excerpt(e.content)}&rdquo;
                   </p>
@@ -314,10 +311,10 @@ function EndorsementsTab({
                     {e.yacht ? ` · ${e.yacht.name}` : ''}
                     {' · '}{date}
                   </p>
-                </div>
+                </motion.div>
               )
             })}
-          </div>
+          </motion.div>
         )}
       </section>
 
@@ -365,36 +362,49 @@ function EndorsementsTab({
   )
 }
 
+// ─── Saved Tab ────────────────────────────────────────────────────────────────
+
+function SavedTab() {
+  return (
+    <Link
+      href="/app/network/saved"
+      className="bg-[var(--color-surface)] rounded-2xl p-5 flex items-center gap-3 hover:bg-[var(--color-surface-raised)] transition-colors"
+    >
+      <span className="text-2xl">🔖</span>
+      <div className="flex-1">
+        <p className="text-sm font-medium text-[var(--color-text-primary)]">Saved Profiles</p>
+        <p className="text-xs text-[var(--color-text-secondary)]">View and organise your saved profiles</p>
+      </div>
+      <span className="text-[var(--color-text-secondary)]">›</span>
+    </Link>
+  )
+}
+
 // ─── Colleagues Tab ───────────────────────────────────────────────────────────
 
 function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
   if (colleagues.length === 0) {
     return (
-      <div className="bg-[var(--color-surface)] rounded-2xl p-6 text-center">
-        <p className="text-sm text-[var(--color-text-secondary)] mb-3">
-          Your colleague list will populate once you and a crewmate have both attached the same
-          yacht to your profiles.
-        </p>
-        <Link
-          href="/app/attachment/new"
-          className="text-sm text-[var(--color-interactive)] font-medium hover:underline"
-        >
-          Add a yacht →
-        </Link>
-      </div>
+      <EmptyState
+        title="Your colleague list will populate once you and a crewmate have both attached the same yacht"
+        actionLabel="Add a yacht"
+        actionHref="/app/attachment/new"
+      />
     )
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="flex flex-col gap-3">
       {colleagues.map((entry) => {
         const profile = entry.profile
         if (!profile) return null
         const name = profile.display_name ?? profile.full_name
 
         return (
-          <div
+          <motion.div
             key={entry.colleague_id}
+            variants={fadeUp}
+            {...cardHover}
             className="bg-[var(--color-surface)] rounded-2xl p-4 flex items-center gap-3"
           >
             <div className="w-11 h-11 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
@@ -433,9 +443,9 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
             >
               Endorse
             </Link>
-          </div>
+          </motion.div>
         )
       })}
-    </div>
+    </motion.div>
   )
 }

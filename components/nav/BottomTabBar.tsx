@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useNetworkBadge } from "@/lib/hooks/useNetworkBadge";
 import {
   ProfileIcon,
   ProfileIconFilled,
@@ -20,10 +22,6 @@ interface Tab {
   href: string;
   icon: React.ReactNode;
   activeIcon: React.ReactNode;
-}
-
-interface BottomTabBarProps {
-  networkBadge?: number;
 }
 
 const tabs: Tab[] = [
@@ -59,8 +57,15 @@ const tabs: Tab[] = [
   },
 ];
 
-export function BottomTabBar({ networkBadge = 0 }: BottomTabBarProps) {
+export function BottomTabBar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const networkBadge = useNetworkBadge();
+
+  // Prefetch all tab routes on mount for instant navigation
+  useEffect(() => {
+    tabs.forEach((tab) => router.prefetch(tab.href));
+  }, [router]);
 
   return (
     <nav

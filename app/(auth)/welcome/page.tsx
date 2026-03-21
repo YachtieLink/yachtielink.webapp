@@ -12,7 +12,7 @@ export default function WelcomePage() {
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-12 bg-[var(--color-surface)]">
       {/* Logo / wordmark placeholder */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-[var(--color-teal-800)] dark:text-[var(--color-teal-100)]">
+        <h1 className="text-3xl font-serif tracking-tight text-[var(--color-teal-800)] dark:text-[var(--color-teal-100)]">
           YachtieLink
         </h1>
         <p className="mt-2 text-sm text-[var(--color-text-secondary)]">

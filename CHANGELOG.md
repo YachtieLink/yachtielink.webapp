@@ -17,6 +17,275 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-21 — Claude Code (Opus 4.6) — Sprint 10.1: Close & Polish Phase 1A
+
+### Done
+
+**Wave 0 — Unblocked dependencies:**
+- Created `EmptyState` component (card + inline variants) — Salty mounting point for Sprint 11
+- Added `GET /api/user-education/[id]` and `PATCH /api/saved-profiles/[id]` routes
+- Created migration `20260321000001_fix_storage_buckets.sql` — bucket creation (user-photos, user-gallery), yacht-photos RLS fix (ex-crew write block), `get_sea_time()` SECURITY DEFINER consistency
+- Replaced 6 ad-hoc empty states with EmptyState component
+
+**Wave 1 — Full polish pass (4 parallel agents + main thread):**
+- **A1:** Education edit page (`/app/education/[id]/edit`) — load, edit, save, delete with loading skeleton and not-found handling
+- **A2:** Saved profiles promoted to `/app/network/saved` — server-side data fetching, folder CRUD, move-to-folder, empty state; SavedTab in AudienceTabs replaced with link card
+- **B:** Dark mode — ProfileStrength arc colours use `--color-strength-*` CSS vars, Insights chart colours use `--chart-*` vars, SidebarNav badge uses `--color-error`
+- **C:** Animation pass — `easeGentle` + `scrollRevealViewport` added to `lib/motion.ts`; ProfileAccordion/IdentityCard/Toast/BottomSheet wired to shared presets; `fadeUp` on page wrappers, `staggerContainer` on card lists, `scrollReveal` on public profile, `cardHover` on cards, `popIn` on badge counts
+- **D:** Typography — DM Serif Display applied to profile names, section headings, page titles, auth pages (weight 400, no synthetic bold)
+- **E:** Route cleanup — `/app/audience` deleted, function renamed to `NetworkPage`, `pb-8` → `pb-24` on 6 edit pages, ghost " 2" directories removed
+- **F:** API hardening — try/catch + handleApiError on stripe/portal, endorsement-requests, cron routes; Zod validation on DELETE /api/saved-profiles and POST /api/profile/ai-summary; health endpoint fixed to query `users` table with sanitised errors
+- **G:** Storage — `uploadUserPhoto`, `uploadGalleryItem`, `deleteUserPhoto`, `deleteGalleryItem`, `extractStoragePath` added to `lib/storage/upload.ts`; photos/gallery pages refactored; account deletion cleans user-photos and user-gallery; PDF generation deletes previous export
+- **I:** admin.ts guarded with `import 'server-only'`; PublicProfileContent "N more" text made functional expand buttons
+
+### Context
+- Sprint 10.1 addresses all findings from the 2026-03-21 six-agent audit + verification audit
+- Phase 1A is now code-complete on `feat/ui-refresh-phase1`
+
+### Next
+- Run `npm run build` — verify zero errors before merge
+- Merge `feat/ui-refresh-phase1` → `main`, tag `v1.0-phase-1a`
+- **Pre-launch blocker:** Privacy page needs registered business address (TODO in /privacy/page.tsx)
+- Phase 1B begins with Sprint 11
+
+### Flags
+- DM Serif Display renders differently per OS — test on Windows/Android if possible
+- Animation agent created `PageTransition` and `ScrollReveal` wrapper components for server component pages — verify these work correctly at runtime
+
+---
+
+## 2026-03-18 — Cowork (Opus 4.6) — Project structure overhaul: sprints, rallies, disciplines, design system
+
+### Done
+
+**Sprint & Rally Structure**
+- Created top-level `sprints/` folder with `major/`, `junior/`, `rallies/` hierarchy
+- Migrated all sprint build plans (5–10), founder notes, phase docs from `notes/` into `sprints/major/`
+- Migrated rally-001 files (7 reports + final proposal) into `sprints/rallies/rally-001-full-audit/`
+- Migrated `specs/` folder into rally-001 (originated from the rally)
+- Created `sprints/major/archive/` with README for completed sprints 5–9
+- Created junior sprint folders: `debug/`, `feature/`, `ui-ux/` each with README + templates
+- Created `rallies/README.md` with three rally types (PR, System, Full Audit) and the two-pass pattern
+- Created master `sprints/README.md` index covering active sprints, rallies, and how to start each
+
+**Discipline Docs**
+- Created `docs/disciplines/` with 6 project-specific discipline files:
+  - `frontend.md` — component conventions, client/server decision tree, security boundary (RLS), page patterns, lib structure
+  - `backend.md` — API routes, Supabase clients, queries, validation, RLS, migrations, bulk rollback pattern
+  - `design.md` — quick reference cheat sheet, defers to design system for depth
+  - `performance.md` — caching (staleTimes, React.cache), query optimisation (Promise.all), prefetching, loading states
+  - `code-review.md` — confidence-based filtering, severity classification (CRITICAL→LOW), review checklist, React/Next.js checks, stubborn bug escalation, build error resolution table, dead code detection tools
+  - `auth-security.md` — auth flow, RLS patterns, storage security, rate limits, GDPR compliance, OWASP Top 10 mapped to our stack, dangerous patterns table
+
+**Design System**
+- Created `docs/design-system/` as the complete visual/interaction reference:
+  - `philosophy.md` — 5 deep design principles (crew first, photo-forward, progressive disclosure, instant good, trust not for sale), the core tension, product invariants
+  - `inspirations.md` — reference products (Notion, Bumble, Linear, Airbnb) with what to take/avoid, anti-inspirations (LinkedIn, yacht crew apps), calibration questions
+  - `style-guide.md` — moved from project root (`yl_style_guide.md`) into design system as canonical location. Full colour palette, typography, animation presets, component styling, shadcn/ui mapping, Salty mascot spec
+  - `flows/` — 5 user journey maps: app-navigation (full route map with ⬜ NOT BUILT markers), onboarding, profile-editing, public-profile, endorsement
+  - `patterns/` — 5 component pattern docs with actual JSX: cards (4 variants), forms (edit page layout, inputs, save patterns, error/feedback decision tree), lists (accordions, bullets, tags, empty states), navigation (headers, back links, tab bar), modals (BottomSheet, Dialog, delete confirmation pattern, toast)
+  - `decisions/` — 9 design decisions seeded from changelog/notes (DM Serif Display, Framer Motion, profile strength framing, hidden empty sections, dark mode via CSS vars, etc.)
+  - `reference/salty_mascot_spec.md` — migrated from notes
+  - `reference/screenshots/` — empty, ready for captures
+
+**AGENTS.md Overhaul**
+- Session Start now reads `sprints/README.md` instead of `yl_build_plan.md`
+- Added discipline auto-select table with 7 disciplines + "load when" triggers
+- Added explicit design system loading instructions for UI tasks
+- Added Sprint Workflow section (major vs junior, fix-in-place heuristic)
+- Added Rally section (two-pass pattern, three rally types, founder-initiated only)
+- Updated Docs Reference table with sprints, disciplines, design system
+- Updated Repository Map with new folder structure
+- Added discipline + design system maintenance rules to Changelog cadence section
+- Relabelled `yl_build_plan.md` as historical record, `notes/` as scratchpad
+
+**CLAUDE.md Updated**
+- Notes/sprints distinction clarified
+- Junior sprint bookkeeping rule added
+
+**Cleanup**
+- Archived ops/ contents (legacy LOG.md, TODO.md, STACK.md) to `archive/ops-legacy/`
+- Cleaned `notes/` — removed migrated files, left only strategy docs (5yr plan, delta analysis)
+- Updated `notes/README.md` with mapping table showing where each file's canonical version lives
+- Created `notes/archive/` folder for founder to manually archive stale notes
+- Created `archive/README.md` explaining what's there and where canonical versions live
+
+**Simulation Test**
+- Ran a Sonnet subagent cold-start simulation on the education/edit task
+- Scored 7/10 — identified 5 gaps, all fixed in follow-up patches
+
+### Context
+- Founder's workflow: fires up Claude Code or Codex, gives it the webapp folder, then jumps into build
+- Previous structure had notes/ doing triple duty (strategy + sprints + rally research) — now separated
+- Discipline docs are populated from actual codebase patterns, not generic advice
+- Design system addresses recurring pain: inconsistent look/feel, LLMs not understanding flows, repeated rejected ideas
+- Generic Claude Code templates from Twitter evaluated — useful patterns (confidence filtering, OWASP checklist, build error table) folded into existing disciplines, rest discarded as inferior to what we built
+
+**Simulation testing & gap fixes (round 2):**
+- Ran 4 parallel Sonnet cold-start simulations (backend, UI/design, performance, PR rally) — scored 7–8.5/10
+- Fixed 5 gaps: mobile responsiveness checklist (frontend.md), PR rally example (rally-002), performance profiling guidance (performance.md), sprint deliverables checklist (sprint-10 README), typography quick reference (navigation.md)
+- Re-ran simulations — scores held or improved
+
+**External skill evaluation:**
+- Evaluated 14 generic Claude Code templates — folded useful patterns (confidence filtering, OWASP, build errors, dead code tools) into code-review.md and auth-security.md
+
+**Business folder setup (parent level):**
+- Created `Strategy/`, `Legal/`, `Finance/`, `Design/`, `Marketing/`, `Operations/` at parent level
+- Created parent-level `AGENTS.md`, `CLAUDE.md`, `CHANGELOG.md`, `README.md`
+- Placed loose files (PDFs, legal review, wireframes, style guide) into new folder structure
+
+### Next
+- `/app/education/[id]/edit` is the next page to build (marked ⬜ NOT BUILT in route map)
+- Capture app screenshots for `reference/screenshots/` during next UI session
+- Clean up parent folder root duplicates (originals already copied to new homes)
+- Delete `ops/` folder (contents archived)
+
+### Flags
+- Parent folder root still has originals alongside copies in new structure — founder can delete originals
+- `ops/` folder still exists (couldn't delete from sandbox) — dead weight
+
+---
+
+## 2026-03-18 — Claude Code (Sonnet 4.6) — Phase 1A post-implementation fixes + audit
+
+### Done
+- **Fixed mutual endorser count bug** in `PublicProfileContent.tsx` — was returning all endorsements when any shared yacht existed; now correctly counts only endorsers whose user ID is in the mutual colleague set
+- **Added error handling to SavedTab** (`AudienceTabs.tsx`) — `Promise.all` fetch now has `.catch()/.finally()` so the tab shows empty state instead of hanging on network failure
+- **Added date validation to education schema** (`lib/validation/schemas.ts`) — `.refine()` ensures `ended_at >= started_at` when both present
+- **Fixed DELETE /api/user-education/[id]** — now returns 404 for non-existent/unowned records instead of silently succeeding
+- **AI summary regeneration** (`/api/profile/ai-summary`) — POST now accepts `force: true` body param to regenerate even after a manual edit; default behaviour (no force) still guards against accidental overwrites
+- **Hardened hobbies bulk-replace** (`/api/user-hobbies`) — snapshots existing rows before delete; restores them if insert fails, preventing data loss
+- **Hardened skills bulk-replace** (`/api/user-skills`) — same rollback pattern as hobbies
+- **Fixed all client-side fetch error handling** (6 files) — second audit pass found every fetch() in Phase 1A client components was missing error handling. Fixed:
+  - `SaveProfileButton.tsx` — optimistic toggle + rollback on non-ok response or network error
+  - `SectionManager.tsx` — optimistic visibility toggle + rollback on failure
+  - `profile/photos/page.tsx` — initial fetch has `.finally(() => setLoading(false))`; delete checks `res.ok` before removing from state
+  - `profile/gallery/page.tsx` — same pattern as photos
+  - `hobbies/edit/page.tsx` — fetch has `.finally()`; save checks `res.ok` and alerts on failure before navigating
+  - `skills/edit/page.tsx` — same pattern as hobbies
+  - `social-links/edit/page.tsx` — save checks `res.ok` and alerts on failure
+
+### Context
+- Two parallel audit agents ran against all Phase 1A additions — API routes audit + TS/component audit
+- The TypeScript `tsc --noEmit` error was a stale `.next/types/routes.d 2.ts` cache artifact — not a real issue
+- Remaining medium issues (gallery sort_order gaps on deletion, `social_links as any` cast, `user as any` at page/component boundary, `role="checkbox"` on button) are non-breaking and acceptable for current sprint
+- Free plan photo limit is still enforced only at API level (server-side), not in client UI — by design for now
+
+### Next
+- Build `/app/education/[id]/edit` page (edit existing education entries)
+- Animation pass — all new components should use `lib/motion.ts` presets
+- Salty empty state illustrations for new sections (photos, education, hobbies, skills, saved)
+- QA dark mode on all new components
+- Mobile responsiveness check at 375px / 768px / 1280px
+
+### Flags
+- None critical
+
+## 2026-03-18 — Claude Code (Opus 4.6) — Phase 1A Profile Robustness implementation
+
+### Done
+- **DB migration** `supabase/migrations/20260317000021_profile_robustness.sql` — 7 new tables (user_photos, user_gallery, profile_folders, saved_profiles, user_hobbies, user_education, user_skills), 4 new columns on users (ai_summary, ai_summary_edited, section_visibility jsonb, social_links jsonb), RLS policies for all tables, get_sea_time() helper function, storage bucket policies for user-photos and user-gallery
+- **Zod schemas** — 12 new schemas in lib/validation/schemas.ts (photos, gallery, saved profiles, folders, hobbies, education, skills, social links, section visibility, AI summary)
+- **Profile queries** extended — getUserById/getUserByHandle now include new columns; new: getExtendedProfileSections(), getSavedStatus(), getSavedProfiles(), getProfileFolders(), getEndorserRoleOnYacht()
+- **lib/profile-summaries.ts** — server-side summary line helpers: formatSeaTime, experienceSummary, endorsementsSummary, certificationsSummary, educationSummary, hobbiesSummary, skillsSummary, gallerySummary, computeProfileStrength
+- **6 new core components**: ProfileAccordion (collapsible with AnimatePresence), PhotoGallery (swipeable hero 65vh, touch events, desktop arrows, dot indicators), SocialLinksRow (platform icons with hover colors), ProfileStrength (donut SVG, 4 strength labels), SaveProfileButton (save/unsave with optimistic toggle), SectionManager (toggle switches with optimistic PATCH calls)
+- **14 new API routes**: /api/user-photos (GET/POST/PUT), /api/user-photos/[id] (DELETE), /api/user-gallery (GET/POST/PUT), /api/user-gallery/[id] (PUT/DELETE), /api/saved-profiles (GET/POST/DELETE), /api/profile-folders (GET/POST), /api/profile-folders/[id] (PUT/DELETE), /api/user-hobbies (GET/PUT), /api/user-education (GET/POST), /api/user-education/[id] (PUT/DELETE), /api/user-skills (GET/PUT), /api/profile/social-links (GET/PATCH), /api/profile/section-visibility (PATCH), /api/profile/ai-summary (POST/PATCH)
+- **Public profile /u/[handle]** — full rewrite: Bumble-style split layout (photo left 40% sticky on desktop, content right), accordion sections with smart summaries, save button for logged-in viewers, sectionVisibility respected (empty + hidden = don't render), social links row, extended data sections (hobbies, education, skills, gallery)
+- **Own profile /app/profile** — full rewrite: PhotoGallery editable with add button, ProfileStrength meter (replaces WheelACard), SectionManager card, SocialLinksRow, all sections as ProfileAccordion with edit links, empty-state prompts with add links
+- **6 new edit pages**: /app/profile/photos (upload/delete, 3-col grid), /app/profile/gallery (upload/delete), /app/hobbies/edit (pill input, emoji, max 10), /app/skills/edit (pill input, category selector, max 20), /app/education/new (form with dates), /app/social-links/edit (one field per platform, 7 platforms)
+
+### Context
+- Sprint 10 = Phase 1A Profile Robustness Sprint from approved plan file (zany-squishing-crystal.md)
+- WheelACard component is still in place but no longer used by profile page — can be deleted in cleanup
+- Education [id]/edit page not yet created (only new; delete is via API)
+- Storage buckets (user-photos, user-gallery) must be created manually in Supabase dashboard before photos work
+- Migration must be applied via Supabase dashboard or `supabase db push` before testing
+- AI summary endpoint requires OPENAI_API_KEY env var (already exists from CV parse)
+- supabase.storage.from('user-photos') CDN URLs are used for photo_url — ensure bucket is public
+
+### Next
+- Apply DB migration via Supabase dashboard
+- Create user-photos and user-gallery storage buckets (public read)
+- Test photo upload flow end-to-end
+- Build /app/education/[id]/edit page (edit existing education entries)
+- Build saved profiles page (/app/network/saved) + folder UI
+- Add animation pass (all new components should use lib/motion.ts presets)
+- Add Salty empty state illustrations to the new sections
+- QA dark mode on all new components
+
+### Flags
+- None critical — all code is new additions, no breaking changes to existing functionality
+
+## 2026-03-17 — Claude Code (Sonnet 4.6) — Feature Roadmap build plan
+
+### Done
+- Created `notes/feature_roadmap_build_plan.md` — full detailed build plan for the community feature roadmap feature
+- Feature lives in the More tab; Pro users can vote + submit requests, free users read-only
+- Plan covers: DB migration (`20260318000001_feature_roadmap.sql`) with 4 tables + RLS + vote-count triggers + seed data, TypeScript types, 5 API routes, 12 components, rate limiting config, admin workflow, decision log (D-031–D-038), and 17 success criteria
+
+### Context
+- Inspired by BuddyBoss roadmap: 3-tab layout (Roadmap / Community Ideas / Released), card-based layout, thumbs-up toggle voting, status badges
+- ~75% of roadmap items will target Pro users, ~25% target all users (editorial guideline, not enforced by code)
+- Roadmap items are admin-managed via Supabase dashboard; community requests require admin approval before going public
+- Reuses existing `UpgradeCTA`, `getProStatus()`, `SettingsRow`, Zod validation, and rate-limiting patterns
+
+### Next
+- Implement the feature roadmap: apply migration → types → API routes → components → route page → More page entry
+- Seed initial roadmap items in Supabase after migration
+
+### Flags
+- None
+
+---
+
+## 2026-03-17 — Claude Code (Opus 4.6) — UI/UX refresh Phase 1 + Salty mascot spec
+
+### Done
+- Expanded colour palette: added coral (#E8634A), navy (#2B4C7E), and amber (#E5A832) token families (50/100/200/500/700 each) to `globals.css`
+- Added DM Serif Display font to `layout.tsx` as display/headline font alongside DM Sans
+- Created `lib/motion.ts` — shared Framer Motion animation presets (fadeUp, fadeIn, staggerContainer, cardHover, buttonTap, scrollReveal, popIn, spring configs)
+- Updated `Card.tsx` — `shadow-sm` default + interactive hover lift + press animation
+- Updated `Button.tsx` — refined press animation to `scale-[0.97]` with `transition-all duration-150`
+- Updated chart colours to multi-colour palette (teal, coral, navy, amber) for light and dark modes
+- Rewrote `yl_style_guide.md` to v2.0 — expanded colours, DM Serif Display typography, motion guidelines, Salty section, bento layouts, updated brand voice
+- Created `notes/salty_mascot_spec.md` — full mascot spec: ethereal wind/water spirit, 8 moods, 5 sizes, voice guide, feature integration map, animation spec, component architecture, rollout plan
+
+### Context
+- Inspired by Notion.com's design energy — colour-coded sections, mascot character, purposeful animation, bento layouts
+- Key decisions: DM Serif Display font, Salty mascot (AI-powered but brand never says "AI"), Phase 1 quick wins first
+- Salty needs SVG artwork before implementation — spec is ready, visuals are not
+
+### Next
+- Phase 2: bento layout for profile page, empty-state illustrations, staggered list animations
+- Phase 3: marketing landing page with bento feature grid, scroll reveals, serif hero
+- Salty SVG artwork needed before Phase 4 mascot implementation
+
+---
+
+## 2026-03-17 — Claude Code (Opus 4.6) — Nav perf + public profile CTA improvements
+
+### Done
+- `staleTimes.dynamic: 300` in next.config.ts — 5 min client-side RSC cache, show stale + refresh in background
+- BottomTabBar + SidebarNav: prefetch all 5 tab routes on mount via `router.prefetch()`
+- Moved network badge from server layout → client-side hook (`useNetworkBadge`) — app shell renders instantly
+- New `/api/badge-count` endpoint + `lib/hooks/useNetworkBadge.ts` — polls every 60s client-side
+- Public profile CTA rework:
+  - Not logged in: dual CTAs — "Build your own profile" (signup) + "Sign in to see how you know [Name]" (login)
+  - Logged in, own profile: "Back to dashboard" button
+  - Logged in, someone else: "Back to my profile" button
+- Cleaned up 64 iCloud sync conflict duplicate files
+- Reconciled diverged local/remote main via rebase, pushed Phase 1A as PR #41
+
+### Context
+- Phase 1A cleanup complete and deployed via PR #41
+- PR #42 open for nav perf + CTA changes
+
+### Next
+- Sprint 9: availability + search + endorsement signals (see notes/sprint9_build_plan.md)
+- Feature roadmap page (saved to memory for future sprint)
+
+---
+
 ## 2026-03-17 — Claude Code (Sonnet 4.6) — Pre-merge audit + launch env finalised
 
 ### Done
@@ -42,6 +311,30 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ### Flags
 - Privacy page section 11 missing registered business address — required for GDPR compliance before launch
+
+---
+
+## 2026-03-17 — Claude Code (Opus 4.6) — Nav perf + public profile CTA improvements
+
+### Done
+- `staleTimes.dynamic: 300` in next.config.ts — 5 min client-side RSC cache, show stale + refresh in background
+- BottomTabBar + SidebarNav: prefetch all 5 tab routes on mount via `router.prefetch()`
+- Moved network badge from server layout → client-side hook (`useNetworkBadge`) — app shell renders instantly
+- New `/api/badge-count` endpoint + `lib/hooks/useNetworkBadge.ts` — polls every 60s client-side
+- Public profile CTA rework:
+  - Not logged in: dual CTAs — "Build your own profile" (signup) + "Sign in to see how you know [Name]" (login)
+  - Logged in, own profile: "Back to dashboard" button
+  - Logged in, someone else: "Back to my profile" button
+- Cleaned up 64 iCloud sync conflict duplicate files
+- Reconciled diverged local/remote main via rebase, pushed Phase 1A as PR #41
+
+### Context
+- Phase 1A cleanup complete and deployed via PR #41
+- PR #42 open for nav perf + CTA changes
+
+### Next
+- Sprint 9: availability + search + endorsement signals (see notes/sprint9_build_plan.md)
+- Feature roadmap page (saved to memory for future sprint)
 
 ---
 

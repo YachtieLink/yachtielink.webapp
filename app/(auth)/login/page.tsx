@@ -40,7 +40,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 px-6 py-12 bg-[var(--color-surface)]">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
+        <h1 className="text-2xl font-serif text-[var(--color-text-primary)]">
           Sign in
         </h1>
         <p className="mt-1 text-sm text-[var(--color-text-secondary)]">

@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { springSnappy } from "@/lib/motion";
 
 type ToastType = "success" | "error" | "info";
 
@@ -94,7 +95,7 @@ function ToastItem({
       transition={
         prefersReducedMotion
           ? { duration: 0 }
-          : { type: "spring", damping: 20, stiffness: 300 }
+          : springSnappy
       }
       className={`
         pointer-events-auto flex w-full max-w-sm items-center justify-between

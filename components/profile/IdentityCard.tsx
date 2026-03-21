@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { AnimatePresence, motion } from 'framer-motion'
+import { easeGentle } from '@/lib/motion'
 
 const QRCode = dynamic(() => import('react-qr-code').then(m => m.default), { ssr: false })
 
@@ -146,7 +147,7 @@ export function IdentityCard({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
+            transition={easeGentle}
             className="overflow-hidden"
           >
             <div className="flex flex-col items-center gap-3 pt-1">

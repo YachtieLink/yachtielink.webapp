@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { springSnappy } from "@/lib/motion";
 
 interface BottomSheetProps {
   open: boolean;
@@ -61,7 +62,7 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
             transition={
               prefersReducedMotion
                 ? { duration: 0 }
-                : { type: "spring", damping: 25, stiffness: 300 }
+                : springSnappy
             }
             className="fixed bottom-0 left-0 right-0 z-50 flex max-h-[90dvh] flex-col rounded-t-2xl bg-[var(--color-surface)] shadow-xl"
           >
