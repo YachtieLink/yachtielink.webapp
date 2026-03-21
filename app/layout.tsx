@@ -55,19 +55,7 @@ export default function RootLayout({
         flash of wrong theme. Reads from localStorage; falls back to system pref.
       */}
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                var stored = localStorage.getItem('yl-theme');
-                var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (stored === 'dark' || (!stored && prefersDark)) {
-                  document.documentElement.classList.add('dark');
-                }
-              })();
-            `,
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: `document.documentElement.classList.remove('dark')` }} />
       </head>
       <body
         className={`${dmSans.variable} ${dmSerifDisplay.variable} antialiased`}

@@ -28,5 +28,6 @@ export { Textarea } from "./Textarea";
 export { Select } from "./Select";
 export { FormField } from "./FormField";
 export { IconButton } from "./IconButton";
+export { DatePicker } from "./DatePicker";
 export { SectionBadge } from "./SectionBadge";
 export { ProfileAvatar } from "./ProfileAvatar";

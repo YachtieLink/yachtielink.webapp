@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { BackButton } from '@/components/ui/BackButton'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { DatePicker } from '@/components/ui/DatePicker'
 
 export default function EducationNewPage() {
   const router = useRouter()
@@ -57,7 +58,7 @@ export default function EducationNewPage() {
     <div className="flex flex-col gap-4 pb-24">
       <div className="flex items-center gap-3">
         <BackButton href="/app/profile" />
-        <h1 className="font-semibold text-lg text-[var(--color-text-primary)]">Add Education</h1>
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Add Education</h1>
       </div>
 
       <form onSubmit={save} className="flex flex-col gap-4">
@@ -86,17 +87,16 @@ export default function EducationNewPage() {
         />
 
         <div className="grid grid-cols-2 gap-3">
-          <Input
+          <DatePicker
             label="Start date"
-            type="date"
-            value={form.started_at}
-            onChange={(e) => update('started_at', e.target.value)}
+            value={form.started_at || null}
+            onChange={(v) => update('started_at', v ?? '')}
+            maxYear={new Date().getFullYear()}
           />
-          <Input
+          <DatePicker
             label="End date"
-            type="date"
-            value={form.ended_at}
-            onChange={(e) => update('ended_at', e.target.value)}
+            value={form.ended_at || null}
+            onChange={(v) => update('ended_at', v ?? '')}
           />
         </div>
 

@@ -1,11 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { uploadCertDocument } from '@/lib/storage/upload'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, DatePicker } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+import {
+  Wrench, UtensilsCrossed, Stethoscope, Compass,
+  Scale, LifeBuoy, Waves, Plus, ChevronLeft, ChevronRight,
+} from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 interface CertType {
   id: string
@@ -15,6 +20,16 @@ interface CertType {
 }
 
 type Step = 'category' | 'cert' | 'details'
+
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  'Engineering': Wrench,
+  'Hospitality & Service': UtensilsCrossed,
+  'Medical': Stethoscope,
+  'Navigation & Watchkeeping': Compass,
+  'Regulatory & Flag State': Scale,
+  'Safety & Sea Survival': LifeBuoy,
+  'Water Sports & Leisure': Waves,
+}
 
 export default function CertNewPage() {
   const router    = useRouter()
@@ -32,6 +47,7 @@ export default function CertNewPage() {
   const [noExpiry, setNoExpiry]       = useState(false)
   const [docFile, setDocFile]         = useState<File | null>(null)
   const [saving, setSaving]           = useState(false)
+  const docFileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     supabase
@@ -136,31 +152,31 @@ export default function CertNewPage() {
     return (
       <div className="flex flex-col gap-4 pb-24">
         <div>
-          <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Add certification</h1>
+          <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Add certification</h1>
           <p className="text-sm text-[var(--color-text-secondary)] mt-1">Choose a category to start.</p>
         </div>
-        <ul className="bg-[var(--color-surface)] rounded-2xl divide-y divide-[var(--color-border)]">
-          {categories.map((cat) => (
-            <li key={cat}>
+        <div className="grid grid-cols-2 gap-2">
+          {categories.map((cat) => {
+            const Icon = CATEGORY_ICONS[cat] ?? Compass
+            return (
               <button
+                key={cat}
                 onClick={() => pickCategory(cat)}
-                className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]/30 transition-colors text-left first:rounded-t-2xl last:rounded-b-2xl"
+                className="flex items-center gap-3 p-4 rounded-xl border transition-colors border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-teal-700)] hover:bg-[var(--color-teal-50)] text-left"
               >
-                {cat}
-                <span className="text-[var(--color-text-secondary)]">›</span>
+                <Icon size={20} className="shrink-0 text-[var(--color-text-secondary)]" />
+                <span className="text-sm font-medium text-[var(--color-text-primary)]">{cat}</span>
               </button>
-            </li>
-          ))}
-          <li>
-            <button
-              onClick={() => { setCategory(''); pickOther() }}
-              className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--color-interactive)] hover:bg-[var(--color-surface-raised)]/30 transition-colors text-left last:rounded-b-2xl"
-            >
-              Other / not listed
-              <span className="text-[var(--color-text-secondary)]">›</span>
-            </button>
-          </li>
-        </ul>
+            )
+          })}
+          <button
+            onClick={() => { setCategory(''); pickOther() }}
+            className="flex items-center gap-3 p-4 rounded-xl border transition-colors border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-teal-700)] hover:bg-[var(--color-teal-50)] text-left"
+          >
+            <Plus size={20} className="shrink-0 text-[var(--color-text-secondary)]" />
+            <span className="text-sm font-medium text-[var(--color-interactive)]">Other / not listed</span>
+          </button>
+        </div>
       </div>
     )
   }
@@ -172,13 +188,13 @@ export default function CertNewPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setStep('category')}
-            className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+            className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-xl text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
             aria-label="Back"
           >
-            ‹
+            <ChevronLeft size={20} />
           </button>
           <div>
-            <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">{category}</h1>
+            <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">{category}</h1>
             <p className="text-sm text-[var(--color-text-secondary)]">Choose your certification</p>
           </div>
         </div>
@@ -195,7 +211,7 @@ export default function CertNewPage() {
                     <p className="text-xs text-[var(--color-text-secondary)]">{ct.short_name}</p>
                   )}
                 </div>
-                <span className="text-[var(--color-text-secondary)]">›</span>
+                <ChevronRight size={16} className="shrink-0 text-[var(--color-text-secondary)]" />
               </button>
             </li>
           ))}
@@ -205,7 +221,7 @@ export default function CertNewPage() {
               className="w-full flex items-center justify-between px-5 py-4 text-sm text-[var(--color-interactive)] hover:bg-[var(--color-surface-raised)]/30 transition-colors text-left last:rounded-b-2xl"
             >
               Other / not listed
-              <span className="text-[var(--color-text-secondary)]">›</span>
+              <ChevronRight size={16} className="shrink-0 text-[var(--color-text-secondary)]" />
             </button>
           </li>
         </ul>
@@ -219,13 +235,13 @@ export default function CertNewPage() {
       <div className="flex items-center gap-3">
         <button
           onClick={() => setStep(isOther && !category ? 'category' : 'cert')}
-          className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+          className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-xl text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
           aria-label="Back"
         >
-          ‹
+          <ChevronLeft size={20} />
         </button>
         <div>
-          <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">
+          <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">
             {isOther ? 'Other certification' : (selectedCert?.name ?? 'Certification')}
           </h1>
           {!isOther && category && (
@@ -245,30 +261,29 @@ export default function CertNewPage() {
           />
         )}
 
-        <Input
+        <DatePicker
           label="Issued date"
-          type="date"
-          value={issuedAt}
-          onChange={(e) => setIssuedAt(e.target.value)}
+          value={issuedAt || null}
+          onChange={(v) => setIssuedAt(v ?? '')}
           hint="Optional"
+          maxYear={new Date().getFullYear()}
         />
 
         <div className="flex flex-col gap-2">
-          <Input
+          <DatePicker
             label="Expiry date"
-            type="date"
-            value={expiresAt}
-            onChange={(e) => setExpiresAt(e.target.value)}
+            value={expiresAt || null}
+            onChange={(v) => setExpiresAt(v ?? '')}
             disabled={noExpiry}
           />
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-[var(--color-surface-raised)] cursor-pointer min-h-[44px]">
             <input
               type="checkbox"
               checked={noExpiry}
               onChange={(e) => { setNoExpiry(e.target.checked); if (e.target.checked) setExpiresAt('') }}
-              className="rounded border-[var(--color-border)] text-[var(--color-interactive)]"
+              className="w-5 h-5 rounded accent-[var(--color-teal-700)]"
             />
-            <span className="text-sm text-[var(--color-text-secondary)]">No expiry / lifetime certification</span>
+            <span className="text-sm text-[var(--color-text-primary)]">No expiry / lifetime certification</span>
           </label>
         </div>
 
@@ -277,15 +292,16 @@ export default function CertNewPage() {
             Supporting document <span className="font-normal text-[var(--color-text-secondary)]">(optional)</span>
           </label>
           <p className="text-xs text-[var(--color-text-secondary)] mb-2">PDF, JPEG, or PNG · max 10 MB · private, only you can see it</p>
+          <Button variant="outline" size="sm" onClick={() => docFileRef.current?.click()}>
+            {docFile ? docFile.name : 'Choose file'}
+          </Button>
           <input
+            ref={docFileRef}
             type="file"
             accept=".pdf,image/jpeg,image/png"
             onChange={(e) => setDocFile(e.target.files?.[0] ?? null)}
-            className="text-sm text-[var(--color-text-primary)]"
+            className="hidden"
           />
-          {docFile && (
-            <p className="text-xs text-[var(--color-interactive)] mt-1">{docFile.name}</p>
-          )}
         </div>
       </div>
 

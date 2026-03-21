@@ -1,14 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { uploadCertDocument } from '@/lib/storage/upload'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, DatePicker } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { BackButton } from '@/components/ui/BackButton'
 
 export default function CertEditPage() {
   const router    = useRouter()
@@ -28,6 +29,7 @@ export default function CertEditPage() {
   const [noExpiry, setNoExpiry]   = useState(false)
   const [existingDoc, setExistingDoc] = useState<string | null>(null)
   const [docFile, setDocFile]     = useState<File | null>(null)
+  const docFileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     async function load() {
@@ -135,9 +137,12 @@ export default function CertEditPage() {
             transition={{ duration: 0.15 }}
             className="flex flex-col gap-6 pb-24"
           >
-            <div>
-              <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Edit certification</h1>
-              <p className="text-sm text-[var(--color-text-secondary)] mt-1">{certName}</p>
+            <div className="flex items-center gap-3">
+              <BackButton href="/app/profile" />
+              <div>
+                <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Edit certification</h1>
+                <p className="text-sm text-[var(--color-text-secondary)] mt-1">{certName}</p>
+              </div>
             </div>
 
             <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
@@ -150,30 +155,29 @@ export default function CertEditPage() {
                 />
               )}
 
-              <Input
+              <DatePicker
                 label="Issued date"
-                type="date"
-                value={issuedAt}
-                onChange={(e) => setIssuedAt(e.target.value)}
+                value={issuedAt || null}
+                onChange={(v) => setIssuedAt(v ?? '')}
                 hint="Optional"
+                maxYear={new Date().getFullYear()}
               />
 
               <div className="flex flex-col gap-2">
-                <Input
+                <DatePicker
                   label="Expiry date"
-                  type="date"
-                  value={expiresAt}
-                  onChange={(e) => setExpiresAt(e.target.value)}
+                  value={expiresAt || null}
+                  onChange={(v) => setExpiresAt(v ?? '')}
                   disabled={noExpiry}
                 />
-                <label className="flex items-center gap-2 cursor-pointer">
+                <label className="flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-[var(--color-surface-raised)] cursor-pointer min-h-[44px]">
                   <input
                     type="checkbox"
                     checked={noExpiry}
                     onChange={(e) => { setNoExpiry(e.target.checked); if (e.target.checked) setExpiresAt('') }}
-                    className="rounded border-[var(--color-border)] text-[var(--color-interactive)]"
+                    className="w-5 h-5 rounded accent-[var(--color-teal-700)]"
                   />
-                  <span className="text-sm text-[var(--color-text-secondary)]">No expiry / lifetime certification</span>
+                  <span className="text-sm text-[var(--color-text-primary)]">No expiry / lifetime certification</span>
                 </label>
               </div>
 
@@ -182,13 +186,16 @@ export default function CertEditPage() {
                 <p className="text-xs text-[var(--color-text-secondary)] mb-2">
                   {existingDoc ? 'A document is already attached. Upload a new one to replace it.' : 'PDF, JPEG, or PNG · max 10 MB · private'}
                 </p>
+                <Button variant="outline" size="sm" onClick={() => docFileRef.current?.click()}>
+                  {docFile ? docFile.name : existingDoc ? 'Replace file' : 'Choose file'}
+                </Button>
                 <input
+                  ref={docFileRef}
                   type="file"
                   accept=".pdf,image/jpeg,image/png"
                   onChange={(e) => setDocFile(e.target.files?.[0] ?? null)}
-                  className="text-sm text-[var(--color-text-primary)]"
+                  className="hidden"
                 />
-                {docFile && <p className="text-xs text-[var(--color-interactive)] mt-1">{docFile.name}</p>}
               </div>
             </div>
 

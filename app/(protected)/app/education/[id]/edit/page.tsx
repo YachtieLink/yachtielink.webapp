@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { BackButton } from '@/components/ui/BackButton'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { DatePicker } from '@/components/ui/DatePicker'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PageTransition } from '@/components/ui/PageTransition'
@@ -165,17 +166,16 @@ export default function EducationEditPage() {
                   />
 
                   <div className="grid grid-cols-2 gap-3">
-                    <Input
+                    <DatePicker
                       label="Start date"
-                      type="date"
-                      value={form.started_at}
-                      onChange={(e) => update('started_at', e.target.value)}
+                      value={form.started_at || null}
+                      onChange={(v) => update('started_at', v ?? '')}
+                      maxYear={new Date().getFullYear()}
                     />
-                    <Input
+                    <DatePicker
                       label="End date"
-                      type="date"
-                      value={form.ended_at}
-                      onChange={(e) => update('ended_at', e.target.value)}
+                      value={form.ended_at || null}
+                      onChange={(v) => update('ended_at', v ?? '')}
                     />
                   </div>
 

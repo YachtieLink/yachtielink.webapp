@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
+import { BackButton } from '@/components/ui/BackButton'
 import { Input } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 
@@ -277,9 +278,12 @@ export function RequestEndorsementClient({
 
   return (
     <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-      <h1 className="text-xl font-bold text-[var(--color-text-primary)] mb-6">
-        Request endorsements
-      </h1>
+      <div className="flex items-center gap-3 mb-6">
+        <BackButton href="/app/network" />
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">
+          Request endorsements
+        </h1>
+      </div>
 
       {/* Yacht card */}
       <div className="bg-[var(--color-surface-raised)] rounded-2xl px-4 py-3 mb-6 flex items-center gap-3">

@@ -4,7 +4,7 @@
  */
 import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin } from 'lucide-react'
+import { MapPin, ChevronLeft, Pencil } from 'lucide-react'
 import { ShareButton } from './ShareButton'
 import { EndorsementCard } from './EndorsementCard'
 import { ShowMoreButton } from './ShowMoreButton'
@@ -180,18 +180,23 @@ export function PublicProfileContent({
           <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
         </div>
 
-        {/* Top bar — absolutely positioned over photo */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-safe-top pt-4 z-10">
-          <Link href="/" className="text-white/90 text-sm font-medium drop-shadow-sm">
-            ← YachtieLink
+        {/* Top bar — icon-only buttons over photo */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-3 pt-[env(safe-area-inset-top,0.75rem)] z-10">
+          <Link
+            href="/"
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-black/25 backdrop-blur-md text-white hover:bg-black/40 transition-colors"
+            aria-label="Go back"
+          >
+            <ChevronLeft size={20} />
           </Link>
           <div className="flex items-center gap-2">
             {isOwnProfile ? (
               <Link
                 href="/app/profile"
-                className="text-xs px-3 py-1.5 rounded-full bg-white/20 backdrop-blur-sm text-white font-medium hover:bg-white/30 transition-colors"
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-black/25 backdrop-blur-md text-white hover:bg-black/40 transition-colors"
+                aria-label="Edit profile"
               >
-                Edit profile
+                <Pencil size={16} />
               </Link>
             ) : isLoggedIn ? (
               <SaveProfileButton
@@ -200,42 +205,41 @@ export function PublicProfileContent({
                 initialFolderId={savedStatus?.folder_id}
               />
             ) : null}
-            <ShareButton url={profileUrl} name={displayName} />
+            <ShareButton url={profileUrl} name={displayName} variant="compact" />
           </div>
         </div>
 
         {/* Identity — overlaid at bottom of photo */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 z-10 flex flex-col gap-2">
-          {/* Name + availability */}
-          <div className="flex items-end justify-between gap-2">
-            <div>
-              <h1 className="text-white font-serif text-3xl md:text-4xl leading-tight drop-shadow-md">{displayName}</h1>
-              {user.primary_role && (
-                <p className="text-white/80 text-sm font-medium">{user.primary_role}</p>
-              )}
-            </div>
-            {user.available_for_work && (
-              <span className="shrink-0 flex items-center gap-1 bg-green-500/20 backdrop-blur-sm border border-green-400/40 rounded-full px-2.5 py-1 text-xs font-semibold text-green-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                Available
-              </span>
-            )}
-          </div>
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 z-10 flex flex-col gap-3">
+          {/* Availability badge */}
+          {user.available_for_work && (
+            <span className="self-start flex items-center gap-1.5 bg-green-500/25 backdrop-blur-md border border-green-400/40 rounded-full px-3 py-1 text-xs font-semibold text-green-300 tracking-wide uppercase">
+              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+              Available for work
+            </span>
+          )}
 
-          {/* Departments */}
-          {user.departments && user.departments.length > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              {user.departments.map((dept) => (
-                <span key={dept} className="text-xs px-2.5 py-0.5 rounded-full bg-white/15 backdrop-blur-sm text-white/90">
-                  {dept}
-                </span>
-              ))}
-            </div>
+          {/* Name — large, confident */}
+          <h1 className="text-white font-serif text-4xl md:text-5xl leading-[1.1] drop-shadow-lg tracking-tight">{displayName}</h1>
+
+          {/* Role + Department — unified line */}
+          {(user.primary_role || (user.departments && user.departments.length > 0)) && (
+            <p className="text-white/90 text-base font-medium drop-shadow-sm">
+              {user.primary_role}
+              {user.primary_role && user.departments && user.departments.length > 0 && (
+                <span className="text-white/50 mx-2">·</span>
+              )}
+              {user.departments && user.departments.length > 0 && (
+                <span className="text-white/70">{user.departments.join(', ')}</span>
+              )}
+            </p>
           )}
 
           {/* Location */}
           {user.show_location && location && (
-            <p className="text-white/70 text-sm flex items-center gap-1"><MapPin size={14} />{location}</p>
+            <p className="text-white/60 text-sm flex items-center gap-1.5 font-medium">
+              <MapPin size={13} className="text-white/50" />{location}
+            </p>
           )}
 
           {/* Social links row (white variant on dark bg) */}

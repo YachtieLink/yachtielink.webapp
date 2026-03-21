@@ -90,7 +90,7 @@ export default function WorkGalleryPage() {
         <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Work Gallery</h1>
       </div>
 
-      <p className="text-sm text-[var(--color-text-secondary)]">Showcase your work — engine rooms, table settings, deck work, interiors. Free: 12 photos · Pro: 30.</p>
+      <p className="text-sm text-[var(--color-text-secondary)]">Showcase your work — engine rooms, table settings, deck work, interiors. Free: up to 3 photos · Pro: up to 15.</p>
 
       <div className="grid grid-cols-3 gap-2">
         {items.map((item) => (
@@ -106,7 +106,7 @@ export default function WorkGalleryPage() {
           </div>
         ))}
 
-        {items.length < 30 && (
+        {items.length < 15 && (
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}

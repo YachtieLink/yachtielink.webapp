@@ -40,11 +40,10 @@ export default function DeleteAccountPage() {
 
   return (
     <div className="flex flex-col max-w-sm mx-auto px-4 py-8 pb-24">
-      <div className="mb-6">
+      <div className="flex items-center gap-3 mb-6">
         <BackButton href="/app/more" />
+        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Delete Your Account</h1>
       </div>
-
-      <h1 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">Delete Your Account</h1>
       <p className="text-sm text-[var(--color-text-secondary)] mb-6 leading-relaxed">
         This will permanently delete your account and all associated data.
       </p>

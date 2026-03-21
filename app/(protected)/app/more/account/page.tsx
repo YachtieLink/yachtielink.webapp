@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button, Input, Select } from '@/components/ui'
+import { BackButton } from '@/components/ui/BackButton'
 import { useToast } from '@/components/ui/Toast'
 
 const DEPARTMENTS = [
@@ -171,11 +172,14 @@ export default function AccountPage() {
 
   return (
     <div className="flex flex-col gap-6 pb-24">
-      <div>
-        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Account</h1>
-        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-          Edit your name, handle, and role.
-        </p>
+      <div className="flex items-center gap-3">
+        <BackButton href="/app/more" />
+        <div>
+          <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Account</h1>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+            Edit your name, handle, and role.
+          </p>
+        </div>
       </div>
 
       {/* ── Identity ────────────────────────────────── */}

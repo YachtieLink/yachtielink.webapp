@@ -5,8 +5,8 @@ import { userGalleryItemSchema, reorderGallerySchema } from '@/lib/validation/sc
 import { handleApiError } from '@/lib/api/errors'
 import { trackServerEvent } from '@/lib/analytics/server'
 
-const FREE_LIMIT = 12
-const PRO_LIMIT = 30
+const FREE_LIMIT = 3
+const PRO_LIMIT = 15
 
 export async function GET() {
   try {
@@ -34,10 +34,10 @@ export async function POST(req: NextRequest) {
 
     const { data: profile } = await supabase
       .from('users')
-      .select('subscription_plan')
+      .select('subscription_status')
       .eq('id', user.id)
       .single()
-    const isPro = profile?.subscription_plan === 'pro'
+    const isPro = profile?.subscription_status === 'pro'
     const limit = isPro ? PRO_LIMIT : FREE_LIMIT
 
     const { count } = await supabase

@@ -23,14 +23,14 @@ export default async function CertsPage() {
         id,
         custom_cert_name,
         issued_at,
-        expiry_date,
+        expires_at,
         document_url,
         expiry_reminder_60d_sent,
         expiry_reminder_30d_sent,
         certification_types ( name, short_name, category )
       `)
       .eq('user_id', user.id)
-      .order('expiry_date', { ascending: true, nullsFirst: false }),
+      .order('expires_at', { ascending: true, nullsFirst: false }),
   ]);
 
   return (

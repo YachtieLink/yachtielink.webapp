@@ -7,7 +7,7 @@ interface CertRow {
   id: string;
   custom_cert_name: string | null;
   issued_at: string | null;
-  expiry_date: string | null;
+  expires_at: string | null;
   document_url: string | null;
   certification_types: { name: string; short_name: string | null; category: string | null } | null;
 }
@@ -54,7 +54,7 @@ export function CertsClient({
     { id: 'expired',  label: 'Expired'  },
   ];
 
-  const statuses = certs.map((c) => ({ cert: c, status: getExpiryStatus(c.expiry_date) }));
+  const statuses = certs.map((c) => ({ cert: c, status: getExpiryStatus(c.expires_at) }));
 
   const expiringSoon = statuses.filter((s) => s.status === 'expiring');
 
@@ -74,7 +74,7 @@ export function CertsClient({
           </p>
           {expiringSoon.map(({ cert }) => (
             <p key={cert.id} className="text-xs text-amber-700 dark:text-amber-400">
-              {cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'} — Expires {formatDate(cert.expiry_date)}
+              {cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'} — Expires {formatDate(cert.expires_at)}
             </p>
           ))}
         </div>
@@ -128,7 +128,7 @@ export function CertsClient({
 
             <div className="text-xs text-[var(--color-text-secondary)] space-y-0.5 mt-1">
               {cert.issued_at && <p>Issued: {formatDate(cert.issued_at)}</p>}
-              {cert.expiry_date && <p>Expires: {formatDate(cert.expiry_date)}</p>}
+              {cert.expires_at && <p>Expires: {formatDate(cert.expires_at)}</p>}
             </div>
 
             <div className="flex items-center gap-3 mt-3">

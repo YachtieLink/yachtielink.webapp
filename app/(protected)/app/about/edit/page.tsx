@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui'
+import { BackButton } from '@/components/ui/BackButton'
 import { Textarea } from '@/components/ui/Textarea'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -63,11 +64,14 @@ export default function AboutEditPage() {
 
   return (
     <PageTransition className="flex flex-col gap-6 pb-24">
-      <div>
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">About</h1>
-        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-          Tell people about your background and experience.
-        </p>
+      <div className="flex items-center gap-3">
+        <BackButton href="/app/profile" />
+        <div>
+          <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">About</h1>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+            Tell people about your background and experience.
+          </p>
+        </div>
       </div>
 
       <AnimatePresence mode="wait">

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, DatePicker } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { BackButton } from '@/components/ui/BackButton'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -119,11 +119,11 @@ export default function AttachmentEditPage() {
             transition={{ duration: 0.15 }}
           >
             {!attachment ? (
-              <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8">
+              <div className="min-h-screen bg-[var(--color-surface)] pt-8">
                 <p className="text-sm text-[var(--color-text-secondary)]">Attachment not found.</p>
               </div>
             ) : (
-              <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
+              <div className="min-h-screen bg-[var(--color-surface)] pt-8 pb-24">
                 <div className="mb-6">
                   <BackButton href="/app/profile" />
                 </div>
@@ -145,40 +145,31 @@ export default function AttachmentEditPage() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
-                      Start date
-                    </label>
-                    <Input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      max={new Date().toISOString().split('T')[0]}
-                    />
-                  </div>
+                  <DatePicker
+                    label="Start date"
+                    value={startDate || null}
+                    onChange={(v) => setStartDate(v ?? '')}
+                    includeDay
+                    maxYear={new Date().getFullYear()}
+                  />
 
                   <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-xs font-medium text-[var(--color-text-secondary)]">
-                        End date
-                      </label>
-                      <label className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
-                        <input
-                          type="checkbox"
-                          checked={isCurrent}
-                          onChange={(e) => setIsCurrent(e.target.checked)}
-                          className="rounded"
-                        />
-                        Currently working here
-                      </label>
-                    </div>
+                    <label className="flex items-center gap-3 py-3 px-4 rounded-xl hover:bg-[var(--color-surface-raised)] cursor-pointer min-h-[44px]">
+                      <input
+                        type="checkbox"
+                        checked={isCurrent}
+                        onChange={(e) => setIsCurrent(e.target.checked)}
+                        className="w-5 h-5 rounded accent-[var(--color-teal-700)]"
+                      />
+                      <span className="text-sm text-[var(--color-text-primary)]">Currently working here</span>
+                    </label>
                     {!isCurrent && (
-                      <Input
-                        type="date"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        min={startDate}
-                        max={new Date().toISOString().split('T')[0]}
+                      <DatePicker
+                        label="End date"
+                        value={endDate || null}
+                        onChange={(v) => setEndDate(v ?? '')}
+                        includeDay
+                        maxYear={new Date().getFullYear()}
                       />
                     )}
                   </div>

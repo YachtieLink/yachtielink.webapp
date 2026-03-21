@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button, Input } from '@/components/ui'
+import { BackButton } from '@/components/ui/BackButton'
 import { Select } from '@/components/ui/Select'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -176,11 +177,14 @@ export default function ProfileSettingsPage() {
 
   return (
     <div className="flex flex-col gap-6 pb-24">
-      <div>
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Contact info</h1>
-        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-          All fields are hidden on your public profile by default. Toggle to show.
-        </p>
+      <div className="flex items-center gap-3">
+        <BackButton href="/app/profile" />
+        <div>
+          <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Contact info</h1>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+            All fields are hidden on your public profile by default. Toggle to show.
+          </p>
+        </div>
       </div>
 
       {/* ── Fields ─────────────────────────────────── */}

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 
+import { Button } from '@/components/ui/Button'
 import type { SectionColor } from '@/lib/section-colors'
 
 interface EmptyStateProps {
@@ -39,11 +40,8 @@ export function EmptyState({
         <p className="text-xs text-[var(--color-text-secondary)] mt-1">{description}</p>
       )}
       {actionLabel && actionHref && (
-        <Link
-          href={actionHref}
-          className="inline-block mt-3 text-sm font-medium text-[var(--color-interactive)] hover:underline"
-        >
-          {actionLabel} →
+        <Link href={actionHref} className="inline-block mt-3">
+          <Button variant="outline" size="sm">{actionLabel}</Button>
         </Link>
       )}
     </>

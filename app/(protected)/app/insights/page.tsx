@@ -7,6 +7,7 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Lock } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase/server';
 import { getProStatus } from '@/lib/stripe/pro';
 import { AnalyticsChart } from '@/components/insights/AnalyticsChart';
@@ -86,8 +87,8 @@ export default async function InsightsPage({ searchParams }: Props) {
         .from('certifications')
         .select('id', { count: 'exact', head: true })
         .eq('user_id', user.id)
-        .lte('expiry_date', sixtyDays.toISOString())
-        .gt('expiry_date', new Date().toISOString()),
+        .lte('expires_at', sixtyDays.toISOString())
+        .gt('expires_at', new Date().toISOString()),
     ]);
 
     const toChart = (rows: TimeseriesRow[] | null) =>
@@ -133,40 +134,42 @@ export default async function InsightsPage({ searchParams }: Props) {
             ))}
           </div>
 
-          <AnalyticsCard title="Profile Views" count={summaryMap['profile_view'] ?? 0} data={viewsData}     color="var(--chart-1)" />
-          <AnalyticsCard title="PDF Downloads" count={summaryMap['pdf_download'] ?? 0} data={downloadsData} color="var(--chart-2)" />
-          <AnalyticsCard title="Link Shares"   count={summaryMap['link_share']   ?? 0} data={sharesData}    color="var(--chart-3)" />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="col-span-2">
+              <AnalyticsCard title="Profile Views" count={summaryMap['profile_view'] ?? 0} data={viewsData} color="var(--chart-1)" />
+            </div>
+            <AnalyticsCard title="PDF Downloads" count={summaryMap['pdf_download'] ?? 0} data={downloadsData} color="var(--chart-2)" />
+            <AnalyticsCard title="Link Shares"   count={summaryMap['link_share']   ?? 0} data={sharesData}    color="var(--chart-3)" />
 
-          <div className="bg-[var(--color-surface)] rounded-2xl p-4">
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="card-soft rounded-2xl p-4">
+              <div className="flex flex-col gap-2">
                 <p className="text-sm font-semibold text-[var(--color-text-primary)]">Cert Document Manager</p>
                 {expiringCertCount > 0 ? (
-                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+                  <p className="text-xs text-amber-600 dark:text-amber-400">
                     ⚠ {expiringCertCount} cert{expiringCertCount > 1 ? 's' : ''} expiring within 60 days
                   </p>
                 ) : (
-                  <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">All certs up to date</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">All certs up to date</p>
                 )}
+                <Link href="/app/certs">
+                  <Button variant="ghost" size="sm">Manage</Button>
+                </Link>
               </div>
-              <Link href="/app/certs" className="text-sm font-medium text-[var(--color-teal-700)] dark:text-[var(--color-teal-400)]">
-                Manage →
-              </Link>
             </div>
-          </div>
 
-          <div className="bg-[var(--color-surface)] rounded-2xl p-4">
-            <p className="text-sm font-semibold text-[var(--color-text-primary)] mb-0.5">
-              Crew Pro · {profile?.subscription_plan === 'annual' ? 'Annual' : 'Monthly'}
-            </p>
-            {proStatus.endsAt && (
-              <p className="text-xs text-[var(--color-text-secondary)] mb-3">
-                Renews {new Date(proStatus.endsAt).toLocaleDateString('en-GB', {
-                  day: 'numeric', month: 'short', year: 'numeric',
-                })}
+            <div className="card-soft rounded-2xl p-4">
+              <p className="text-sm font-semibold text-[var(--color-text-primary)] mb-0.5">
+                Crew Pro · {profile?.subscription_plan === 'annual' ? 'Annual' : 'Monthly'}
               </p>
-            )}
-            {profile?.stripe_customer_id && <ManagePortalButton />}
+              {proStatus.endsAt && (
+                <p className="text-xs text-[var(--color-text-secondary)] mb-3">
+                  Renews {new Date(proStatus.endsAt).toLocaleDateString('en-GB', {
+                    day: 'numeric', month: 'short', year: 'numeric',
+                  })}
+                </p>
+              )}
+              {profile?.stripe_customer_id && <ManagePortalButton />}
+            </div>
           </div>
         </>
       ) : (
@@ -178,7 +181,7 @@ export default async function InsightsPage({ searchParams }: Props) {
           <TeaserCard title="Cert Document Manager" subtitle="Expiry tracking + email reminders" />
 
           {!profileComplete ? (
-            <div className="bg-[var(--color-surface)] rounded-2xl p-5 text-center">
+            <div className="card-soft rounded-2xl p-4 text-center">
               <p className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">
                 Finish setting up your profile first
               </p>
@@ -203,7 +206,7 @@ export default async function InsightsPage({ searchParams }: Props) {
 
 function TeaserCard({ title, subtitle }: { title: string; subtitle: string }) {
   return (
-    <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex items-center justify-between">
+    <div className="card-soft rounded-2xl p-4 flex items-center justify-between">
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-[var(--color-text-primary)]">{title}</p>
         <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">{subtitle}</p>
@@ -228,7 +231,7 @@ function AnalyticsCard({
   color: string;
 }) {
   return (
-    <div className="bg-[var(--color-surface)] rounded-2xl p-4">
+    <div className="card-soft rounded-2xl p-4">
       <div className="flex items-baseline justify-between mb-3">
         <p className="text-sm font-semibold text-[var(--color-text-primary)]">{title}</p>
         <span className="text-2xl font-bold text-[var(--color-text-primary)]">{count}</span>
