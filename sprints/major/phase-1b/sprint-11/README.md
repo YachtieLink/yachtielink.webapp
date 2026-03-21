@@ -1,110 +1,87 @@
-# Sprint 11 — Crew Landing Pages + Public Polish
-
-> **DRAFT** — This sprint plan is a draft outline. Scope, deliverables, and build plan are subject to change before work begins.
+# Sprint 11 — CV Onboarding + Public Profile Polish
 
 **Phase:** 1B
-**Status:** 📋 Draft
+**Status:** 📋 Ready for execution
+**Estimated effort:** 5–7 days (core) · 7–9 days (with stretch)
 **Started:** —
 **Completed:** —
 
 ## Goal
 
-Make crew profiles beautiful enough that people want to share them. This is the "wow factor" sprint — section colours, Salty mascot, scroll animations, dynamic OG images, and polished QR sharing.
+One file drop, one loading screen, you're in. New users upload their CV, the AI populates their entire profile (name, handle, role, yachts, certs, bio), and they land on a populated profile page in under 10 seconds of waiting. No forms, no multi-step wizard. The profile page is where they review and edit.
+
+## The Flow
+
+```
+                    ┌─ CV UPLOAD ─→ "Setting up your profile…" ─→ /app/profile (populated)
+ONBOARDING START ──→│
+                    └─ SKIP ─→ NAME ─→ HANDLE ─→ /app/profile (empty)
+```
+
+**CV path:** One interaction (drop file) → loading screen (~5-8s) → populated profile.
+**Manual path:** Two inputs (name + handle) → empty profile. User fills in details later.
 
 ## Scope
 
-In:
-- Public profile visual upgrade (section colours, scroll reveals, typography polish)
-- Salty mascot Phase 1 (empty states + onboarding hints only)
-- Dynamic OG image generation for `/u/[handle]`
-- QR code card with branding
-- Profile templates (2-3 visual variants for Pro users)
-- Section colour system (coral → endorsements, navy → experience, amber → certs)
+**In:**
+- Onboarding rebuild: 6 steps → fork (CV path: 1 step, manual: 2 steps)
+- CV upload → parse → auto-generate handle → save everything → redirect to profile
+- Manual fallback: name → handle → empty profile
+- Shared save utility (`lib/cv/save-parsed-cv-data.ts`)
+- Refactor `CvReviewClient` to use shared save
+- Remove role/yacht/endorsement steps from onboarding
+- Section colour accents on public profile
+- Public profile motion polish
+- OG image enhancement
+- QR code branding + PNG download (free-tier)
 
-Out:
-- Yacht graph (Sprint 12)
-- Marketing landing page (Sprint 13)
-- Salty Phase 2 (contextual hints, AI integration — post-launch)
-- Admin dashboard
-- New data models or API routes (unless OG images need one)
+**Stretch:** Profile templates (2 variants, Pro-gated)
 
-## Dependencies
-
-- Sprint 10.1 complete (Phase 1A closed, branch on `main`)
-- Salty mascot spec at `docs/design-system/reference/salty_mascot_spec.md`
-- Section colours defined in `globals.css` (teal, coral, navy, amber already tokenised)
-- Framer Motion presets in `lib/motion.ts`
+**Out:** Salty (Phase 2/3), yacht graph (Sprint 12), marketing page (Sprint 13), in-app endorsement prompts (future), CV vision parsing, native contact access, own-profile section colours
 
 ## Key Deliverables
 
-### Salty Mascot — Phase 1
-- ⬜ `components/salty/Salty.tsx` — base illustration component (SVG, 5 sizes, 8 moods)
-- ⬜ `components/salty/SaltyEmptyState.tsx` — empty state wrapper (illustration + message + optional CTA)
-- ⬜ Replace all existing empty states with Salty variants:
-  - Photos: "Looking a bit bare up here" → add photos CTA
-  - Education: "Every course counts" → add education CTA
-  - Endorsements: "Your shipmates haven't chimed in yet" → request endorsement CTA
-  - Hobbies: "All work and no play?" → add hobbies CTA
-  - Skills: "What are you good at?" → add skills CTA
-  - Gallery: "Show off your work" → add gallery CTA
-  - Saved profiles: "Start building your network" → browse CTA
-- ⬜ Onboarding wizard Salty hints (welcome step, first yacht step, endorsement step)
+### Onboarding Rebuild (centrepiece)
+- ⬜ STEPS: `["cv-upload", "name", "handle", "done"]` — CV path skips name+handle
+- ⬜ `StepCvUpload` — drag-drop, loading screen, parallel: upload + parse + auto-handle + save
+- ⬜ Handle auto-generation via `suggest_handles` + `handle_available` RPCs
+- ⬜ `lib/cv/save-parsed-cv-data.ts` — shared save (profile, yachts, certs)
+- ⬜ Refactor `CvReviewClient` to use shared save
+- ⬜ Remove role/yacht/endorsement steps from wizard
+- ⬜ Error handling: parse fail / rate limit → fallback to manual path
+- ⬜ Standalone `/app/cv/upload` + `/app/cv/review` unchanged
 
 ### Section Colours
-- ⬜ Apply section-specific accent colours to public profile:
-  - Endorsements section → coral (#E8634A) accent (border, icon tint, badge)
-  - Experience/yachts section → navy (#2B4C7E) accent
-  - Certifications section → amber (#E5A832) accent
-  - Education → teal (primary, default)
-  - Skills/hobbies → neutral with subtle tint
-- ⬜ Update `ProfileAccordion` to accept `accentColor` prop
-- ⬜ Apply to both own-profile and public profile views
+- ⬜ `accentColor` on ProfileAccordion, threaded through 6 of 8 public profile sections
+- ⬜ EmptyState accentColor rendering
+- ⬜ Dark mode 700-level overrides
 
-### Public Profile Polish
-- ⬜ Scroll-reveal animations on public profile sections (using `scrollReveal` from `lib/motion.ts`)
-- ⬜ Staggered card entrance on endorsement cards
-- ⬜ Typography polish — DM Serif Display on profile name (public view hero), DM Sans body
-- ⬜ Card hover effects on interactive elements (endorsement cards, yacht cards)
-- ⬜ Bento-style layout experiment on profile sections (mixed card widths where appropriate)
-
-### OG Image Generation
-- ⬜ Dynamic OG image at `/api/og/profile/[handle]` using `@vercel/og` (Satori)
-- ⬜ Template: profile photo + full name + role + "View my profile on YachtieLink"
-- ⬜ 1200x630px, branded with YachtieLink colours
-- ⬜ Add `<meta property="og:image">` to `/u/[handle]` page
-- ⬜ Twitter card meta tags
-
-### QR Code Polish
-- ⬜ Branded QR card component (logo in centre, teal border, name underneath)
-- ⬜ Download as PNG option
-- ⬜ Print-friendly layout (business card size)
-
-### Profile Templates (Pro Feature)
-- ⬜ 2-3 public profile visual variants:
-  - Classic (current layout, refined)
-  - Bold (larger photos, more colour)
-  - Minimal (text-focused, clean)
-- ⬜ Template picker in profile settings (Pro-gated with UpgradeCTA for free)
-- ⬜ `template_id` already exists on users table
+### Polish
+- ⬜ Staggered endorsement cards + hover effects
+- ⬜ OG image: DM Serif Display, photo layout, branding
+- ⬜ QR code: branded card, PNG download
 
 ## Exit Criteria
 
-- Public profiles use section colours consistently
-- Salty appears in all empty states with appropriate mood + message
-- OG image generates correctly for any profile handle
-- QR code card looks professional enough to hand out at a marina
-- At least 2 profile templates selectable by Pro users
-- All new elements work in dark mode
-- Mobile-first: no regressions at 375px
+### Required
+- CV path: drop file → loading → populated profile (~5-8s)
+- Manual path: skip → name → handle → empty profile
+- All CV data saved: name, handle, role, yachts, certs, bio, location
+- Errors gracefully fall back to manual path
+- Standalone CV flow still works
+- Section colours on public profile
+- OG image + QR code polished
+- Mobile-first, `npm run build` zero errors
 
-## Estimated Effort
-
-5–7 days
+### Stretch
+- Profile templates (2 variants, Pro-gated)
 
 ## Notes
 
-> **Supersedes the old Sprint 11 (Feature Roadmap).** The feature roadmap is deprioritised in favour of crew-facing polish. Roadmap moves to Sprint 13 as a lighter deliverable.
+> **The profile page is the review.** No confirmation screen, no inline editing during onboarding. Land on the profile, see everything populated, edit anything that's wrong.
 
-The Salty mascot spec is comprehensive (327 lines). Phase 1 implements only empty states and onboarding hints — no contextual tips, no AI integration, no animation yet. Keep it simple: static SVG illustrations with mood variants.
+> **Handle auto-generation makes this possible.** `suggest_handles` RPC already exists. Called with the CV-extracted name instead of requiring user input.
 
-OG images are critical for growth — when crew share their `/u/handle` link on WhatsApp or Instagram, the preview card is the first impression. This is worth getting right.
+> **Endorsements move to contextual prompts.** Cold ask during signup → warm ask after adding a yacht. Future sprint.
+
+> See `build_plan.md` for detailed implementation spec.
