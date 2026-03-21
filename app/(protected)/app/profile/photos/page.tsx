@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
+import { uploadUserPhoto } from '@/lib/storage/upload'
 
 interface Photo {
   id: string
@@ -37,14 +38,9 @@ export default function ProfilePhotosPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const ext = file.name.split('.').pop() ?? 'jpg'
-      const path = `${user.id}/${crypto.randomUUID()}.${ext}`
-
-      const { error: uploadErr } = await supabase.storage.from('user-photos').upload(path, file, { upsert: false })
-      if (uploadErr) { alert(uploadErr.message); return }
-
-      const { data: urlData } = supabase.storage.from('user-photos').getPublicUrl(path)
-      const photoUrl = urlData.publicUrl
+      const result = await uploadUserPhoto(user.id, file)
+      if (!result.ok) { alert(result.error); return }
+      const photoUrl = result.url
 
       const res = await fetch('/api/user-photos', {
         method: 'POST',

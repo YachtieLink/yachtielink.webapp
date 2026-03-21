@@ -134,7 +134,7 @@ export default function CertNewPage() {
   // ── Step: Category ──────────────────────────────────────────────────────────
   if (step === 'category') {
     return (
-      <div className="flex flex-col gap-4 pb-8">
+      <div className="flex flex-col gap-4 pb-24">
         <div>
           <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Add certification</h1>
           <p className="text-sm text-[var(--color-text-secondary)] mt-1">Choose a category to start.</p>
@@ -168,7 +168,7 @@ export default function CertNewPage() {
   // ── Step: Cert within category ──────────────────────────────────────────────
   if (step === 'cert') {
     return (
-      <div className="flex flex-col gap-4 pb-8">
+      <div className="flex flex-col gap-4 pb-24">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setStep('category')}
@@ -215,7 +215,7 @@ export default function CertNewPage() {
 
   // ── Step: Details ───────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col gap-6 pb-8">
+    <div className="flex flex-col gap-6 pb-24">
       <div className="flex items-center gap-3">
         <button
           onClick={() => setStep(isOther && !category ? 'category' : 'cert')}

@@ -7,7 +7,9 @@ import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { ProfileStrength } from '@/components/profile/ProfileStrength'
 import { SectionManager } from '@/components/profile/SectionManager'
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { EndorsementsSection } from '@/components/profile/EndorsementsSection'
+import { PageTransition } from '@/components/ui/PageTransition'
 import {
   aboutSummary,
   experienceSummary,
@@ -86,11 +88,11 @@ export default async function ProfilePage() {
   })()
 
   return (
-    <div className="flex flex-col gap-3 pb-24">
+    <PageTransition className="flex flex-col gap-3 pb-24">
 
       {/* Page title */}
       <div className="flex items-center justify-between px-1">
-        <h1 className="font-semibold text-lg text-[var(--color-text-primary)]">My Profile</h1>
+        <h1 className="font-serif text-lg text-[var(--color-text-primary)]">My Profile</h1>
         <Link
           href={`/u/${profile.handle}`}
           className="text-xs text-[var(--color-interactive)] hover:underline"
@@ -282,14 +284,17 @@ export default async function ProfilePage() {
         {extended.education.length > 0 ? (
           <div className="flex flex-col gap-3">
             {extended.education.map((edu) => (
-              <div key={edu.id}>
-                <p className="text-sm font-medium text-[var(--color-text-primary)]">{edu.institution}</p>
-                {edu.qualification && <p className="text-sm text-[var(--color-text-secondary)]">{edu.qualification}</p>}
+              <div key={edu.id} className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-[var(--color-text-primary)]">{edu.institution}</p>
+                  {edu.qualification && <p className="text-sm text-[var(--color-text-secondary)]">{edu.qualification}</p>}
+                </div>
+                <Link href={`/app/education/${edu.id}/edit`} className="text-xs text-[var(--color-interactive)] shrink-0">Edit</Link>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-[var(--color-text-secondary)]">No education added. <Link href="/app/education/new" className="text-[var(--color-interactive)] underline">Add →</Link></p>
+          <EmptyState variant="inline" title="No education added" actionLabel="Add education" actionHref="/app/education/new" />
         )}
       </ProfileAccordion>
 
@@ -347,6 +352,6 @@ export default async function ProfilePage() {
         )}
       </ProfileAccordion>
 
-    </div>
+    </PageTransition>
   )
 }

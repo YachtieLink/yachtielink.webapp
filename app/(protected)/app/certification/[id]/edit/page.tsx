@@ -119,7 +119,7 @@ export default function CertEditPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 pb-8">
+    <div className="flex flex-col gap-6 pb-24">
       <div>
         <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Edit certification</h1>
         <p className="text-sm text-[var(--color-text-secondary)] mt-1">{certName}</p>

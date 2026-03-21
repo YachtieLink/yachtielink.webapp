@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { validateBody } from '@/lib/validation/validate'
 import { saveProfileSchema } from '@/lib/validation/schemas'
 import { handleApiError } from '@/lib/api/errors'
 import { trackServerEvent } from '@/lib/analytics/server'
+
+const deleteSavedSchema = z.object({ saved_user_id: z.string().uuid() })
 
 export async function GET(req: NextRequest) {
   try {
@@ -76,9 +79,9 @@ export async function DELETE(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const body = await req.json()
-    const saved_user_id = body?.saved_user_id
-    if (!saved_user_id) return NextResponse.json({ error: 'Missing saved_user_id' }, { status: 400 })
+    const result = await validateBody(req, deleteSavedSchema)
+    if ('error' in result) return result.error
+    const { saved_user_id } = result.data
 
     await supabase
       .from('saved_profiles')

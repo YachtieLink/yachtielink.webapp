@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { handleApiError } from '@/lib/api/errors'
+import { extractStoragePath } from '@/lib/storage/upload'
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -18,9 +19,8 @@ export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ 
       .single()
     if (!photo) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
-    // Delete storage object (extract path from URL)
-    const url = new URL(photo.photo_url)
-    const storagePath = url.pathname.split('/object/public/user-photos/')[1]
+    // Delete storage object
+    const storagePath = extractStoragePath(photo.photo_url, 'user-photos')
     if (storagePath) {
       await supabase.storage.from('user-photos').remove([storagePath])
     }

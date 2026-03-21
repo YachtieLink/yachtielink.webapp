@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
           bio, profile_photo_url,
           phone, whatsapp, email, location_country, location_city,
           show_phone, show_whatsapp, show_email, show_location,
-          subscription_status
+          subscription_status, latest_pdf_path
         `)
         .eq('id', user.id)
         .single(),
@@ -109,6 +109,11 @@ export async function POST(req: NextRequest) {
     const pdfPath = `${user.id}/profile-${timestamp}.pdf`
 
     const serviceClient = createServiceClient()
+
+    // Delete previous PDF to avoid orphaned files
+    if (profile.latest_pdf_path) {
+      await serviceClient.storage.from('pdf-exports').remove([profile.latest_pdf_path])
+    }
 
     const { error: uploadErr } = await serviceClient.storage
       .from('pdf-exports')

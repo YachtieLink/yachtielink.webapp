@@ -170,7 +170,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 pb-8">
+    <div className="flex flex-col gap-6 pb-24">
       <div>
         <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Account</h1>
         <p className="text-sm text-[var(--color-text-secondary)] mt-1">

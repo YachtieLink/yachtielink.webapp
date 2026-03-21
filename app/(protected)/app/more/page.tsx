@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import { fadeUp } from '@/lib/motion'
 import { createClient } from '@/lib/supabase/client'
 import { ManagePortalButton } from '@/components/insights/ManagePortalButton'
 
@@ -112,7 +114,7 @@ export default function MorePage() {
   }
 
   return (
-    <div className="flex flex-col pb-24">
+    <motion.div variants={fadeUp} initial="hidden" animate="visible" className="flex flex-col pb-24">
       {/* ── Appearance ─────────────────────────────── */}
       <SectionHeader title="Appearance" />
       <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden">
@@ -236,6 +238,6 @@ export default function MorePage() {
       <p className="text-center text-xs text-[var(--color-text-secondary)] mt-6 mb-2">
         YachtieLink · Phase 1A
       </p>
-    </div>
+    </motion.div>
   )
 }

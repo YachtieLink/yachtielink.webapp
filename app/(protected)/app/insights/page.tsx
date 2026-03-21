@@ -12,6 +12,7 @@ import { AnalyticsChart } from '@/components/insights/AnalyticsChart';
 import { UpgradeCTA } from '@/components/insights/UpgradeCTA';
 import { InsightsUpgradedToast } from '@/components/insights/InsightsUpgradedToast';
 import { ManagePortalButton } from '@/components/insights/ManagePortalButton';
+import { PageTransition } from '@/components/ui/PageTransition';
 
 type TimeRange = '7' | '30' | 'all';
 
@@ -101,11 +102,11 @@ export default async function InsightsPage({ searchParams }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-4 pb-24">
+    <PageTransition className="flex flex-col gap-4 pb-24">
       {upgraded && <InsightsUpgradedToast isPro={proStatus.isPro} />}
 
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-[var(--color-text-primary)]">Insights</h1>
+        <h1 className="text-xl font-serif text-[var(--color-text-primary)]">Insights</h1>
         {proStatus.isPro && (
           <span className="text-xs font-semibold bg-[var(--color-teal-700)] text-white px-2.5 py-1 rounded-full">
             Pro ✓
@@ -131,9 +132,9 @@ export default async function InsightsPage({ searchParams }: Props) {
             ))}
           </div>
 
-          <AnalyticsCard title="Profile Views" count={summaryMap['profile_view'] ?? 0} data={viewsData}     color="#0D7377" />
-          <AnalyticsCard title="PDF Downloads" count={summaryMap['pdf_download'] ?? 0} data={downloadsData} color="#0D9488" />
-          <AnalyticsCard title="Link Shares"   count={summaryMap['link_share']   ?? 0} data={sharesData}    color="#14B8A6" />
+          <AnalyticsCard title="Profile Views" count={summaryMap['profile_view'] ?? 0} data={viewsData}     color="var(--chart-1)" />
+          <AnalyticsCard title="PDF Downloads" count={summaryMap['pdf_download'] ?? 0} data={downloadsData} color="var(--chart-2)" />
+          <AnalyticsCard title="Link Shares"   count={summaryMap['link_share']   ?? 0} data={sharesData}    color="var(--chart-3)" />
 
           <div className="bg-[var(--color-surface)] rounded-2xl p-4">
             <div className="flex items-center justify-between">
@@ -195,7 +196,7 @@ export default async function InsightsPage({ searchParams }: Props) {
           )}
         </>
       )}
-    </div>
+    </PageTransition>
   );
 }
 
