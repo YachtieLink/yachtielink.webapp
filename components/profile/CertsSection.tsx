@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 interface Cert {
   id: string
@@ -57,9 +58,7 @@ export function CertsSection({ certs }: CertsSectionProps) {
       </div>
 
       {certs.length === 0 ? (
-        <p className="text-sm text-[var(--color-text-secondary)]">
-          Add your certifications to complete your profile.
-        </p>
+        <EmptyState variant="inline" title="No certifications added" actionLabel="Add certification" actionHref="/app/certification/new" />
       ) : (
         <ul className="flex flex-col divide-y divide-[var(--color-border)]">
           {certs.map((cert) => {

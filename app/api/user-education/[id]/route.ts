@@ -4,6 +4,27 @@ import { validateBody } from '@/lib/validation/validate'
 import { userEducationSchema } from '@/lib/validation/schemas'
 import { handleApiError } from '@/lib/api/errors'
 
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const { data, error } = await supabase
+      .from('user_education')
+      .select('id, institution, qualification, field_of_study, started_at, ended_at, sort_order')
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .single()
+    if (error || !data) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+    return NextResponse.json({ education: data })
+  } catch (e) {
+    return handleApiError(e)
+  }
+}
+
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
