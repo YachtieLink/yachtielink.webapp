@@ -7,6 +7,7 @@ export default async function sitemap() {
     .from('users')
     .select('handle, updated_at')
     .not('handle', 'is', null)
+    .is('deleted_at', null)
 
   const profileUrls = (users ?? []).map((user) => ({
     url: `https://yachtie.link/u/${user.handle}`,
