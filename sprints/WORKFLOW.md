@@ -179,6 +179,24 @@ For each .select(), .from(), .update(), .insert() in the diff:
 10. If a component's props changed, do all call sites pass the
     new required props?
 
+## Blast Radius / Downstream Caller Check
+For every function, constant, type, config value, or rate limit
+category that was CHANGED (not just added):
+11. Grep the entire codebase for all callers/importers of that symbol
+12. For each caller, ask: does this caller still work correctly with
+    the change? Pay special attention to:
+    - Shared rate limit categories used by unrelated routes
+    - Config objects where adding a field changes default behavior
+    - Functions whose error behavior changed (fail-open → fail-closed)
+    - Types whose required fields changed (new required props)
+    - Constants whose value or meaning changed
+13. If a caller would break, flag it as CRITICAL with the specific
+    downstream file and the impact on the user.
+
+This is the single most valuable check. Most bugs that survive plan
+review and build pass are downstream impact bugs — the change works
+in isolation but breaks something else that depends on it.
+
 ## Known Failure Patterns (from lessons-learned.md)
 Read docs/ops/lessons-learned.md and check if any of the known
 patterns appear in the diff. Common ones:
@@ -186,6 +204,8 @@ patterns appear in the diff. Common ones:
 - Identity mapping (auth.uid() vs table-specific PK)
 - Migration timestamp collisions
 - Empty string vs null normalization
+- Shared rate limit categories (fileUpload used by export route)
+- Component swaps that lose functionality (Select → SearchableSelect lost clear option)
 
 Return a structured report with file, line, severity, and fix.
 ```
