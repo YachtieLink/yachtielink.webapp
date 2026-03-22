@@ -53,7 +53,8 @@ export async function GET(req: NextRequest) {
       countMap[r.user_id] = r.view_count;
     }
 
-    // Fire emails in parallel, batch update after
+    // Fire emails in parallel (promises start eagerly at .map() time,
+    // allSettled just awaits completion). Batch update flags after.
     const emailTasks = users
       .filter((u) => u.email)
       .map((u) => ({
