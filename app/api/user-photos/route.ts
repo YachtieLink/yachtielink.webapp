@@ -102,6 +102,7 @@ export async function PUT(req: NextRequest) {
     const results = await Promise.all(updates)
     const failed = results.filter((r) => r.error)
     if (failed.length > 0) {
+      console.error('Photo reorder partial failure:', failed.map((r) => r.error))
       return NextResponse.json({ error: 'Some photos could not be reordered' }, { status: 500 })
     }
 

@@ -30,6 +30,7 @@ export async function PATCH(req: NextRequest) {
     if (typeof cv_public === 'boolean') update.cv_public = cv_public
     if (cv_public_source) update.cv_public_source = cv_public_source
 
+    // Zod refine guarantees at least one field, but belt-and-suspenders
     if (Object.keys(update).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
     }

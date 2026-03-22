@@ -182,7 +182,10 @@ export const sectionVisibilitySchema = z.object({
 export const cvSettingsSchema = z.object({
   cv_public: z.boolean().optional(),
   cv_public_source: z.enum(['generated', 'uploaded']).optional(),
-});
+}).refine(
+  (d) => d.cv_public !== undefined || d.cv_public_source !== undefined,
+  'At least one field required',
+);
 
 // --- AI Summary ---
 
