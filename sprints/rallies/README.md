@@ -65,7 +65,7 @@ Multi-agent, multi-angle review of the whole app.
 
 | Slug | Status | Scope |
 |------|--------|-------|
-| — | — | None active |
+| [rally-003-codebase-bugs](./rally-003-codebase-bugs/) | 🔍 In Progress | Full codebase bug audit — 6 agents, schema/RLS/logic/UX/API/perf |
 
 ---
 
