@@ -10,6 +10,7 @@ import { ProfileSectionGrid, type SectionItem } from '@/components/profile/Profi
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { SeaTimeSummary } from '@/components/profile/SeaTimeSummary'
 import {
   aboutSummary,
   experienceSummary,
@@ -29,7 +30,7 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/welcome')
 
-  const [profile, { attachments, certifications: certs, endorsements }, extended, { data: profilePhotos }] =
+  const [profile, { attachments, certifications: certs, endorsements }, extended, { data: profilePhotos }, seaTimeRes] =
     await Promise.all([
       getUserById(user.id),
       getProfileSections(user.id),
@@ -39,7 +40,12 @@ export default async function ProfilePage() {
         .select('id, photo_url, sort_order')
         .eq('user_id', user.id)
         .order('sort_order'),
+      supabase.rpc('get_sea_time', { p_user_id: user.id }),
     ])
+
+  const seaTime = seaTimeRes.data as { total_days: number; yacht_count: number }[] | null
+  const seaTimeTotalDays = seaTime?.[0]?.total_days ?? 0
+  const seaTimeYachtCount = seaTime?.[0]?.yacht_count ?? 0
 
   if (!profile || !profile.onboarding_complete) {
     redirect('/onboarding')
@@ -235,6 +241,9 @@ export default async function ProfilePage() {
         nextHref={strengthCta?.href}
         ctaLabel={strengthCta?.label}
       />
+
+      {/* Sea Time */}
+      <SeaTimeSummary totalDays={seaTimeTotalDays} yachtCount={seaTimeYachtCount} />
 
       {/* Section Grid */}
       <ProfileSectionGrid sections={sectionGridItems} />

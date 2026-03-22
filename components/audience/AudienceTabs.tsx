@@ -456,6 +456,14 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
           </motion.div>
         )
       })}
+
+      {/* Explore full network link */}
+      <Link
+        href="/app/network/colleagues"
+        className="mt-2 block text-center text-sm text-[var(--color-interactive)] font-medium py-2 hover:underline"
+      >
+        Explore your network →
+      </Link>
     </motion.div>
   )
 }

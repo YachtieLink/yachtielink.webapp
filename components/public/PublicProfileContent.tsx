@@ -13,6 +13,7 @@ import { HeroSection } from './HeroSection'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { PhotoGallery } from '@/components/profile/PhotoGallery'
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
+import { formatSeaTime } from '@/lib/sea-time'
 import { SaveProfileButton } from '@/components/profile/SaveProfileButton'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import {
@@ -79,6 +80,8 @@ export interface PublicProfileContentProps {
   }
   sectionVisibility?: Record<string, boolean>
   savedStatus?: { id: string; folder_id: string | null } | null
+  seaTimeTotalDays?: number
+  seaTimeYachtCount?: number
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -119,6 +122,8 @@ export function PublicProfileContent({
   viewerRelationship,
   sectionVisibility = {},
   savedStatus,
+  seaTimeTotalDays = 0,
+  seaTimeYachtCount = 0,
 }: PublicProfileContentProps) {
   const displayName = user.display_name ?? user.full_name
   const firstName = displayName.split(' ')[0]
@@ -330,6 +335,15 @@ export function PublicProfileContent({
               </p>
             </ProfileAccordion>
             </ScrollReveal>
+          )}
+
+          {/* Sea Time Stat Line */}
+          {seaTimeTotalDays > 0 && (
+            <div className="px-1 py-2">
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                ⚓ {formatSeaTime(seaTimeTotalDays).displayLong} at sea · {seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}
+              </p>
+            </div>
           )}
 
           {/* Experience */}

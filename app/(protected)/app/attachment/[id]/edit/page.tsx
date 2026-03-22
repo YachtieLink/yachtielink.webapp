@@ -9,6 +9,7 @@ import { useToast } from '@/components/ui/Toast'
 import { BackButton } from '@/components/ui/BackButton'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { TransferSheet } from '@/components/attachment/TransferSheet'
 
 interface Attachment {
   id: string
@@ -33,9 +34,14 @@ export default function AttachmentEditPage() {
   const [deleting, setDeleting] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [transferOpen, setTransferOpen] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
   const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setUserId(user.id)
+    })
     supabase
       .from('attachments')
       .select('id, role_label, started_at, ended_at, yachts(id, name)')
@@ -182,6 +188,40 @@ export default function AttachmentEditPage() {
                   >
                     {saving ? 'Saving…' : 'Save changes'}
                   </Button>
+
+                  {/* Wrong yacht? */}
+                  <div className="border-t border-[var(--color-border)] pt-4 mt-2">
+                    <p className="text-sm font-medium text-[var(--color-text-primary)] mb-1">Wrong yacht?</p>
+                    <p className="text-xs text-[var(--color-text-secondary)] mb-3">
+                      If this role was on a different vessel, you can move it without losing your dates.
+                    </p>
+                    <Button
+                      onClick={() => setTransferOpen(true)}
+                      className="w-full"
+                      size="lg"
+                      variant="ghost"
+                    >
+                      Move to a different yacht
+                    </Button>
+                  </div>
+
+                  {userId && attachment.yachts && (
+                    <TransferSheet
+                      open={transferOpen}
+                      onClose={() => setTransferOpen(false)}
+                      attachmentId={attachment.id}
+                      userId={userId}
+                      currentYachtId={attachment.yachts.id}
+                      currentYachtName={attachment.yachts.name}
+                      roleLabel={roleLabel || attachment.role_label}
+                      startDate={startDate || attachment.started_at}
+                      endDate={isCurrent ? null : (endDate || attachment.ended_at)}
+                      onTransferComplete={() => {
+                        toast('Moved to a different yacht.', 'success')
+                        router.push('/app/profile')
+                      }}
+                    />
+                  )}
 
                   <div className="border-t border-[var(--color-border)] pt-4 mt-2">
                     <p className="text-xs text-[var(--color-text-secondary)] mb-3">
