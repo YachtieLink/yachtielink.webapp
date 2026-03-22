@@ -6,12 +6,28 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 53 lessons
+**Current count:** 55 lessons
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## Replacing Native `<Select>` with Custom Component Removes the Clear Option
+
+**What happened:** Sprint 11.2 replaced the native `<Select>` for country with a custom `SearchableSelect` that only had concrete country values as options. Users who already had a country set could no longer clear it back to empty/null.
+**Fix:** Added `clearable` and `clearLabel` props to `SearchableSelect`. When `clearable` is true, a "No country" option appears at the top of the dropdown that sets the value to empty string.
+**Pattern to avoid:** Any time you replace a native `<select>` that had an empty `<option>`, make sure the replacement component has an equivalent clear/reset mechanism.
+
+---
+
+## Subagents Hallucinate Table Names Based on Function Names
+
+**What happened:** During Sprint 11.3 build spec, the plan referenced a `yacht_crew` table for colleague overlap queries. This table doesn't exist — the actual table is `attachments` (employment history). The confusion likely came from functions like `yacht_crew_count` and `get_yacht_crew_threshold` in the codebase, which operate on the `attachments` table.
+**Fix:** Sonnet reviewer caught it during pre-build review. All references changed to `attachments` with `.is('deleted_at', null)`.
+**Pattern to avoid:** Never assume a table name from function names. Always grep `supabase/migrations/` for `create table` to confirm the actual table name before writing queries.
 
 ---
 
