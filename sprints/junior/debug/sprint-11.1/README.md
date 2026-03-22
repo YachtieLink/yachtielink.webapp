@@ -1,7 +1,8 @@
 # Sprint 11.1 — Bug fixes + UI polish
 
 **Started:** 2026-03-22
-**Status:** 🐛 Ready to build
+**Status:** ✅ Shipped (PR #55)
+**Completed:** 2026-03-22
 **Parent:** Sprint 11 (CV-first onboarding, section colours, profile polish)
 
 ---

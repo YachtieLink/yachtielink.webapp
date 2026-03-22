@@ -10,9 +10,7 @@ Keep these focused — one problem (or one group of related problems) per sprint
 
 | Slug | Started | Issue |
 |------|---------|-------|
-| debug-cv-parse-extraction | 2026-03-22 | CV upload fails — "Could not extract text" on all files |
-| debug-photo-upload-limit | 2026-03-22 | Photo page uses Pro limit for free users — wrong add button + count |
-| debug-cv-regenerate-date | 2026-03-22 | Regenerate PDF date doesn't update after generation |
+| — | — | None active |
 
 ---
 
@@ -50,4 +48,7 @@ How we confirmed it's fixed.
 
 | Slug | Completed | Summary |
 |------|-----------|---------|
-| — | — | None yet |
+| [sprint-11.1](./sprint-11.1/) | 2026-03-22 | CV parse, photo limits, regenerate date — bundled fix (PR #55) |
+| [debug-cv-parse-extraction](./debug-cv-parse-extraction/) | 2026-03-22 | Fixed via `serverExternalPackages` in Sprint 11.1 |
+| [debug-photo-upload-limit](./debug-photo-upload-limit/) | 2026-03-22 | Fixed via subscription check in Sprint 11.1 |
+| [debug-cv-regenerate-date](./debug-cv-regenerate-date/) | 2026-03-22 | Fixed via local state in Sprint 11.1 |

@@ -6,12 +6,28 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 51 lessons
+**Current count:** 53 lessons
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## Client-Side Plan Checks Must Fail-Open (Pro), Not Fail-Closed (Free)
+
+**What happened:** Sprint 11.1 photo page fetched `subscription_status` from Supabase and defaulted `isPro` to `false`. If the query failed (network error, RLS issue, Supabase outage), paid users silently got treated as free — their photos 4–9 were hidden and the add button removed. Codex code review caught this.
+**Fix:** Default `isPro` to `true`. Only downgrade to free on a successful query that confirms free status. Server-side upload limits still enforce the real constraint.
+**Pattern to avoid:** Any client-side feature gate that checks subscription status must fail-open (show Pro features) not fail-closed (hide them). The server is the enforcement layer — the client is just UI convenience. This applies to photo limits, template selectors, CV features, and any future Pro gates.
+
+---
+
+## Next.js Bundler Breaks Dynamic Imports of Native Node Packages
+
+**What happened:** `pdf-parse` v2 worked perfectly in standalone Node.js (`node -e "..."`) but threw errors when dynamically imported in a Next.js API route. The `{ PDFParse }` named import was correct — the problem was the bundler transforming the import and breaking pdfjs-dist's internal worker/canvas dependencies.
+**Fix:** Added `pdf-parse` to `serverExternalPackages` in `next.config.ts`. This tells Next.js to leave the package unbundled and use the native Node.js module.
+**Pattern to avoid:** Any package that uses native Node modules, workers, or canvas (pdfjs-dist, sharp, canvas, puppeteer, etc.) needs to be in `serverExternalPackages`. If a dynamic import works in `node -e` but fails in an API route, check the bundler first.
 
 ---
 
