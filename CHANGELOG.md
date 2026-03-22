@@ -24,6 +24,60 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-22 — Claude Code (Opus 4.6) — Rally 003 Sprints 5–6 + v2 Review Prompts + /review Skill
+
+### Done
+
+**Rally 003 Sprint 5 — length_m → length_meters (merged):**
+- Renamed ghost column reference across 7 files (prompt, save, PDF, public profile, generate-pdf, CvReview, PublicProfileContent)
+- Yacht length was silently discarded everywhere — never stored from CV parse, never displayed, missing from PDFs
+- No migration needed — DB column was already correctly named `length_meters`
+- Opus review: clean pass, all callers verified
+
+**Rally 003 Sprint 6 — Cert Expiry + Endorsement + Section Visibility (PR #70):**
+- Cert expiry cron: 60d branch now requires `daysLeft > 30` (was firing for certs at 5 days). Emails parallelized with `Promise.allSettled`, only marks as sent on successful delivery. Batch DB updates via `.in()`.
+- Endorsement unique constraint: replaced full-table UNIQUE with partial index `WHERE deleted_at IS NULL` — users can re-endorse after retraction.
+- Section visibility: replaced read-modify-write PATCH with atomic `jsonb_set` RPC, ownership check inside SECURITY DEFINER, GRANT EXECUTE.
+- Opus review caught 2 P1s (missing GRANT EXECUTE, missing auth.uid() ownership check in DEFINER) and 2 P2s (email flags set before delivery, stale schema docs). All fixed before PR.
+
+**v2 Review Prompts — Founder Collaboration:**
+- Founder wrote alternative review prompt structure, merged with existing prompts
+- 5 specific improvements applied:
+  1. Include new code paths that affect existing behavior (not just modified symbols)
+  2. "Concrete evidence only" — plausible risks go to Open Questions, not Findings
+  3. Read targeted migrations, not all migrations (saves context)
+  4. Pass 1 candidate-heavy (recall), Pass 2 confirmation-heavy (precision)
+  5. "Do not edit code" instead of "do not fix" (clearer instruction)
+- Sonnet prompt: now explicitly candidate-heavy, added GRANT EXECUTE check, Pro gate consistency, SECURITY DEFINER awareness
+- Opus prompt: 13 embedded failure patterns, 4 anti-rationalization rules, open questions / testing gaps / residual risks output
+
+**Created /review Skill:**
+- Reusable skill at `~/.claude/skills/review/` — runs two-phase review with single command
+- Phase 1 (Sonnet): ~$0.20, 1-2 min, broad scan
+- Phase 2 (Opus): ~$1.50, 3-6 min, deep trace + adversarial challenge
+- Reads customized prompts from `sprints/WORKFLOW.md` if present, falls back to generic defaults
+
+**Other:**
+- Created backlog system (`sprints/backlog/`) with idea capture workflow in CLAUDE.md
+- Filed bug-reporter backlog item
+- SearchableSelect now supports clearable prop (Codex catch from 11.2)
+
+### Context
+- Rally 003: Sprints 1–5 merged, Sprint 6 in PR. Sprints 7–10 remain (race conditions, performance, UX, accessibility).
+- Review process fully defined: Sonnet first-pass → Opus deep review → commit. Codex as optional third opinion.
+- PR #65 was first clean Codex pass on a security PR — the review system is working.
+
+### Next
+- Merge Sprint 6 PR #70
+- Rally 003 Sprints 7–10: N+1 queries, Promise.all waterfalls, unoptimized images, UX empty states
+- Test v2 review prompts on next sprint to validate improvements
+
+### Flags
+- `sprints/WORKFLOW.md` has the v2 prompts on a branch (PR #71) — needs merge before next sprint uses them
+- Session was very long (~6 hours) — future sessions should be shorter with tighter scope
+
+---
+
 ## 2026-03-22 — Claude Code (Opus 4.6) — Rally 003 Sprints 2–4 + Opus Reviewer Tuning
 
 ### Done
