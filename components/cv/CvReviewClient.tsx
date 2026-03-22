@@ -174,7 +174,7 @@ export function CvReviewClient({ userId, existingProfile }: CvReviewClientProps)
                 <p className="text-xs text-[var(--color-text-tertiary)]">
                   {[
                     emp.yacht_type,
-                    emp.length_m ? `${emp.length_m}m` : null,
+                    emp.length_meters ? `${emp.length_meters}m` : null,
                     emp.flag_state,
                   ].filter(Boolean).join(' · ')}
                 </p>

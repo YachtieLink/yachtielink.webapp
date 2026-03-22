@@ -29,7 +29,7 @@ interface Attachment {
   yachts: {
     name: string
     yacht_type?: string | null
-    length_m?: number | null
+    length_meters?: number | null
     flag_state?: string | null
   } | null
 }

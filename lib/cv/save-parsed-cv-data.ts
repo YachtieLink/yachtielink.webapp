@@ -5,7 +5,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 interface ParsedEmployment {
   yacht_name: string
   yacht_type?: string | null
-  length_m?: number | null
+  length_meters?: number | null
   role: string
   start_date?: string | null
   end_date?: string | null
@@ -143,7 +143,7 @@ export async function saveParsedCvData(
             .insert({
               name: emp.yacht_name,
               yacht_type: emp.yacht_type ?? null,
-              length_m: emp.length_m ?? null,
+              length_meters: emp.length_meters ?? null,
               flag_state: emp.flag_state ?? null,
               created_by: userId,
             })

@@ -359,7 +359,7 @@ export function PublicProfileContent({
                         )}
                         {att.yachts?.flag_state && (
                           <p className="text-xs text-[var(--color-text-secondary)]">
-                            🏳 {att.yachts.flag_state}{att.yachts.length_m ? ` · ${att.yachts.length_m}m` : ''}
+                            🏳 {att.yachts.flag_state}{att.yachts.length_meters ? ` · ${att.yachts.length_meters}m` : ''}
                           </p>
                         )}
                       </div>
