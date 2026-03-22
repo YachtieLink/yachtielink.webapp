@@ -100,7 +100,7 @@ export default function ProfilePhotosPage() {
   const [photos, setPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
-  const [isPro, setIsPro] = useState(false)
+  const [isPro, setIsPro] = useState(true) // Default to Pro so paid users aren't penalised if plan lookup fails
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const maxPhotos = isPro ? MAX_PHOTOS_PRO : MAX_PHOTOS_FREE
@@ -116,12 +116,15 @@ export default function ProfilePhotosPage() {
         const supabase = createClient()
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
-          const { data: profile } = await supabase
+          const { data: profile, error } = await supabase
             .from('users')
             .select('subscription_status')
             .eq('id', user.id)
             .single()
-          setIsPro(profile?.subscription_status === 'pro')
+          if (!error && profile) {
+            setIsPro(profile.subscription_status === 'pro')
+          }
+          // On error, keep default (Pro) so paid users aren't penalised — server enforces real limit on upload
         }
         const res = await fetch('/api/user-photos')
         const d = await res.json()
