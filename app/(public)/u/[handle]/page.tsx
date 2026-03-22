@@ -175,10 +175,18 @@ export default async function PublicProfilePage({ params }: Props) {
 
   const sectionVisibility = (user.section_visibility ?? {}) as Record<string, boolean>
 
+  // Strip contact fields server-side when hidden — prevents PII leaking into serialised HTML
+  const sanitisedUser = {
+    ...user,
+    phone: user.show_phone ? user.phone : null,
+    whatsapp: user.show_whatsapp ? user.whatsapp : null,
+    email: user.show_email ? user.email : null,
+  }
+
   return (
     <div className="min-h-screen bg-[var(--color-surface-raised)]">
       <PublicProfileContent
-        user={user as any}
+        user={sanitisedUser as any}
         attachments={(attRes.data as any) ?? []}
         certifications={(certRes.data as any) ?? []}
         endorsements={(endRes.data as any) ?? []}
