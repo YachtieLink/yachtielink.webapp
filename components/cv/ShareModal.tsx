@@ -85,7 +85,6 @@ export function ShareModal({
               alt={displayName}
               fill
               className="object-cover"
-              unoptimized
             />
           </div>
         ) : (

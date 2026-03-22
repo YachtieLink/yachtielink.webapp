@@ -29,23 +29,21 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/welcome')
 
-  const [profile, { attachments, certifications: certs, endorsements }, extended] =
+  const [profile, { attachments, certifications: certs, endorsements }, extended, { data: profilePhotos }] =
     await Promise.all([
       getUserById(user.id),
       getProfileSections(user.id),
       getExtendedProfileSections(user.id),
+      supabase
+        .from('user_photos')
+        .select('id, photo_url, sort_order')
+        .eq('user_id', user.id)
+        .order('sort_order'),
     ])
 
   if (!profile || !profile.onboarding_complete) {
     redirect('/onboarding')
   }
-
-  // Fetch profile gallery photos
-  const { data: profilePhotos } = await supabase
-    .from('user_photos')
-    .select('id, photo_url, sort_order')
-    .eq('user_id', user.id)
-    .order('sort_order')
 
   const sectionVisibility = (profile.section_visibility ?? {
     about: true, experience: true, endorsements: true, certifications: true,
@@ -182,7 +180,6 @@ export default async function ProfilePage() {
                   alt={`Photo ${i + 1}`}
                   fill
                   className="object-cover"
-                  unoptimized
                 />
                 {i === 0 && (
                   <div className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[9px] text-center py-0.5 font-medium">

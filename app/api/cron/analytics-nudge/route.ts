@@ -15,39 +15,27 @@ export async function GET(req: NextRequest) {
 
     const supabase = createServiceClient();
 
-    // Get 7-day profile view counts for all users
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-    const { data: viewCounts } = await supabase
-      .from('profile_analytics')
-      .select('user_id')
-      .eq('event_type', 'profile_view')
-      .gte('occurred_at', sevenDaysAgo.toISOString());
+    // DB-level aggregation instead of fetching all rows into JS
+    const { data: viewCounts } = await supabase.rpc('get_weekly_view_counts');
 
     if (!viewCounts?.length) {
       return NextResponse.json({ sent: 0 });
     }
 
-    // Count per user
-    const countMap: Record<string, number> = {};
-    for (const row of viewCounts) {
-      countMap[row.user_id] = (countMap[row.user_id] ?? 0) + 1;
-    }
-
-    const counts = Object.values(countMap);
-    const avg = counts.reduce((a, b) => a + b, 0) / counts.length;
+    // Calculate threshold (2x average)
+    const counts = viewCounts.map((r: { view_count: number }) => r.view_count);
+    const avg = counts.reduce((a: number, b: number) => a + b, 0) / counts.length;
     const threshold = avg * 2;
 
-    // Find free users above threshold who haven't received the nudge
-    const candidates = Object.entries(countMap)
-      .filter(([, count]) => count >= threshold)
-      .map(([userId]) => userId);
+    const candidates = viewCounts
+      .filter((r: { view_count: number }) => r.view_count >= threshold)
+      .map((r: { user_id: string }) => r.user_id);
 
     if (!candidates.length) {
       return NextResponse.json({ sent: 0 });
     }
 
+    // Find free users above threshold who haven't received the nudge
     const { data: users } = await supabase
       .from('users')
       .select('id, email, full_name, display_name')
@@ -59,18 +47,35 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ sent: 0 });
     }
 
-    let sent = 0;
-    for (const user of users) {
-      if (!user.email) continue;
-      const viewCount = countMap[user.id] ?? 0;
-      const name = user.full_name ?? user.display_name ?? 'there';
-
-      await sendAnalyticsNudgeEmail({ email: user.email, name, viewCount });
-      await supabase.from('users').update({ analytics_nudge_sent: true }).eq('id', user.id);
-      sent++;
+    // Build a count map for email content
+    const countMap: Record<string, number> = {};
+    for (const r of viewCounts) {
+      countMap[r.user_id] = r.view_count;
     }
 
-    return NextResponse.json({ sent });
+    // Fire emails in parallel (promises start eagerly at .map() time,
+    // allSettled just awaits completion). Batch update flags after.
+    const emailTasks = users
+      .filter((u) => u.email)
+      .map((u) => ({
+        id: u.id,
+        promise: sendAnalyticsNudgeEmail({
+          email: u.email!,
+          name: u.full_name ?? u.display_name ?? 'there',
+          viewCount: countMap[u.id] ?? 0,
+        }),
+      }));
+
+    const results = await Promise.allSettled(emailTasks.map((t) => t.promise));
+    const sentIds = emailTasks
+      .filter((_, i) => results[i].status === 'fulfilled')
+      .map((t) => t.id);
+
+    if (sentIds.length > 0) {
+      await supabase.from('users').update({ analytics_nudge_sent: true }).in('id', sentIds);
+    }
+
+    return NextResponse.json({ sent: sentIds.length });
   } catch (e) {
     return handleApiError(e);
   }
