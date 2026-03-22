@@ -55,3 +55,22 @@ All now codified in lessons-learned.md and the Opus review prompt.
   2. Added zero-tolerance severity policy — find it, fix it, no exceptions
   3. Replaced narrow security checklists with general adversarial thinking
   4. GDPR/legal always P1 regardless of probability
+
+## Sprints 5–6 + v2 Review Prompts
+
+- **Sprint 5 (length_m → length_meters):** Pure rename across 7 files. Opus clean pass. Yacht length has never worked anywhere — silently discarded on every CV parse since Sprint 7. Merged.
+- **Sprint 6 (cert expiry + endorsement + section visibility):** Three data integrity fixes. Opus caught 2 P1s (missing GRANT EXECUTE, missing auth.uid() in DEFINER) and 2 P2s (email flags before delivery, stale schema docs). All fixed. PR #70.
+- **v2 Review Prompts:** Founder wrote alternative prompt structure and provided 5 specific refinements:
+  1. Include new code paths (blind spot for new routes/RPCs)
+  2. Concrete evidence only (reduce false positives)
+  3. Targeted migrations not all (save context)
+  4. Pass 1 recall, Pass 2 precision (intentionally different output styles)
+  5. "Do not edit code" not "do not fix" (disambiguation)
+- **Created /review skill:** Reusable two-phase review skill at `~/.claude/skills/review/`. Runs Sonnet first-pass then Opus deep review.
+- **Backlog system:** Created `sprints/backlog/` for idea capture. Added idea capture workflow to CLAUDE.md.
+
+## What's Left
+
+- Rally 003 Sprints 7–10 (N+1 queries, Promise.all waterfalls, unoptimized images, UX empty states)
+- Merge Sprint 6 PR #70 and v2 prompts PR #71
+- Test v2 review prompts on next sprint
