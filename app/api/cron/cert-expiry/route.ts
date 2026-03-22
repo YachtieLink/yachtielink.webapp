@@ -5,6 +5,12 @@ import { handleApiError } from '@/lib/api/errors';
 
 export const runtime = 'nodejs';
 
+interface EmailTask {
+  certId: string
+  bucket: '60d' | '30d'
+  promise: Promise<void>
+}
+
 export async function GET(req: NextRequest) {
   try {
     // Verify request is from Vercel Cron — secret is mandatory
@@ -19,10 +25,6 @@ export async function GET(req: NextRequest) {
     // 60-day window
     const in60 = new Date();
     in60.setDate(in60.getDate() + 60);
-
-    // 30-day window
-    const in30 = new Date();
-    in30.setDate(in30.getDate() + 30);
 
     // Find Pro users' certs expiring within 60 days where reminder hasn't been sent
     const { data: certsDue } = await supabase
@@ -47,7 +49,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ sent: 0 });
     }
 
-    let sent = 0;
+    const tasks: EmailTask[] = [];
 
     for (const cert of certsDue) {
       const user = (cert as any).users;
@@ -58,21 +60,46 @@ export async function GET(req: NextRequest) {
       const certName = (cert as any).certification_types?.name ?? cert.custom_cert_name ?? 'Certification';
       const name = user.full_name ?? user.display_name ?? 'there';
 
-      // Send 60-day reminder
-      if (daysLeft <= 60 && !cert.expiry_reminder_60d_sent) {
-        await sendCertExpiryEmail({ email: user.email, name, certName, expiryDate: cert.expires_at!, daysUntilExpiry: daysLeft });
-        await supabase.from('certifications').update({ expiry_reminder_60d_sent: true }).eq('id', cert.id);
-        sent++;
+      // 60-day reminder: only for certs 31-60 days out
+      if (daysLeft > 30 && daysLeft <= 60 && !cert.expiry_reminder_60d_sent) {
+        tasks.push({
+          certId: cert.id,
+          bucket: '60d',
+          promise: sendCertExpiryEmail({ email: user.email, name, certName, expiryDate: cert.expires_at!, daysUntilExpiry: daysLeft }),
+        });
       }
-      // Send 30-day reminder
+      // 30-day reminder: for certs 1-30 days out
       else if (daysLeft <= 30 && !cert.expiry_reminder_30d_sent) {
-        await sendCertExpiryEmail({ email: user.email, name, certName, expiryDate: cert.expires_at!, daysUntilExpiry: daysLeft });
-        await supabase.from('certifications').update({ expiry_reminder_30d_sent: true }).eq('id', cert.id);
-        sent++;
+        tasks.push({
+          certId: cert.id,
+          bucket: '30d',
+          promise: sendCertExpiryEmail({ email: user.email, name, certName, expiryDate: cert.expires_at!, daysUntilExpiry: daysLeft }),
+        });
       }
     }
 
-    return NextResponse.json({ sent });
+    // Fire emails in parallel, only mark successfully sent ones
+    const results = await Promise.allSettled(tasks.map(t => t.promise));
+
+    const sent60dIds: string[] = [];
+    const sent30dIds: string[] = [];
+
+    for (let i = 0; i < results.length; i++) {
+      if (results[i].status === 'fulfilled') {
+        if (tasks[i].bucket === '60d') sent60dIds.push(tasks[i].certId);
+        else sent30dIds.push(tasks[i].certId);
+      }
+    }
+
+    // Batch update flags — only for successfully sent emails
+    if (sent60dIds.length > 0) {
+      await supabase.from('certifications').update({ expiry_reminder_60d_sent: true }).in('id', sent60dIds);
+    }
+    if (sent30dIds.length > 0) {
+      await supabase.from('certifications').update({ expiry_reminder_30d_sent: true }).in('id', sent30dIds);
+    }
+
+    return NextResponse.json({ sent: sent60dIds.length + sent30dIds.length });
   } catch (e) {
     return handleApiError(e);
   }

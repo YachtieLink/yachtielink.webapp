@@ -14,20 +14,12 @@ export async function PATCH(req: NextRequest) {
     if ('error' in result) return result.error
     const { section, visible } = result.data
 
-    // Fetch current visibility, merge the single key change, and save
-    const { data: profile } = await supabase
-      .from('users')
-      .select('section_visibility')
-      .eq('id', user.id)
-      .single()
-
-    const current = (profile?.section_visibility ?? {}) as Record<string, boolean>
-    current[section] = visible
-
-    const { error } = await supabase
-      .from('users')
-      .update({ section_visibility: current })
-      .eq('id', user.id)
+    // Atomic jsonb_set — no read-modify-write race
+    const { error } = await supabase.rpc('update_section_visibility', {
+      p_user_id: user.id,
+      p_section: section,
+      p_visible: visible,
+    })
     if (error) throw error
 
     return NextResponse.json({ ok: true })

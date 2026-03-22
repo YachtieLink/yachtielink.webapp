@@ -278,8 +278,9 @@ create table public.endorsements (
   constraint no_self_endorsement check (endorser_id != recipient_id),
   constraint dates_valid check (worked_together_end is null or worked_together_end >= worked_together_start),
   
-  -- One endorsement per (endorser, recipient, yacht) — see D-010
-  constraint unique_endorsement unique (endorser_id, recipient_id, yacht_id)
+  -- One active endorsement per (endorser, recipient, yacht) — see D-010
+  -- Enforced via partial unique index: idx_endorsements_unique_active
+  -- WHERE deleted_at IS NULL (allows re-endorsement after retraction)
 );
 
 -- Indexes
