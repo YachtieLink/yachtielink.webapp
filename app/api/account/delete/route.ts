@@ -68,10 +68,11 @@ export async function POST(req: NextRequest) {
     .update({ deleted_at: new Date().toISOString() })
     .eq('user_id', user.id);
 
-  // 5. Soft-delete certifications
-  await admin.from('certifications')
-    .update({ deleted_at: new Date().toISOString() })
+  // 5. Hard-delete certifications (no deleted_at column — was a ghost column bug)
+  const { error: certErr } = await admin.from('certifications')
+    .delete()
     .eq('user_id', user.id);
+  if (certErr) console.error('Account deletion: certifications cleanup failed:', certErr);
 
   // 6. Anonymise endorsements GIVEN by this user
   //    Keep endorsement text (it's about the recipient) but remove endorser context
@@ -79,18 +80,59 @@ export async function POST(req: NextRequest) {
     .update({ endorser_role_label: null })
     .eq('endorser_id', user.id);
 
-  // 7. Soft-delete endorsement requests
-  await admin.from('endorsement_requests')
-    .update({ deleted_at: new Date().toISOString() })
-    .eq('requester_id', user.id);
+  // 7. Cancel pending endorsement requests (no deleted_at column — use status field)
+  const { error: reqErr } = await admin.from('endorsement_requests')
+    .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
+    .eq('requester_id', user.id)
+    .neq('status', 'accepted');
+  if (reqErr) console.error('Account deletion: endorsement_requests cleanup failed:', reqErr);
 
   // 8. Delete analytics data (not needed post-deletion)
   await admin.from('profile_analytics')
     .delete()
     .eq('user_id', user.id);
 
-  // 9. Delete auth user — invalidates all sessions
-  await admin.auth.admin.deleteUser(user.id);
+  // 9. Clean up Sprint 10+ tables (not covered by CASCADE since users row is anonymised, not deleted)
+  const cleanupErrors: string[] = [];
+  const cleanupTables = [
+    { table: 'saved_profiles', filter: 'user_id' },
+    { table: 'saved_profiles', filter: 'saved_user_id' },
+    { table: 'profile_folders', filter: 'user_id' },
+    { table: 'user_education', filter: 'user_id' },
+    { table: 'user_skills', filter: 'user_id' },
+    { table: 'user_hobbies', filter: 'user_id' },
+    { table: 'user_photos', filter: 'user_id' },
+    { table: 'user_gallery', filter: 'user_id' },
+  ] as const;
+
+  for (const { table, filter } of cleanupTables) {
+    const { error } = await admin.from(table).delete().eq(filter, user.id);
+    if (error) {
+      console.error(`Account deletion: ${table} (${filter}) cleanup failed:`, error);
+      cleanupErrors.push(`${table}.${filter}`);
+    }
+  }
+
+  // 10. Delete auth user — invalidates all sessions
+  // This is the critical irreversible step. If it fails, data is already cleaned
+  // but the user can still log in to a broken profile.
+  try {
+    const { error: authErr } = await admin.auth.admin.deleteUser(user.id);
+    if (authErr) throw authErr;
+  } catch (e) {
+    console.error('Account deletion: auth.deleteUser failed:', e);
+    return NextResponse.json(
+      { error: 'Account deletion partially failed. Your data has been removed but your login still exists. Please contact support.' },
+      { status: 500 },
+    );
+  }
+
+  if (cleanupErrors.length > 0) {
+    return NextResponse.json({
+      ok: true,
+      warning: `Account deleted but some data cleanup failed: ${cleanupErrors.join(', ')}. Contact support if needed.`,
+    });
+  }
 
   return NextResponse.json({ ok: true });
 }
