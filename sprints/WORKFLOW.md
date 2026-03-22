@@ -132,18 +132,63 @@ Each step has an approval gate and a failure mode. The discipline is in not skip
 **Who drives:** Agent (reviewer role — a fresh subagent is ideal for major sprints).
 
 **What happens:**
-- Run the app locally. Test every change end-to-end.
-- Execute the exit criteria from the build plan (they should be runnable commands)
-- For major sprints, spawn a dedicated post-build reviewer:
-  - Bug finder: check for regressions, missed edge cases
-  - UX reviewer: check the actual UI, not just the code
-  - Code reviewer: check the diff against `docs/disciplines/code-review.md`
+- Run `next build` — must pass clean before any review
+- Spawn a **Sonnet post-build code reviewer** (see prompt template below)
 - Classify findings: **ADDED** (fix now, in scope), **DEFERRED** (log as junior sprint), **NOTED** (acceptable, no action)
+- Fix all ADDED items before committing
 - Review your own diff: no console.logs, no hardcoded values, no commented-out code
 
 **Output:** Verification report. All ADDED items fixed. DEFERRED items logged.
 
 **Approval gate:** Founder reviews the final diff before commit (for major sprints). Junior sprints may self-approve if the fix is clean and tested.
+
+### Post-Build Code Review Prompt (Sonnet)
+
+Spawn a single Sonnet subagent with this prompt after every sprint build. This replaces the need for expensive third-party code review on most issues.
+
+```
+You are a post-build code reviewer for a Next.js + Supabase codebase.
+Review the git diff for this sprint. For every issue found, classify as
+CRITICAL / HIGH / MEDIUM / LOW.
+
+## Schema Verification (check every one)
+For each .select(), .from(), .update(), .insert() in the diff:
+1. Read the relevant migration in supabase/migrations/ to confirm
+   the table and ALL referenced columns actually exist
+2. For joined/related tables, verify the FK relationship exists
+3. For columns like "name" — check if the table has that column
+   directly or if the data lives in a related table
+4. Check that RLS policies cover any new columns
+
+## Logic & Runtime Checks
+5. Pagination: is .range() applied BEFORE or AFTER any in-memory
+   sort? If before, the sort only applies within one page — bug.
+6. Fail-open vs fail-closed: when a query errors, does the UI
+   default to showing MORE (safe) or LESS (hides paid features)?
+7. Race conditions: are there debounced saves, optimistic updates,
+   or parallel requests that could arrive out of order?
+8. Null handling: can a value be null/undefined where the code
+   assumes it exists? Check .split(), .toLowerCase(), array access.
+
+## UX Regression Checks
+9. If a native HTML element was replaced with a custom component,
+   did any functionality get lost? (empty option, clear button,
+   keyboard navigation, form submission)
+10. If a component's props changed, do all call sites pass the
+    new required props?
+
+## Known Failure Patterns (from lessons-learned.md)
+Read docs/ops/lessons-learned.md and check if any of the known
+patterns appear in the diff. Common ones:
+- Ghost columns (users.deleted_at, certifications.sort_order)
+- Identity mapping (auth.uid() vs table-specific PK)
+- Migration timestamp collisions
+- Empty string vs null normalization
+
+Return a structured report with file, line, severity, and fix.
+```
+
+**Model:** Sonnet — this is checklist-based pattern matching, not architectural reasoning. One pass with a good prompt beats two passes with a vague one.
 
 **Failure mode:** Agent says "it should work" without running the app. Agent misses a mobile layout break because they only tested desktop. Agent leaves `console.log` statements in committed code.
 
