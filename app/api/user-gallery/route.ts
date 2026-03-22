@@ -77,10 +77,27 @@ export async function PUT(req: NextRequest) {
     if ('error' in result) return result.error
     const { item_ids } = result.data
 
+    // Validate that item_ids covers all user gallery items
+    const { data: existing } = await supabase
+      .from('user_gallery')
+      .select('id')
+      .eq('user_id', user.id)
+    const existingIds = new Set((existing ?? []).map((g) => g.id))
+    const submittedIds = new Set(item_ids)
+    if (existingIds.size !== submittedIds.size || ![...existingIds].every((id) => submittedIds.has(id))) {
+      return NextResponse.json({ error: 'item_ids must include all your gallery items' }, { status: 400 })
+    }
+
+    // Update sort_order — check for errors
     const updates = item_ids.map((id, idx) =>
       supabase.from('user_gallery').update({ sort_order: idx }).eq('id', id).eq('user_id', user.id)
     )
-    await Promise.all(updates)
+    const results = await Promise.all(updates)
+    const failed = results.filter((r) => r.error)
+    if (failed.length > 0) {
+      console.error('Gallery reorder partial failure:', failed.map((r) => r.error))
+      return NextResponse.json({ error: 'Some items could not be reordered' }, { status: 500 })
+    }
 
     return NextResponse.json({ ok: true })
   } catch (e) {
