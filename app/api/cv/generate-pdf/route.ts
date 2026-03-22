@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         .from('attachments')
         .select(`
           id, role_label, started_at, ended_at,
-          yachts ( id, name, yacht_type, length_m, flag_state )
+          yachts ( id, name, yacht_type, length_meters, flag_state )
         `)
         .eq('user_id', user.id)
         .is('deleted_at', null)

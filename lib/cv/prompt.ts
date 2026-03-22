@@ -13,7 +13,7 @@ Extract the following fields. If a field is not found in the CV, use null.
     {
       "yacht_name": "string",
       "yacht_type": "Motor Yacht or Sailing Yacht or null",
-      "length_m": "number or null — length in metres",
+      "length_meters": "number or null — length in metres",
       "role": "string — job title/role on this yacht",
       "start_date": "YYYY-MM or YYYY or null",
       "end_date": "YYYY-MM or YYYY or 'Current' or null",
