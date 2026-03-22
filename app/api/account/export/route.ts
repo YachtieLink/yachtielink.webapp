@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     admin.from('endorsements').select('*').eq('endorser_id', user.id),
     admin.from('endorsements').select('*').eq('recipient_id', user.id),
     admin.from('endorsement_requests').select('*').eq('requester_id', user.id),
-    admin.from('profile_analytics').select('*').eq('user_id', user.id).limit(10000),
+    admin.from('profile_analytics').select('*').eq('user_id', user.id),
     admin.from('saved_profiles').select('*').eq('user_id', user.id),
     admin.from('profile_folders').select('*').eq('user_id', user.id),
     admin.from('user_education').select('*').eq('user_id', user.id),
