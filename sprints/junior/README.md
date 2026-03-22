@@ -12,7 +12,13 @@ They are first-class work — they get their own folder, their own README, and t
 
 | Type | Slug | Status | Summary |
 |------|------|--------|---------|
-| — | — | — | None active |
+| debug | debug-cv-parse-extraction | 🐛 In Progress | CV upload text extraction fails on all file types |
+| debug | debug-photo-upload-limit | 🐛 In Progress | Photo page uses Pro limit for free users — wrong add button + count |
+| debug | debug-cv-regenerate-date | 🐛 In Progress | Regenerate PDF date doesn't update after generation |
+| feature | feature-pro-subdomain-link | ⚡ Planned | Pro custom subdomain (`{handle}.yachtie.link`) with reserved upsell page |
+| feature | feature-cv-sharing-rework | ⚡ Planned | Full CV & Sharing page rework — always-on QR, share modal, CV toggle |
+| feature | feature-saved-profiles-rework | ⚡ Planned | Saved profiles — notes, availability watch, relationship context, folders |
+| ui-ux | ui-public-profile-button-margin | 🎨 In Progress | Top bar buttons on public profile sit flush against screen edge |
 
 ---
 

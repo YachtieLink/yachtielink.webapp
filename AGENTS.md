@@ -120,6 +120,8 @@ These guide judgement calls. When a decision feels like it might drift from them
 
 All execution work lives in `/sprints/`. Two modes: **sprints** (building) and **rallies** (auditing).
 
+**Execution workflow:** When you're about to start a sprint or rally, read `sprints/WORKFLOW.md`. It defines the full loop (Scope → Plan → Review → Build → Verify → Ship), approval gates, parallel agent patterns, model allocation, and common mistakes. Don't load it on every session — only when executing.
+
 ### Sprints
 
 **Major sprints** — phased roadmap work (Phase 1A → 1B → 1C → 2 → 3). Each gets a folder under `sprints/major/` with a `README.md` and `build_plan.md`. These are the planned features that take ground.

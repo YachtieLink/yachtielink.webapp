@@ -10,7 +10,9 @@ Keep these focused — one problem (or one group of related problems) per sprint
 
 | Slug | Started | Issue |
 |------|---------|-------|
-| — | — | None active |
+| debug-cv-parse-extraction | 2026-03-22 | CV upload fails — "Could not extract text" on all files |
+| debug-photo-upload-limit | 2026-03-22 | Photo page uses Pro limit for free users — wrong add button + count |
+| debug-cv-regenerate-date | 2026-03-22 | Regenerate PDF date doesn't update after generation |
 
 ---
 
