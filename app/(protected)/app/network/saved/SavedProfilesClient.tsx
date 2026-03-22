@@ -1,28 +1,34 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
 import { BackButton } from '@/components/ui/BackButton'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Select'
+import { SavedProfileCard } from '@/components/network/SavedProfileCard'
+import { SavedProfileFilters, type SortOption } from '@/components/network/SavedProfileFilters'
+import { useToast } from '@/components/ui/Toast'
 
 interface SavedUser {
   id: string
   full_name: string
   display_name: string | null
-  handle: string | null
+  handle: string
   profile_photo_url: string | null
   primary_role: string | null
+  departments: string[] | null
+  location_country: string | null
 }
 
 interface SavedProfile {
   id: string
   folder_id: string | null
-  saved_user_id: string
+  notes: string | null
+  watching: boolean
+  created_at: string
   saved_user: SavedUser | null
+  isColleague: boolean
+  topCerts: string[]
 }
 
 interface Folder {
@@ -37,30 +43,41 @@ interface Props {
 }
 
 export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) {
+  const { toast } = useToast()
   const [profiles, setProfiles] = useState(initialProfiles)
   const [folders, setFolders] = useState(initialFolders)
   const [activeFolder, setActiveFolder] = useState<string | null>(null)
+  const [sort, setSort] = useState<SortOption>('recent')
+  const [watchingOnly, setWatchingOnly] = useState(false)
   const [newFolderName, setNewFolderName] = useState('')
   const [showNewFolder, setShowNewFolder] = useState(false)
 
-  async function unsave(savedUserId: string) {
-    setProfiles((prev) => prev.filter((p) => p.saved_user_id !== savedUserId))
-    await fetch('/api/saved-profiles', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ saved_user_id: savedUserId }),
-    })
-  }
-
-  async function moveToFolder(profileId: string, folderId: string | null) {
+  async function updateProfile(id: string, patch: Partial<{ notes: string | null; watching: boolean; folder_id: string | null }>) {
+    // Optimistic update
     setProfiles((prev) =>
-      prev.map((p) => (p.id === profileId ? { ...p, folder_id: folderId } : p))
+      prev.map((p) => (p.id === id ? { ...p, ...patch } : p))
     )
-    await fetch(`/api/saved-profiles/${profileId}`, {
+    const res = await fetch(`/api/saved-profiles/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ folder_id: folderId }),
+      body: JSON.stringify(patch),
     })
+    if (!res.ok) {
+      toast('Update failed', 'error')
+      // TODO: rollback on failure
+    }
+  }
+
+  async function unsave(id: string) {
+    const profile = profiles.find((p) => p.id === id)
+    if (!profile?.saved_user) return
+    setProfiles((prev) => prev.filter((p) => p.id !== id))
+    const res = await fetch('/api/saved-profiles', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ saved_user_id: profile.saved_user.id }),
+    })
+    if (!res.ok) toast('Could not unsave', 'error')
   }
 
   async function createFolder() {
@@ -81,7 +98,6 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
 
   async function deleteFolder(folderId: string) {
     if (!confirm('Delete this folder? Profiles will be moved to "All".')) return
-    // Move profiles out of this folder first
     setProfiles((prev) =>
       prev.map((p) => (p.folder_id === folderId ? { ...p, folder_id: null } : p))
     )
@@ -90,9 +106,26 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
     await fetch(`/api/profile-folders/${folderId}`, { method: 'DELETE' })
   }
 
-  const filtered = activeFolder
-    ? profiles.filter((p) => p.folder_id === activeFolder)
-    : profiles
+  // Apply filters
+  let filtered = profiles
+  if (activeFolder) filtered = filtered.filter((p) => p.folder_id === activeFolder)
+  if (watchingOnly) filtered = filtered.filter((p) => p.watching)
+
+  // Apply sort (client-side for name/role since we have all page data)
+  if (sort === 'name') {
+    filtered = [...filtered].sort((a, b) => {
+      const nameA = (a.saved_user?.display_name ?? a.saved_user?.full_name ?? '').toLowerCase()
+      const nameB = (b.saved_user?.display_name ?? b.saved_user?.full_name ?? '').toLowerCase()
+      return nameA.localeCompare(nameB)
+    })
+  } else if (sort === 'role') {
+    filtered = [...filtered].sort((a, b) => {
+      const roleA = (a.saved_user?.primary_role ?? '').toLowerCase()
+      const roleB = (b.saved_user?.primary_role ?? '').toLowerCase()
+      return roleA.localeCompare(roleB)
+    })
+  }
+  // 'recent' is already the default order from API
 
   if (profiles.length === 0) {
     return (
@@ -165,10 +198,7 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
             onKeyDown={(e) => e.key === 'Enter' && createFolder()}
             className="flex-1"
           />
-          <Button
-            onClick={createFolder}
-            size="sm"
-          >
+          <Button onClick={createFolder} size="sm">
             Create
           </Button>
         </div>
@@ -188,54 +218,40 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
         </div>
       )}
 
-      {/* Profile list */}
+      {/* Sort + filter */}
+      <SavedProfileFilters
+        sort={sort}
+        onSortChange={setSort}
+        watchingOnly={watchingOnly}
+        onWatchingChange={setWatchingOnly}
+      />
+
+      {/* Profile cards */}
       <div className="flex flex-col gap-3">
         {filtered.map((entry) => {
           const u = entry.saved_user
           if (!u) return null
-          const name = u.display_name ?? u.full_name
           return (
-            <div key={entry.id} className="bg-[var(--color-surface)] rounded-2xl p-4 flex items-center gap-3">
-              <Link href={`/u/${u.handle}`} className="w-11 h-11 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
-                {u.profile_photo_url ? (
-                  <Image src={u.profile_photo_url} alt={name} width={44} height={44} className="object-cover w-full h-full" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-base font-semibold text-[var(--color-text-secondary)]">
-                    {name[0]?.toUpperCase()}
-                  </div>
-                )}
-              </Link>
-              <Link href={`/u/${u.handle}`} className="min-w-0 flex-1">
-                <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">{name}</p>
-                {u.primary_role && (
-                  <p className="text-xs text-[var(--color-text-secondary)] truncate">{u.primary_role}</p>
-                )}
-              </Link>
-              {/* Folder move dropdown */}
-              {folders.length > 0 && (
-                <Select
-                  value={entry.folder_id ?? ''}
-                  onChange={(e) => moveToFolder(entry.id, e.target.value || null)}
-                  className="shrink-0 h-8 text-xs px-2"
-                >
-                  <option value="">No folder</option>
-                  {folders.map((f) => (
-                    <option key={f.id} value={f.id}>{f.emoji ? `${f.emoji} ` : ''}{f.name}</option>
-                  ))}
-                </Select>
-              )}
-              <button
-                onClick={() => unsave(u.id)}
-                className="shrink-0 text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-error)] transition-colors px-2 py-1"
-                aria-label="Unsave"
-              >
-                ✕
-              </button>
-            </div>
+            <SavedProfileCard
+              key={entry.id}
+              saved={{
+                id: entry.id,
+                notes: entry.notes,
+                watching: entry.watching,
+                created_at: entry.created_at,
+                folder_id: entry.folder_id,
+              }}
+              user={u}
+              isColleague={entry.isColleague}
+              topCerts={entry.topCerts}
+              folders={folders}
+              onUpdate={updateProfile}
+              onUnsave={unsave}
+            />
           )
         })}
-        {filtered.length === 0 && activeFolder && (
-          <EmptyState title="No profiles in this folder" variant="card" />
+        {filtered.length === 0 && (activeFolder || watchingOnly) && (
+          <EmptyState title="No profiles match" variant="card" />
         )}
       </div>
     </>
