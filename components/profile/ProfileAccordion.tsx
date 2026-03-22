@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import { easeGentle } from '@/lib/motion'
 import Link from 'next/link'
+import { type SectionColor, getSectionTokens } from '@/lib/section-colors'
 
 interface ProfileAccordionProps {
   title: string
@@ -16,6 +17,8 @@ interface ProfileAccordionProps {
   defaultOpen?: boolean
   /** If true, section is completely hidden (empty + not visible) */
   hidden?: boolean
+  /** Optional section accent colour — adds left border + chevron tint */
+  accentColor?: SectionColor
 }
 
 export function ProfileAccordion({
@@ -25,13 +28,18 @@ export function ProfileAccordion({
   editHref,
   defaultOpen = false,
   hidden = false,
+  accentColor,
 }: ProfileAccordionProps) {
   const [open, setOpen] = useState(defaultOpen)
+  const tokens = accentColor ? getSectionTokens(accentColor) : null
 
   if (hidden) return null
 
   return (
-    <div className="bg-[var(--color-surface)] rounded-2xl shadow-sm overflow-hidden border border-[var(--color-border-subtle)]">
+    <div
+      className="bg-[var(--color-surface)] rounded-2xl shadow-sm overflow-hidden border border-[var(--color-border-subtle)]"
+      style={tokens ? { borderLeftWidth: 3, borderLeftColor: tokens.accent500 } : undefined}
+    >
       <button
         className="w-full text-left p-4 flex items-start gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-interactive)] active:scale-[0.99] transition-transform"
         onClick={() => setOpen((v) => !v)}
@@ -55,10 +63,11 @@ export function ProfileAccordion({
         <motion.span
           animate={{ rotate: open ? 90 : 0 }}
           transition={easeGentle}
-          className="shrink-0 text-[var(--color-text-secondary)] mt-0.5"
+          className="shrink-0 mt-0.5"
+          style={open && tokens ? { color: tokens.accent500 } : undefined}
           aria-hidden
         >
-          <ChevronRight size={18} />
+          <ChevronRight size={18} className={!open || !tokens ? 'text-[var(--color-text-secondary)]' : ''} />
         </motion.span>
       </button>
 

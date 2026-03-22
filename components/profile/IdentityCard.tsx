@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
@@ -27,7 +27,9 @@ export function IdentityCard({
   photoUrl,
 }: IdentityCardProps) {
   const [copied, setCopied] = useState(false)
-  const [showQR, setShowQR]   = useState(false)
+  const [showQR, setShowQR] = useState(false)
+  const [downloading, setDownloading] = useState(false)
+  const qrCardRef = useRef<HTMLDivElement>(null)
   const profileUrl = `https://yachtie.link/u/${handle}`
 
   async function shareProfile() {
@@ -53,18 +55,37 @@ export function IdentityCard({
     }
   }
 
-  function downloadQR() {
-    const svg  = document.getElementById('profile-qr-svg')
-    if (!svg) return
-    const data = new XMLSerializer().serializeToString(svg)
-    const blob = new Blob([data], { type: 'image/svg+xml' })
-    const url  = URL.createObjectURL(blob)
-    const a    = document.createElement('a')
-    a.href     = url
-    a.download = `${handle}-qr.svg`
-    a.click()
-    URL.revokeObjectURL(url)
-  }
+  const downloadQR = useCallback(async () => {
+    if (!qrCardRef.current || downloading) return
+    setDownloading(true)
+
+    try {
+      // Try html-to-image for PNG export
+      const { toPng } = await import('html-to-image')
+      const dataUrl = await toPng(qrCardRef.current, {
+        pixelRatio: 2,
+        backgroundColor: '#ffffff',
+      })
+      const a = document.createElement('a')
+      a.href = dataUrl
+      a.download = `yachtielink-${handle}-qr.png`
+      a.click()
+    } catch {
+      // Fallback: SVG download (works reliably on all browsers including iOS Safari)
+      const svg = document.getElementById('profile-qr-svg')
+      if (!svg) return
+      const data = new XMLSerializer().serializeToString(svg)
+      const blob = new Blob([data], { type: 'image/svg+xml' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `yachtielink-${handle}-qr.svg`
+      a.click()
+      URL.revokeObjectURL(url)
+    } finally {
+      setDownloading(false)
+    }
+  }, [handle, downloading])
 
   return (
     <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
@@ -78,7 +99,7 @@ export function IdentityCard({
               width={72}
               height={72}
               className="w-18 h-18 rounded-full object-cover ring-2 ring-[var(--color-border)]"
-              unoptimized // CDN URL; next/image optimisation would re-fetch
+              unoptimized
             />
           ) : (
             <div className="w-[72px] h-[72px] rounded-full bg-[var(--color-surface-raised)] flex items-center justify-center ring-2 ring-[var(--color-border)]">
@@ -87,7 +108,6 @@ export function IdentityCard({
               </span>
             </div>
           )}
-          {/* Edit badge */}
           <span className="absolute -bottom-1 -right-1 bg-[var(--color-interactive)] text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center shadow">
             ✎
           </span>
@@ -140,7 +160,7 @@ export function IdentityCard({
         </button>
       </div>
 
-      {/* QR panel (toggle) */}
+      {/* QR panel (toggle) — branded card */}
       <AnimatePresence>
         {showQR && (
           <motion.div
@@ -151,19 +171,44 @@ export function IdentityCard({
             className="overflow-hidden"
           >
             <div className="flex flex-col items-center gap-3 pt-1">
-              <div className="bg-white p-3 rounded-xl">
-                <QRCode
-                  id="profile-qr-svg"
-                  value={profileUrl}
-                  size={160}
-                  level="M"
-                />
+              {/* Branded QR card — captured for PNG download */}
+              <div
+                ref={qrCardRef}
+                className="flex flex-col items-center gap-3 bg-white rounded-2xl p-5 border-2 border-[var(--color-teal-700)]"
+              >
+                {/* QR code with logo overlay */}
+                <div className="relative">
+                  <QRCode
+                    id="profile-qr-svg"
+                    value={profileUrl}
+                    size={160}
+                    level="H"
+                    bgColor="#ffffff"
+                    fgColor="#0D7377"
+                  />
+                  {/* Logo overlay in centre */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-white rounded-lg p-1.5 shadow-sm">
+                      <span className="text-xs font-bold text-[#0D7377] tracking-tight">YL</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Name + handle */}
+                <div className="text-center">
+                  <p className="text-sm font-serif font-semibold text-gray-900">
+                    {displayName || fullName}
+                  </p>
+                  <p className="text-xs text-gray-500">@{handle}</p>
+                </div>
               </div>
+
               <button
                 onClick={downloadQR}
-                className="text-xs text-[var(--color-interactive)] hover:underline"
+                disabled={downloading}
+                className="text-xs text-[var(--color-interactive)] hover:underline disabled:opacity-50"
               >
-                Download QR code
+                {downloading ? 'Downloading…' : 'Download QR card'}
               </button>
             </div>
           </motion.div>

@@ -72,6 +72,7 @@ export const sectionColors: Record<string, SectionColor> = {
   insights: "coral",
   pro: "sand",
   more: "sand",
+  experience: "navy",
   education: "teal",
   gallery: "teal",
 };

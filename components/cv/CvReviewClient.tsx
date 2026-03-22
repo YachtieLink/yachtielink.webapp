@@ -4,35 +4,9 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/components/ui/Toast'
+import { saveParsedCvData, type ParsedCvData } from '@/lib/cv/save-parsed-cv-data'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
-
-interface ParsedEmployment {
-  yacht_name: string
-  yacht_type?: string | null
-  length_m?: number | null
-  role: string
-  start_date?: string | null
-  end_date?: string | null
-  flag_state?: string | null
-}
-
-interface ParsedCertification {
-  name: string
-  category?: string | null
-  issued_date?: string | null
-  expiry_date?: string | null
-}
-
-interface ParsedData {
-  full_name?: string | null
-  bio?: string | null
-  location?: { country?: string | null; city?: string | null } | null
-  employment_history?: ParsedEmployment[]
-  certifications?: ParsedCertification[]
-  languages?: string[]
-  primary_role?: string | null
-}
 
 interface ExistingProfile {
   full_name: string | null
@@ -40,12 +14,6 @@ interface ExistingProfile {
   primary_role: string | null
   location_country: string | null
   location_city: string | null
-}
-
-interface YachtMatch {
-  id: string
-  name: string
-  sim: number
 }
 
 interface CvReviewClientProps {
@@ -60,7 +28,7 @@ export function CvReviewClient({ userId, existingProfile }: CvReviewClientProps)
   const { toast } = useToast()
   const supabase = createClient()
 
-  const [data, setData] = useState<ParsedData | null>(null)
+  const [data, setData] = useState<ParsedCvData | null>(null)
   const [saving, setSaving] = useState(false)
 
   // Editable fields — pre-populated from parsed data, respecting existing profile
@@ -77,7 +45,7 @@ export function CvReviewClient({ userId, existingProfile }: CvReviewClientProps)
       return
     }
 
-    const parsed = JSON.parse(stored) as ParsedData
+    const parsed = JSON.parse(stored) as ParsedCvData
     setData(parsed)
 
     // Only set fields that are currently empty in the existing profile
@@ -101,113 +69,31 @@ export function CvReviewClient({ userId, existingProfile }: CvReviewClientProps)
     if (!data) return
     setSaving(true)
 
-    try {
-      // 1. Update user profile fields (only non-empty changes)
-      const updates: Record<string, string> = {}
-      if (fullName && fullName !== existingProfile.full_name) updates.full_name = fullName
-      if (bio && bio !== existingProfile.bio) updates.bio = bio
-      if (primaryRole && primaryRole !== existingProfile.primary_role) updates.primary_role = primaryRole
-      if (locationCountry && locationCountry !== existingProfile.location_country) updates.location_country = locationCountry
-      if (locationCity && locationCity !== existingProfile.location_city) updates.location_city = locationCity
+    // Build overridden parsed data from the editable fields
+    const overriddenData: ParsedCvData = {
+      ...data,
+      full_name: fullName || data.full_name,
+      bio: bio || data.bio,
+      primary_role: primaryRole || data.primary_role,
+      location: {
+        country: locationCountry || data.location?.country,
+        city: locationCity || data.location?.city,
+      },
+    }
 
-      if (Object.keys(updates).length > 0) {
-        const { error } = await supabase.from('users').update(updates).eq('id', userId)
-        if (error) throw error
-      }
+    const result = await saveParsedCvData(supabase, userId, overriddenData, {
+      skipExistingFields: false,
+    })
 
-      // 2. Create yachts and attachments
-      if (data.employment_history?.length) {
-        for (const emp of data.employment_history) {
-          // Search for existing yacht
-          let yachtId: string | null = null
-
-          const { data: matches } = await supabase.rpc('search_yachts', {
-            p_query: emp.yacht_name,
-            p_limit: 3,
-          })
-
-          if (matches && matches.length > 0) {
-            // Use best match if similarity is reasonable
-            const best = matches[0] as YachtMatch
-            if (best.sim > 0.3) {
-              yachtId = best.id
-            }
-          }
-
-          // Create new yacht if no match
-          if (!yachtId) {
-            const { data: newYacht, error: yachtErr } = await supabase
-              .from('yachts')
-              .insert({
-                name: emp.yacht_name,
-                yacht_type: emp.yacht_type ?? null,
-                length_m: emp.length_m ?? null,
-                flag_state: emp.flag_state ?? null,
-                created_by: userId,
-              })
-              .select('id')
-              .single()
-
-            if (yachtErr || !newYacht) continue
-            yachtId = newYacht.id
-          }
-
-          // Parse dates — handle YYYY and YYYY-MM formats
-          const startDate = emp.start_date ? normalizeDateToISO(emp.start_date) : null
-          const endDate = emp.end_date && emp.end_date !== 'Current'
-            ? normalizeDateToISO(emp.end_date)
-            : null
-
-          // Create attachment
-          await supabase.from('attachments').insert({
-            user_id: userId,
-            yacht_id: yachtId,
-            role_label: emp.role,
-            started_at: startDate,
-            ended_at: endDate,
-          })
-        }
-      }
-
-      // 3. Create certifications
-      if (data.certifications?.length) {
-        // Fetch cert types for matching
-        const { data: certTypes } = await supabase
-          .from('certification_types')
-          .select('id, name, short_name')
-
-        for (const cert of data.certifications) {
-          let certTypeId: string | null = null
-
-          // Try to match by name
-          if (certTypes) {
-            const match = certTypes.find(
-              (ct) =>
-                ct.name.toLowerCase() === cert.name.toLowerCase() ||
-                ct.short_name?.toLowerCase() === cert.name.toLowerCase(),
-            )
-            if (match) certTypeId = match.id
-          }
-
-          await supabase.from('certifications').insert({
-            user_id: userId,
-            certification_type_id: certTypeId,
-            custom_cert_name: certTypeId ? null : cert.name,
-            issued_at: cert.issued_date ? normalizeDateToISO(cert.issued_date) : null,
-            expires_at: cert.expiry_date ? normalizeDateToISO(cert.expiry_date) : null,
-          })
-        }
-      }
-
-      // Clean up
+    if (result.ok) {
       sessionStorage.removeItem('cv_parsed_data')
       toast('CV imported successfully', 'success')
       router.push('/app/profile')
-    } catch {
+    } else {
       toast('Failed to save some data. Please check your profile.', 'error')
-    } finally {
-      setSaving(false)
     }
+
+    setSaving(false)
   }
 
   if (!data) {
@@ -405,13 +291,4 @@ function Field({
       )}
     </div>
   )
-}
-
-// ── Helpers ────────────────────────────────────────────────────────────────────
-
-/** Convert YYYY or YYYY-MM to a valid ISO date string for Supabase */
-function normalizeDateToISO(dateStr: string): string {
-  if (/^\d{4}$/.test(dateStr)) return `${dateStr}-01-01`
-  if (/^\d{4}-\d{2}$/.test(dateStr)) return `${dateStr}-01`
-  return dateStr
 }

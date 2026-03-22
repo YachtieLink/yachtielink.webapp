@@ -228,21 +228,25 @@
   /* Section colors — dark mode (200-level for softer appearance) */
   --color-teal-50:  #0a2424;
   --color-teal-100: #0f3636;
+  --color-teal-900: #11BABB;
 
   --color-coral-50:  #2a1512;
   --color-coral-100: #3d1f1a;
   --color-coral-200: #F9A99C;
   --color-coral-500: #F9A99C;
+  --color-coral-700: #F9A99C;
 
   --color-navy-50:  #131b2e;
   --color-navy-100: #1c2a45;
   --color-navy-200: #A8BAD3;
   --color-navy-500: #A8BAD3;
+  --color-navy-700: #A8BAD3;
 
   --color-amber-50:  #1f1a0e;
   --color-amber-100: #2d2515;
   --color-amber-200: #FBD97D;
   --color-amber-500: #FBD97D;
+  --color-amber-700: #FBD97D;
 
   --color-sand-100: #1e1c17;
   --color-sand-200: #2d2a21;

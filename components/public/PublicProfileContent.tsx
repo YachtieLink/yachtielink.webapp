@@ -8,6 +8,7 @@ import { MapPin, ChevronLeft, Pencil } from 'lucide-react'
 import { ShareButton } from './ShareButton'
 import { EndorsementCard } from './EndorsementCard'
 import { ShowMoreButton } from './ShowMoreButton'
+import { StaggeredList, StaggeredItem } from './StaggeredList'
 import { HeroSection } from './HeroSection'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { PhotoGallery } from '@/components/profile/PhotoGallery'
@@ -300,6 +301,7 @@ export function PublicProfileContent({
             <ProfileAccordion
               title="About"
               summary={aboutSummary(user.ai_summary, user.bio)}
+              accentColor="teal"
             >
               <p className="text-sm text-[var(--color-text-primary)] leading-relaxed whitespace-pre-line">
                 {user.ai_summary || user.bio}
@@ -314,6 +316,7 @@ export function PublicProfileContent({
             <ProfileAccordion
               title="Experience"
               summary={experienceSummary(attachments)}
+              accentColor="navy"
             >
               <div className="flex flex-col gap-3">
                 {attachments.map((att: any) => {
@@ -352,18 +355,20 @@ export function PublicProfileContent({
             <ProfileAccordion
               title="Endorsements"
               summary={endorsementsSummary(endorsements.length, mutualEndorserCount)}
+              accentColor="coral"
             >
-              <div className="flex flex-col gap-3">
+              <StaggeredList className="flex flex-col gap-3">
                 {endorsements.slice(0, 5).map((end: any) => (
-                  <EndorsementCard
-                    key={end.id}
-                    endorserName={end.endorser?.display_name ?? end.endorser?.full_name ?? 'Anonymous'}
-                    endorserRole={end.endorser_role_label}
-                    endorserPhoto={end.endorser?.profile_photo_url}
-                    yachtName={end.yacht?.name}
-                    date={end.created_at}
-                    content={end.content}
-                  />
+                  <StaggeredItem key={end.id}>
+                    <EndorsementCard
+                      endorserName={end.endorser?.display_name ?? end.endorser?.full_name ?? 'Anonymous'}
+                      endorserRole={end.endorser_role_label}
+                      endorserPhoto={end.endorser?.profile_photo_url}
+                      yachtName={end.yacht?.name}
+                      date={end.created_at}
+                      content={end.content}
+                    />
+                  </StaggeredItem>
                 ))}
                 {endorsements.length > 5 && (
                   <ShowMoreButton label={`${endorsements.length - 5} more endorsements`}>
@@ -380,7 +385,7 @@ export function PublicProfileContent({
                     ))}
                   </ShowMoreButton>
                 )}
-              </div>
+              </StaggeredList>
             </ProfileAccordion>
             </ScrollReveal>
           )}
@@ -391,6 +396,7 @@ export function PublicProfileContent({
             <ProfileAccordion
               title="Certifications"
               summary={certificationsSummary(certifications.length, expiringCount)}
+              accentColor="amber"
             >
               <div className="flex flex-col gap-2">
                 {certifications.map((cert: any) => {
@@ -416,6 +422,7 @@ export function PublicProfileContent({
             <ProfileAccordion
               title="Education"
               summary={educationSummary(education)}
+              accentColor="teal"
             >
               <div className="flex flex-col gap-3">
                 {education.map((edu) => (
@@ -490,6 +497,7 @@ export function PublicProfileContent({
             <ProfileAccordion
               title="Gallery"
               summary={gallerySummary(gallery.length)}
+              accentColor="teal"
             >
               <div className="grid grid-cols-3 gap-1.5">
                 {gallery.slice(0, 9).map((item) => (
