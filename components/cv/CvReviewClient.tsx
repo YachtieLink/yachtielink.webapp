@@ -45,7 +45,14 @@ export function CvReviewClient({ userId, existingProfile }: CvReviewClientProps)
       return
     }
 
-    const parsed = JSON.parse(stored) as ParsedCvData
+    let parsed: ParsedCvData
+    try {
+      parsed = JSON.parse(stored) as ParsedCvData
+    } catch {
+      sessionStorage.removeItem('cv_parsed_data')
+      router.replace('/app/cv/upload')
+      return
+    }
     setData(parsed)
 
     // Only set fields that are currently empty in the existing profile

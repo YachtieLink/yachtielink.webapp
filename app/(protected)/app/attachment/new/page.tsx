@@ -71,7 +71,7 @@ export default function AttachmentNewPage() {
 
   // ── submit ──────────────────────────────────────────────────────
   async function handleSave() {
-    if (!yacht || !roleLabel || !startDate) return
+    if (!yacht || !roleLabel || !startDate || !userId) return
     setSaving(true)
 
     const { error } = await supabase.from('attachments').insert({

@@ -82,13 +82,17 @@ export function HeroSection({
 
       {/* Top bar — icon-only buttons over photo */}
       <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top,0px),1rem)] z-10">
-        <Link
-          href="/"
+        <button
+          onClick={() => {
+            const isSameOrigin = document.referrer && new URL(document.referrer).origin === window.location.origin
+            if (isSameOrigin) window.history.back()
+            else window.location.assign('/')
+          }}
           className="flex items-center justify-center w-10 h-10 rounded-full bg-black/25 backdrop-blur-md text-white hover:bg-black/40 transition-colors"
           aria-label="Go back"
         >
           <ChevronLeft size={20} />
-        </Link>
+        </button>
         <div className="flex items-center gap-2">
           {isOwnProfile ? (
             <Link

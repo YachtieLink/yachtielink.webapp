@@ -605,6 +605,14 @@ export function Wizard({ userId, initialData }: WizardProps) {
     initialData.display_name ?? ""
   );
   const [handle, setHandle] = useState(initialData.handle ?? "");
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear redirect timer on unmount
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    };
+  }, []);
 
   const VISIBLE_STEPS = STEPS.length - 1; // exclude "done" from progress count
 
@@ -621,7 +629,8 @@ export function Wizard({ userId, initialData }: WizardProps) {
     setDisplayName(name.split(" ")[0]);
     // Go straight to done
     setStepIndex(3);
-    setTimeout(() => router.push("/app/profile"), 2200);
+    if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    redirectTimerRef.current = setTimeout(() => router.push("/app/profile"), 2200);
   }
 
   function handleCvSkip() {
@@ -646,7 +655,8 @@ export function Wizard({ userId, initialData }: WizardProps) {
     setHandle(data.handle);
     await saveToDb({ handle: data.handle, onboarding_complete: true });
     setStepIndex(3);
-    setTimeout(() => router.push("/app/profile"), 2200);
+    if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
+    redirectTimerRef.current = setTimeout(() => router.push("/app/profile"), 2200);
   }
 
   const currentStep = STEPS[stepIndex];
