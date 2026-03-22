@@ -14,6 +14,8 @@ interface SearchableSelectProps {
   options: Option[]
   pinnedOptions?: Option[]
   placeholder?: string
+  clearable?: boolean
+  clearLabel?: string
   className?: string
 }
 
@@ -24,6 +26,8 @@ export function SearchableSelect({
   options,
   pinnedOptions = [],
   placeholder = 'Search...',
+  clearable = false,
+  clearLabel = 'None',
   className = '',
 }: SearchableSelectProps) {
   const id = useId()
@@ -100,8 +104,25 @@ export function SearchableSelect({
         className="h-12 w-full rounded-xl border px-4 text-sm bg-[var(--color-surface)] text-[var(--color-text-primary)] border-[var(--color-border)] focus-visible:outline-none focus-visible:ring-2 focus-visible:border-[var(--color-interactive)] focus-visible:ring-[var(--color-interactive)]/20 transition-colors"
       />
 
-      {open && (filteredPinned.length > 0 || filteredOptions.length > 0) && (
+      {open && (clearable || filteredPinned.length > 0 || filteredOptions.length > 0) && (
         <ul className="absolute top-full left-0 right-0 mt-1 max-h-60 overflow-y-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-lg z-50">
+          {/* Clear option */}
+          {clearable && (!search || clearLabel.toLowerCase().includes(query)) && (
+            <li>
+              <button
+                type="button"
+                onClick={() => select('')}
+                className={`w-full text-left px-4 py-2.5 text-sm transition-colors hover:bg-[var(--color-surface-overlay)] ${
+                  !value
+                    ? 'text-[var(--color-interactive)] font-medium'
+                    : 'text-[var(--color-text-tertiary)] italic'
+                }`}
+              >
+                {clearLabel}
+              </button>
+            </li>
+          )}
+
           {/* Pinned options */}
           {filteredPinned.map((o) => (
             <li key={`pinned-${o.value}`}>

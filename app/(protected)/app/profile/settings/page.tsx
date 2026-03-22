@@ -222,6 +222,8 @@ export default function ProfileSettingsPage() {
               options={ALL_COUNTRIES.map((c) => ({ value: c, label: c }))}
               pinnedOptions={PINNED_COUNTRIES.map((c) => ({ value: c, label: c }))}
               placeholder="Search countries..."
+              clearable
+              clearLabel="No country"
               className="flex-1"
             />
             <Input
