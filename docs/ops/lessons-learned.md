@@ -6,12 +6,28 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 55 lessons
+**Current count:** 57 lessons
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## Shared Rate Limit Categories Can Break Unrelated Routes
+
+**What happened:** Sprint 1 of Rally 003 changed the `fileUpload` rate limit category to `failOpen: false` to prevent unbounded resource consumption when Redis is down. But the GDPR data export route (`/api/account/export`) also used the `fileUpload` category. This meant users couldn't export their own data during Redis outages — a functional regression and potential GDPR violation.
+**Fix:** Codex caught it. Created a separate `dataExport` category with `failOpen: true` for the export route.
+**Pattern to avoid:** Before changing the behavior of any shared config value (rate limit category, env var, constant), grep the codebase for ALL callers. Ask: "does every caller still work correctly with this change?" This is the #1 category of bugs that survive plan review and build pass.
+
+---
+
+## Downstream Caller Checks Are the Most Valuable Review Step
+
+**What happened:** Across all PRs in this session, Codex consistently caught bugs that our Sonnet post-build reviewer missed. Every one was a downstream impact bug: a change that worked correctly in isolation but broke something else that depended on it. Examples: rate limit category shared by export route, Select→SearchableSelect lost the clear option, isPro defaulting to false on query error.
+**Fix:** Added a "Blast Radius / Downstream Caller Check" section to the post-build review prompt in WORKFLOW.md. For every changed symbol, the reviewer now greps for all callers and verifies each one still works.
+**Pattern to avoid:** Never change the behavior of a shared function, config, or type without checking every caller. The fix always looks correct in the file you're editing — the bug is in the file you didn't read.
 
 ---
 
