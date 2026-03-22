@@ -82,7 +82,6 @@ export function PhotoGallery({ photos, profilePhotoUrl, displayName, editable, f
             fill
             className="object-cover"
             priority={current === 0}
-            unoptimized
           />
         </motion.div>
       </AnimatePresence>

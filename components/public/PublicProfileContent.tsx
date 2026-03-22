@@ -529,7 +529,6 @@ export function PublicProfileContent({
                       alt={item.caption ?? 'Gallery photo'}
                       fill
                       className="object-cover"
-                      unoptimized
                     />
                   </div>
                 ))}
@@ -544,7 +543,6 @@ export function PublicProfileContent({
                           alt={item.caption ?? 'Gallery photo'}
                           fill
                           className="object-cover"
-                          unoptimized
                         />
                       </div>
                     ))}

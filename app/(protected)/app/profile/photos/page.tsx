@@ -72,7 +72,6 @@ function SortablePhoto({
         alt={`Photo ${index + 1}`}
         fill
         className="object-cover pointer-events-none"
-        unoptimized
       />
       {index === 0 && (
         <span className="absolute top-1 left-1 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded-full">

@@ -52,7 +52,7 @@ export default async function PublicProfilePage({ params }: Props) {
   }).then(() => {})
 
   // Fetch all data in parallel
-  const [attRes, certRes, endRes, extended, { data: { user: viewer } }] = await Promise.all([
+  const [attRes, certRes, endRes, extended, { data: { user: viewer } }, { data: profilePhotos }] = await Promise.all([
     supabase
       .from('attachments')
       .select(`
@@ -82,14 +82,12 @@ export default async function PublicProfilePage({ params }: Props) {
       .order('created_at', { ascending: false }),
     getExtendedProfileSections(user.id),
     supabase.auth.getUser(),
+    supabase
+      .from('user_photos')
+      .select('id, photo_url, sort_order')
+      .eq('user_id', user.id)
+      .order('sort_order'),
   ])
-
-  // Fetch profile photos for gallery hero
-  const { data: profilePhotos } = await supabase
-    .from('user_photos')
-    .select('id, photo_url, sort_order')
-    .eq('user_id', user.id)
-    .order('sort_order')
 
   // Viewer relationship logic
   type MutualColleague = {

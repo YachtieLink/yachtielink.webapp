@@ -95,7 +95,7 @@ export default function WorkGalleryPage() {
       <div className="grid grid-cols-3 gap-2">
         {items.map((item) => (
           <div key={item.id} className="relative aspect-square rounded-xl overflow-hidden bg-[var(--color-surface-raised)]">
-            <Image src={item.image_url} alt={item.caption ?? 'Gallery photo'} fill className="object-cover" unoptimized />
+            <Image src={item.image_url} alt={item.caption ?? 'Gallery photo'} fill className="object-cover" />
             <button
               onClick={() => deleteItem(item.id)}
               className="absolute top-1 right-1 bg-black/50 hover:bg-[var(--color-error)] text-white text-xs w-6 h-6 rounded-full flex items-center justify-center transition-colors"

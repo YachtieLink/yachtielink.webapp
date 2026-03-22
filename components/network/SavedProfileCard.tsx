@@ -52,7 +52,7 @@ export function SavedProfileCard({
         <Link href={`/u/${user.handle}`} className="shrink-0">
           {user.profile_photo_url ? (
             <div className="relative w-12 h-12 rounded-full overflow-hidden border border-[var(--color-border)]">
-              <Image src={user.profile_photo_url} alt={displayName} fill className="object-cover" unoptimized />
+              <Image src={user.profile_photo_url} alt={displayName} fill className="object-cover" />
             </div>
           ) : (
             <div className="w-12 h-12 rounded-full bg-[var(--color-surface-overlay)] flex items-center justify-center text-lg text-[var(--color-text-tertiary)]">

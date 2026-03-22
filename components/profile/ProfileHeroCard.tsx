@@ -61,7 +61,6 @@ export function ProfileHeroCard({
               width={56}
               height={56}
               className="object-cover w-full h-full"
-              unoptimized
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-lg font-semibold text-[var(--color-text-secondary)]">
