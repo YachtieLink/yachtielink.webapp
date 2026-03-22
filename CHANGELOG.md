@@ -15,6 +15,75 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - Confirm it's complete at session end
 - Be concise but specific — the next agent needs to understand what happened and what's next
 
+**Also update when writing here:**
+- `sessions/YYYY-MM-DD-<slug>.md` — working notes (create at session start if not yet created)
+- `docs/modules/<module>.md` + `.activity.md` — if you touched any module's code
+- `docs/ops/lessons-learned.md` — if you hit a non-obvious gotcha
+- `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
+- `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
+
+---
+
+## 2026-03-22 — Claude Code (Opus 4.6) — Ralph Loop: Sprint Planning + Build Spec Drafting
+
+### Done
+
+**Sprint Planning (Ralph Loop) — drafting, not implementation:**
+- Wrote 17 sprint planning READMEs via automated sequential loop (each sprint reads the preceding one):
+  - Phase 1C: README + Sprints 14–17 (availability, search, AI pack 1, attachment confirmation)
+  - Phase 2: README + Sprints 18–20 (peer hiring, recruiter access, agency plans + NLP search)
+  - Phase 3: README + Sprints 21–23 (messaging, notifications + multilingual, timeline + community)
+  - Phase 4: README + Sprints 24–26 (AI career tools, advanced AI, verified status + moderation)
+- These are planning documents with scope, deliverables, dependencies, and exit criteria — not build specs
+
+**Build Spec Hardening — drafting, not implementation:**
+- Hardened 7 sprint READMEs into full `build_plan.md` files (Sprints 14–20) using parallel Opus subagents
+- Each build plan includes: migration SQL, component specs, API routes, cron jobs, PostHog events, implementation order, testing checklist, rollback plan
+- Build plans are implementation-ready specifications but no code has been written
+
+**Cross-Sprint Review:**
+- Batch 1 review (Sprints 14–16): 3 critical issues, 7 warnings — all fixed
+- Batch 2 review (Sprints 17–20): Sprint 20 had 5 critical issues (auth.uid() confusion, file collision, safety regression) — all fixed
+- Review reports at `sprints/major/phase-1c/build_spec_review_batch1.md` and `sprints/major/phase-2/build_spec_review_batch2.md`
+
+**Critical Fixes Applied:**
+- Migration timestamp collisions resolved (sequential ordering across all sprints)
+- `users.deleted_at` ghost references removed (Sprints 14, 19 — column doesn't exist on users)
+- `ai_usage_log` RLS tightened (was allowing anon inserts)
+- Sprint 20: 16+ RLS policies fixed for `auth.uid()` vs `recruiters.auth_user_id` mapping
+- Sprint 20: `lib/ai/embeddings.ts` collision resolved (renamed to `crew-embeddings.ts`)
+- Sprint 20: `unlock_crew_profile()` safety checks restored (subscription, visibility, race condition)
+- Sprint 20: `role_title` → `role_label` column name corrected
+- Sprint 15: GIN index operator fixed (`= ANY()` → `@>` for array containment)
+- Sprint 16: Pro gate standardised to use `getProStatus()` helper
+
+**Documentation & Process Improvements:**
+- Added cross-reference "Also update" nudges to 4 logging docs (CHANGELOG, sessions/README, lessons-learned, feedback) so agents are reminded of sibling docs when writing
+- Added 3 new lessons to `docs/ops/lessons-learned.md` (48 → 51): deleted_at ghost, timestamp collisions, identity mapping
+- Updated `sprints/major/README.md` phase map and active phases to reflect all planned work
+- Created session log at `sessions/2026-03-22-ralph-loop-planning.md` with full timestamped working notes
+
+### Context
+
+- The Ralph Loop prompt at `sprints/major/RALPH_LOOP_PROMPT.md` drove the sequential planning
+- All 17 planning files and 7 build specs are in `sprints/major/phase-{1c,2,3,4}/`
+- No code has been written — this is all planning and specification work
+- Build specs for Sprints 21–26 (Phase 3–4) have not yet been hardened
+
+### Next
+
+- Harden remaining 6 build specs: Sprints 21–26 (messaging, notifications, timeline, AI career, advanced AI, verified status)
+- Review those specs for cross-sprint consistency (same pattern as batches 1–2)
+- Founder reviews all 17 sprint plans and adjusts scope/sequencing as needed
+- Sprint 11 (CV onboarding) is the immediate build target — it already has a build_plan.md and is on the current branch
+
+### Flags
+
+- Sprint 20 build spec was the most complex (3,649 lines) and had the most issues — worth a second review pass before execution
+- Recurring pattern: subagents tend to reference `users.deleted_at` which doesn't exist — future spec generation should note this
+- Recurring pattern: migration timestamp collisions when multiple agents work in parallel — need explicit timestamp allocation
+- **Founder review needed:** `docs/yl_phase1_execution.md` Phase 1C section still says "Peer hiring, Recruiter access, Broader discovery tooling" — the Ralph Loop plans Phase 1C as availability, search, AI pack, graph integrity instead. Peer hiring moved to Phase 2. The canonical doc should be updated to match, but this is a founder decision
+
 ---
 
 ## 2026-03-21 — Claude Code (Opus 4.6) — Sprint 10.2 + 10.3: Design System & Page Layout

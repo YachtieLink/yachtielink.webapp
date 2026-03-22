@@ -1,7 +1,7 @@
 import Link from 'next/link'
 
 import { Button } from '@/components/ui/Button'
-import type { SectionColor } from '@/lib/section-colors'
+import { type SectionColor, getSectionTokens } from '@/lib/section-colors'
 
 interface EmptyStateProps {
   /** Emoji or React node displayed above the title */
@@ -19,7 +19,7 @@ interface EmptyStateProps {
    * 'inline' — renders just the text content (for use inside an existing card)
    */
   variant?: 'card' | 'inline'
-  /** Optional section accent color for the icon tint */
+  /** Optional section accent color — tints icon and left border */
   accentColor?: SectionColor
 }
 
@@ -32,9 +32,15 @@ export function EmptyState({
   variant = 'card',
   accentColor,
 }: EmptyStateProps) {
+  const tokens = accentColor ? getSectionTokens(accentColor) : null
+
   const content = (
     <>
-      {icon && <div className="text-2xl mb-3">{icon}</div>}
+      {icon && (
+        <div className="text-2xl mb-3" style={tokens ? { color: tokens.text700 } : undefined}>
+          {icon}
+        </div>
+      )}
       <p className="text-sm font-medium text-[var(--color-text-primary)]">{title}</p>
       {description && (
         <p className="text-xs text-[var(--color-text-secondary)] mt-1">{description}</p>
@@ -52,7 +58,14 @@ export function EmptyState({
   }
 
   return (
-    <div className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-2xl p-6 text-center">
+    <div
+      className="bg-[var(--color-surface-raised)] border border-[var(--color-border)] rounded-2xl p-6 text-center"
+      style={tokens ? {
+        borderLeftWidth: 3,
+        borderLeftColor: tokens.accent500,
+        backgroundColor: tokens.bg50,
+      } : undefined}
+    >
       {content}
     </div>
   )

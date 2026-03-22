@@ -21,6 +21,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.37.0",
+    "html-to-image": "^1.11.13",
     "ioredis": "^5.10.0",
     "lucide-react": "^0.577.0",
     "mammoth": "^1.12.0",

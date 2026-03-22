@@ -206,6 +206,11 @@ export default function MorePage() {
       <SectionHeader title="Help" />
       <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
         <SettingsRow
+          label="Feature Roadmap"
+          href="/app/more/roadmap"
+          sublabel="See what's coming and what's shipped"
+        />
+        <SettingsRow
           label="Send feedback"
           href="mailto:hello@yachtie.link?subject=YachtieLink feedback"
           sublabel="hello@yachtie.link"

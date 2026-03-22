@@ -10,12 +10,20 @@ interface PublicQRCodeProps {
 
 export function PublicQRCode({ handle }: PublicQRCodeProps) {
   return (
-    <QRCode
-      value={`https://yachtie.link/u/${handle}`}
-      size={80}
-      level="M"
-      bgColor="transparent"
-      fgColor="var(--color-text-tertiary)"
-    />
+    <div className="relative">
+      <QRCode
+        value={`https://yachtie.link/u/${handle}`}
+        size={160}
+        level="H"
+        bgColor="transparent"
+        fgColor="var(--color-teal-700)"
+      />
+      {/* Logo overlay */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="bg-[var(--color-surface)] rounded-lg p-1.5">
+          <span className="text-xs font-bold text-[var(--color-teal-700)] tracking-tight">YL</span>
+        </div>
+      </div>
+    </div>
   )
 }

@@ -44,6 +44,11 @@ export async function proxy(request: NextRequest) {
 
   const { pathname, searchParams } = request.nextUrl;
 
+  // Redirect authenticated users from root to their profile
+  if (user && pathname === '/') {
+    return NextResponse.redirect(new URL('/app/profile', request.url));
+  }
+
   // Redirect unauthenticated users away from protected routes
   if (!user && PROTECTED_PREFIXES.some((p) => pathname.startsWith(p))) {
     const url = new URL("/welcome", request.url);

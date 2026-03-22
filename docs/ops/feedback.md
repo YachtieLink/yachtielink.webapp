@@ -8,6 +8,11 @@
 
 **Current count:** 18 rules
 
+**Also update when writing here:**
+- `CHANGELOG.md` — note the correction in your session's Flags section
+- `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
+- `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
 ---
 
 ## Update CHANGELOG Before Every Commit

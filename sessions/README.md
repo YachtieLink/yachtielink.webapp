@@ -42,3 +42,10 @@ Extract any durable lessons to `docs/ops/lessons-learned.md` before archival.
 - **Session log** = what was attempted, discovered, and decided (working notes)
 
 Both are updated during work. They serve different purposes.
+
+## Also update when writing here
+
+- `CHANGELOG.md` — if not already current (Done/Context/Next/Flags)
+- `docs/modules/<module>.md` + `.activity.md` — if you touched any module's code
+- `docs/ops/lessons-learned.md` — if you discovered a gotcha worth capturing
+- `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
