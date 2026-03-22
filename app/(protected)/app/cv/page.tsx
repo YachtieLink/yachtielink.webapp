@@ -11,7 +11,7 @@ export default async function CvPage() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('id, handle, latest_pdf_path, latest_pdf_generated_at, subscription_status')
+    .select('id, handle, full_name, display_name, primary_role, departments, profile_photo_url, latest_pdf_path, latest_pdf_generated_at, cv_storage_path, cv_public, cv_public_source, subscription_status')
     .eq('id', authUser.id)
     .single()
 
@@ -24,7 +24,14 @@ export default async function CvPage() {
         handle={profile.handle!}
         hasPdf={!!profile.latest_pdf_path}
         pdfGeneratedAt={profile.latest_pdf_generated_at}
+        hasUploadedCv={!!profile.cv_storage_path}
+        cvPublic={profile.cv_public ?? true}
+        cvPublicSource={(profile.cv_public_source as 'generated' | 'uploaded') ?? 'generated'}
         isPro={profile.subscription_status === 'pro'}
+        displayName={profile.display_name || profile.full_name}
+        primaryRole={profile.primary_role}
+        departments={profile.departments}
+        profilePhotoUrl={profile.profile_photo_url}
       />
     </PageTransition>
   )

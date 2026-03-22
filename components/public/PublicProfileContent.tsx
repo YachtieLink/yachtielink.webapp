@@ -4,7 +4,7 @@
  */
 import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin, ChevronLeft, Pencil } from 'lucide-react'
+import { MapPin, ChevronLeft, Pencil, Download } from 'lucide-react'
 import { ShareButton } from './ShareButton'
 import { EndorsementCard } from './EndorsementCard'
 import { ShowMoreButton } from './ShowMoreButton'
@@ -51,6 +51,10 @@ interface UserProfile {
   available_for_work?: boolean
   founding_member?: boolean
   social_links?: Array<{ platform: string; url: string }> | null
+  cv_public?: boolean
+  cv_public_source?: string
+  latest_pdf_path?: string | null
+  cv_storage_path?: string | null
 }
 
 export interface PublicProfileContentProps {
@@ -117,6 +121,7 @@ export function PublicProfileContent({
   savedStatus,
 }: PublicProfileContentProps) {
   const displayName = user.display_name ?? user.full_name
+  const firstName = displayName.split(' ')[0]
   const isOwnProfile = viewerRelationship?.isOwnProfile ?? false
   const sharedYachtIdSet = new Set(viewerRelationship?.sharedYachtIds ?? [])
   const isColleague = sharedYachtIdSet.size > 0
@@ -282,16 +287,33 @@ export function PublicProfileContent({
             <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-1.5 border border-[var(--color-border-subtle)]">
               <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-1">Contact</p>
               {user.show_email && user.email && (
-                <a href={`mailto:${user.email}`} className="text-sm text-[var(--color-interactive)] hover:underline">{user.email}</a>
+                <a href={`mailto:${user.email}?subject=${encodeURIComponent(`Hey ${firstName}`)}&body=${encodeURIComponent(`Hey ${firstName}, I saw your profile on YachtieLink.\n\n`)}`} className="text-sm text-[var(--color-interactive)] hover:underline">{user.email}</a>
               )}
               {user.show_phone && user.phone && (
                 <a href={`tel:${user.phone}`} className="text-sm text-[var(--color-text-primary)]">{user.phone}</a>
               )}
               {user.show_whatsapp && user.whatsapp && (
-                <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--color-interactive)] hover:underline">
+                <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hey ${firstName}, I saw your profile on YachtieLink. `)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--color-interactive)] hover:underline">
                   WhatsApp: {user.whatsapp}
                 </a>
               )}
+            </div>
+          )}
+
+          {/* CV Download — shown only when the selected public source has a file */}
+          {user.cv_public && (
+            (user.cv_public_source === 'uploaded' ? user.cv_storage_path : user.latest_pdf_path)
+          ) && (
+            <div className="bg-[var(--color-surface)] rounded-2xl p-4 border border-[var(--color-border-subtle)]">
+              <a
+                href={`/api/cv/public-download/${user.handle}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm font-medium text-[var(--color-interactive)] hover:underline"
+              >
+                <Download size={16} />
+                Download CV
+              </a>
             </div>
           )}
 
