@@ -11,6 +11,11 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 BEGIN
+  -- Ownership check: caller can only modify their own visibility
+  IF p_user_id != auth.uid() THEN
+    RAISE EXCEPTION 'Forbidden' USING ERRCODE = '42501';
+  END IF;
+
   UPDATE users
   SET section_visibility = jsonb_set(
     COALESCE(section_visibility, '{}'::jsonb),
@@ -22,5 +27,4 @@ BEGIN
 END;
 $$;
 
--- RLS: Only the user can call this for themselves
--- The function is SECURITY DEFINER but we validate p_user_id = auth.uid() via the API route
+GRANT EXECUTE ON FUNCTION public.update_section_visibility(uuid, text, boolean) TO authenticated;

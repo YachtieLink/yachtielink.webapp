@@ -5,6 +5,12 @@ import { handleApiError } from '@/lib/api/errors';
 
 export const runtime = 'nodejs';
 
+interface EmailTask {
+  certId: string
+  bucket: '60d' | '30d'
+  promise: Promise<void>
+}
+
 export async function GET(req: NextRequest) {
   try {
     // Verify request is from Vercel Cron — secret is mandatory
@@ -43,9 +49,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ sent: 0 });
     }
 
-    const sent60dIds: string[] = [];
-    const sent30dIds: string[] = [];
-    const emailPromises: Promise<void>[] = [];
+    const tasks: EmailTask[] = [];
 
     for (const cert of certsDue) {
       const user = (cert as any).users;
@@ -58,24 +62,36 @@ export async function GET(req: NextRequest) {
 
       // 60-day reminder: only for certs 31-60 days out
       if (daysLeft > 30 && daysLeft <= 60 && !cert.expiry_reminder_60d_sent) {
-        emailPromises.push(
-          sendCertExpiryEmail({ email: user.email, name, certName, expiryDate: cert.expires_at!, daysUntilExpiry: daysLeft })
-        );
-        sent60dIds.push(cert.id);
+        tasks.push({
+          certId: cert.id,
+          bucket: '60d',
+          promise: sendCertExpiryEmail({ email: user.email, name, certName, expiryDate: cert.expires_at!, daysUntilExpiry: daysLeft }),
+        });
       }
       // 30-day reminder: for certs 1-30 days out
       else if (daysLeft <= 30 && !cert.expiry_reminder_30d_sent) {
-        emailPromises.push(
-          sendCertExpiryEmail({ email: user.email, name, certName, expiryDate: cert.expires_at!, daysUntilExpiry: daysLeft })
-        );
-        sent30dIds.push(cert.id);
+        tasks.push({
+          certId: cert.id,
+          bucket: '30d',
+          promise: sendCertExpiryEmail({ email: user.email, name, certName, expiryDate: cert.expires_at!, daysUntilExpiry: daysLeft }),
+        });
       }
     }
 
-    // Fire emails in parallel
-    await Promise.allSettled(emailPromises);
+    // Fire emails in parallel, only mark successfully sent ones
+    const results = await Promise.allSettled(tasks.map(t => t.promise));
 
-    // Batch update flags
+    const sent60dIds: string[] = [];
+    const sent30dIds: string[] = [];
+
+    for (let i = 0; i < results.length; i++) {
+      if (results[i].status === 'fulfilled') {
+        if (tasks[i].bucket === '60d') sent60dIds.push(tasks[i].certId);
+        else sent30dIds.push(tasks[i].certId);
+      }
+    }
+
+    // Batch update flags — only for successfully sent emails
     if (sent60dIds.length > 0) {
       await supabase.from('certifications').update({ expiry_reminder_60d_sent: true }).in('id', sent60dIds);
     }
