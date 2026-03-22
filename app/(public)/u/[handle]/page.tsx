@@ -52,7 +52,7 @@ export default async function PublicProfilePage({ params }: Props) {
   }).then(() => {})
 
   // Fetch all data in parallel
-  const [attRes, certRes, endRes, extended, { data: { user: viewer } }, { data: profilePhotos }] = await Promise.all([
+  const [attRes, certRes, endRes, extended, { data: { user: viewer } }, { data: profilePhotos }, seaTimeRes] = await Promise.all([
     supabase
       .from('attachments')
       .select(`
@@ -87,7 +87,12 @@ export default async function PublicProfilePage({ params }: Props) {
       .select('id, photo_url, sort_order')
       .eq('user_id', user.id)
       .order('sort_order'),
+    supabase.rpc('get_sea_time', { p_user_id: user.id }),
   ])
+
+  const seaTime = seaTimeRes.data as { total_days: number; yacht_count: number }[] | null
+  const seaTimeTotalDays = seaTime?.[0]?.total_days ?? 0
+  const seaTimeYachtCount = seaTime?.[0]?.yacht_count ?? 0
 
   // Viewer relationship logic
   type MutualColleague = {
@@ -198,6 +203,8 @@ export default async function PublicProfilePage({ params }: Props) {
         viewerRelationship={viewerRelationship}
         sectionVisibility={sectionVisibility}
         savedStatus={savedStatus}
+        seaTimeTotalDays={seaTimeTotalDays}
+        seaTimeYachtCount={seaTimeYachtCount}
       />
     </div>
   )

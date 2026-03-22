@@ -3,10 +3,10 @@
 The canonical reference for how work moves from idea to shipped code. Read this when you're about to start executing — not on every session start.
 
 **What to read based on your task:**
-- **Major sprint** → The Loop (Steps 1–6) + Parallel Agent Patterns + Common Mistakes
-- **Junior sprint** → The Loop (Steps 1–6, lighter intensity — see Workflow by Sprint Size table)
+- **Major sprint** → The Loop (Steps 1–7) + Parallel Agent Patterns + Common Mistakes
+- **Junior sprint** → The Loop (Steps 1–7, lighter intensity — see Workflow by Sprint Size table)
 - **Rally** → Rally Execution (Steps R1–R6) + Parallel Agent Patterns
-- **Quick fix** → Skim Steps 4–6 only — just build, verify, ship
+- **Quick fix** → Skim Steps 4–7 only — just build, verify, migrate, ship
 
 ---
 
@@ -20,7 +20,8 @@ Every sprint follows the same core loop, scaled to the size of the work:
 3. REVIEW   →  Stress-test the plan before any code is written
 4. BUILD    →  Execute the plan, wave by wave
 5. VERIFY   →  Run the app, test end-to-end, review your own diff
-6. SHIP     →  Commit, update docs, close the sprint
+6. MIGRATE  →  Apply pending Supabase migrations to production
+7. SHIP     →  Commit, update docs, close the sprint
 ```
 
 Each step has an approval gate and a failure mode. The discipline is in not skipping steps, even when the fix seems obvious.
@@ -410,7 +411,32 @@ A clean review is a valid outcome.
 
 ---
 
-## Step 6 — SHIP
+## Step 6 — MIGRATE
+
+**Who drives:** Agent, with explicit founder approval.
+
+**When:** After build passes and code review is complete, but BEFORE commit and push. Only runs when the sprint includes new or modified migration files.
+
+**What happens:**
+
+1. Check for pending migrations: `ls supabase/migrations/` and compare against what's already applied
+2. **Ask the founder for explicit approval:** "There are N pending migration(s) ready to apply to production Supabase. Shall I run `supabase db push`?" List the migration filenames and a one-line summary of each.
+3. **Wait for a "yes" / affirmative response** before proceeding
+4. Run `supabase db push` via the Supabase CLI
+5. Verify success — check for errors in the output
+6. If a migration fails: stop, diagnose, fix the migration SQL, and re-run. Do not proceed to SHIP with a failed migration.
+
+**If no migrations exist in the sprint:** Skip this step entirely — proceed directly to SHIP.
+
+**Why this step exists:** Migrations applied after commit/push create a window where the deployed code references schema that doesn't exist yet. Applying before commit ensures the database and codebase stay in sync. The founder gate prevents accidental production schema changes.
+
+**Approval gate:** Founder must explicitly confirm before `supabase db push` runs. Never apply migrations silently.
+
+**Failure mode:** Agent applies migrations without asking. Agent commits code that references new columns/RPCs before the migration runs. Agent skips this step and the next deploy breaks because the schema is behind.
+
+---
+
+## Step 7 — SHIP
 
 **Who drives:** Agent, with founder approval.
 
@@ -572,12 +598,12 @@ Rallies follow their own loop. No code is written — the output is a plan that 
 
 Not every sprint needs every step at full intensity:
 
-| Sprint Type | Scope | Plan | Review | Build | Verify | Ship |
-|-------------|-------|------|--------|-------|--------|------|
-| **Major sprint** | Founder walkthrough | README + build_plan.md | Dedicated reviewer subagent | Multi-agent with dependency waves | Post-build review agents | Full CHANGELOG + module updates |
-| **Junior sprint** | Founder describes issue | README (plan optional) | Self-review | Single agent | Run app, test the fix | CHANGELOG + sprint index update |
-| **Quick fix** | Obvious bug in current scope | None needed | Glance at the diff | Just fix it | Run app | CHANGELOG note |
-| **Rally** | Founder defines audit scope | Two-pass analysis | Built into the process | No code — output is a plan | N/A | Rally README + proposal doc |
+| Sprint Type | Scope | Plan | Review | Build | Verify | Migrate | Ship |
+|-------------|-------|------|--------|-------|--------|---------|------|
+| **Major sprint** | Founder walkthrough | README + build_plan.md | Dedicated reviewer subagent | Multi-agent with dependency waves | Post-build review agents | Ask founder → `supabase db push` | Full CHANGELOG + module updates |
+| **Junior sprint** | Founder describes issue | README (plan optional) | Self-review | Single agent | Run app, test the fix | Ask founder → `supabase db push` | CHANGELOG + sprint index update |
+| **Quick fix** | Obvious bug in current scope | None needed | Glance at the diff | Just fix it | Run app | Ask founder if migrations exist | CHANGELOG note |
+| **Rally** | Founder defines audit scope | Two-pass analysis | Built into the process | No code — output is a plan | N/A | N/A | Rally README + proposal doc |
 
 ---
 

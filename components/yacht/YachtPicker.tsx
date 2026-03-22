@@ -13,6 +13,8 @@ export interface YachtOption {
   yacht_type: string | null
   length_meters: number | null
   flag_state: string | null
+  crew_count?: number
+  is_established?: boolean
 }
 
 interface Props {
@@ -52,7 +54,35 @@ export function YachtPicker({ userId, onSelect }: Props) {
     if (!q.trim()) { setResults([]); setSearching(false); return }
     setSearching(true)
     const { data } = await supabase.rpc('search_yachts', { p_query: q, p_limit: 8 })
-    setResults((data as YachtOption[]) ?? [])
+    const baseResults = (data as YachtOption[]) ?? []
+
+    // Enrich with crew counts + established status
+    if (baseResults.length > 0) {
+      const ids = baseResults.map(r => r.id)
+      const { data: yachtDetails } = await supabase
+        .from('yachts')
+        .select('id, is_established')
+        .in('id', ids)
+
+      const detailMap = new Map((yachtDetails ?? []).map(
+        (y: { id: string; is_established: boolean }) => [y.id, y]
+      ))
+
+      // Fetch crew counts in parallel
+      const crewCounts = await Promise.all(
+        baseResults.map(r => supabase.rpc('yacht_crew_count', { yacht: r.id }))
+      )
+
+      const enriched = baseResults.map((r, i) => ({
+        ...r,
+        crew_count: (crewCounts[i].data as number) ?? 0,
+        is_established: detailMap.get(r.id)?.is_established ?? false,
+      }))
+
+      setResults(enriched)
+    } else {
+      setResults(baseResults)
+    }
     setSearching(false)
   }
 
@@ -143,7 +173,12 @@ export function YachtPicker({ userId, onSelect }: Props) {
 
   // ── helpers ───────────────────────────────────────────
   function yachtMeta(y: YachtOption) {
-    const parts = [y.yacht_type, y.length_meters ? `${y.length_meters}m` : null, y.flag_state]
+    const parts = [
+      y.yacht_type,
+      y.length_meters ? `${y.length_meters}m` : null,
+      y.flag_state,
+      y.crew_count != null && y.crew_count > 0 ? `${y.crew_count} crew` : null,
+    ]
     return parts.filter(Boolean).join(' · ')
   }
 
@@ -195,7 +230,14 @@ export function YachtPicker({ userId, onSelect }: Props) {
               onClick={() => onSelect(r)}
               className="w-full text-left px-4 py-3 rounded-xl bg-[var(--color-surface-raised)] hover:bg-[var(--color-border)] transition-colors"
             >
-              <p className="font-medium text-sm text-[var(--color-text-primary)]">{r.name}</p>
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-sm text-[var(--color-text-primary)]">{r.name}</p>
+                {r.is_established && (
+                  <span className="text-[10px] bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-1.5 py-0.5 rounded-full font-medium">
+                    Established
+                  </span>
+                )}
+              </div>
               {yachtMeta(r) && (
                 <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{yachtMeta(r)}</p>
               )}
@@ -314,7 +356,14 @@ export function YachtPicker({ userId, onSelect }: Props) {
               onClick={() => handleDupeUseExisting(c)}
               className="w-full text-left px-4 py-3 rounded-xl bg-[var(--color-surface-raised)] hover:bg-[var(--color-border)] transition-colors"
             >
-              <p className="font-medium text-sm text-[var(--color-text-primary)]">{c.name}</p>
+              <div className="flex items-center gap-2">
+                <p className="font-medium text-sm text-[var(--color-text-primary)]">{c.name}</p>
+                {c.is_established && (
+                  <span className="text-[10px] bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-1.5 py-0.5 rounded-full font-medium">
+                    Established
+                  </span>
+                )}
+              </div>
               {yachtMeta(c) && (
                 <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{yachtMeta(c)}</p>
               )}

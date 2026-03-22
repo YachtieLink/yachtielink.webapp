@@ -6,12 +6,36 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 58 lessons
+**Current count:** 61 lessons
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## DROP FUNCTION Destroys GRANT EXECUTE — Silent RPC Failure
+
+**What happened:** Sprint 12 review (Opus Phase 2). Migration `20260321000001` dropped and recreated `get_sea_time()` to fix a return type conflict. The `DROP` destroyed the prior `GRANT EXECUTE`. Without the grant, Supabase returns `{ data: null, error: ... }` instead of throwing — and every caller used `?? 0` fallback. Sea time would have silently shown as zero everywhere in production with no error in logs.
+**Fix:** Added explicit `GRANT EXECUTE ... TO authenticated, anon` in the Sprint 12 migration. Also granted to `anon` since public profiles call this RPC.
+**Pattern to avoid:** Every `DROP FUNCTION` must be followed by `GRANT EXECUTE` on the replacement. Supabase RPCs fail silently without grants — the only symptom is null data, which blends into default fallbacks.
+
+---
+
+## RLS Is Row-Level, Not Column-Level — admin_notes Exposed
+
+**What happened:** Sprint 12 review (Sonnet Phase 1). The `reports` table had an `admin_notes` column meant to be service-role-only. The RLS SELECT policy granted reporters access to their own rows — but RLS is row-level. Once a row is accessible, ALL columns are readable, including `admin_notes`.
+**Fix:** Added `REVOKE SELECT (admin_notes) ON public.reports FROM authenticated, anon` — column-level privileges survive RLS and are the correct tool for hiding specific columns.
+**Pattern to avoid:** RLS cannot hide individual columns. If a table has both user-visible and admin-only columns, use column-level REVOKE or split into separate tables.
+
+---
+
+## N+1 RPC Fan-Out in Client Components — Batch or Enrich Instead
+
+**What happened:** Sprint 12 review (both phases). YachtPicker enriches search results by firing one `yacht_crew_count` RPC per result (up to 8 parallel calls per keystroke). On slow mobile connections this adds 200-500ms. The 300ms debounce limits frequency but each search still fires 9 total RPCs (1 search + 8 enrichments).
+**Fix:** Deferred — works correctly, just suboptimal. Documented in build plan as DRF-03.
+**Pattern to avoid:** When enriching a list with per-item data, create a batch RPC that accepts an array of IDs, or enrich in the original query. Never fan out N individual RPCs from a client component on a debounced input.
 
 ---
 

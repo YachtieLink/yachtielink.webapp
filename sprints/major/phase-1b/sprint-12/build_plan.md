@@ -868,11 +868,148 @@ Before starting Parts 4 (sea time on profile) and 3 (colleague explorer), confir
 
 ---
 
+## Part 9: Attachment Transfer
+
+### 9.1 — Database (in Sprint 12 migration)
+
+Two new tables + two RPCs. See `supabase/migrations/20260322000010_attachment_transfers_reports.sql` for the complete SQL.
+
+**`attachment_transfers`** — immutable audit log. One row per transfer. Records `from_yacht_id`, `to_yacht_id`, which endorsements moved vs skipped, and optional reason.
+
+**`reports`** — generic user flagging. CHECK constraints on `target_type` (user/endorsement/yacht/attachment), `category` (spam/harassment/fake_identity/etc), `status` (pending/reviewing/resolved/dismissed). Partial unique index prevents duplicate active reports. No UI in Sprint 12 — foundation only.
+
+**`transfer_attachment()`** RPC — atomic operation:
+1. Validates caller owns the attachment (`auth.uid()`, `FOR UPDATE` lock)
+2. Validates target yacht exists and is different
+3. Enforces 5-transfer lifetime limit per attachment
+4. Updates `attachments.yacht_id`
+5. If `p_cascade_endorsements = true`: moves endorsements where both parties have attachments to the destination yacht. Endorsements where the other party has NO attachment to the destination are skipped (stay on old yacht).
+6. Moves pending `endorsement_requests` when cascade is enabled
+7. Logs everything to `attachment_transfers`
+8. Returns structured JSONB: `{ success, transfer_id, endorsements_moved, endorsements_skipped, skipped_endorsement_ids }`
+
+**`submit_report()`** RPC — validates target existence, checks for duplicate active reports, inserts.
+
+### 9.2 — API Route
+
+**File to create:** `app/api/attachment/transfer/route.ts`
+
+```typescript
+// POST /api/attachment/transfer
+// Body: { attachmentId, toYachtId, cascadeEndorsements, reason? }
+// Calls transfer_attachment() RPC
+// Returns: RPC result (success/failure with details)
+```
+
+Thin wrapper around the RPC. Validates request body with Zod. Returns the RPC response directly.
+
+### 9.3 — Transfer UI on Attachment Edit Page
+
+**File to modify:** `app/(protected)/app/attachment/[id]/edit/page.tsx`
+
+Add a "Wrong yacht?" section between "Save changes" and the danger zone:
+
+```
+┌─────────────────────────────────────┐
+│  Save changes                       │  ← existing primary CTA
+├─────────────────────────────────────┤
+│                                     │
+│  Wrong yacht?                       │
+│  If this role was on a different    │
+│  vessel, you can move it without    │
+│  losing your dates.                 │
+│                                     │
+│  [ Move to a different yacht ]      │  ← ghost variant button
+│                                     │
+├─────────────────────────────────────┤
+│  Remove this yacht                  │  ← existing danger zone
+└─────────────────────────────────────┘
+```
+
+### 9.4 — Transfer BottomSheet Flow
+
+**File to create:** `components/attachment/TransferSheet.tsx` — client component
+
+**Step 1: Yacht selection** — reuses YachtPicker inside a BottomSheet. User searches for destination yacht.
+
+**Step 2: Impact preview** — shows before user confirms:
+
+```
+┌─────────────────────────────────────┐
+│  Confirm transfer                   │
+│                                     │
+│  M/Y Lady M  ──→  M/Y Aqua Blue    │
+│                                     │
+│  What stays the same                │
+│  · Your role: Chief Stewardess      │
+│  · Your dates: Mar 2022 – Nov 2023  │
+│                                     │
+│  What changes                       │
+│  · 2 endorsements will move         │
+│  · You'll join 8 crew on Aqua Blue  │
+│  · You'll leave 12 crew on Lady M   │
+│                                     │
+│  ⚠ 1 endorsement can't move        │  ← only if skipped > 0
+│  (endorser not on Aqua Blue)        │
+│                                     │
+│  ☑ Move my endorsements too         │  ← cascade checkbox, default on
+│                                     │
+│  [ Confirm transfer ]               │
+│  Cancel                             │
+└─────────────────────────────────────┘
+```
+
+**Step 3: Success** — sheet closes, toast "Moved to M/Y Aqua Blue", edit page reloads with new yacht name.
+
+**Data needed for impact preview** (fetched after yacht selection, before showing preview):
+- Destination yacht crew count: `yacht_crew_count(to_yacht_id)`
+- Source yacht crew count: already known from page context
+- Endorsement count that would move: count endorsements on this yacht involving this user, cross-referenced with destination yacht attachments
+- This can be a preview RPC or computed client-side from existing data
+
+Props:
+```typescript
+interface TransferSheetProps {
+  attachmentId: string
+  currentYachtId: string
+  currentYachtName: string
+  roleLabel: string
+  startDate: string
+  endDate: string | null
+  onTransferComplete: () => void  // triggers page reload
+}
+```
+
+### 9.5 — Edge Cases Handled
+
+| Edge case | Handling |
+|-----------|----------|
+| Transfer to same yacht | RPC rejects: `same_yacht` error |
+| Attachment already deleted | RPC rejects: `attachment_not_found` |
+| Target yacht doesn't exist | RPC rejects: `target_yacht_not_found` |
+| Transfer limit reached (5) | RPC rejects: `transfer_limit_reached`. UI shows message. |
+| Endorser has no attachment to destination | Endorsement stays on old yacht. Returned in `skipped_endorsement_ids`. Shown in UI as warning. |
+| User has existing attachment on destination yacht (different dates) | Allowed — different time periods on the same yacht are valid. |
+| User has overlapping dates on destination yacht | Allowed — date overlap validation is not enforced (same as regular attachment creation). |
+| Pending endorsement requests on old yacht | Moved to new yacht when cascade is on (no coworker constraint — endorsement not yet written). |
+| Yacht establishment status changes | Handled automatically — `check_yacht_established` is computed on access, not stored. `is_established = true` is a one-way ratchet (OR clause). |
+
+---
+
+## Part 10: Reporting Foundation (Database Only)
+
+The `reports` table and `submit_report()` RPC ship in the Sprint 12 migration. No UI is built. This is foundation work so reporting can be added in a future sprint without a migration.
+
+**Architecture note for Sprint 12 crew cards:** The `CrewCard` component (Part 2.3) should accept an optional `menuItems` or `actions` prop for future extensibility. When reporting ships, an overflow menu (three-dot) can be added to crew cards without restructuring the component. Same applies to `YachtEndorsements` cards (Part 2.5).
+
+---
+
 ## Files to Create / Modify
 
 ### New files
 ```
 supabase/migrations/YYYYMMDD000001_sprint12_yacht_graph.sql
+supabase/migrations/20260322000010_attachment_transfers_reports.sql  (already created)
 lib/sea-time.ts
 components/yacht/CrewCard.tsx
 components/yacht/YachtEndorsements.tsx
@@ -880,8 +1017,10 @@ components/network/ColleagueExplorer.tsx
 components/profile/SeaTimeSummary.tsx
 components/profile/SeaTimeBreakdown.tsx
 components/profile/MutualColleagues.tsx
+components/attachment/TransferSheet.tsx
 app/(protected)/app/network/colleagues/page.tsx
 app/(protected)/app/profile/sea-time/page.tsx
+app/api/attachment/transfer/route.ts
 ```
 
 ### Modified files
@@ -893,6 +1032,7 @@ app/u/[handle]/page.tsx (or equivalent)         — sea time stat line on public
 components/yacht/YachtPicker.tsx                 — fuzzy match UX improvements, duplicate detection
 components/audience/AudienceTabs.tsx             — "Explore" link in colleagues section
 app/(protected)/app/endorsement/request/page.tsx — add query param handling for pre-fill (if not already supported)
+app/(protected)/app/attachment/[id]/edit/page.tsx — "Wrong yacht?" section with transfer trigger
 CHANGELOG.md                                    — update before commit
 docs/modules/*.md                               — update affected modules
 ```
@@ -909,8 +1049,9 @@ docs/modules/*.md                               — update affected modules
 5. **Colleague explorer** — ColleagueExplorer component, new page, entry points from AudienceTabs + profile, empty state
 6. **Endorsement request pre-fill** — add query param handling to `/app/endorsement/request` if not already supported
 7. **Yacht search** — YachtPicker improvements, duplicate detection UX, established badge (deferrable)
-8. **Polish** — cross-page navigation consistency, responsive checks at 375px, accessibility audit
-9. **CHANGELOG + module docs** — update before commit
+8. **Attachment transfer** — migration tables + RPC, API route, transfer UI on attachment edit page (BottomSheet + YachtPicker + impact preview)
+9. **Polish** — cross-page navigation consistency, responsive checks at 375px, accessibility audit
+10. **CHANGELOG + module docs** — update before commit
 
 ---
 
@@ -929,6 +1070,26 @@ docs/modules/*.md                               — update affected modules
 | D-S12-09 | Sea time is public information | Sea time is derived from attachments which are already visible on yacht detail pages. No additional privacy gating needed — any user can see crew lists on any yacht. RPC uses `security definer` for codebase consistency. |
 | D-S12-10 | Endorsement cross-refs respect D-011 | Endorsement section on yacht page uses neutral framing ("Endorsements between crew on this yacht"). Section is hidden if 0 endorsements — no "no endorsements yet" messaging that could imply absence is negative. |
 | D-S12-11 | All RPCs use `security definer` | Matches codebase convention. All existing RPCs (`get_colleagues`, `get_sea_time`, `search_yachts`, `are_coworkers_on_yacht`) use `security definer`. Sprint 12 follows suit. |
+| D-S12-12 | Attachment transfer: endorsements move, not soft-delete | Endorsements follow the attachment to the new yacht IF the other party also has an attachment there. Otherwise they stay on the old yacht (historically accurate, not orphaned). Soft-deleting destroys value — the endorsement was about the work, not the database row. |
+| D-S12-13 | Skipped endorsements stay alive on old yacht | If endorser has no attachment to destination yacht, their endorsement stays on the original yacht. More useful than silent deletion. UI shows which endorsements couldn't move. |
+| D-S12-14 | Transfer limit: 5 per attachment, no cooldown | Prevents abuse without being restrictive. Users correcting mistakes shouldn't wait 7 days. Lifetime limit of 5 is sufficient at current scale. |
+| D-S12-15 | Transfer is invisible to other users | No notifications to crew on either yacht. The transfer is a correction, not a departure/arrival. Endorser notifications for skipped endorsements are a future enhancement. |
+| D-S12-16 | "Wrong yacht?" on attachment edit page only | One entry point. Uses existing BottomSheet + YachtPicker. Not on yacht detail page (that's a community view, not a personal edit surface). Not a primary action — most users never need it. |
+| D-S12-17 | Endorsement cascade is opt-in | The `transfer_attachment()` RPC takes `p_cascade_endorsements` flag. UI presents this as a checkbox so users understand what moves. Default: true (most users want endorsements to follow). |
+| D-S12-18 | Reports table ships empty (no UI) | Foundation for future reporting/flagging. Tables + RPC + RLS ready. Crew cards in Sprint 12 should be built with extensible props so an overflow menu / report button can be added later without restructuring. |
+| D-S12-19 | Yacht name timeline table (foundation, no UI) | Yachts change names frequently in the industry. `yacht_names` table tracks the full history so old names resolve to the same entity (kills a class of duplicates), attachments can show the name at time of service, and yacht pages can show "formerly M/Y Dilbar". Seeded from existing `yachts.name`. `yachts.name` remains the denormalized current display name. Name editing UI is a future sprint. |
+
+---
+
+## Deferred Review Findings (Sprint 12 Pre-Commit Review)
+
+Review run: 2026-03-22. Phase 1 (Sonnet) + Phase 2 (Opus). 13 findings total, 10 fixed, 3 deferred below.
+
+| ID | Finding | Why Deferred | Future Fix |
+|----|---------|-------------|------------|
+| DRF-01 | `transfer_attachment()` leaves completed `endorsement_requests` pointing at old yacht. Accepted/pending requests move correctly, but requests with `status = 'accepted'` (endorsement already written) keep the old `yacht_id`. | Not a data-loss bug — the endorsement itself transfers, and the completed request is historical record. Fixing could break the audit trail. | If we add a request history UI, consider migrating completed requests to match their endorsement's yacht_id. Low priority. |
+| DRF-02 | `get_mutual_colleagues()` RPC exists in migration but is not called by any TypeScript code. The public profile page computes mutual colleagues client-side via multi-step attachment joins. | Created for future use and to establish the contract. The client-side logic works correctly today. | Wire up the RPC to replace the manual join in `/u/[handle]/page.tsx` when we refactor public profiles. Reduces client complexity and query count. |
+| DRF-03 | YachtPicker fires N+1 RPC calls per search keystroke — up to 8 parallel `yacht_crew_count` RPCs after `search_yachts` returns. On slow mobile connections this adds 200-500ms latency. | Works correctly, just suboptimal. Debounce (300ms) limits blast radius. Fixing requires a new batch RPC or enriched search function. | Create `search_yachts_enriched()` RPC that returns crew count and `is_established` in one query. Or add `get_yacht_crew_counts(uuid[])` batch variant. |
 
 ---
 
@@ -942,6 +1103,8 @@ docs/modules/*.md                               — update affected modules
 | `colleague_explorer.endorse_tapped` | `{ colleague_id, yacht_id }` | User taps "Endorse" quick-action |
 | `colleague_explorer.searched` | `{ query_length }` | User searches within colleague explorer |
 | `sea_time.viewed` | `{ total_days, yacht_count }` | User views sea time breakdown page |
+| `attachment.transfer_started` | `{ attachment_id, from_yacht_id }` | User taps "Move to a different yacht" |
+| `attachment.transfer_completed` | `{ attachment_id, from_yacht_id, to_yacht_id, endorsements_moved, endorsements_skipped }` | Transfer confirmed and executed |
 
 ---
 
@@ -979,4 +1142,11 @@ docs/modules/*.md                               — update affected modules
 - [ ] Non-critical query failures degrade gracefully (yacht page renders without endorsement section if that query fails)
 - [ ] Accessibility: accordion has aria-expanded, endorsement status has text labels, stats use semantic HTML
 - [ ] `formatSeaTime()` utility used in all 3 sea time display locations (no duplicated logic)
+- [ ] `transfer_attachment()` RPC validates ownership, enforces 5-transfer limit, moves endorsements conditionally
+- [ ] Transfer UI: "Wrong yacht?" section on attachment edit page with BottomSheet flow
+- [ ] Transfer impact preview shows: what stays (role, dates), what changes (endorsements moved/skipped, crew counts)
+- [ ] Skipped endorsements (endorser not on destination yacht) stay on old yacht, shown to user
+- [ ] `reports` and `attachment_transfers` tables exist with RLS (reports: no UI yet, foundation only)
+- [ ] `submit_report()` RPC validates target existence and prevents duplicate active reports
+- [ ] Crew card component accepts extensible props for future overflow menu / report action
 - [ ] CHANGELOG and module docs updated before commit

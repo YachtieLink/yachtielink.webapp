@@ -43,3 +43,6 @@ Any context, constraints, or open questions.
 | Proposal | Status | Priority |
 |----------|--------|----------|
 | [Bug Reporter](./bug-reporter.md) | fleshed-out | P2 |
+| [Attachment Transfer](./attachment-transfer.md) | promoted (Sprint 12) | P2 |
+| [Reporting & Flagging](./reporting-flagging.md) | idea | P2 |
+| [Yacht Name Timeline](./yacht-name-timeline.md) | idea (DB foundation in Sprint 12) | P2 |

@@ -20,9 +20,14 @@ Enhance the yacht detail page with crew context and endorsement cross-references
 - Colleague explorer page — `/app/network/colleagues` (grouped by yacht, endorsement status, quick endorse action)
 - Sea time display — profile summary card + per-yacht breakdown page + public profile stat
 - Yacht search UX improvements (better fuzzy match presentation, improved duplicate detection dialog)
+- Attachment transfer — "Wrong yacht?" correction flow on attachment edit page (move work history to correct yacht, endorsement cascade)
+- Trust infrastructure (database only) — `attachment_transfers` + `reports` tables, `transfer_attachment()` + `submit_report()` RPCs. Report UI deferred.
+- Yacht name timeline (database only) — `yacht_names` table tracking name history. Yachts change names frequently; this prevents duplicate yacht entries and lets attachments show the name the yacht had when crew worked there. Seeded from existing `yachts.name`. UI deferred.
 
 **Out:**
-- Yacht merge flow — not needed; graph self-heals via crew count signal (the yacht with more crew is canonical). YachtPicker shows crew count to steer users to the right entry.
+- Yacht merge flow — not needed; graph self-heals via crew count signal + attachment transfer lets users self-correct
+- Yacht search as browsing/discovery tool (intentionally deferred — monetisation candidate for paid tier)
+- Report UI (tables + RPCs ship, UI is a future sprint)
 - Gap analysis in sea time (out for now, can be added later)
 - Recruiter search / NLP search (future phase)
 - Availability broadcast / discovery (future phase)
@@ -77,6 +82,17 @@ Enhance the yacht detail page with crew context and endorsement cross-references
 - ⬜ Established yacht badge in search results
 - ⬜ Broader match threshold for more inclusive suggestions
 
+### Attachment Transfer — "Wrong yacht?" correction
+- ⬜ `attachment_transfers` table (audit log) + `reports` table (trust foundation)
+- ⬜ `transfer_attachment()` RPC — atomic: validate ownership, move attachment, cascade endorsements (opt-in), log transfer
+- ⬜ `submit_report()` RPC — validate target, prevent duplicates, insert
+- ⬜ API route: `POST /api/attachment/transfer`
+- ⬜ "Wrong yacht?" section on attachment edit page
+- ⬜ TransferSheet: BottomSheet with YachtPicker → impact preview → confirm
+- ⬜ Impact preview shows: what stays (role, dates), what changes (endorsements, crew counts)
+- ⬜ Skipped endorsements (endorser not on destination) shown as warning
+- ⬜ 5-transfer lifetime limit per attachment
+
 ### Database Migration
 - ⬜ Fix existing `get_sea_time()` date arithmetic bug (extract(day) → date subtraction)
 - ⬜ `get_sea_time_detailed(p_user_id)` — per-yacht sea time breakdown
@@ -94,6 +110,10 @@ Enhance the yacht detail page with crew context and endorsement cross-references
 - Sea time displays on profile (summary card) and public profile (stat line)
 - Sea time breakdown page shows per-yacht details
 - Yacht search shows match quality and improved duplicate comparison
+- Attachment transfer: "Wrong yacht?" flow works end-to-end (BottomSheet → YachtPicker → impact preview → confirm → endorsement cascade)
+- Transfer RPC enforces ownership, 5-transfer limit, returns moved/skipped endorsement details
+- `reports` + `attachment_transfers` tables exist with RLS (reports: foundation only, no UI)
+- Crew card component built with extensible props for future overflow menu / report button
 - All new pages work at 375px width (mobile-first)
 - No performance regressions — `Promise.all()` on all independent queries
 - GRANT EXECUTE applied to all new RPCs
