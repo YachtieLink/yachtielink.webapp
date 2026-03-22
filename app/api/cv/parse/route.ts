@@ -20,6 +20,11 @@ export async function POST(req: NextRequest) {
   if ('error' in result) return result.error
   const { storagePath } = result.data
 
+  // Ownership guard: users can only parse their own CV files
+  if (!storagePath.startsWith(`${user.id}/`)) {
+    return NextResponse.json({ error: 'Access denied' }, { status: 403 })
+  }
+
   // Rate limit check
   const { data: allowed } = await supabase.rpc('check_cv_parse_limit', { p_user_id: user.id })
   if (!allowed) {

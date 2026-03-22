@@ -35,14 +35,16 @@ export async function checkRateLimit(
   key: string,
   limit: number,
   windowSeconds: number,
+  options?: { failOpen?: boolean },
 ): Promise<RateLimitResult> {
+  const failOpen = options?.failOpen ?? true;
   const now = Math.floor(Date.now() / 1000);
   const resetAt = (Math.floor(now / windowSeconds) + 1) * windowSeconds;
 
   // Fail open if Redis is not configured (local dev / missing env vars)
   const redis = getRedis();
   if (!redis) {
-    return { allowed: true, remaining: limit, resetAt };
+    return { allowed: failOpen, remaining: failOpen ? limit : 0, resetAt };
   }
 
   try {
@@ -60,8 +62,8 @@ export async function checkRateLimit(
       resetAt,
     };
   } catch {
-    // Redis unavailable — fail open so real features still work
-    return { allowed: true, remaining: limit, resetAt };
+    // Redis unavailable — fail open for non-critical routes, fail closed for expensive ones
+    return { allowed: failOpen, remaining: failOpen ? limit : 0, resetAt };
   }
 }
 

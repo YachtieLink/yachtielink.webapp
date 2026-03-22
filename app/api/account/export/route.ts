@@ -8,8 +8,8 @@ export async function GET(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  // Rate limit: use fileUpload budget (20/hour — generous for data export)
-  const limited = await applyRateLimit(req, 'fileUpload', user.id);
+  // Rate limit: dedicated category — must fail open for GDPR compliance
+  const limited = await applyRateLimit(req, 'dataExport', user.id);
   if (limited) return limited;
 
   const admin = createServiceClient();
