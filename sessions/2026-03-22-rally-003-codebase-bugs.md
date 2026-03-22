@@ -69,8 +69,20 @@ All now codified in lessons-learned.md and the Opus review prompt.
 - **Created /review skill:** Reusable two-phase review skill at `~/.claude/skills/review/`. Runs Sonnet first-pass then Opus deep review.
 - **Backlog system:** Created `sprints/backlog/` for idea capture. Added idea capture workflow to CLAUDE.md.
 
+## Sprints 7–10 + Final Session Work
+
+- **Sprint 7 (Race conditions):** Photo/gallery reorder now validates full array + checks errors. CV-settings uses Zod. Endorsement request phone dedup index. Opus caught phantom 'declined' status in CHECK constraint (P1).
+- **Sprint 8 (Performance):** Analytics nudge cron → DB-level RPC. New index on subscription_status. user_photos into Promise.all on both profile pages. Removed `unoptimized` from all 10 Image components + AVIF/WebP config. Opus caught duplicate index, unnecessary RPC grant, bigint wire issue.
+- **Sprint 9 (UX states):** More page billing skeleton (no flash of Free). Back button same-origin aware. CV page handle guard (was causing redirect loop). Certs loading.tsx. CvReviewClient JSON.parse safety. Wizard setTimeout cleanup. Public profile empty fallback. Opus caught broken QR URL from null handle, history.back() regression, timer overwrite.
+- **Sprint 10 (Accessibility):** SectionManager role=switch. Button aria-busy. Skeleton w-0 fix. ProfileStrength aria-label. Account page null guard. Endorsement form hint visible from empty. Opus: clean pass.
+- **Migrations applied:** All 9 pending migrations pushed to production Supabase via CLI.
+- **Sprint CV-Parse planned:** Full build plan with 6-step import wizard, yacht matching UX, colleague discovery, reference extraction, endorsement request sending.
+- **Ghost Profiles spec written:** Frictionless endorsement response without signup, token-based verification, claimable accounts, viral growth loop.
+
 ## What's Left
 
-- Rally 003 Sprints 7–10 (N+1 queries, Promise.all waterfalls, unoptimized images, UX empty states)
-- Merge Sprint 6 PR #70 and v2 prompts PR #71
-- Test v2 review prompts on next sprint
+- Merge PRs #73, #74, #75, #76, #77, #78
+- Sprint CV-Parse: rally + build (gates Phase 1B)
+- Ghost Profiles: major sprint (foundational to growth model)
+- Sprint 12 (Yacht Graph), Sprint 13 (Launch Polish)
+- Debug CV upload/parse in production

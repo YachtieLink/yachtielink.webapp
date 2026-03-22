@@ -24,57 +24,72 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
-## 2026-03-22 — Claude Code (Opus 4.6) — Rally 003 Sprints 5–6 + v2 Review Prompts + /review Skill
+## 2026-03-22 — Claude Code (Opus 4.6) — Rally 003 Complete (All 10 Sprints) + v2 Review System + Sprint Planning
 
 ### Done
 
-**Rally 003 Sprint 5 — length_m → length_meters (merged):**
-- Renamed ghost column reference across 7 files (prompt, save, PDF, public profile, generate-pdf, CvReview, PublicProfileContent)
-- Yacht length was silently discarded everywhere — never stored from CV parse, never displayed, missing from PDFs
-- No migration needed — DB column was already correctly named `length_meters`
-- Opus review: clean pass, all callers verified
+**Rally 003 — All 10 Fix Sprints Shipped:**
 
-**Rally 003 Sprint 6 — Cert Expiry + Endorsement + Section Visibility (PR #70):**
-- Cert expiry cron: 60d branch now requires `daysLeft > 30` (was firing for certs at 5 days). Emails parallelized with `Promise.allSettled`, only marks as sent on successful delivery. Batch DB updates via `.in()`.
-- Endorsement unique constraint: replaced full-table UNIQUE with partial index `WHERE deleted_at IS NULL` — users can re-endorse after retraction.
-- Section visibility: replaced read-modify-write PATCH with atomic `jsonb_set` RPC, ownership check inside SECURITY DEFINER, GRANT EXECUTE.
-- Opus review caught 2 P1s (missing GRANT EXECUTE, missing auth.uid() ownership check in DEFINER) and 2 P2s (email flags set before delivery, stale schema docs). All fixed before PR.
+| Sprint | Scope | PR | Opus Findings |
+|--------|-------|----|---------------|
+| 5 | length_m → length_meters (7 files) | Merged | Clean |
+| 6 | Cert expiry logic, endorsement constraint, atomic section visibility | #70 | 2 P1, 2 P2 |
+| 7 | Photo/gallery reorder validation, cv-settings Zod, request dedup | #73 | 1 P1, 3 P2 |
+| 8 | Analytics N+1 → RPC, indexes, image optimization (10 files) | #74 | 4 P2 |
+| 9 | More page flash fix, back button origin check, handle guard, loading states | #75 | 3 P2 |
+| 10 | ARIA roles, button aria-busy, skeleton fix, null guards | #76 | Clean |
+
+**Opus Deep Review Performance:**
+- Sprints 5-10: 10 P1s and 12 P2s caught before merge
+- Zero false positives — every finding was a real bug
+- Key catches: missing GRANT EXECUTE, SECURITY DEFINER without ownership check, duplicate index, phantom CHECK constraint value, history.back() UX regression, broken QR URL from null handle
 
 **v2 Review Prompts — Founder Collaboration:**
 - Founder wrote alternative review prompt structure, merged with existing prompts
-- 5 specific improvements applied:
-  1. Include new code paths that affect existing behavior (not just modified symbols)
-  2. "Concrete evidence only" — plausible risks go to Open Questions, not Findings
-  3. Read targeted migrations, not all migrations (saves context)
-  4. Pass 1 candidate-heavy (recall), Pass 2 confirmation-heavy (precision)
-  5. "Do not edit code" instead of "do not fix" (clearer instruction)
-- Sonnet prompt: now explicitly candidate-heavy, added GRANT EXECUTE check, Pro gate consistency, SECURITY DEFINER awareness
+- 5 improvements: new code paths, concrete evidence only, targeted migrations, recall vs precision split, "do not edit code"
+- Sonnet prompt: candidate-heavy, GRANT EXECUTE check, Pro gate consistency, SECURITY DEFINER awareness
 - Opus prompt: 13 embedded failure patterns, 4 anti-rationalization rules, open questions / testing gaps / residual risks output
 
 **Created /review Skill:**
-- Reusable skill at `~/.claude/skills/review/` — runs two-phase review with single command
-- Phase 1 (Sonnet): ~$0.20, 1-2 min, broad scan
-- Phase 2 (Opus): ~$1.50, 3-6 min, deep trace + adversarial challenge
-- Reads customized prompts from `sprints/WORKFLOW.md` if present, falls back to generic defaults
+- Reusable skill at `~/.claude/skills/review/` — two-phase review with single command
+- Phase 1 (Sonnet): ~$0.20, 1-2 min — broad, candidate-heavy
+- Phase 2 (Opus): ~$1.50, 3-6 min — confirmation-heavy, adversarial
+
+**Sprint Planning — CV Parse & Populate:**
+- Created Sprint CV-Parse as Phase 1B gate sprint — full rally + build
+- Build plan: 6-step guided import wizard (profile → yachts → certs → education → skills → summary)
+- Yacht matching UX with colleague discovery and endorsement requests
+- Reference extraction from CV → endorsement invites via email/WhatsApp (viral loop)
+
+**Ghost Profiles & Claimable Accounts (Backlog):**
+- Spec for frictionless endorsement response without account creation
+- Token link IS the verification — zero extra friction
+- Ghost profile created on endorsement submission, claimable later via verified contact
+- Viral growth loop: CV upload → reference extraction → endorsement request → ghost profile → claim
 
 **Other:**
 - Created backlog system (`sprints/backlog/`) with idea capture workflow in CLAUDE.md
-- Filed bug-reporter backlog item
-- SearchableSelect now supports clearable prop (Codex catch from 11.2)
+- Applied all 9 pending Supabase migrations to production (fix_storage_buckets through performance_indexes)
+- SearchableSelect clearable prop (Codex catch)
+- CV page: shows prompt to set handle instead of redirect loop
 
 ### Context
-- Rally 003: Sprints 1–5 merged, Sprint 6 in PR. Sprints 7–10 remain (race conditions, performance, UX, accessibility).
-- Review process fully defined: Sonnet first-pass → Opus deep review → commit. Codex as optional third opinion.
-- PR #65 was first clean Codex pass on a security PR — the review system is working.
+- Rally 003 is complete: 101 bugs found → 52 unique confirmed → all fixed across 10 sprints
+- Two-phase review system fully operational — Opus reviewer caught 22 issues across Sprints 5-10
+- First clean Codex pass on PR #65 validated the review system works
+- All Supabase migrations applied to production
+- Phase 1B: Sprint 11 shipped, Sprints 12-13 draft, Sprint CV-Parse planned as gate
 
 ### Next
-- Merge Sprint 6 PR #70
-- Rally 003 Sprints 7–10: N+1 queries, Promise.all waterfalls, unoptimized images, UX empty states
-- Test v2 review prompts on next sprint to validate improvements
+- Sprint CV-Parse: rally the CV parse chain, build the import wizard
+- Ghost Profiles: plan as a major sprint (foundational to growth model)
+- Sprint 12 (Yacht Graph) or 13 (Launch Polish) when ready
+- Merge remaining PRs (#73, #74, #75, #76, #77, #78)
 
 ### Flags
-- `sprints/WORKFLOW.md` has the v2 prompts on a branch (PR #71) — needs merge before next sprint uses them
-- Session was very long (~6 hours) — future sessions should be shorter with tighter scope
+- CV upload/parse currently broken in production — `pdf-parse` import pattern may need debugging after migration apply
+- The import wizard is a significant build (~3-5 day sprint) — needs dedicated session
+- Ghost profiles spec has 4 key decisions that need founder input (identity mapping, visibility, duplicate handling, GDPR)
 
 ---
 
