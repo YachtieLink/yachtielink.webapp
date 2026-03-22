@@ -43,5 +43,15 @@ All now codified in lessons-learned.md and the Opus review prompt.
 
 ## What's Left
 
-- Rally 003 Sprints 2-10 (see final_proposal.md)
-- First real test of Opus deep review prompt on Sprint 2
+- Rally 003 Sprints 5-10 (schema rename, data integrity, performance, UX)
+
+## Sprints 2-4 Execution + Opus Reviewer Tuning
+
+- **Sprint 2 (RLS):** Opus passed clean. Codex caught SECURITY DEFINER RPC bypass on analytics — RLS policy was insufficient because `record_profile_event` bypasses RLS. Fixed by adding validation inside the RPC.
+- **Sprint 3 (Endorsement):** Opus passed clean. Codex passed clean (PR #65 — first clean security PR).
+- **Sprint 4 (Account deletion):** Opus caught GDPR export gap (P1) and auth.deleteUser error handling (P2). Codex caught analytics export row limit. Opus had found the limit but rated P3 — severity policy updated.
+- **Opus prompt iterations:**
+  1. Added "Adversarial Self-Challenge" — tries to bypass its own approvals
+  2. Added zero-tolerance severity policy — find it, fix it, no exceptions
+  3. Replaced narrow security checklists with general adversarial thinking
+  4. GDPR/legal always P1 regardless of probability
