@@ -44,16 +44,20 @@ export async function GET(req: NextRequest) {
       query = query.eq('watching', true)
     }
 
-    // Sort — name/role sorting happens client-side since PostgREST
-    // doesn't support ORDER BY on joined columns easily (H2 fix)
+    // P3 fix: for name/role sort, we must fetch all rows, sort, then paginate.
+    // For 'recent' sort, Supabase handles both ordering and pagination.
     query = query.order('created_at', { ascending: false })
 
-    query = query.range((page - 1) * limit, page * limit - 1)
+    if (sort === 'recent') {
+      query = query.range((page - 1) * limit, page * limit - 1)
+    }
+    // else: fetch all rows, sort in JS, then slice after enrichment
 
-    const { data, count } = await query
+    const { data: rawData, count } = await query
 
-    // Enrich with colleague overlap + top certs (M3: merge strategy — do it here)
-    const savedUserIds = (data ?? [])
+    // Enrich with colleague overlap + top certs
+    const data = rawData ?? []
+    const savedUserIds = data
       .map((d: any) => d.saved_user?.id)
       .filter(Boolean)
 
@@ -79,29 +83,32 @@ export async function GET(req: NextRequest) {
         }
       }
 
-      // C2 fix: use created_at not sort_order for certs
+      // P1 fix: certifications has custom_cert_name OR certification_type_id (FK to certification_types.name)
       const { data: certs } = await supabase
         .from('certifications')
-        .select('user_id, name')
+        .select('user_id, custom_cert_name, cert_type:certification_type_id(name)')
         .in('user_id', savedUserIds)
         .order('created_at', { ascending: false })
 
       if (certs) {
-        for (const cert of certs) {
+        for (const cert of certs as any[]) {
+          const certName = cert.custom_cert_name
+            || (Array.isArray(cert.cert_type) ? cert.cert_type[0]?.name : cert.cert_type?.name)
+          if (!certName) continue
           if (!certMap[cert.user_id]) certMap[cert.user_id] = []
-          if (certMap[cert.user_id].length < 2) certMap[cert.user_id].push(cert.name)
+          if (certMap[cert.user_id].length < 2) certMap[cert.user_id].push(certName)
         }
       }
     }
 
     // Merge enrichment into results
-    const enriched = (data ?? []).map((item: any) => ({
+    let enriched = data.map((item: any) => ({
       ...item,
       isColleague: item.saved_user?.id ? colleagueSet.has(item.saved_user.id) : false,
       topCerts: item.saved_user?.id ? (certMap[item.saved_user.id] ?? []) : [],
     }))
 
-    // Client-side sort for name/role (H2)
+    // P3 fix: sort THEN paginate for name/role
     if (sort === 'name') {
       enriched.sort((a: any, b: any) => {
         const nameA = (a.saved_user?.display_name ?? a.saved_user?.full_name ?? '').toLowerCase()
@@ -116,11 +123,17 @@ export async function GET(req: NextRequest) {
       })
     }
 
+    // Apply pagination after sort for name/role (already applied at DB for recent)
+    const total = count ?? enriched.length
+    if (sort !== 'recent') {
+      enriched = enriched.slice((page - 1) * limit, page * limit)
+    }
+
     return NextResponse.json({
       results: enriched,
-      total: count ?? 0,
+      total,
       page,
-      pages: Math.ceil((count ?? 0) / limit),
+      pages: Math.ceil(total / limit),
     })
   } catch (e) {
     return handleApiError(e)

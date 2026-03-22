@@ -59,17 +59,20 @@ export default async function SavedProfilesPage() {
       }
     }
 
-    // Top 2 certs per saved user
+    // Top 2 certs per saved user — P1 fix: use custom_cert_name OR cert_type relation
     const { data: certs } = await supabase
       .from('certifications')
-      .select('user_id, name')
+      .select('user_id, custom_cert_name, cert_type:certification_type_id(name)')
       .in('user_id', savedUserIds)
       .order('created_at', { ascending: false })
 
     if (certs) {
-      for (const cert of certs) {
+      for (const cert of certs as any[]) {
+        const certName = cert.custom_cert_name
+          || (Array.isArray(cert.cert_type) ? cert.cert_type[0]?.name : cert.cert_type?.name)
+        if (!certName) continue
         if (!certMap[cert.user_id]) certMap[cert.user_id] = []
-        if (certMap[cert.user_id].length < 2) certMap[cert.user_id].push(cert.name)
+        if (certMap[cert.user_id].length < 2) certMap[cert.user_id].push(certName)
       }
     }
   }

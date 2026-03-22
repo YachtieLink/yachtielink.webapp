@@ -12,6 +12,9 @@ export function SavedProfileNoteEditor({ initialNote, onSave }: SavedProfileNote
   const [saved, setSaved] = useState(true)
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  // P2 fix: serialize saves — track the latest pending value and abort stale requests
+  const latestValueRef = useRef(initialNote ?? '')
+  const savingRef = useRef(false)
 
   // Auto-resize textarea
   useEffect(() => {
@@ -21,16 +24,38 @@ export function SavedProfileNoteEditor({ initialNote, onSave }: SavedProfileNote
     el.style.height = `${el.scrollHeight}px`
   }, [value])
 
-  const debouncedSave = useCallback(
-    (text: string) => {
+  const doSave = useCallback(
+    async (text: string) => {
+      latestValueRef.current = text
+      // If already saving, the in-flight save will check latestValueRef when done
+      if (savingRef.current) return
+      savingRef.current = true
       setSaved(false)
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-      timeoutRef.current = setTimeout(() => {
-        onSave(text)
-        setSaved(true)
-      }, 500)
+
+      let textToSave = text
+      // Keep saving until latestValueRef matches what we just saved
+      while (true) {
+        onSave(textToSave)
+        // Small yield to let any pending updates to latestValueRef land
+        await new Promise((r) => setTimeout(r, 50))
+        if (latestValueRef.current === textToSave) break
+        textToSave = latestValueRef.current
+      }
+
+      savingRef.current = false
+      setSaved(true)
     },
     [onSave],
+  )
+
+  const debouncedSave = useCallback(
+    (text: string) => {
+      latestValueRef.current = text
+      setSaved(false)
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      timeoutRef.current = setTimeout(() => doSave(text), 500)
+    },
+    [doSave],
   )
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -41,8 +66,7 @@ export function SavedProfileNoteEditor({ initialNote, onSave }: SavedProfileNote
 
   function handleBlur() {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    onSave(value)
-    setSaved(true)
+    doSave(value)
   }
 
   return (
