@@ -19,16 +19,10 @@ export async function GET(
     const { id: token } = await params
     const supabase = await createClient()
 
+    // Use SECURITY DEFINER RPC so unauthenticated and email-only recipients
+    // can load the request. Direct table query was blocked by RLS for anon users.
     const { data: request, error } = await supabase
-      .from('endorsement_requests')
-      .select(`
-        id, token, requester_id, yacht_id, recipient_email,
-        status, expires_at, created_at, accepted_at, cancelled_at,
-        requester:users!requester_id(display_name, full_name, profile_photo_url),
-        yacht:yachts!yacht_id(id, name, yacht_type, length_meters, flag_state, year_built)
-      `)
-      .eq('token', token)
-      .single()
+      .rpc('get_endorsement_request_by_token', { p_token: token })
 
     if (error || !request) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
