@@ -554,6 +554,22 @@ export function PublicProfileContent({
           )}
         </div>
 
+        {/* Fallback when all sections are hidden */}
+        {!sectionVisible(sectionVisibility, 'about', !!(user.ai_summary || user.bio)) &&
+         !sectionVisible(sectionVisibility, 'experience', attachments.length > 0) &&
+         !sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) &&
+         !sectionVisible(sectionVisibility, 'certifications', certifications.length > 0) &&
+         !sectionVisible(sectionVisibility, 'education', education.length > 0) &&
+         !sectionVisible(sectionVisibility, 'hobbies', hobbies.length > 0) &&
+         !sectionVisible(sectionVisibility, 'skills', skills.length > 0) &&
+         !sectionVisible(sectionVisibility, 'gallery', gallery.length > 0) && (
+          <div className="px-4 py-8 text-center">
+            <p className="text-sm text-[var(--color-text-tertiary)]">
+              This crew member hasn&apos;t shared their profile details yet.
+            </p>
+          </div>
+        )}
+
         {/* Bottom CTAs */}
         <div className="px-4 pb-8 flex flex-col gap-3">
           {!isLoggedIn ? (

@@ -8,6 +8,7 @@ import { PageTransition } from '@/components/ui/PageTransition'
 import { ManagePortalButton } from '@/components/insights/ManagePortalButton'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/skeleton'
 
 function SettingsRow({
   label,
@@ -72,7 +73,7 @@ export default function MorePage() {
   const router   = useRouter()
   const supabase = createClient()
   const { toast } = useToast()
-  const [isPro, setIsPro] = useState(false)
+  const [isPro, setIsPro] = useState<boolean | null>(null)
   const [subPlan, setSubPlan] = useState<string | null>(null)
   const [subEndsAt, setSubEndsAt] = useState<string | null>(null)
   const [hasStripeCustomer, setHasStripeCustomer] = useState(false)
@@ -172,7 +173,12 @@ export default function MorePage() {
       {/* ── Billing ────────────────────────────────── */}
       <SectionHeader title="Billing" />
       <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
-        {isPro ? (
+        {isPro === null ? (
+          <div className="px-5 py-4 space-y-2">
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-3 w-1/3" />
+          </div>
+        ) : isPro ? (
           <div className="px-5 py-4">
             <p className="text-sm text-[var(--color-text-primary)]">
               Current plan: <span className="font-semibold">Crew Pro · {subPlan === 'annual' ? 'Annual' : 'Monthly'}</span>
