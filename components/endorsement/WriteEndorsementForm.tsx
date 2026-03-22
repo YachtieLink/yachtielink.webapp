@@ -175,7 +175,7 @@ export function WriteEndorsementForm({
           className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-interactive)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20 resize-none"
         />
         <div className="flex items-center justify-between mt-1">
-          {!minMet && charCount > 0 ? (
+          {!minMet ? (
             <p className="text-xs text-[var(--color-text-secondary)]">10 characters minimum</p>
           ) : (
             <span />

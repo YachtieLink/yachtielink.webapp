@@ -69,7 +69,7 @@ export default function MoreLoading() {
       </div>
 
       {/* Sign out */}
-      <Skeleton className="h-3 w-0 mx-1 mt-4 mb-1" />
+      <Skeleton className="h-3 w-12 mx-1 mt-4 mb-1" />
       <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden">
         <div className="px-5 py-4">
           <Skeleton className="h-4 w-16" />
