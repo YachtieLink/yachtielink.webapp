@@ -24,6 +24,72 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-22 — Claude Code (Opus 4.6) — Rally 003 + Opus Deep Review + Security Sprint 1
+
+### Done
+
+**Rally 003 — Full Codebase Bug Audit:**
+- Ran 6 parallel Sonnet audit agents (schema, RLS/auth, runtime logic, UX/accessibility, API/data integrity, performance) across the entire codebase
+- 96 Pass 1 findings → 3 challenger agents verified → 52 unique confirmed bugs after dedup and false positive removal
+- 15 new issues found by challengers that Pass 1 missed
+- Synthesised into 10 fix sprints (P0–P3) with blast radius analysis, regression risk, rollback strategies, and dependency graph
+- Full rally docs at `sprints/rallies/rally-003-codebase-bugs/`
+
+**Rally 003 Sprint 1 — Security Fixes (P0):**
+- CV parse path traversal: ownership guard prevents users from reading other users' private CVs via storagePath manipulation
+- Cron auth hardening: CRON_SECRET is now mandatory — missing env var blocks requests instead of skipping auth
+- Rate limit fail-closed: expensive routes (PDF gen, file upload, AI summary) now block when Redis is unavailable
+- GDPR export separated to its own `dataExport` rate limit category (failOpen: true) — Codex caught this downstream impact
+
+**Opus Deep Review Process:**
+- Created two-layer review process in WORKFLOW.md Step 5:
+  - Sonnet fast pass (~$0.10): schema checks, logic bugs, UX regressions, known patterns
+  - Opus deep review (~$1-2): downstream caller tracing, fail-mode analysis, cross-file impact
+- Replaces third-party code review (Codex) at ~half the cost and twice the speed
+- Added blast radius check to post-build review prompt — traces every changed symbol to all callers
+- Added 2 new lessons to lessons-learned.md (55 → 57): shared config categories, downstream caller checks
+
+### Context
+- Rally 003 reports are in `sprints/rallies/rally-003-codebase-bugs/pass1/` and `pass2/`
+- Final proposal with all 10 fix sprints: `sprints/rallies/rally-003-codebase-bugs/final_proposal.md`
+- Sprint 1 (security) is merged. Sprints 2–10 are planned but not yet executed.
+- The Opus deep review prompt is the new final gate — every future sprint runs it before commit
+
+### Next
+- Rally 003 Sprint 2: RLS for deleted users + analytics abuse + contact field exposure
+- Rally 003 Sprint 3: Endorsement deep-link fix + RLS tightening
+- Rally 003 Sprint 4: Account deletion cleanup (GDPR — highest regression risk)
+- Rally 003 Sprint 5: length_m → length_meters rename (6 files)
+- Sprints 6–10: data integrity, race conditions, performance, UX polish
+
+### Flags
+- Sprint 4 (account deletion) has a hidden risk: do NOT add CASCADE — the users row is anonymised, not deleted, so CASCADE would never fire. Use explicit per-table deletes instead.
+- The Opus deep review prompt needs real-world validation — first test will be Sprint 2
+- 23 findings were deferred to backlog (LOW/INFO severity) — see final_proposal.md "Findings Not Included" section
+
+---
+
+## 2026-03-22 — Claude Code (Opus 4.6) — Backlog system + bug reporter proposal
+
+### Done
+- Created `sprints/backlog/` as the idea inbox — README with template, lifecycle (capture → develop → promote → archive)
+- Filed first backlog item: `sprints/backlog/bug-reporter.md` — fully fleshed-out proposal for in-app bug reporting (Supabase table, API route, form page, settings link)
+- Added "Idea Capture" section to `CLAUDE.md` — instructs future agents to check `docs/yl_features.md` first for existing features, then `sprints/backlog/` for new ideas, and never jump to coding
+- Added Backlog to `sprints/README.md` sprint hierarchy
+- Confirmed roadmap display already exists at `/app/more/roadmap` — no work needed
+
+### Context
+Founder wanted to capture a bug reporter idea and a roadmap display check. Roadmap was already built. This surfaced a workflow gap: no system for capturing ideas that aren't ready for sprint execution. Built the backlog system to solve this.
+
+### Next
+- Bug reporter proposal is ready to be promoted into a sprint when planned
+- Backlog system is live — future ideas land here automatically
+
+### Flags
+- None
+
+---
+
 ## 2026-03-22 — Claude Code (Opus 4.6 + Sonnet 4.6) — Sprints 11.1–11.3 + WORKFLOW.md
 
 ### Done
