@@ -28,6 +28,7 @@ export function CvActions({ handle, hasPdf, pdfGeneratedAt, isPro }: CvActionsPr
   const router = useRouter()
   const [generating, setGenerating] = useState(false)
   const [pdfReady, setPdfReady] = useState(hasPdf)
+  const [generatedAt, setGeneratedAt] = useState(pdfGeneratedAt)
   const [showQR, setShowQR] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<Template>('standard')
 
@@ -56,6 +57,7 @@ export function CvActions({ handle, hasPdf, pdfGeneratedAt, isPro }: CvActionsPr
       }
       const { url } = await res.json()
       setPdfReady(true)
+      setGeneratedAt(new Date().toISOString())
       // Auto-download
       window.open(url, '_blank')
       toast('PDF generated', 'success')
@@ -135,16 +137,16 @@ export function CvActions({ handle, hasPdf, pdfGeneratedAt, isPro }: CvActionsPr
               <Button variant="link" size="sm" onClick={generatePdf} loading={generating}>
                 {generating ? 'Generating…' : 'Regenerate PDF'}
               </Button>
-              {pdfGeneratedAt && (
+              {generatedAt && (
                 <span className="text-xs text-[var(--color-text-tertiary)]">
-                  · {new Date(pdfGeneratedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  · {new Date(generatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                 </span>
               )}
             </div>
           )}
-          {!pdfReady && pdfGeneratedAt && (
+          {!pdfReady && generatedAt && (
             <p className="text-xs text-[var(--color-text-tertiary)]">
-              Last generated {new Date(pdfGeneratedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+              Last generated {new Date(generatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
             </p>
           )}
 

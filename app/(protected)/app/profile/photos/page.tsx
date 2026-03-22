@@ -100,7 +100,10 @@ export default function ProfilePhotosPage() {
   const [photos, setPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [isPro, setIsPro] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const maxPhotos = isPro ? MAX_PHOTOS_PRO : MAX_PHOTOS_FREE
 
   // Require a small drag distance before starting to avoid accidental drags
   const sensors = useSensors(
@@ -108,11 +111,28 @@ export default function ProfilePhotosPage() {
   )
 
   useEffect(() => {
-    fetch('/api/user-photos')
-      .then((r) => r.json())
-      .then((d) => { setPhotos(d.photos ?? []) })
-      .catch(() => {})
-      .finally(() => setLoading(false))
+    async function load() {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          const { data: profile } = await supabase
+            .from('users')
+            .select('subscription_status')
+            .eq('id', user.id)
+            .single()
+          setIsPro(profile?.subscription_status === 'pro')
+        }
+        const res = await fetch('/api/user-photos')
+        const d = await res.json()
+        setPhotos(d.photos ?? [])
+      } catch {
+        // silently fail
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
   }, [])
 
   async function handleDragEnd(event: DragEndEvent) {
@@ -147,7 +167,6 @@ export default function ProfilePhotosPage() {
     const fileList = e.target.files
     if (!fileList || fileList.length === 0) return
 
-    const maxPhotos = MAX_PHOTOS_PRO // Use max possible; server enforces actual limit
     const remaining = maxPhotos - photos.length
     let files = Array.from(fileList)
 
@@ -220,8 +239,15 @@ export default function ProfilePhotosPage() {
         <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Photos</h1>
       </div>
 
+      {/* Downgrade notice — photos exist beyond free limit */}
+      {!isPro && photos.length > MAX_PHOTOS_FREE && (
+        <div className="rounded-xl border border-[var(--color-warning-border,var(--color-border))] bg-[var(--color-warning-bg,var(--color-surface-overlay))] p-3 text-sm text-[var(--color-text-secondary)]">
+          You have {photos.length} photos but your free plan shows {MAX_PHOTOS_FREE}. Your extra photos are safe — upgrade to Pro to make them visible again.
+        </div>
+      )}
+
       <p className="text-sm text-[var(--color-text-secondary)]">
-        Your first photo is your main profile picture. Drag to reorder. Free: up to {MAX_PHOTOS_FREE} photos · Pro: up to {MAX_PHOTOS_PRO}.
+        Your first photo is your main profile picture.{!isPro && photos.length > MAX_PHOTOS_FREE ? '' : ' Drag to reorder.'} {Math.min(photos.length, maxPhotos)}/{maxPhotos} photos visible{!isPro && photos.length <= MAX_PHOTOS_FREE ? ` · Upgrade to Pro for up to ${MAX_PHOTOS_PRO}` : ''}.
       </p>
 
       <DndContext
@@ -229,9 +255,9 @@ export default function ProfilePhotosPage() {
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={photos.map((p) => p.id)} strategy={rectSortingStrategy}>
+        <SortableContext items={photos.slice(0, maxPhotos).map((p) => p.id)} strategy={rectSortingStrategy}>
           <div className="grid grid-cols-3 gap-2">
-            {photos.map((photo, idx) => (
+            {photos.slice(0, maxPhotos).map((photo, idx) => (
               <SortablePhoto
                 key={photo.id}
                 photo={photo}
@@ -240,7 +266,7 @@ export default function ProfilePhotosPage() {
               />
             ))}
 
-            {photos.length < MAX_PHOTOS_PRO && (
+            {photos.length < maxPhotos && (
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
