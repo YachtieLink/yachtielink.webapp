@@ -8,10 +8,11 @@ Major sprints are the planned, phased work that builds the core YachtieLink prod
 
 ```
 Phase 1A  →  Profile robustness, photo-forward UX, CV parsing polish
-Phase 1B  →  Public polish, yacht graph, launch readiness (DRAFT)
-Phase 1C  →  TBD
-Phase 2   →  TBD
-Phase 3   →  TBD
+Phase 1B  →  Public polish, yacht graph, launch readiness
+Phase 1C  →  Availability, crew search, AI pack 1, graph integrity (DRAFT)
+Phase 2   →  Peer hiring, recruiter access, agency plans, NLP search (DRAFT)
+Phase 3   →  Messaging, notifications, multilingual, timeline, IRL connections (DRAFT)
+Phase 4   →  AI career tools, advanced AI, verified status, community moderation (DRAFT)
 ```
 
 ---
@@ -83,8 +84,15 @@ Before marking a major sprint as **ready for execution**, verify its build plan 
 
 ## Active Phases
 
-- [Phase 1A](./phase-1a/README.md) — Profile robustness sprint (Sprint 10 + 10.1)
-- [Phase 1B](./phase-1b/README.md) — Public polish, yacht graph & launch (Sprints 11–13) — **DRAFT**
+- [Phase 1A](./phase-1a/README.md) — Profile robustness (Sprint 10 + 10.1) — In Progress
+- [Phase 1B](./phase-1b/README.md) — Public polish, yacht graph & launch (Sprints 11–13) — Draft, build plans written
+
+## Planned Phases (Ralph Loop Drafts — 2026-03-22)
+
+- [Phase 1C](./phase-1c/README.md) — Availability, search, AI pack 1, graph integrity (Sprints 14–17) — Draft, build plans written + reviewed
+- [Phase 2](./phase-2/README.md) — Peer hiring, recruiter access, agency plans, NLP search (Sprints 18–20) — Draft, build plans written + reviewed
+- [Phase 3](./phase-3/README.md) — Messaging, notifications, multilingual, timeline, IRL connections (Sprints 21–23) — Draft, build plans not yet written
+- [Phase 4](./phase-4/README.md) — AI career tools, advanced AI, verified status, community moderation (Sprints 24–26) — Draft, build plans not yet written
 
 ## Archive
 

@@ -6,7 +6,36 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 48 lessons
+**Current count:** 51 lessons
+
+**Also update when writing here:**
+- `CHANGELOG.md` — log the discovery in your session's Flags or Done section
+- `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
+- `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## Subagents Reference `users.deleted_at` Which Does Not Exist
+
+**What happened:** During parallel build spec generation (Sprints 14–20), two independent subagents included `AND deleted_at IS NULL` filters on the `users` table. The `users` table has no `deleted_at` column — only `attachments` and `endorsements` do. The same bug appeared in Sprint 14 and Sprint 19, written by different agents.
+**Fix:** Review reports caught it. Removed the clauses. Migrations would have failed at `CREATE INDEX` time.
+**Pattern to avoid:** When generating SQL for `users` table queries, never assume soft-delete columns exist. The `users` table uses cascade deletion from `auth.users`, not soft deletes. If writing a build spec, explicitly check the schema before adding `deleted_at` filters.
+
+---
+
+## Parallel Agents Produce Migration Timestamp Collisions
+
+**What happened:** When 3–4 subagents write build specs simultaneously, they tend to pick the same migration timestamp prefix (e.g., `20260322000001`). Supabase requires unique, sequentially ordered migration filenames. This happened twice: Sprint 14 vs 16 (batch 1) and Sprints 18/19/20 (batch 2).
+**Fix:** Review reports caught it. Timestamps were manually reassigned to sequential values.
+**Pattern to avoid:** When launching parallel spec-writing agents, pre-assign migration timestamps in the prompt (e.g., "Sprint 18 uses `000002`, Sprint 19 uses `000003`"). Don't let agents pick their own timestamps independently.
+
+---
+
+## Separate Account Types Need Explicit Identity Mapping Documentation
+
+**What happened:** Sprint 20 introduced agency features extending the `recruiters` table from Sprint 19. Sprint 19 correctly mapped `auth.uid()` → `recruiters.auth_user_id` (because Supabase Auth UUID ≠ recruiter table PK). Sprint 20's agent didn't follow this pattern — it wrote 16+ RLS policies and 5+ API routes comparing `auth.uid()` directly against `recruiters.id`, which would deny all recruiter access.
+**Fix:** Review caught it. All 20+ instances fixed to use the `auth_user_id` mapping.
+**Pattern to avoid:** Any time the codebase has a separate table for a user type (recruiters, agencies, etc.) with its own PK that differs from `auth.users.id`, the build spec MUST document the identity mapping pattern explicitly. Include a "How auth maps to this table" section. Future agents writing RLS policies for non-crew tables should be prompted with the mapping pattern.
 
 ---
 
