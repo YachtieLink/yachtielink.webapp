@@ -60,7 +60,7 @@ export default function AccountPage() {
       ])
 
       if (profile) {
-        setFullName(profile.full_name)
+        setFullName(profile.full_name ?? '')
         setDisplayName(profile.display_name ?? '')
         setHandle(profile.handle ?? '')
         setOriginalHandle(profile.handle ?? '')

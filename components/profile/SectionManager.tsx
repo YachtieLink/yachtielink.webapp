@@ -59,7 +59,7 @@ export function SectionManager({ visibility: initialVisibility, sections }: Sect
           return (
             <div key={key} className="flex items-center gap-3 py-2.5">
               <button
-                role="checkbox"
+                role="switch"
                 aria-checked={checked}
                 onClick={() => toggle(key)}
                 disabled={isPending}

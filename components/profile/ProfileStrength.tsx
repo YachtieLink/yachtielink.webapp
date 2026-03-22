@@ -30,7 +30,7 @@ export function ProfileStrength({ score, label, nextPrompt, nextHref, ctaLabel }
       <div className="flex items-center gap-4">
         {/* SVG donut */}
         <motion.div variants={popIn} initial="hidden" animate="visible" className="shrink-0">
-          <svg width="72" height="72" viewBox="0 0 72 72">
+          <svg width="72" height="72" viewBox="0 0 72 72" role="img" aria-label={`Profile strength: ${score}%`}>
             <circle cx="36" cy="36" r="28" fill="none" stroke="var(--color-border)" strokeWidth="6" />
             <circle
               cx="36"
