@@ -300,8 +300,10 @@ export function PublicProfileContent({
             </div>
           )}
 
-          {/* CV Download — shown when user has enabled public CV */}
-          {user.cv_public && (user.latest_pdf_path || user.cv_storage_path) && (
+          {/* CV Download — shown only when the selected public source has a file */}
+          {user.cv_public && (
+            (user.cv_public_source === 'uploaded' ? user.cv_storage_path : user.latest_pdf_path)
+          ) && (
             <div className="bg-[var(--color-surface)] rounded-2xl p-4 border border-[var(--color-border-subtle)]">
               <a
                 href={`/api/cv/public-download/${user.handle}`}
