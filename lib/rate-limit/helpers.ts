@@ -22,6 +22,7 @@ export const RATE_LIMITS = {
   search:            { limit: 60,  window: 60,                scope: 'user' as const, failOpen: true  }, // 60/min/user
   accountFlag:       { limit: 10,  window: 7 * 24 * 60 * 60,  scope: 'user' as const, failOpen: true  }, // 10/7days/user
   aiSummary:         { limit: 10,  window: 60 * 60,           scope: 'user' as const, failOpen: false }, // 10/1h/user — expensive
+  dataExport:        { limit: 5,   window: 60 * 60,           scope: 'user' as const, failOpen: true  }, // 5/1h/user — GDPR, must not block
 } as const;
 
 export async function applyRateLimit(
