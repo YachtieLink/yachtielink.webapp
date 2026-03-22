@@ -24,6 +24,56 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-22 — Claude Code (Opus 4.6) — Rally 003 Sprints 2–4 + Opus Reviewer Tuning
+
+### Done
+
+**Rally 003 Sprint 2 — RLS & Analytics (P0, merged):**
+- Users public read policy now filters `deleted_at IS NULL` — soft-deleted users no longer publicly visible
+- Analytics insert policy restricts to valid non-deleted user targets
+- Sitemap excludes deleted users
+- Contact fields stripped server-side when `show_*` flags are false (prevents PII in serialised HTML)
+
+**Rally 003 Sprint 3 — Endorsement Deep-Link (P0, merged):**
+- GET handler switched from direct table query to `get_endorsement_request_by_token` RPC (SECURITY DEFINER) — fixes deep-link for unauthenticated and email-only recipients
+- Endorsement_requests update policy split into requester (full) and recipient (status-only)
+
+**Rally 003 Sprint 4 — Account Deletion Cleanup (P1, merged):**
+- Certifications: ghost `deleted_at` soft-delete → hard delete (column never existed)
+- Endorsement requests: ghost `deleted_at` → canonical `status: cancelled` pattern
+- Added cleanup for 8 Sprint 10+ tables (saved_profiles x2, profile_folders, education, skills, hobbies, photos, gallery)
+- Added error handling for `auth.deleteUser` with user-facing partial-failure message
+- GDPR export now includes all Sprint 10+ tables (Opus P1 catch)
+- Removed analytics export row limit (Codex catch — GDPR requires completeness)
+
+**Analytics RPC Validation (Codex catch on Sprint 2, merged):**
+- `record_profile_event` now validates target user exists and isn't deleted inside the function
+- RLS policy alone was insufficient — RPC is SECURITY DEFINER and bypasses RLS
+
+**Opus Deep Reviewer Tuning:**
+- Added "Adversarial Self-Challenge" step — reviewer tries to bypass every fix it approved
+- Added zero-tolerance severity policy — every issue found must be fixed, no "acceptable to defer"
+- GDPR/legal/compliance issues are always P1 regardless of probability
+- Replaced narrow security checklists with general adversarial thinking instruction
+
+### Context
+- Sprints 1–4 of Rally 003 are merged (all P0/P1 security + data integrity fixes)
+- Sprints 5–10 remain (schema rename, race conditions, performance, UX polish)
+- Opus reviewer prompt is iterating — each Codex catch improves the prompt
+- PR #65 passed Codex with zero findings (first clean security PR)
+
+### Next
+- Rally 003 Sprint 5: `length_m` → `length_meters` rename (6 files)
+- Rally 003 Sprint 6: cert expiry logic + endorsement constraint + TOCTOU
+- Sprints 7–10: race conditions, performance, UX, accessibility
+
+### Flags
+- Opus reviewer found the GDPR export gap but rated it P3 ("low probability") — severity policy updated to prevent this
+- Codex caught analytics RPC bypass that Opus approved as "defense-in-depth" — adversarial challenge added to prevent this pattern
+- Sprint 4 account deletion does NOT use CASCADE — users row is anonymised, not deleted
+
+---
+
 ## 2026-03-22 — Claude Code (Opus 4.6) — Rally 003 + Opus Deep Review + Security Sprint 1
 
 ### Done
