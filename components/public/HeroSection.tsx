@@ -81,7 +81,7 @@ export function HeroSection({
       </div>
 
       {/* Top bar — icon-only buttons over photo */}
-      <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-3 pt-[env(safe-area-inset-top,0.75rem)] z-10">
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top,0px),1rem)] z-10">
         <Link
           href="/"
           className="flex items-center justify-center w-10 h-10 rounded-full bg-black/25 backdrop-blur-md text-white hover:bg-black/40 transition-colors"

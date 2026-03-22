@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ['pdf-parse'],
   experimental: {
     staleTimes: {
       dynamic: 120,  // cache dynamic RSC payloads for 2 min — instant tabs, reasonable freshness
