@@ -300,18 +300,33 @@ It usually means the actual attack path is unprotected and you're
 rationalising. State it plainly: "this fix does not block the
 reported attack vector because [specific bypass path]."
 
+## Severity Policy
+
+EVERY issue found must be fixed. There is no "acceptable" or
+"defer" category. If you find it, it gets fixed. Do not dismiss
+issues based on low probability — low probability bugs still
+ship to real users.
+
+P1 = fix before commit (blocks merge)
+P2 = fix before commit (blocks merge)
+P3 = fix before commit unless genuinely cosmetic (spelling, formatting)
+
+Do NOT rate something P3 to avoid fixing it. If it affects
+functionality, data, security, or user experience in any way,
+it is P1 or P2.
+
+GDPR, legal, and compliance issues are ALWAYS P1 regardless
+of probability. Data exports must be complete. Deletion must
+be thorough. Privacy fields must not leak.
+
 ## Output format
 For each finding:
 
-### [P1/P2/P3] Title
+### [P1/P2] Title
 **File:** path/to/file.ts
 **Impact:** What breaks for the user
 **Evidence:** The specific code + the specific caller that breaks
 **Fix:** What to change (be specific — file and line)
-
-P1 = breaks functionality or security (fix before commit)
-P2 = data integrity or consistency risk (fix before commit if easy)
-P3 = minor issue, acceptable to defer (log as junior sprint)
 
 If you find ZERO issues, say so explicitly. Do not invent problems.
 A clean review is a valid outcome.
