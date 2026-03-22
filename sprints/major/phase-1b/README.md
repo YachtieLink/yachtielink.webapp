@@ -24,9 +24,10 @@ Design philosophy: 75% professional, 25% personality. Notion-level energy. AI in
 
 | Sprint | Status | Focus |
 |--------|--------|-------|
-| [Sprint 11 — Crew Landing Pages + Public Polish](./sprint-11/README.md) | 📋 Draft | Beautiful public profiles, Salty, section colours, OG images |
+| [Sprint 11 — Crew Landing Pages + Public Polish](./sprint-11/README.md) | ✅ Shipped | Beautiful public profiles, Salty, section colours, OG images |
 | [Sprint 12 — Yacht Graph](./sprint-12/README.md) | 📋 Draft | Yacht pages, crew network, colleague graph, sea time |
 | [Sprint 13 — Launch Polish + Marketing](./sprint-13/README.md) | 📋 Draft | Landing page, production env, QA, domain, feature roadmap |
+| [Sprint CV-Parse — CV Parse & Populate](./sprint-cv-parse/README.md) | 🔲 Not Started | Rally + build: audit and fix the entire CV parse chain. Gates Phase 1B completion. |
 
 ---
 
@@ -38,4 +39,5 @@ Design philosophy: 75% professional, 25% personality. Notion-level energy. AI in
 - Marketing landing page converts visitors to signups
 - Production environment fully configured (Vercel, KV, Sentry, PostHog)
 - Manual QA checklist signed off (OAuth, Stripe, emails, mobile Safari)
+- CV parse-and-populate audited, fixed, and tested with real CVs
 - Ready for Med season soft launch (target: June 2026)
