@@ -2,6 +2,8 @@
 
 This is the canonical home for all execution work — building (sprints) and auditing (rallies). For strategy, competitive research, and exploratory thinking, see `/notes`.
 
+**Before starting a sprint or rally:** Read [WORKFLOW.md](./WORKFLOW.md) — the full execution loop, approval gates, parallel agent patterns, and common mistakes.
+
 ---
 
 ## Active Right Now

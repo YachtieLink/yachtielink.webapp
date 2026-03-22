@@ -10,7 +10,7 @@ These often happen between major sprints or when something looks off and you wan
 
 | Slug | Started | Summary |
 |------|---------|---------|
-| — | — | None active |
+| ui-public-profile-button-margin | 2026-03-22 | Top bar buttons on public profile sit flush against screen edge |
 
 ---
 
