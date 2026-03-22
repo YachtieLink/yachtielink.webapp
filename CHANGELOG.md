@@ -24,6 +24,66 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-22 — Claude Code (Opus 4.6 + Sonnet 4.6) — Sprints 11.1–11.3 + WORKFLOW.md
+
+### Done
+
+**Sprint 11.1 (PR #55 — merged):**
+- CV parse: added `pdf-parse` to `serverExternalPackages` (bundler was breaking dynamic import)
+- Photo upload: free users now see correct 3-photo limit; downgraded users' extra photos hidden not deleted
+- CV regenerate date: updates immediately via local state
+- Public profile button margin: `max(safe-area-inset-top, 1rem)` + `px-4`
+- Codex review caught fail-open bug on plan lookup → fixed to default to Pro limits on error
+
+**Sprint 11.2 (PR #57 — awaiting merge):**
+- New `SearchableSelect` component with pinned options + type-ahead + clearable
+- Extracted country list to `lib/constants/countries.ts` with pinned yacht-industry countries
+- Contact link prefill: email + WhatsApp open with "Hey {firstName}, I saw your profile on YachtieLink"
+- CV & Sharing page rework: always-on QR, ShareModal (fullscreen with photo/name/QR/native share), split CV cards (generated + uploaded), public download toggle with source selector
+- New API routes: `PATCH /api/user/cv-settings`, `GET /api/cv/public-download/[handle]`
+- Migration: `cv_public` + `cv_public_source` columns on users table
+- Codex caught: download button showed for wrong source → fixed; country field couldn't be cleared → fixed with clearable prop
+
+**Sprint 11.3 (PR #58 — awaiting merge):**
+- Saved profiles rework: rich cards with role, dept, country, colleague badge, top 2 certs
+- Private notes per saved profile: inline auto-resizing textarea, 500ms debounced save, 2000 char limit
+- Availability watch toggle (Sprint 14 wires notifications)
+- Sort (recent/name/role) + watching-only filter
+- Migration: `notes` + `watching` columns on `saved_profiles` with partial index
+- PATCH handler: now accepts notes + watching, builds update object dynamically, normalizes empty notes to null
+- GET handler: enriched with departments, location, colleague overlap (via attachments), top certs
+- Sonnet reviewer caught 4 criticals pre-build: wrong table (`yacht_crew` → `attachments`), missing column (`certifications.sort_order` → `created_at`), non-atomic schema rename, silent field drop in PATCH destructure
+
+**WORKFLOW.md (PR #54 — merged):**
+- Created `sprints/WORKFLOW.md` as canonical sprint + rally execution reference
+- Routing table at top so agents skip irrelevant sections
+- Rally execution steps R1–R6 with failure modes, model allocation, approval gates
+- CHANGELOG Done/Context/Next/Flags format spelled out
+- Cross-reference checklist for sibling docs in Step 6
+
+### Context
+
+- Branch `feat/sprint-11.2-cv-sharing-rework` has 3 commits (original + 2 Codex fixes)
+- Branch `feat/sprint-11.3-saved-profiles-rework` has 1 commit
+- Both need migrations pushed to Supabase before or after merge (no staging — push straight to prod)
+- Main is current as of PR #56 merge
+
+### Next
+
+- Merge PR #57 (11.2) then PR #58 (11.3) — both have all Codex fixes
+- Push both migrations to Supabase
+- Sprint 11.4: Pro subdomain link (feature-pro-subdomain-link) — needs DNS/Vercel setup
+- Remaining build specs to harden: Sprints 21–26 (Phases 3–4)
+- Founder review of Ralph Loop sprint plans for scope/sequencing
+
+### Flags
+
+- **Pre-build Sonnet review is paying for itself** — caught 4 criticals on 11.3 that would have been runtime bugs. Codex post-build caught 2 more on 11.1 and 11.2. Both review stages are valuable.
+- **Founder correction:** push migrations straight to main, no staging until real users. Logged as process decision.
+- Sprint 11.2 CvActions was a full rewrite — if it causes issues, the old version is in git history pre-PR-57.
+
+---
+
 ## 2026-03-22 — Claude Code (Opus 4.6 + Sonnet 4.6) — Sprint 11 QA + Sprint 11.1 Build
 
 ### Done
