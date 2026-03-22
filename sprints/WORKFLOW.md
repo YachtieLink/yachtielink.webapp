@@ -132,11 +132,13 @@ Each step has an approval gate and a failure mode. The discipline is in not skip
 **Who drives:** Agent (reviewer role — a fresh subagent is ideal for major sprints).
 
 **What happens:**
-- Run `next build` — must pass clean before any review
-- Spawn a **Sonnet post-build code reviewer** (see prompt template below)
-- Classify findings: **ADDED** (fix now, in scope), **DEFERRED** (log as junior sprint), **NOTED** (acceptable, no action)
-- Fix all ADDED items before committing
-- Review your own diff: no console.logs, no hardcoded values, no commented-out code
+1. **Build check** — run `next build`, must pass clean
+2. **Run the app** — test every change end-to-end locally. Don't skip this — build passing doesn't mean the feature works. Check happy path, error states, empty states, mobile layout.
+3. **Execute exit criteria** — run the specific verification steps from the build plan (they should be runnable commands or testable user flows, not prose)
+4. **Spawn a Sonnet post-build code reviewer** (see prompt template below) — catches schema bugs, logic errors, and UX regressions that manual testing misses
+5. **Classify findings** — **ADDED** (fix now, in scope), **DEFERRED** (log as junior sprint), **NOTED** (acceptable, no action)
+6. Fix all ADDED items before committing
+7. Review your own diff: no console.logs, no hardcoded values, no commented-out code
 
 **Output:** Verification report. All ADDED items fixed. DEFERRED items logged.
 
