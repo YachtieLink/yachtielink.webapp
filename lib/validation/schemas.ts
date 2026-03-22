@@ -111,6 +111,12 @@ export const moveToFolderSchema = z.object({
   folder_id: z.string().uuid().nullable(),
 });
 
+export const savedProfileUpdateSchema = z.object({
+  folder_id: z.string().uuid().nullable().optional(),
+  notes: z.string().max(2000).nullable().optional(),
+  watching: z.boolean().optional(),
+});
+
 // --- Profile Folders ---
 
 export const profileFolderSchema = z.object({
