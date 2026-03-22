@@ -23,6 +23,13 @@ export async function GET(req: NextRequest) {
     endorsementsReceivedRes,
     endorsementRequestsRes,
     analyticsRes,
+    savedProfilesRes,
+    profileFoldersRes,
+    educationRes,
+    skillsRes,
+    hobbiesRes,
+    photosRes,
+    galleryRes,
   ] = await Promise.all([
     admin.from('users').select('*').eq('id', user.id).single(),
     admin.from('attachments').select('*, yacht:yachts!yacht_id(*)').eq('user_id', user.id),
@@ -30,7 +37,14 @@ export async function GET(req: NextRequest) {
     admin.from('endorsements').select('*').eq('endorser_id', user.id),
     admin.from('endorsements').select('*').eq('recipient_id', user.id),
     admin.from('endorsement_requests').select('*').eq('requester_id', user.id),
-    admin.from('profile_analytics').select('*').eq('user_id', user.id),
+    admin.from('profile_analytics').select('*').eq('user_id', user.id).limit(10000),
+    admin.from('saved_profiles').select('*').eq('user_id', user.id),
+    admin.from('profile_folders').select('*').eq('user_id', user.id),
+    admin.from('user_education').select('*').eq('user_id', user.id),
+    admin.from('user_skills').select('*').eq('user_id', user.id),
+    admin.from('user_hobbies').select('*').eq('user_id', user.id),
+    admin.from('user_photos').select('*').eq('user_id', user.id),
+    admin.from('user_gallery').select('*').eq('user_id', user.id),
   ]);
 
   const exportData = {
@@ -42,6 +56,13 @@ export async function GET(req: NextRequest) {
     endorsements_received: endorsementsReceivedRes.data ?? [],
     endorsement_requests: endorsementRequestsRes.data ?? [],
     profile_analytics: analyticsRes.data ?? [],
+    saved_profiles: savedProfilesRes.data ?? [],
+    profile_folders: profileFoldersRes.data ?? [],
+    education: educationRes.data ?? [],
+    skills: skillsRes.data ?? [],
+    hobbies: hobbiesRes.data ?? [],
+    photos: photosRes.data ?? [],
+    gallery: galleryRes.data ?? [],
   };
 
   return new Response(JSON.stringify(exportData, null, 2), {
