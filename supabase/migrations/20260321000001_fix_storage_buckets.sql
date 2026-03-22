@@ -71,6 +71,8 @@ create policy "yacht-photos: crew delete (active only)"
   );
 
 -- ─── Fix get_sea_time() — add SECURITY DEFINER + search_path ───
+-- Must drop first because return type may differ from existing version
+drop function if exists public.get_sea_time(uuid);
 create or replace function public.get_sea_time(p_user_id uuid)
 returns table (total_days int, yacht_count int)
 language sql stable
