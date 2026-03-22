@@ -280,6 +280,26 @@ diff introduces the same pattern. Key ones:
 - Fail-open defaults that hide paid features on error
 - Race conditions in debounced/optimistic patterns
 
+## Step 6: Adversarial Self-Challenge
+After completing Steps 1-5, STOP and challenge your own conclusions.
+For every finding you classified as "no issue" or "defense-in-depth":
+1. Assume you are WRONG. Try to break the code you just approved.
+2. For security fixes: try to bypass the fix entirely. What path
+   would an attacker take that avoids the protection? If the fix is
+   an RLS policy, does the actual write path use SECURITY DEFINER
+   and bypass RLS? If the fix is client-side validation, can the
+   user call the API directly?
+3. For data fixes: try to corrupt the data. What sequence of API
+   calls would produce an inconsistent state?
+4. For every "this is fine because X", ask: "but what if X isn't
+   true?" — what if the cache misses, the env var is unset, the
+   user is on a slow connection, the query returns null?
+
+If you catch yourself saying "defense-in-depth" — that's a red flag.
+It usually means the actual attack path is unprotected and you're
+rationalising. State it plainly: "this fix does not block the
+reported attack vector because [specific bypass path]."
+
 ## Output format
 For each finding:
 
