@@ -36,6 +36,11 @@ Unplanned or reactive work that sits outside the main phase structure. Three typ
 
 → [junior/README.md](./junior/README.md)
 
+### Backlog
+The idea inbox. Feature ideas, bug fix proposals, and improvement thoughts captured during conversations. Items here get fleshed out over time, then promoted into a sprint when ready.
+
+→ [backlog/README.md](./backlog/README.md)
+
 ### Rallies
 Intensive audit sessions — not building, but investigating. Multiple agents research in parallel across different angles (UX, features, tech), then challengers stress-test the findings. Produces a proposal that feeds into real sprints.
 

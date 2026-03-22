@@ -135,10 +135,12 @@ Each step has an approval gate and a failure mode. The discipline is in not skip
 1. **Build check** — run `next build`, must pass clean
 2. **Run the app** — test every change end-to-end locally. Don't skip this — build passing doesn't mean the feature works. Check happy path, error states, empty states, mobile layout.
 3. **Execute exit criteria** — run the specific verification steps from the build plan (they should be runnable commands or testable user flows, not prose)
-4. **Spawn a Sonnet post-build code reviewer** (see prompt template below) — catches schema bugs, logic errors, and UX regressions that manual testing misses
-5. **Classify findings** — **ADDED** (fix now, in scope), **DEFERRED** (log as junior sprint), **NOTED** (acceptable, no action)
-6. Fix all ADDED items before committing
-7. Review your own diff: no console.logs, no hardcoded values, no commented-out code
+4. **Spawn a Sonnet post-build code reviewer** (see Sonnet prompt below) — fast pass for schema bugs, logic errors, and UX regressions
+5. Fix all findings from the Sonnet review
+6. **Spawn the Opus deep reviewer** (see Opus prompt below) — final gate, traces every change to all downstream callers. This is the step that replaces third-party code review (Codex).
+7. **Classify findings** — **ADDED** (fix now, in scope), **DEFERRED** (log as junior sprint), **NOTED** (acceptable, no action)
+8. Fix all ADDED items before committing
+9. Review your own diff: no console.logs, no hardcoded values, no commented-out code
 
 **Output:** Verification report. All ADDED items fixed. DEFERRED items logged.
 
@@ -211,6 +213,93 @@ Return a structured report with file, line, severity, and fix.
 ```
 
 **Model:** Sonnet — this is checklist-based pattern matching, not architectural reasoning. One pass with a good prompt beats two passes with a vague one.
+
+### Deep Review Prompt (Opus) — Final Gate
+
+Spawn a single **Opus** subagent after the Sonnet review passes and all its findings are fixed. This is the final gate before commit — it replaces third-party code review (Codex). Cost: ~$1-2 per review. Time: 3-6 minutes.
+
+**When to run:** Every sprint build and every rally fix sprint. Skip only for single-line typo fixes where the blast radius is obviously zero.
+
+```
+You are the final code reviewer for a Next.js + Supabase codebase.
+Your job is to find bugs that the build, manual testing, and a
+first-pass Sonnet reviewer all missed. These are typically
+DOWNSTREAM IMPACT BUGS — changes that work in the file being
+edited but break callers in other files.
+
+## Step 1: Read the diff
+Run `git diff main...HEAD` and read every changed file completely.
+Build a list of every CHANGED symbol: functions, constants, types,
+interfaces, config values, rate limit categories, env var checks,
+component props, database column names, RLS policies.
+
+Do NOT list symbols that were only ADDED (new files, new functions).
+Only symbols that EXISTED BEFORE and were MODIFIED.
+
+## Step 2: Trace every changed symbol to all callers
+For each changed symbol from Step 1:
+1. Grep the ENTIRE codebase for all files that import, call, or
+   reference this symbol
+2. READ each caller file (not just the grep match — read enough
+   context to understand how it uses the symbol)
+3. Ask: "Does this caller still work correctly after the change?"
+4. Pay special attention to:
+   - The caller assumes the old behavior (e.g., function used to
+     fail open, now fails closed — does the caller handle that?)
+   - The caller passes the old props/args (new required parameter
+     added — does the caller pass it?)
+   - The caller reads the old return shape (return type changed —
+     does the caller destructure correctly?)
+   - The caller uses a shared config value that was tightened
+     (rate limit category, feature flag, etc.)
+
+## Step 3: Check migrations against the full schema
+For any new migration files in the diff:
+1. Read ALL existing migrations to understand the current schema
+2. Does the new migration conflict with existing constraints?
+3. Does it reference columns/tables that exist?
+4. Is there a safe DOWN migration path?
+5. Will it break any existing RLS policies?
+
+## Step 4: Fail-mode analysis
+For each changed code path:
+1. What happens when the happy path fails? (network error, null
+   response, timeout, Redis down, Supabase down)
+2. Does the failure mode make things WORSE for the user than the
+   original code? (e.g., blocking GDPR export during Redis outage)
+3. Are there any error paths that silently succeed? (catch block
+   returns 200 instead of an error)
+
+## Step 5: Check against known failure patterns
+Read docs/ops/lessons-learned.md. For each lesson, check if the
+diff introduces the same pattern. Key ones:
+- Ghost columns (referencing columns that don't exist)
+- Shared config categories used by unrelated routes
+- Component swaps that lose native element functionality
+- Identity mapping confusion (auth.uid() vs table-specific PK)
+- Fail-open defaults that hide paid features on error
+- Race conditions in debounced/optimistic patterns
+
+## Output format
+For each finding:
+
+### [P1/P2/P3] Title
+**File:** path/to/file.ts
+**Impact:** What breaks for the user
+**Evidence:** The specific code + the specific caller that breaks
+**Fix:** What to change (be specific — file and line)
+
+P1 = breaks functionality or security (fix before commit)
+P2 = data integrity or consistency risk (fix before commit if easy)
+P3 = minor issue, acceptable to defer (log as junior sprint)
+
+If you find ZERO issues, say so explicitly. Do not invent problems.
+A clean review is a valid outcome.
+```
+
+**Model:** Opus — this requires reasoning through call chains and understanding fail modes across the full codebase. Sonnet cannot reliably do this.
+
+**Cost:** ~$1-2 per review (~80K input, ~8K output with caching). Significantly cheaper than third-party code review, and trained on this codebase's specific failure patterns.
 
 **Failure mode:** Agent says "it should work" without running the app. Agent misses a mobile layout break because they only tested desktop. Agent leaves `console.log` statements in committed code.
 
