@@ -55,7 +55,8 @@ export const getUserByHandle = cache(async (handle: string) => {
       primary_role, departments,
       phone, whatsapp, email, location_country, location_city,
       show_phone, show_whatsapp, show_email, show_location,
-      founding_member, ai_summary, section_visibility, social_links
+      founding_member, ai_summary, section_visibility, social_links,
+      cv_public, cv_public_source, latest_pdf_path, cv_storage_path
     `)
     .eq('handle', handle.toLowerCase())
     .single()
