@@ -629,6 +629,7 @@ export function Wizard({ userId, initialData }: WizardProps) {
     setDisplayName(name.split(" ")[0]);
     // Go straight to done
     setStepIndex(3);
+    if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
     redirectTimerRef.current = setTimeout(() => router.push("/app/profile"), 2200);
   }
 
@@ -654,6 +655,7 @@ export function Wizard({ userId, initialData }: WizardProps) {
     setHandle(data.handle);
     await saveToDb({ handle: data.handle, onboarding_complete: true });
     setStepIndex(3);
+    if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
     redirectTimerRef.current = setTimeout(() => router.push("/app/profile"), 2200);
   }
 
