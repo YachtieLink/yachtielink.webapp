@@ -177,6 +177,13 @@ export const sectionVisibilitySchema = z.object({
   visible: z.boolean(),
 });
 
+// --- CV Settings ---
+
+export const cvSettingsSchema = z.object({
+  cv_public: z.boolean().optional(),
+  cv_public_source: z.enum(['generated', 'uploaded']).optional(),
+});
+
 // --- AI Summary ---
 
 export const aiSummaryEditSchema = z.object({

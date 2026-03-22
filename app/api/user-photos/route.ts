@@ -84,11 +84,26 @@ export async function PUT(req: NextRequest) {
     if ('error' in result) return result.error
     const { photo_ids } = result.data
 
-    // Update sort_order for each photo in sequence
+    // Validate that photo_ids covers all user photos
+    const { data: existing } = await supabase
+      .from('user_photos')
+      .select('id')
+      .eq('user_id', user.id)
+    const existingIds = new Set((existing ?? []).map((p) => p.id))
+    const submittedIds = new Set(photo_ids)
+    if (existingIds.size !== submittedIds.size || ![...existingIds].every((id) => submittedIds.has(id))) {
+      return NextResponse.json({ error: 'photo_ids must include all your photos' }, { status: 400 })
+    }
+
+    // Update sort_order for each photo — check for errors
     const updates = photo_ids.map((id, idx) =>
       supabase.from('user_photos').update({ sort_order: idx }).eq('id', id).eq('user_id', user.id)
     )
-    await Promise.all(updates)
+    const results = await Promise.all(updates)
+    const failed = results.filter((r) => r.error)
+    if (failed.length > 0) {
+      return NextResponse.json({ error: 'Some photos could not be reordered' }, { status: 500 })
+    }
 
     // Sync profile_photo_url to the first photo in the new order
     const { data: firstPhoto } = await supabase
