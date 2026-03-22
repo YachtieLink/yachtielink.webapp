@@ -24,6 +24,47 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-22 — Claude Code (Opus 4.6 + Sonnet 4.6) — Sprint 11 QA + Sprint 11.1 Build
+
+### Done
+
+**Sprint 11 QA:**
+- Tested CV upload, photo management, CV regeneration, and public profile from the live app
+- Identified 3 bugs + 1 UI issue, documented as Sprint 11.1
+- Identified 3 feature rework sprints (CV & Sharing page, Saved profiles, Pro subdomain link)
+
+**Sprint 11.1 — built and shipped (PR #55):**
+- CV parse extraction: added `pdf-parse` to `serverExternalPackages` in `next.config.ts` — Next.js bundler was breaking the dynamic import
+- Photo upload limit: page now fetches `subscription_status`, enforces correct limit (3 free / 9 pro). Downgraded users see first 3 photos only with upgrade notice — extra photos preserved, not deleted
+- CV regenerate date: added `generatedAt` local state in `CvActions.tsx`, updates immediately after successful PDF generation
+- Public profile button margin: changed to `max(env(safe-area-inset-top), 1rem)` + `px-4` in both `HeroSection.tsx` and `PublicProfileContent.tsx`
+- Codex review fix: defaulted `isPro` to `true` so paid users aren't penalised if plan lookup fails — server enforces real upload limit
+
+**Process improvements:**
+- Created `sprints/WORKFLOW.md` — canonical execution reference for sprints and rallies (routing table, approval gates, failure modes, model allocation, rally R1–R6 steps)
+- Added AGENTS.md reference to WORKFLOW.md
+
+### Context
+
+- Branch `fix/sprint-11.1-bugfixes` merged to `main` via PR #55
+- Branch `docs/sprint-11-qa-and-workflow` merged to `main` via PR #54
+- All junior sprint READMEs created in `sprints/junior/{debug,feature,ui-ux}/`
+- CV parse fix needs real-world testing — the root cause was confirmed (bundler), but the user should re-test uploading a PDF/DOCX
+
+### Next
+
+- Sprint 11.2: CV & Sharing page rework (always-on QR, share modal, download toggle)
+- Sprint 11.3: Saved profiles rework (notes, availability watch, relationship context)
+- Sprint 11.4: Pro subdomain link (`{handle}.yachtie.link`) + reserved upsell page
+- Founder should re-test CV upload to verify the parse fix works end-to-end
+
+### Flags
+
+- Codex caught a valid issue: plan lookup failure silently downgraded Pro users. Fixed by defaulting to Pro. Pattern to watch: any client-side plan check should fail-open (show Pro) not fail-closed (show free)
+- CV parse was never tested with a real file in this session — the `serverExternalPackages` fix is the right approach but needs manual verification
+
+---
+
 ## 2026-03-22 — Claude Code (Opus 4.6) — Ralph Loop: Sprint Planning + Build Spec Drafting
 
 ### Done
