@@ -6,6 +6,8 @@ When you make changes to this module, append a one-line entry with date, agent n
 
 ---
 
+**2026-03-23** — Claude Code (Opus 4.6, CV Parse Sprint): Attachment edit — 4 new fields (employment_type, yacht_program, description w/ 2000 char counter, cruising_area). Cert edit — issuing_body field. CvUploadClient rewritten with two-button split. 5-step import wizard with yacht cards, skip/edit, celebration screen. saveConfirmedImport() with yacht search→create, cert type matching, batch operations. PDF templates enhanced with builder, program, description, cruising area per employment + issuing body per cert. CvPreview HTML component + owner preview + public CV viewer routes. CvActions preview link added.
+
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.3): CV page bento button hierarchy — Share primary, Generate/Upload secondary, QR/Edit ghost; lock icons on Pro templates; router.push replacing window.location.href.
 
 **2026-03-18** — Claude Code (Opus 4.6, Phase 1A Profile Robustness): `profile_queries.ts` extended — `getExtendedProfileSections()`, `getEndorserRoleOnYacht()` added to support new employment context on public profile.

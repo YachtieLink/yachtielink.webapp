@@ -6,6 +6,8 @@ When you make changes to this module, append a one-line entry with date, agent n
 
 ---
 
+**2026-03-23** — Claude Code (Opus 4.6, CV Parse Sprint): Profile settings page — 8 new fields (DOB, home country, smoke pref, appearance, travel docs, license, show_dob, show_home_country). Languages edit page (CRUD via API, max 10). Profile page: flag emoji + sea time in hero card, languages row, CV completeness prompt, SeaTimeSummary removed. getUserById extended with 9 new columns. show_home_country privacy enforced.
+
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.3): Profile page redesign — hero card (photo + name + role + URL + copy + Preview/Share buttons), profile strength card with smart CTA, 2-col section grid with toggle switches, empty states with icons replacing "Add →" hyperlinks, removed accordion sections, teal-50 full-bleed background.
 
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.3): Custom month/year DatePicker replacing all native date inputs; 44px checkbox tap targets for "currently working here" / "no expiry"; cert category picker with Lucide icons in 2-col grid.
