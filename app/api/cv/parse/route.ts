@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createServiceClient } from '@/lib/supabase/admin'
 import OpenAI from 'openai'
 import { CV_EXTRACTION_PROMPT } from '@/lib/cv/prompt'
-import { validateExtractedText } from '@/lib/cv/validate'
 import { validateBody } from '@/lib/validation/validate'
 import { parseCVSchema } from '@/lib/validation/schemas'
 import { applyRateLimit } from '@/lib/rate-limit/helpers'
 import { trackServerEvent } from '@/lib/analytics/server'
+import { extractCvText, isExtractError } from '@/lib/cv/extract-text'
 import type { ParsedCvData } from '@/lib/cv/types'
+
+export const maxDuration = 60
 
 async function callAiWithRetry(openai: OpenAI, text: string, maxRetries = 1): Promise<ParsedCvData> {
   let lastError: Error | null = null
@@ -65,14 +66,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Access denied' }, { status: 403 })
   }
 
-  // .doc rejection
-  if (storagePath.endsWith('.doc') && !storagePath.endsWith('.docx')) {
-    return NextResponse.json(
-      { error: "Can't read .doc files. Please save as .pdf or .docx and try again." },
-      { status: 400 },
-    )
-  }
-
   // Rate limit check
   const { data: allowed } = await supabase.rpc('check_cv_parse_limit', { p_user_id: user.id })
   if (!allowed) {
@@ -82,49 +75,12 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Download file from storage using service role (server-side)
-  const serviceClient = createServiceClient()
-
-  const { data: fileData, error: downloadErr } = await serviceClient.storage
-    .from('cv-uploads')
-    .download(storagePath)
-
-  if (downloadErr || !fileData) {
-    return NextResponse.json({ error: 'Could not download CV file' }, { status: 500 })
+  // Extract text (shared helper — handles download, PDF/DOCX extraction, validation, truncation)
+  const extraction = await extractCvText(storagePath)
+  if (isExtractError(extraction)) {
+    return NextResponse.json({ error: extraction.error }, { status: extraction.status })
   }
-
-  // Extract text based on file type
-  let extractedText: string
-  try {
-    const buffer = Buffer.from(await fileData.arrayBuffer())
-
-    if (storagePath.endsWith('.pdf')) {
-      const { PDFParse } = await import('pdf-parse')
-      const parser = new PDFParse({ data: new Uint8Array(buffer) })
-      const textResult = await parser.getText()
-      extractedText = textResult.pages.map((p) => p.text).join('\n')
-    } else if (storagePath.endsWith('.docx')) {
-      const mammoth = await import('mammoth')
-      const result = await mammoth.extractRawText({ buffer })
-      extractedText = result.value
-    } else {
-      return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 })
-    }
-  } catch {
-    return NextResponse.json(
-      { error: 'Could not extract text from your CV. Try entering your details manually.' },
-      { status: 422 },
-    )
-  }
-
-  // Pre-flight validation
-  const validation = validateExtractedText(extractedText.trim())
-  if (!validation.valid) {
-    return NextResponse.json({ error: validation.error }, { status: 400 })
-  }
-
-  // Truncate to 25K chars
-  const truncated = extractedText.slice(0, 25000)
+  const truncated = extraction.text
 
   // Call OpenAI API
   const apiKey = process.env.OPENAI_API_KEY
@@ -159,5 +115,5 @@ export async function POST(req: NextRequest) {
     .eq('id', user.id)
 
   trackServerEvent(user.id, 'cv.parsed')
-  return NextResponse.json({ ok: true, data: parsedData, warning: validation.warning })
+  return NextResponse.json({ ok: true, data: parsedData, warning: extraction.warning })
 }

@@ -18,6 +18,7 @@ They are first-class work — they get their own folder, their own README, and t
 | feature | feature-pro-subdomain-link | ⚡ Planned | Pro custom subdomain (`{handle}.yachtie.link`) with reserved upsell page |
 | feature | feature-cv-sharing-rework | ⚡ Planned | Full CV & Sharing page rework — always-on QR, share modal, CV toggle |
 | feature | feature-saved-profiles-rework | ⚡ Planned | Saved profiles — notes, availability watch, relationship context, folders |
+| feature | feature-two-pass-cv-parse | ✅ Shipped | Split CV parse into fast personal + background full parse for better UX |
 | ui-ux | ui-public-profile-button-margin | 🎨 In Progress | Top bar buttons on public profile sit flush against screen edge |
 
 ---

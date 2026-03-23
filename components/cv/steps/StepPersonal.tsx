@@ -11,7 +11,7 @@ interface StepPersonalProps {
   parsed: ParsedPersonal | null
   languages: ParsedLanguage[]
   existing: Record<string, unknown>
-  parseLoading: boolean
+  parsePersonalLoading: boolean
   onConfirm: (personal: ParsedPersonal, languages: ParsedLanguage[]) => void
 }
 
@@ -41,7 +41,7 @@ function merge(existing: unknown, parsed: unknown): string {
   return (existing as string) || (parsed as string) || ''
 }
 
-export function StepPersonal({ parsed, languages: parsedLangs, existing, parseLoading, onConfirm }: StepPersonalProps) {
+export function StepPersonal({ parsed, languages: parsedLangs, existing, parsePersonalLoading, onConfirm }: StepPersonalProps) {
   const [editing, setEditing] = useState(false)
 
   // Merged state
@@ -176,13 +176,13 @@ export function StepPersonal({ parsed, languages: parsedLangs, existing, parseLo
     <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-3">
       <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Your Details</h2>
 
-      {parseLoading && displayFields.length === 0 ? (
+      {parsePersonalLoading && displayFields.length === 0 ? (
         <div className="flex flex-col gap-3">
           <Skeleton className="h-5 w-48" />
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-4 w-40" />
           <p className="text-sm text-[var(--color-text-secondary)] mt-2">
-            Hang tight — we&apos;re pulling out your details, experience, and qualifications.
+            Hang tight — we&apos;re pulling out your details.
           </p>
         </div>
       ) : (
@@ -194,22 +194,15 @@ export function StepPersonal({ parsed, languages: parsedLangs, existing, parseLo
             </div>
           ))}
 
-          {parseLoading && (
-            <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)]">
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-[var(--color-text-tertiary)] border-t-[var(--color-interactive)]" />
-              Reading your CV for more...
-            </div>
-          )}
-
-          {!parseLoading && displayFields.length > 0 && displayFields.length < 3 && (
+          {displayFields.length > 0 && displayFields.length < 3 && (
             <p className="text-xs text-[var(--color-text-tertiary)]">
               We found a few details. You can add more anytime from your profile.
             </p>
           )}
 
           <div className="flex gap-2 mt-1">
-            <Button onClick={handleConfirm} className="flex-1" disabled={parseLoading}>Looks good</Button>
-            <Button variant="secondary" onClick={() => setEditing(true)} className="flex-1" disabled={parseLoading}>Edit details</Button>
+            <Button onClick={handleConfirm} className="flex-1">Looks good</Button>
+            <Button variant="secondary" onClick={() => setEditing(true)} className="flex-1">Edit details</Button>
           </div>
         </>
       )}
