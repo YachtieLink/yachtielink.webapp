@@ -2,7 +2,7 @@
 
 **Phase:** 1B (must complete before Phase 1B closes — gate to Phase 1C)
 **Priority:** P0 — this is the core onboarding experience
-**Status:** 📋 Specs Ready — Reviewed & UX-Refined (2 Sessions)
+**Status:** 🏗️ Built — Code complete, reviewed, migration applied. Pending: manual testing with 9 real CVs + PR to main.
 **Type:** Build (specs complete, co-authored with founder)
 **Depends on:** Sprint 11 (CV upload infrastructure)
 

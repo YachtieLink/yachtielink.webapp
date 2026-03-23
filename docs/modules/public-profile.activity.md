@@ -6,6 +6,8 @@ When you make changes to this module, append a one-line entry with date, agent n
 
 ---
 
+**2026-03-23** — Claude Code (Opus 4.6, CV Parse Sprint): Public CV viewer at /u/[handle]/cv (generated HTML via CvPreview or uploaded PDF iframe, gated by cv_public). PublicProfileContent "View CV" + download icon split replacing single download link. getUserByHandle extended with new personal fields (excluding dob due to column-level REVOKE). show_home_country + show_dob privacy respected in CvPreview viewer mode.
+
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.3): Public profile hero identity — larger name (text-4xl), unified "Role · Dept" line; top bar with icon-only circular buttons (back/edit/share) replacing labelled pills.
 
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.1): `PublicProfileContent` "N more" text made functional expand buttons.
