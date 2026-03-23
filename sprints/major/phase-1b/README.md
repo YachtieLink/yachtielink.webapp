@@ -27,7 +27,8 @@ Design philosophy: 75% professional, 25% personality. Notion-level energy. AI in
 | [Sprint 11 — Crew Landing Pages + Public Polish](./sprint-11/README.md) | ✅ Shipped | Beautiful public profiles, Salty, section colours, OG images |
 | [Sprint 12 — Yacht Graph](./sprint-12/README.md) | 📋 Draft | Yacht pages, crew network, colleague graph, sea time |
 | [Sprint 13 — Launch Polish + Marketing](./sprint-13/README.md) | 📋 Draft | Landing page, production env, QA, domain, feature roadmap |
-| [Sprint CV-Parse — CV Parse & Populate](./sprint-cv-parse/README.md) | 📋 Specs Ready | 7-wave build spec co-authored with founder over 2 sessions. 14 new schema fields, 5-step batch-confirm wizard, yacht matching pipeline, pre-flight validation, CV preview/viewer. Specs reviewed and UX-refined. Gates Phase 1B completion. |
+| [Sprint CV-Parse — CV Parse & Populate](./sprint-cv-parse/README.md) | ✅ Shipped | 7-wave build spec co-authored with founder over 2 sessions. 14 new schema fields, 5-step batch-confirm wizard, yacht matching pipeline, pre-flight validation, CV preview/viewer. Specs reviewed and UX-refined. |
+| [Sprint CV-Parse Bugfix — Post-Build QA Rally](./sprint-cv-parse-bugfix/README.md) | 📋 Planning | 37 bugs from founder QA walkthrough. 5 waves: data integrity, public profile, wizard UX, profile page, network tab. Plan reviewed. |
 
 ---
 

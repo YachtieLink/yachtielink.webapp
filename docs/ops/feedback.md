@@ -6,12 +6,44 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 21 rules
+**Current count:** 25 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## No Magic Links in Auth Flows
+
+**Rule:** Never propose magic links as an authentication option. Use password or OAuth (Google, Apple) only.
+**Origin:** 2026-03-23. During ghost profiles design interview, magic link was proposed as a claim flow option. Founder rejected it: "no magic links i hate them."
+**How to apply:** Any auth flow (signup, login, claim, verify) should offer password + social OAuth. Don't include magic link even as a fallback or alternative.
+
+---
+
+## Never Persist AI-Generated User-Facing Text
+
+**Rule:** Don't store LLM-generated endorsement drafts (or similar user-facing content) in the database. Generate on demand every time.
+**Origin:** 2026-03-23. During endorsement writing assist design, founder pointed out that storing generated text creates a database of generic recycled snippets. The value is fresh, context-specific generation.
+**How to apply:** Any feature that generates text for users should call the LLM on demand and return ephemeral results. Exception: ghost profile pre-generated suggestions on `endorsement_requests` (approved as lower-signal quick interactions for busy captains).
+
+---
+
+## Yacht Flags Are Ensigns, Not Country Flags
+
+**Rule:** Yachts fly maritime ensigns (Red Ensign variants), not national flags. Never use country flag emoji for yacht flag states. Use proper ensign images.
+**Origin:** 2026-03-24. Agent suggested using country flag emoji as approximation for yacht flags. Founder corrected: yachts fly ensigns. Agent then suggested backlogging it as "nice-to-have polish". Founder corrected again: "this is not for backlog this is a bug to be fixed."
+**How to apply:** Source or commission ensign images for common flag states (UK Red Ensign, Cayman, Marshall Islands, Malta, Gibraltar, etc.). Store as static assets. Map flag_state to ensign image everywhere yachts appear.
+
+---
+
+## Don't Downgrade Bugs to Backlog Without Asking
+
+**Rule:** If the founder identifies something as a bug during QA, it's a bug to fix — not a "nice-to-have" or backlog item. Don't unilaterally recategorize issues as lower priority or suggest deferring them.
+**Origin:** 2026-03-24. During QA walkthrough, agent suggested ensign flags were a "nice-to-have polish item" for backlog. Founder corrected sharply: "why are you making calls like that you ask me."
+**How to apply:** During bug documentation, record everything at the severity the founder implies. If unsure about priority, ask — don't assume.
 
 ---
 

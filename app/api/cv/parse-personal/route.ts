@@ -31,10 +31,13 @@ export async function POST(req: NextRequest) {
   }
 
   // Extract text (shared helper)
+  console.log('[parse-personal] Extracting text from:', storagePath)
   const extraction = await extractCvText(storagePath)
   if (isExtractError(extraction)) {
+    console.error('[parse-personal] Extraction failed:', extraction.error, 'status:', extraction.status)
     return NextResponse.json({ error: extraction.error }, { status: extraction.status })
   }
+  console.log('[parse-personal] Extracted', extraction.text.length, 'chars')
 
   // AI call — no retry, 15s timeout
   const apiKey = process.env.OPENAI_API_KEY
@@ -66,8 +69,9 @@ export async function POST(req: NextRequest) {
 
     const data = JSON.parse(content) as { personal: ParsedPersonal; languages: ParsedLanguage[] }
     return NextResponse.json({ ok: true, data, warning: extraction.warning })
-  } catch {
+  } catch (err) {
     clearTimeout(timeout)
+    console.error('[parse-personal] AI call failed:', err)
     return NextResponse.json(
       { error: 'Could not parse personal details.' },
       { status: 422 },

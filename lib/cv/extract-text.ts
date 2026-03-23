@@ -54,7 +54,10 @@ export async function extractCvText(storagePath: string): Promise<ExtractResult>
           setTimeout(() => reject(new Error('PDF extraction timed out')), 15000)
         ),
       ])
-      extractedText = textResult.pages.map((p: { text: string }) => p.text).join('\n')
+      console.log(`[extractCvText] PDF has ${textResult.pages.length} pages`)
+      extractedText = textResult.pages.map((p: { text: string }, i: number) =>
+        `--- PAGE ${i + 1} ---\n${p.text}`
+      ).join('\n\n')
     } else if (storagePath.endsWith('.docx')) {
       const mammoth = await import('mammoth')
       const result = await mammoth.extractRawText({ buffer })
@@ -62,7 +65,8 @@ export async function extractCvText(storagePath: string): Promise<ExtractResult>
     } else {
       return { error: 'Unsupported file type', status: 400 }
     }
-  } catch {
+  } catch (err) {
+    console.error('[extractCvText] Text extraction failed:', err)
     return { error: 'Could not extract text from your CV. Try entering your details manually.', status: 422 }
   }
 
