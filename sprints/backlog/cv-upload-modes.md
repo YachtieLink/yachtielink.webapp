@@ -1,6 +1,6 @@
 # CV Upload Modes
 
-**Status:** Backlog
+**Status:** Promoted → Sprint CV-Parse (Step 0 of the import wizard)
 **Source:** Founder QA (2026-03-22)
 **Priority:** Medium — affects user trust in data integrity
 

@@ -6,12 +6,36 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 18 rules
+**Current count:** 21 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## Write Specs in the Repo, Not Claude Plans
+
+**Rule:** Build specs, wave plans, and implementation documents go in the sprint's `specs/` folder in the repo — never in Claude's internal plan files. The founder needs to read, edit, and approve specs directly. Claude's plan mode is for thinking, not for deliverables.
+**Origin:** 2026-03-23. Agent wrote wave specs to Claude's plan file. Founder corrected: "mate don't write it in the claude plans? make mds and put it in the proper folders in the repo."
+**How to apply:** Any document that the founder or future agents need to reference goes in the repo under the appropriate sprint or docs folder. Use Claude's plan mode for temporary thinking only.
+
+---
+
+## CV Viewer Serves Both Owner and Viewer
+
+**Rule:** When building a preview/viewer component, always consider both audiences: the owner (who needs to see what others will see + edit links) and the viewer (who needs a clean read-only view). A single component serves both with a `mode` prop.
+**Origin:** 2026-03-23. Founder corrected assumption that CV preview was owner-only: "the user needs the preview and the viewer needs the preview too." Also: "and they can present their own cv if they want" — uploaded CVs must be viewable in-app, not just downloadable.
+**How to apply:** For any user-facing content preview (CV, profile, endorsements), build one component with owner/viewer modes. Owner gets edit links and missing-field prompts. Viewer gets clean read-only. Support both generated and user-uploaded content paths.
+
+---
+
+## Wizard UX: Show Don't Ask, Confirm Don't Type
+
+**Rule:** Import wizards should be review flows, not forms. Present merged results as confirm cards ("Looks good?"), not as empty inputs. Never show fields that have no value — those go under "Add more details" for power users. The wizard gets the profile to 80%, the normal app handles the rest.
+**Origin:** 2026-03-23. Founder refined the wizard spec from a 7-step form-heavy flow to a 5-step confirm-card flow: "Show, don't ask. Never make them type. Never leave them wondering." Also: every loading moment must give the user something to do (confirm name while parse runs in background).
+**How to apply:** When building multi-step import/onboarding flows, default to ConfirmCard pattern (show data → "Looks good ✓" / "Edit details"). Only show edit inputs when the user opts in. Empty fields are hidden on confirm cards. Parse/matching work runs in background while user reviews earlier steps.
 
 ---
 
