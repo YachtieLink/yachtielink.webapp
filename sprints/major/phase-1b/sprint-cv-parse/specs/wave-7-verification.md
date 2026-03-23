@@ -21,7 +21,7 @@ Verify: columns exist, CHECK constraints work, DOB column-level REVOKE works.
 1. **Profile settings** — set all new fields, save, reload, verify persistence
 2. **Attachment edit** — set employment_type, program, description, cruising_area
 3. **Languages edit** — add/remove languages with proficiency
-4. **Profile page** — nationality flag in hero, sea time in hero, languages row, CV completeness prompt
+4. **Profile page** — home_country flag in hero, sea time in hero, languages row, CV completeness prompt
 
 ### 7.4 — Pre-Flight Validation Test
 
@@ -39,15 +39,15 @@ For each CV: upload → choose "Build my profile" → walk through wizard → ve
 **Target: ≥80% profile completion after import for CVs with average completeness.**
 
 **CVs:**
-- [ ] Alexandru Botez — land-based only, skills, hobbies, languages, education
-- [ ] Christian Arnold (2023) — yacht experience, inline references, DOB, nationality
-- [ ] Christian Arnold (2024) — same person, different format, cuisine skills
-- [ ] Ece Pekcan — references with yacht context, education, social media
-- [ ] Nicholas Essex — .doc file (error message), social media, GCSE grades
-- [ ] Reann Elks — B1B2, vaccination, certifications
-- [ ] Tamara Fredriksen — heavy freelance, 20+ positions, 5 references
-- [ ] Clare McGuigan — 4-page, chalet + yacht, multiple cookery schools
-- [ ] Krista Graham — 4-page, Michelin background, multiple yachts
+- [ ] Test CV 1 — land-based only, skills, hobbies, languages, education
+- [ ] Test CV 2 (2023) — yacht experience, inline references, DOB, home_country
+- [ ] Test CV 2 (2024) — same person, different format, cuisine skills
+- [ ] Test CV 3 — references with yacht context, education, social media
+- [ ] Test CV 4 — .doc file (error message), social media, GCSE grades
+- [ ] Test CV 5 — B1B2, vaccination, certifications
+- [ ] Test CV 6 — heavy freelance, 20+ positions, 5 references
+- [ ] Test CV 7 — 4-page, chalet + yacht, multiple cookery schools
+- [ ] Test CV 8 — 4-page, Michelin background, multiple yachts
 
 ### 7.6 — Wizard UX Test
 
@@ -85,7 +85,7 @@ For each CV: upload → choose "Build my profile" → walk through wizard → ve
 ### 7.9 — PDF Generation Test
 
 1. Generate PDF, verify new fields appear
-2. Test with Tamara Fredriksen (20+ positions) — layout doesn't break
+2. Test with Test CV 6 (20+ positions) — layout doesn't break
 3. Verify all 3 templates render correctly
 
 ### 7.10 — Two-Phase Code Review

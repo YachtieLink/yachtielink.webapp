@@ -19,6 +19,14 @@ interface UserProfile {
   show_whatsapp?: boolean
   show_email?: boolean
   show_location?: boolean
+  dob?: string | null
+  home_country?: string | null
+  smoke_pref?: string | null
+  appearance_note?: string | null
+  travel_docs?: string[] | null
+  license_info?: string | null
+  languages?: Array<{ language: string; proficiency: string }> | null
+  show_dob?: boolean
 }
 
 interface Attachment {
@@ -26,12 +34,36 @@ interface Attachment {
   role_label?: string | null
   started_at?: string | null
   ended_at?: string | null
+  employment_type?: string | null
+  yacht_program?: string | null
+  description?: string | null
+  cruising_area?: string | null
   yachts: {
     name: string
     yacht_type?: string | null
     length_meters?: number | null
     flag_state?: string | null
+    builder?: string | null
   } | null
+}
+
+interface Education {
+  id: string
+  institution: string
+  qualification?: string | null
+  field_of_study?: string | null
+  started_at?: string | null
+  ended_at?: string | null
+}
+
+interface Skill {
+  id: string
+  name: string
+}
+
+interface Hobby {
+  id: string
+  name: string
 }
 
 interface Certification {
@@ -39,6 +71,7 @@ interface Certification {
   custom_cert_name?: string | null
   issued_at?: string | null
   expires_at?: string | null
+  issuing_body?: string | null
   certification_types: {
     name: string
     category?: string | null
@@ -65,6 +98,9 @@ interface ProfilePdfProps {
   attachments: Attachment[]
   certifications: Certification[]
   endorsements: Endorsement[]
+  education?: Education[]
+  skills?: Skill[]
+  hobbies?: Hobby[]
   qrDataUrl: string
   isPro: boolean
   template?: PdfTemplate
@@ -416,6 +452,92 @@ function truncate(text: string, maxLen: number): string {
   return text.slice(0, maxLen) + '…'
 }
 
+function calculateAge(dob: string): number {
+  return Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 86400000))
+}
+
+function humanize(s: string): string {
+  return s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
+function renderPersonalDetailsSection(user: UserProfile, s: Record<string, any>) {
+  const details: string[] = []
+  if (user.smoke_pref) details.push(humanize(user.smoke_pref))
+  if (user.appearance_note && user.appearance_note !== 'not_specified') details.push(`Tattoos: ${humanize(user.appearance_note)}`)
+  if (user.travel_docs?.length) details.push(`Visas: ${user.travel_docs.join(', ')}`)
+  if (user.license_info) details.push(`License: ${user.license_info}`)
+  if (user.languages?.length) details.push(`Languages: ${user.languages.map(l => `${l.language} (${l.proficiency})`).join(', ')}`)
+
+  if (details.length === 0) return null
+  return (
+    <View style={s.section}>
+      <Text style={s.sectionTitle}>Personal Details</Text>
+      {details.map((d, i) => <Text key={i} style={s.contactRow}>{d}</Text>)}
+    </View>
+  )
+}
+
+function renderHeaderSubline(user: UserProfile): string {
+  const parts: string[] = []
+  if (user.home_country) parts.push(user.home_country)
+  if (user.dob && user.show_dob !== false) parts.push(`${calculateAge(user.dob)} years old`)
+  return parts.join(' · ')
+}
+
+function renderAttachmentDetails(att: Attachment, s: Record<string, any>) {
+  const specs = [
+    att.yachts?.length_meters ? `${att.yachts.length_meters}m` : null,
+    att.yachts?.builder,
+    att.yacht_program ? humanize(att.yacht_program) : null,
+    att.yachts?.flag_state,
+  ].filter(Boolean).join(' · ')
+
+  return (
+    <>
+      {specs && <Text style={s.dates}>{specs}</Text>}
+      {att.cruising_area && <Text style={s.dates}>{att.cruising_area}</Text>}
+      {att.description && <Text style={{ ...s.dates, marginTop: 2 }}>{truncate(att.description, 500)}</Text>}
+    </>
+  )
+}
+
+function renderEducationSection(education: Education[] | undefined, s: Record<string, any>) {
+  if (!education?.length) return null
+  return (
+    <View style={s.section}>
+      <Text style={s.sectionTitle}>Education</Text>
+      {education.map((edu) => (
+        <View key={edu.id} style={{ marginBottom: 4 }}>
+          <Text style={s.certName}>{edu.institution}</Text>
+          <Text style={s.dates}>
+            {[edu.qualification, edu.field_of_study, edu.started_at && edu.ended_at ? `${formatDate(edu.started_at)} — ${formatDate(edu.ended_at)}` : null].filter(Boolean).join(' · ')}
+          </Text>
+        </View>
+      ))}
+    </View>
+  )
+}
+
+function renderSkillsHobbiesSection(skills: Skill[] | undefined, hobbies: Hobby[] | undefined, s: Record<string, any>) {
+  if (!skills?.length && !hobbies?.length) return null
+  return (
+    <View style={s.section}>
+      {skills && skills.length > 0 && (
+        <>
+          <Text style={s.sectionTitle}>Skills</Text>
+          <Text style={s.contactRow}>{skills.map(sk => sk.name).join(' · ')}</Text>
+        </>
+      )}
+      {hobbies && hobbies.length > 0 && (
+        <>
+          <Text style={{ ...s.sectionTitle, marginTop: skills?.length ? 8 : 0 }}>Hobbies</Text>
+          <Text style={s.contactRow}>{hobbies.map(h => h.name).join(' · ')}</Text>
+        </>
+      )}
+    </View>
+  )
+}
+
 // ── Component ──────────────────────────────────────────────────────────────────
 
 export function ProfilePdfDocument({
@@ -423,6 +545,9 @@ export function ProfilePdfDocument({
   attachments,
   certifications,
   endorsements,
+  education,
+  skills,
+  hobbies,
   qrDataUrl,
   isPro,
   template = 'standard',
@@ -430,10 +555,10 @@ export function ProfilePdfDocument({
   const displayName = user.display_name ?? user.full_name
 
   if (template === 'classic-navy') {
-    return <ClassicNavyPdf user={user} attachments={attachments} certifications={certifications} endorsements={endorsements} qrDataUrl={qrDataUrl} isPro={isPro} />
+    return <ClassicNavyPdf user={user} attachments={attachments} certifications={certifications} endorsements={endorsements} education={education} skills={skills} hobbies={hobbies} qrDataUrl={qrDataUrl} isPro={isPro} />
   }
   if (template === 'modern-minimal') {
-    return <ModernMinimalPdf user={user} attachments={attachments} certifications={certifications} endorsements={endorsements} qrDataUrl={qrDataUrl} isPro={isPro} />
+    return <ModernMinimalPdf user={user} attachments={attachments} certifications={certifications} endorsements={endorsements} education={education} skills={skills} hobbies={hobbies} qrDataUrl={qrDataUrl} isPro={isPro} />
   }
 
   const hasVisibleContact =
@@ -463,6 +588,7 @@ export function ProfilePdfDocument({
                 {[user.primary_role, ...(user.departments ?? [])].filter(Boolean).join(' · ')}
               </Text>
             )}
+            {(() => { const sub = renderHeaderSubline(user); return sub ? <Text style={styles.role}>{sub}</Text> : null })()}
             <Text style={styles.url}>yachtie.link/u/{user.handle}</Text>
           </View>
         </View>
@@ -496,6 +622,9 @@ export function ProfilePdfDocument({
           </View>
         )}
 
+        {/* Personal Details */}
+        {renderPersonalDetailsSection(user, styles)}
+
         {/* Employment History */}
         {attachments.length > 0 && (
           <View style={styles.section}>
@@ -520,6 +649,7 @@ export function ProfilePdfDocument({
                       {att.ended_at ? formatDate(att.ended_at) : 'Present'}
                     </Text>
                   )}
+                  {renderAttachmentDetails(att, styles)}
                 </View>
               </View>
             ))}
@@ -532,18 +662,25 @@ export function ProfilePdfDocument({
             <Text style={styles.sectionTitle}>Certifications</Text>
             {certifications.map((cert) => (
               <View key={cert.id} style={styles.certRow}>
-                <Text style={styles.certName}>
-                  {cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'}
-                </Text>
-                {cert.expires_at && (
-                  <Text style={styles.certExpiry}>
-                    Exp. {formatDate(cert.expires_at)}
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.certName}>
+                    {cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'}
                   </Text>
-                )}
+                  {cert.issuing_body && <Text style={styles.certExpiry}>{cert.issuing_body}</Text>}
+                </View>
+                <Text style={styles.certExpiry}>
+                  {cert.expires_at ? `Exp. ${formatDate(cert.expires_at)}` : cert.issued_at ? `Issued ${formatDate(cert.issued_at)}` : ''}
+                </Text>
               </View>
             ))}
           </View>
         )}
+
+        {/* Education */}
+        {renderEducationSection(education, styles)}
+
+        {/* Skills & Hobbies */}
+        {renderSkillsHobbiesSection(skills, hobbies, styles)}
 
         {/* Endorsements (top 3) */}
         {endorsements.length > 0 && (
@@ -582,7 +719,7 @@ export function ProfilePdfDocument({
 
 // ── Classic Navy PDF ───────────────────────────────────────────────────────────
 
-function ClassicNavyPdf({ user, attachments, certifications, endorsements, qrDataUrl, isPro }: Omit<ProfilePdfProps, 'template'>) {
+function ClassicNavyPdf({ user, attachments, certifications, endorsements, education, skills, hobbies, qrDataUrl, isPro }: Omit<ProfilePdfProps, 'template'>) {
   const displayName = user.display_name ?? user.full_name
   const s = navyStyles
   const hasVisibleContact =
@@ -610,6 +747,7 @@ function ClassicNavyPdf({ user, attachments, certifications, endorsements, qrDat
                 {[user.primary_role, ...(user.departments ?? [])].filter(Boolean).join(' · ')}
               </Text>
             )}
+            {(() => { const sub = renderHeaderSubline(user); return sub ? <Text style={s.url}>{sub}</Text> : null })()}
             <Text style={s.url}>yachtie.link/u/{user.handle}</Text>
           </View>
         </View>
@@ -636,6 +774,8 @@ function ClassicNavyPdf({ user, attachments, certifications, endorsements, qrDat
             </View>
           )}
 
+          {renderPersonalDetailsSection(user, s)}
+
           {attachments.length > 0 && (
             <View style={s.section}>
               <Text style={s.sectionTitle}>Employment History</Text>
@@ -657,6 +797,7 @@ function ClassicNavyPdf({ user, attachments, certifications, endorsements, qrDat
                         {att.ended_at ? formatDate(att.ended_at) : 'Present'}
                       </Text>
                     )}
+                    {renderAttachmentDetails(att, s)}
                   </View>
                 </View>
               ))}
@@ -669,12 +810,18 @@ function ClassicNavyPdf({ user, attachments, certifications, endorsements, qrDat
               <View style={s.divider} />
               {certifications.map((cert) => (
                 <View key={cert.id} style={s.certRow}>
-                  <Text style={s.certName}>{cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'}</Text>
-                  {cert.expires_at && <Text style={s.certExpiry}>Exp. {formatDate(cert.expires_at)}</Text>}
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.certName}>{cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'}</Text>
+                    {cert.issuing_body && <Text style={s.certExpiry}>{cert.issuing_body}</Text>}
+                  </View>
+                  <Text style={s.certExpiry}>{cert.expires_at ? `Exp. ${formatDate(cert.expires_at)}` : cert.issued_at ? `Issued ${formatDate(cert.issued_at)}` : ''}</Text>
                 </View>
               ))}
             </View>
           )}
+
+          {renderEducationSection(education, s)}
+          {renderSkillsHobbiesSection(skills, hobbies, s)}
 
           {endorsements.length > 0 && (
             <View style={s.section}>
@@ -707,7 +854,7 @@ function ClassicNavyPdf({ user, attachments, certifications, endorsements, qrDat
 
 // ── Modern Minimal PDF ─────────────────────────────────────────────────────────
 
-function ModernMinimalPdf({ user, attachments, certifications, endorsements, qrDataUrl, isPro }: Omit<ProfilePdfProps, 'template'>) {
+function ModernMinimalPdf({ user, attachments, certifications, endorsements, education, skills, hobbies, qrDataUrl, isPro }: Omit<ProfilePdfProps, 'template'>) {
   const displayName = user.display_name ?? user.full_name
   const s = minimalStyles
   const hasVisibleContact =
@@ -762,6 +909,8 @@ function ModernMinimalPdf({ user, attachments, certifications, endorsements, qrD
             </View>
           )}
 
+          {renderPersonalDetailsSection(user, s)}
+
           {attachments.length > 0 && (
             <View style={s.section}>
               <Text style={s.sectionTitle}>Employment History</Text>
@@ -782,6 +931,7 @@ function ModernMinimalPdf({ user, attachments, certifications, endorsements, qrD
                         {att.ended_at ? formatDate(att.ended_at) : 'Present'}
                       </Text>
                     )}
+                    {renderAttachmentDetails(att, s)}
                   </View>
                 </View>
               ))}
@@ -793,12 +943,18 @@ function ModernMinimalPdf({ user, attachments, certifications, endorsements, qrD
               <Text style={s.sectionTitle}>Certifications</Text>
               {certifications.map((cert) => (
                 <View key={cert.id} style={s.certRow}>
-                  <Text style={s.certName}>{cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'}</Text>
-                  {cert.expires_at && <Text style={s.certExpiry}>Exp. {formatDate(cert.expires_at)}</Text>}
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.certName}>{cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'}</Text>
+                    {cert.issuing_body && <Text style={s.certExpiry}>{cert.issuing_body}</Text>}
+                  </View>
+                  <Text style={s.certExpiry}>{cert.expires_at ? `Exp. ${formatDate(cert.expires_at)}` : cert.issued_at ? `Issued ${formatDate(cert.issued_at)}` : ''}</Text>
                 </View>
               ))}
             </View>
           )}
+
+          {renderEducationSection(education, s)}
+          {renderSkillsHobbiesSection(skills, hobbies, s)}
 
           {endorsements.length > 0 && (
             <View style={s.section}>

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
-import { Button, Input, DatePicker } from '@/components/ui'
+import { Button, Input, DatePicker, Select } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { BackButton } from '@/components/ui/BackButton'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -36,6 +36,10 @@ export default function AttachmentEditPage() {
   const [loading, setLoading] = useState(true)
   const [transferOpen, setTransferOpen] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
+  const [employmentType, setEmploymentType] = useState('')
+  const [yachtProgram, setYachtProgram] = useState('')
+  const [description, setDescription] = useState('')
+  const [cruisingArea, setCruisingArea] = useState('')
   const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
@@ -44,7 +48,7 @@ export default function AttachmentEditPage() {
     })
     supabase
       .from('attachments')
-      .select('id, role_label, started_at, ended_at, yachts(id, name)')
+      .select('id, role_label, started_at, ended_at, employment_type, yacht_program, description, cruising_area, yachts(id, name)')
       .eq('id', params.id)
       .single()
       .then(({ data }) => {
@@ -55,6 +59,10 @@ export default function AttachmentEditPage() {
           setStartDate(att.started_at)
           setEndDate(att.ended_at ?? '')
           setIsCurrent(!att.ended_at)
+          setEmploymentType((data as any).employment_type ?? '')
+          setYachtProgram((data as any).yacht_program ?? '')
+          setDescription((data as any).description ?? '')
+          setCruisingArea((data as any).cruising_area ?? '')
         }
         setLoading(false)
       })
@@ -69,6 +77,10 @@ export default function AttachmentEditPage() {
         role_label: roleLabel.trim(),
         started_at: startDate,
         ended_at: isCurrent ? null : endDate || null,
+        employment_type: employmentType || null,
+        yacht_program: yachtProgram || null,
+        description: description.trim() || null,
+        cruising_area: cruisingArea.trim() || null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', params.id)
@@ -178,6 +190,57 @@ export default function AttachmentEditPage() {
                         maxYear={new Date().getFullYear()}
                       />
                     )}
+                  </div>
+
+                  {/* Employment Details */}
+                  <div className="border-t border-[var(--color-border)] pt-4 mt-2">
+                    <p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">Employment Details</p>
+
+                    <div className="flex flex-col gap-4">
+                      <Select
+                        label="Employment Type"
+                        value={employmentType}
+                        onChange={(e) => setEmploymentType(e.target.value)}
+                      >
+                        <option value="">Select...</option>
+                        <option value="permanent">Permanent</option>
+                        <option value="seasonal">Seasonal</option>
+                        <option value="freelance">Freelance</option>
+                        <option value="relief">Relief</option>
+                        <option value="temporary">Temporary</option>
+                      </Select>
+
+                      <Select
+                        label="Yacht Program"
+                        value={yachtProgram}
+                        onChange={(e) => setYachtProgram(e.target.value)}
+                      >
+                        <option value="">Select...</option>
+                        <option value="private">Private</option>
+                        <option value="charter">Charter</option>
+                        <option value="private_charter">Private/Charter</option>
+                      </Select>
+
+                      <Input
+                        label="Cruising Area"
+                        value={cruisingArea}
+                        onChange={(e) => setCruisingArea(e.target.value)}
+                        placeholder="e.g. Mediterranean, Caribbean"
+                      />
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="text-sm font-medium text-[var(--color-text-primary)]">Description</label>
+                        <textarea
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value.slice(0, 2000))}
+                          placeholder="Describe your role and responsibilities..."
+                          className="min-h-[120px] resize-y rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20 focus:border-[var(--color-interactive)]"
+                        />
+                        <p className="text-xs text-[var(--color-text-tertiary)] text-right">
+                          {description.length}/2000
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
                   <Button

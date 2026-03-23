@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { Pencil, Copy, Share2, Check } from 'lucide-react'
 import { Button, IconButton } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+import { countryToFlag } from '@/lib/constants/country-iso'
+import { formatSeaTime } from '@/lib/sea-time'
 
 interface ProfileHeroCardProps {
   displayName: string
@@ -13,6 +15,9 @@ interface ProfileHeroCardProps {
   primaryRole: string | null
   departments: string[]
   profilePhotoUrl: string | null
+  home_country?: string | null
+  seaTimeTotalDays?: number
+  seaTimeYachtCount?: number
 }
 
 export function ProfileHeroCard({
@@ -21,6 +26,9 @@ export function ProfileHeroCard({
   primaryRole,
   departments,
   profilePhotoUrl,
+  home_country,
+  seaTimeTotalDays,
+  seaTimeYachtCount,
 }: ProfileHeroCardProps) {
   const { toast } = useToast()
   const [copied, setCopied] = useState(false)
@@ -73,11 +81,18 @@ export function ProfileHeroCard({
             {displayName}
           </p>
           {primaryRole && (
-            <p className="text-sm text-[var(--color-text-secondary)]">{primaryRole}</p>
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              {primaryRole}{home_country ? ` · ${countryToFlag(home_country)}` : ''}
+            </p>
           )}
           {departments.length > 0 && (
             <p className="text-xs text-[var(--color-text-tertiary)]">
               {departments.join(' \u00b7 ')}
+            </p>
+          )}
+          {(seaTimeTotalDays ?? 0) > 0 && (
+            <p className="text-xs text-[var(--color-text-tertiary)]">
+              {formatSeaTime(seaTimeTotalDays!).displayShort} at sea · {seaTimeYachtCount} yacht{seaTimeYachtCount === 1 ? '' : 's'}
             </p>
           )}
         </div>

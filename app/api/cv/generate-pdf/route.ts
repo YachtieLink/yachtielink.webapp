@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Fetch all profile data
-    const [profileRes, attRes, certRes, endRes] = await Promise.all([
+    const [profileRes, attRes, certRes, endRes, eduRes, skillsRes, hobbiesRes] = await Promise.all([
       supabase
         .from('users')
         .select(`
@@ -47,15 +47,16 @@ export async function POST(req: NextRequest) {
           bio, profile_photo_url,
           phone, whatsapp, email, location_country, location_city,
           show_phone, show_whatsapp, show_email, show_location,
-          subscription_status, latest_pdf_path
+          subscription_status, latest_pdf_path,
+          dob, home_country, smoke_pref, appearance_note, travel_docs, license_info, languages, show_dob
         `)
         .eq('id', user.id)
         .single(),
       supabase
         .from('attachments')
         .select(`
-          id, role_label, started_at, ended_at,
-          yachts ( id, name, yacht_type, length_meters, flag_state )
+          id, role_label, started_at, ended_at, employment_type, yacht_program, description, cruising_area,
+          yachts ( id, name, yacht_type, length_meters, flag_state, builder )
         `)
         .eq('user_id', user.id)
         .is('deleted_at', null)
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
       supabase
         .from('certifications')
         .select(`
-          id, custom_cert_name, issued_at, expires_at,
+          id, custom_cert_name, issued_at, expires_at, issuing_body,
           certification_types ( name, category )
         `)
         .eq('user_id', user.id)
@@ -79,6 +80,9 @@ export async function POST(req: NextRequest) {
         .is('deleted_at', null)
         .order('created_at', { ascending: false })
         .limit(3),
+      supabase.from('user_education').select('id, institution, qualification, field_of_study, started_at, ended_at').eq('user_id', user.id).order('sort_order'),
+      supabase.from('user_skills').select('id, name').eq('user_id', user.id).order('sort_order'),
+      supabase.from('user_hobbies').select('id, name').eq('user_id', user.id).order('sort_order'),
     ])
 
     const profile = profileRes.data
@@ -99,6 +103,9 @@ export async function POST(req: NextRequest) {
         attachments: (attRes.data as any) ?? [],
         certifications: (certRes.data as any) ?? [],
         endorsements: (endRes.data as any) ?? [],
+        education: (eduRes.data as any) ?? [],
+        skills: (skillsRes.data as any) ?? [],
+        hobbies: (hobbiesRes.data as any) ?? [],
         qrDataUrl,
         isPro: profile?.subscription_status === 'pro',
       }),

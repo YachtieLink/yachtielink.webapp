@@ -3,12 +3,29 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Button, Input } from '@/components/ui'
+import { Button, Input, Select, DatePicker } from '@/components/ui'
 import { BackButton } from '@/components/ui/BackButton'
 import { SearchableSelect } from '@/components/ui/SearchableSelect'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ALL_COUNTRIES, PINNED_COUNTRIES } from '@/lib/constants/countries'
+
+const SMOKE_OPTIONS = [
+  { value: '', label: 'Select...' },
+  { value: 'non_smoker', label: 'Non Smoker' },
+  { value: 'smoker', label: 'Smoker' },
+  { value: 'social_smoker', label: 'Social Smoker' },
+]
+
+const APPEARANCE_OPTIONS = [
+  { value: '', label: 'Select...' },
+  { value: 'none', label: 'None' },
+  { value: 'visible', label: 'Visible' },
+  { value: 'non_visible', label: 'Non Visible' },
+  { value: 'not_specified', label: 'Not Specified' },
+]
+
+const COMMON_TRAVEL_DOCS = ['B1/B2', 'Schengen', 'EU Citizen', "Seaman's Book"]
 
 interface ContactSettings {
   phone:            string
@@ -20,6 +37,14 @@ interface ContactSettings {
   show_whatsapp:    boolean
   show_email:       boolean
   show_location:    boolean
+  dob:              string
+  home_country:     string
+  smoke_pref:       string
+  appearance_note:  string
+  travel_docs:      string[]
+  license_info:     string
+  show_dob:         boolean
+  show_home_country: boolean
 }
 
 function ToggleRow({
@@ -73,6 +98,14 @@ export default function ProfileSettingsPage() {
     show_whatsapp:    false,
     show_email:       false,
     show_location:    true,
+    dob:              '',
+    home_country:     '',
+    smoke_pref:       '',
+    appearance_note:  '',
+    travel_docs:      [],
+    license_info:     '',
+    show_dob:         false,
+    show_home_country: false,
   })
 
   useEffect(() => {
@@ -81,7 +114,7 @@ export default function ProfileSettingsPage() {
       if (!user) return
       const { data } = await supabase
         .from('users')
-        .select('phone, whatsapp, email, location_country, location_city, show_phone, show_whatsapp, show_email, show_location')
+        .select('phone, whatsapp, email, location_country, location_city, show_phone, show_whatsapp, show_email, show_location, dob, home_country, smoke_pref, appearance_note, travel_docs, license_info, show_dob, show_home_country')
         .eq('id', user.id)
         .single()
       if (data) {
@@ -95,6 +128,14 @@ export default function ProfileSettingsPage() {
           show_whatsapp:    data.show_whatsapp,
           show_email:       data.show_email,
           show_location:    data.show_location,
+          dob:              data.dob              ?? '',
+          home_country:     data.home_country     ?? '',
+          smoke_pref:       data.smoke_pref       ?? '',
+          appearance_note:  data.appearance_note  ?? '',
+          travel_docs:      data.travel_docs      ?? [],
+          license_info:     data.license_info     ?? '',
+          show_dob:         data.show_dob         ?? false,
+          show_home_country: data.show_home_country ?? false,
         })
       }
       setLoaded(true)
@@ -123,6 +164,14 @@ export default function ProfileSettingsPage() {
           show_whatsapp:    form.show_whatsapp,
           show_email:       form.show_email,
           show_location:    form.show_location,
+          dob:              form.dob              || null,
+          home_country:     form.home_country.trim() || null,
+          smoke_pref:       form.smoke_pref       || null,
+          appearance_note:  form.appearance_note  || null,
+          travel_docs:      form.travel_docs,
+          license_info:     form.license_info.trim() || null,
+          show_dob:         form.show_dob,
+          show_home_country: form.show_home_country,
         })
         .eq('id', user.id)
 
@@ -241,6 +290,145 @@ export default function ProfileSettingsPage() {
             onChange={(v) => set('show_location', v)}
           />
         </div>
+      </div>
+
+      {/* ── Personal Details ────────────────────────── */}
+      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
+        <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Personal Details</h2>
+
+        <DatePicker
+          label="Date of Birth"
+          value={form.dob || null}
+          onChange={(v) => set('dob', v ?? '')}
+          includeDay
+          maxYear={new Date().getFullYear() - 16}
+          minYear={1940}
+        />
+
+        <SearchableSelect
+          label="Home Country"
+          value={form.home_country}
+          onChange={(v) => set('home_country', v)}
+          options={ALL_COUNTRIES.map((c) => ({ value: c, label: c }))}
+          pinnedOptions={PINNED_COUNTRIES.map((c) => ({ value: c, label: c }))}
+          placeholder="Search countries..."
+          clearable
+          clearLabel="No country"
+        />
+
+        <Select
+          label="Smoking Preference"
+          value={form.smoke_pref}
+          onChange={(e) => set('smoke_pref', e.target.value)}
+        >
+          {SMOKE_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </Select>
+
+        <Select
+          label="Tattoos / Piercings"
+          value={form.appearance_note}
+          onChange={(e) => set('appearance_note', e.target.value)}
+        >
+          {APPEARANCE_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </Select>
+
+        <Input
+          label="Driving License"
+          type="text"
+          value={form.license_info}
+          onChange={(e) => set('license_info', e.target.value)}
+          placeholder="e.g. Full UK, International"
+        />
+      </div>
+
+      {/* ── Visa / Travel Documents ──────────────────── */}
+      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
+        <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Visa / Travel Documents</h2>
+        <div className="flex flex-wrap gap-2">
+          {COMMON_TRAVEL_DOCS.map((doc) => {
+            const active = form.travel_docs.includes(doc)
+            return (
+              <button
+                key={doc}
+                type="button"
+                onClick={() => {
+                  set('travel_docs', active
+                    ? form.travel_docs.filter((d) => d !== doc)
+                    : [...form.travel_docs, doc]
+                  )
+                }}
+                className={`px-3 py-1.5 rounded-lg text-sm border transition-colors ${
+                  active
+                    ? 'bg-[var(--color-interactive)] text-white border-[var(--color-interactive)]'
+                    : 'bg-[var(--color-surface)] text-[var(--color-text-primary)] border-[var(--color-border)]'
+                }`}
+              >
+                {doc}
+              </button>
+            )
+          })}
+        </div>
+        {form.travel_docs.filter((d) => !COMMON_TRAVEL_DOCS.includes(d)).length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {form.travel_docs.filter((d) => !COMMON_TRAVEL_DOCS.includes(d)).map((doc) => (
+              <span
+                key={doc}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs bg-[var(--color-interactive)] text-white"
+              >
+                {doc}
+                <button
+                  type="button"
+                  onClick={() => set('travel_docs', form.travel_docs.filter((d) => d !== doc))}
+                  className="hover:opacity-70"
+                >
+                  ×
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            const input = (e.currentTarget.elements.namedItem('other_doc') as HTMLInputElement)
+            const val = input.value.trim()
+            if (val && !form.travel_docs.includes(val)) {
+              set('travel_docs', [...form.travel_docs, val])
+              input.value = ''
+            }
+          }}
+          className="flex gap-2"
+        >
+          <Input
+            name="other_doc"
+            type="text"
+            placeholder="Other document..."
+            className="flex-1"
+          />
+          <Button type="submit" variant="secondary" className="shrink-0">
+            Add
+          </Button>
+        </form>
+      </div>
+
+      {/* ── Visibility ───────────────────────────────── */}
+      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
+        <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Visibility</h2>
+        <ToggleRow
+          label="Show age on profile"
+          sublabel="Calculated from date of birth"
+          checked={form.show_dob}
+          onChange={(v) => set('show_dob', v)}
+        />
+        <ToggleRow
+          label="Show home country on profile"
+          checked={form.show_home_country}
+          onChange={(v) => set('show_home_country', v)}
+        />
       </div>
 
       {/* ── Save ───────────────────────────────────── */}

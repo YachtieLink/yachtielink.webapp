@@ -20,15 +20,15 @@ Update PDF template with all new fields. Build the in-app CV preview component f
 
 Add to `ProfilePdfDocument.tsx` interfaces and all 3 template variants:
 
-**New in header:** nationality + age (from DOB)
-**New section — Personal Details:** smoker, tattoo, visa types, license, languages with proficiency
+**New in header:** home_country + age (from DOB)
+**New section — Personal Details:** smoke_pref, appearance, visa types, license, languages with proficiency
 **Enhanced Employment:** builder, program, description (truncated 500 chars), cruising area, length + flag (already fetched but not rendered)
 **Enhanced Certs:** issuing body, issued date
 **New sections:** Education, Skills, Hobbies
 
 ## PDF Generate Route Updates
 
-Fetch new user columns: `date_of_birth, nationality, smoker, tattoo_visibility, visa_types, drivers_license, languages, show_dob`
+Fetch new user columns: `dob, home_country, smoke_pref, appearance_visibility, travel_docs, license_info, languages, show_dob`
 
 Fetch new attachment columns: `employment_type, yacht_program, description, cruising_area`
 
@@ -58,52 +58,52 @@ interface CvPreviewProps {
 **Layout:** document-style container. White bg, max-w-[700px], subtle border. Styled to feel like a formatted CV within the app.
 
 ```
-CHRISTIAN ARNOLD
-Head Chef
-British · 36 years old
-Antibes, France
-email · phone
+{FULL_NAME}
+{role}
+{home_country} . {age} years old
+{location}
+{contact_line}
 
-Non Smoker · No Visible Tattoos
-B1/B2 · Schengen · Int'l License
-English (native) · French (basic)
+{smoke_pref_label} . {appearance_label}
+{visa_badges} . {license}
+{languages_with_proficiency}
 
-────────────────────────
+---
 ABOUT
-[bio text]
+{bio_text}
 
-────────────────────────
+---
 EXPERIENCE
-M/Y Amevi · 80m · Oceanco
-Head Chef · Oct 2020 – Sep 2021
-Private · Mediterranean, Maldives
-[description paragraph]
+{yacht_name} . {length} . {builder}
+{role} . {start} - {end}
+{program} . {cruising_area}
+{description_paragraph}
 
 [more entries...]
 
-────────────────────────
+---
 CERTIFICATIONS
-STCW10 · Valid until Jan 2027
-  Romanian Naval Authority
-ENG1 · Exp May 2025 ⚠️
+{cert_name} . Valid until {expiry}
+  {issuing_body}
+{cert_name} . Exp {expiry} [!]
 
-────────────────────────
+---
 EDUCATION
-Le Cordon Bleu · Culinary Arts
-2010 – 2011 · Austin, TX
+{institution} . {qualification}
+{start} - {end} . {location}
 
-────────────────────────
+---
 SKILLS
-Silver Service · Wine Knowledge...
+{skill_1} . {skill_2} ...
 
-────────────────────────
+---
 ENDORSEMENTS
-"Great chef..." — Capt. Smith
+"{excerpt}" -- {endorser_name}
 [top 3 excerpts]
 ```
 
 **Owner mode extras:**
-- Missing field prompts inline: `⚠ Add smoker status` → links to edit page
+- Missing field prompts inline: `[!] Add {field_name}` with link to edit page
 - Section edit links (pencil icon)
 - Bottom buttons: "Edit Profile" + "Download PDF"
 
@@ -130,13 +130,13 @@ Server component. Two render paths based on `cv_public_source`:
 
 Returns 404 if `cv_public = false`.
 
-Back link → `/u/[handle]`. "Download PDF" at bottom for both paths.
+Back link to `/u/[handle]`. "Download PDF" at bottom for both paths.
 
 ## CvActions Updates
 
 Wire the already-imported-but-unused Eye icon:
 
-- Add "Preview your CV" link → `/app/cv/preview`
+- Add "Preview your CV" link to `/app/cv/preview`
 - Sits next to existing Generate/Download buttons
 
 ## PublicProfileContent Updates
@@ -147,7 +147,7 @@ Replace current "Download CV" link:
 // OLD: single download link
 // NEW: two buttons
 <Link href={`/u/${user.handle}/cv`}>View CV</Link>     // primary
-<a href={`/api/cv/public-download/${user.handle}`}>↓</a> // download icon
+<a href={`/api/cv/public-download/${user.handle}`}>download icon</a> // download icon
 ```
 
 ## Verification
@@ -161,7 +161,7 @@ Replace current "Download CV" link:
 - [ ] Public profile: "View CV" button works
 - [ ] Public profile: download icon works
 - [ ] PDF template: all new fields render in all 3 templates
-- [ ] PDF includes: age, nationality, smoker, tattoo, visa, license, languages
+- [ ] PDF includes: age, home_country, smoke_pref, appearance, visa, license, languages
 - [ ] PDF includes: builder, program, description, cruising area per employment
 - [ ] PDF includes: issuing body per cert
 - [ ] PDF includes: education, skills, hobbies sections

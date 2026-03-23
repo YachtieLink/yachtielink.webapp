@@ -27,6 +27,7 @@ export default function CertEditPage() {
   const [issuedAt, setIssuedAt]   = useState('')
   const [expiresAt, setExpiresAt] = useState('')
   const [noExpiry, setNoExpiry]   = useState(false)
+  const [issuingBody, setIssuingBody] = useState('')
   const [existingDoc, setExistingDoc] = useState<string | null>(null)
   const [docFile, setDocFile]     = useState<File | null>(null)
   const docFileRef = useRef<HTMLInputElement>(null)
@@ -35,7 +36,7 @@ export default function CertEditPage() {
     async function load() {
       const { data } = await supabase
         .from('certifications')
-        .select('custom_cert_name, issued_at, expires_at, document_url, certification_types(name)')
+        .select('custom_cert_name, issued_at, expires_at, document_url, issuing_body, certification_types(name)')
         .eq('id', params.id)
         .single()
 
@@ -48,6 +49,7 @@ export default function CertEditPage() {
       setIssuedAt(data.issued_at ?? '')
       setExpiresAt(data.expires_at ?? '')
       setNoExpiry(!data.expires_at)
+      setIssuingBody(data.issuing_body ?? '')
       setExistingDoc(data.document_url)
       setLoaded(true)
     }
@@ -71,6 +73,7 @@ export default function CertEditPage() {
           custom_cert_name: isCustom ? customName.trim() : undefined,
           issued_at:  issuedAt  || null,
           expires_at: noExpiry ? null : (expiresAt || null),
+          issuing_body: issuingBody.trim() || null,
         })
         .eq('id', params.id)
 
@@ -180,6 +183,13 @@ export default function CertEditPage() {
                   <span className="text-sm text-[var(--color-text-primary)]">No expiry / lifetime certification</span>
                 </label>
               </div>
+
+              <Input
+                label="Issuing body"
+                value={issuingBody}
+                onChange={(e) => setIssuingBody(e.target.value)}
+                placeholder="e.g. Maritime Authority"
+              />
 
               <div>
                 <label className="text-sm font-medium text-[var(--color-text-primary)]">Supporting document</label>

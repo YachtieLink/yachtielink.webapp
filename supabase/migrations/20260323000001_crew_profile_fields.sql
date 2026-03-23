@@ -1,5 +1,5 @@
 -- Migration: Crew Profile Fields
--- Adds personal detail fields (DOB, nationality, smoker, tattoo, visa, license, languages)
+-- Adds crew profile detail fields (UF1-UF9, see field-registry.md)
 -- to users, builder to yachts, and employment enrichment to attachments.
 -- Part of Sprint CV-Parse Wave 1.
 
@@ -8,23 +8,20 @@
 -- ═══════════════════════════════════════════════════════════
 
 alter table public.users
-  add column if not exists date_of_birth date,
-  add column if not exists nationality text,
-  add column if not exists smoker text
-    check (smoker in ('non_smoker', 'smoker', 'social_smoker')),
-  add column if not exists tattoo_visibility text
-    check (tattoo_visibility in ('none', 'visible', 'non_visible', 'not_specified')),
-  add column if not exists visa_types text[] default '{}',
-  add column if not exists drivers_license text,
+  add column if not exists dob date,
+  add column if not exists home_country text,
+  add column if not exists smoke_pref text
+    check (smoke_pref in ('non_smoker', 'smoker', 'social_smoker')),
+  add column if not exists appearance_note text
+    check (appearance_note in ('none', 'visible', 'non_visible', 'not_specified')),
+  add column if not exists travel_docs text[] default '{}',
+  add column if not exists license_info text,
   add column if not exists languages jsonb default '[]',
   add column if not exists show_dob boolean not null default false,
-  add column if not exists show_nationality boolean not null default true;
+  add column if not exists show_home_country boolean not null default true;
 
--- Column-level REVOKE on date_of_birth — sensitive PII.
--- Anon users (public profile viewers without auth) cannot read exact DOB.
--- Authenticated users CAN read it (needed for own profile edit page).
--- Public profile displays age (computed server-side), never the date itself.
-revoke select (date_of_birth) on public.users from anon;
+-- Column-level REVOKE on dob — anon sees computed age only, never the date.
+revoke select (dob) on public.users from anon;
 
 -- ═══════════════════════════════════════════════════════════
 -- 2. Yachts — builder/shipyard

@@ -159,6 +159,15 @@ export const bulkSkillsSchema = z.object({
   ).min(0).max(20),
 });
 
+// --- Languages ---
+
+export const languagesSchema = z.object({
+  languages: z.array(z.object({
+    language: z.string().min(1).max(50).trim(),
+    proficiency: z.enum(['native', 'fluent', 'intermediate', 'basic']),
+  })).max(10),
+})
+
 // --- Social Links ---
 
 export const socialLinksSchema = z.object({

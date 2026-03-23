@@ -14,15 +14,15 @@ One migration file. 14 new columns across users/yachts/attachments. No UI change
 
 | Column | Type | Default/Constraint |
 |--------|------|-------------------|
-| `date_of_birth` | `date` | nullable. Column-level REVOKE from anon (PII). |
-| `nationality` | `text` | nullable |
-| `smoker` | `text` | CHECK: `non_smoker`, `smoker`, `social_smoker` |
-| `tattoo_visibility` | `text` | CHECK: `none`, `visible`, `non_visible`, `not_specified` |
-| `visa_types` | `text[]` | DEFAULT `'{}'` |
-| `drivers_license` | `text` | nullable |
+| `dob` | `date` | nullable. Column-level REVOKE from anon. |
+| `home_country` | `text` | nullable |
+| `smoke_pref` | `text` | CHECK: `non_smoker`, `smoker`, `social_smoker` |
+| `appearance_note` | `text` | CHECK: `none`, `visible`, `non_visible`, `not_specified` |
+| `travel_docs` | `text[]` | DEFAULT `'{}'` |
+| `license_info` | `text` | nullable |
 | `languages` | `jsonb` | DEFAULT `'[]'`. Array of `{language, proficiency}` objects. |
 | `show_dob` | `boolean` | NOT NULL DEFAULT false |
-| `show_nationality` | `boolean` | NOT NULL DEFAULT true |
+| `show_home_country` | `boolean` | NOT NULL DEFAULT true |
 
 ### yachts (1 column)
 
@@ -42,8 +42,8 @@ One migration file. 14 new columns across users/yachts/attachments. No UI change
 ## Design Decisions
 
 - `languages` as JSONB not `user_skills` — proficiency matters, `user_skills` has no proficiency column
-- `date_of_birth` REVOKE from anon — public profile shows age (computed server-side), never the actual date
-- `visa_types` as `text[]` — small fixed set, array simpler than a join table
+- `dob` REVOKE from anon — public profile shows computed age, never the raw value
+- `travel_docs` as `text[]` — small fixed set, array simpler than a join table
 - `description` separate from `notes` — notes is private (500 char), description is the public job description from CV (2000 char)
 - `builder` on yachts not attachments — builder is a property of the yacht, shared by all crew on it
 - No new RLS policies needed — new columns inherit existing row-level policies

@@ -10,7 +10,6 @@ import { ProfileSectionGrid, type SectionItem } from '@/components/profile/Profi
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageTransition } from '@/components/ui/PageTransition'
-import { SeaTimeSummary } from '@/components/profile/SeaTimeSummary'
 import {
   aboutSummary,
   experienceSummary,
@@ -224,6 +223,9 @@ export default async function ProfilePage() {
         primaryRole={profile.primary_role}
         departments={departments}
         profilePhotoUrl={profile.profile_photo_url}
+        home_country={profile.show_home_country !== false ? profile.home_country : null}
+        seaTimeTotalDays={seaTimeTotalDays}
+        seaTimeYachtCount={seaTimeYachtCount}
       />
 
       {/* Social links */}
@@ -233,6 +235,35 @@ export default async function ProfilePage() {
         </div>
       )}
 
+      {/* Languages */}
+      {Array.isArray(profile.languages) && (profile.languages as any[]).length > 0 && (
+        <Link href="/app/languages/edit">
+          <div className="bg-[var(--color-surface)] rounded-2xl px-4 py-3">
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              {(profile.languages as any[]).map((l: any) => l?.language ? `${l.language} (${l.proficiency})` : String(l)).join(' · ')}
+            </p>
+          </div>
+        </Link>
+      )}
+
+      {/* CV Completeness Prompt */}
+      {(() => {
+        const missing = [profile.dob, profile.home_country, profile.smoke_pref].filter((v) => !v).length
+        if (missing === 0) return null
+        return (
+          <Link href="/app/profile/settings">
+            <div className="bg-[var(--color-surface)] rounded-2xl px-4 py-3 border border-amber-200">
+              <p className="text-sm font-medium text-[var(--color-text-primary)]">
+                Your generated CV is missing {missing} field{missing === 1 ? '' : 's'} captains look for.
+              </p>
+              <p className="text-xs text-[var(--color-interactive)] mt-1">
+                Complete your CV details
+              </p>
+            </div>
+          </Link>
+        )
+      })()}
+
       {/* Profile Strength */}
       <ProfileStrength
         score={score}
@@ -241,9 +272,6 @@ export default async function ProfilePage() {
         nextHref={strengthCta?.href}
         ctaLabel={strengthCta?.label}
       />
-
-      {/* Sea Time */}
-      <SeaTimeSummary totalDays={seaTimeTotalDays} yachtCount={seaTimeYachtCount} />
 
       {/* Section Grid */}
       <ProfileSectionGrid sections={sectionGridItems} />

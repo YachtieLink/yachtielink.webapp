@@ -34,7 +34,9 @@ export const getUserById = cache(async (userId: string) => {
       show_phone, show_whatsapp, show_email, show_location,
       subscription_status, subscription_plan, subscription_ends_at,
       stripe_customer_id, founding_member, show_watermark, template_id,
-      ai_summary, ai_summary_edited, section_visibility, social_links
+      ai_summary, ai_summary_edited, section_visibility, social_links,
+      home_country, languages, dob, smoke_pref, appearance_note,
+      travel_docs, license_info, show_dob, show_home_country
     `)
     .eq('id', userId)
     .single()
@@ -56,7 +58,8 @@ export const getUserByHandle = cache(async (handle: string) => {
       phone, whatsapp, email, location_country, location_city,
       show_phone, show_whatsapp, show_email, show_location,
       founding_member, ai_summary, section_visibility, social_links,
-      cv_public, cv_public_source, latest_pdf_path, cv_storage_path
+      cv_public, cv_public_source, latest_pdf_path, cv_storage_path,
+      home_country, languages, smoke_pref, appearance_note, travel_docs, license_info, show_dob, show_home_country
     `)
     .eq('handle', handle.toLowerCase())
     .single()

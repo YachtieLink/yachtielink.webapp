@@ -177,6 +177,14 @@ export function CvActions({
           Your CVs
         </h2>
 
+        <a
+          href="/app/cv/preview"
+          className="flex items-center gap-2 rounded-xl border border-[var(--color-border)] p-3 hover:bg-[var(--color-surface-raised)] transition-colors"
+        >
+          <Eye size={16} className="text-[var(--color-text-tertiary)]" />
+          <span className="text-sm font-medium text-[var(--color-text-primary)]">Preview your CV</span>
+        </a>
+
         <div className="flex flex-col gap-3">
           {/* Generated CV */}
           <div className="rounded-xl border border-[var(--color-border)] p-3 flex flex-col gap-2">
