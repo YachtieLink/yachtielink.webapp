@@ -24,6 +24,126 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-23 — Claude Code (Opus 4.6) — CV Parse Spec Review & UX Overhaul
+
+### Done
+
+**Sprint CV-Parse — Full Spec Review + Founder UX Refinement:**
+
+Deep review of all 8 spec files against founder's UX vision. Codebase audit confirmed current state (schema, parse flow, edit pages, PDF template, public profile). Then founder-driven spec rewrites across 7 files:
+
+**Spec Rewrites (Founder-Directed):**
+
+1. **merge-ux.md — Complete rewrite.** Old: field-by-field radio buttons (`FieldMerge` component per field). New: batch ConfirmCard pattern — auto-merge picks best value, shows result as a card, "Looks good?" / "Edit details". Conflicts only surface in edit view with amber left-border highlights. Components: `ConfirmCard`, `ConflictInput`, `ChipSelect` replace `FieldMerge`, `ArrayMerge`, `DuplicateDetector`.
+
+2. **wave-4-import-wizard.md — Complete rewrite.** Founder's 4 rules: (1) Show don't ask, (2) Never make them type — empty fields hidden not shown as blank inputs, (3) Never leave them wondering, (4) Wizard is a fast-track not the whole app. Detailed yacht matching pipeline with 4 card states (matched/needs-pick/new/already-on-profile), scoring logic, former name handling. All yachts scrollable not one-at-a-time. Celebration screen with completion %.
+
+3. **wave-3-ai-prompt.md — Major expansion.** Added pre-flight text validation (`lib/cv/validate.ts`) — catches empty, garbled, and too-short files in <1s. Added retry logic (retry once on timeout/5xx). Bumped max_tokens 4000→8000. Added `response_format: json_object`. Moved all types to shared `lib/cv/types.ts` with proper typing (no more `Record<string, any>`).
+
+4. **wave-5-save-function.md — Aligned with new wizard.** Added yacht creation flow (create yacht first, get ID, then insert attachment). Added skills/hobbies deduplication. Added `profileCompletionPercent` for celebration screen. Partial failure resilience with independent try/catch blocks.
+
+5. **wave-7-verification.md — Expanded.** Added pre-flight validation test cases. Added wizard speed test (<60s target). Added ≥80% completion target for test CVs. Aligned with 5-step wizard.
+
+6. **wave-2-edit-pages.md — Gaps filled.** Added missing cert edit `issuing_body` field. Added `countryToFlag()` helper spec.
+
+7. **build_plan.md — Parts 5, 8, 9 updated.** New wizard philosophy (fast-track, not form). 5-step flow. Updated file lists and build order.
+
+**Sprint README — Exit criteria rewritten.** Old criteria referenced deprecated patterns (CvReviewClient, field exclusion checkboxes). New criteria match the batch confirm UX, pre-flight validation, yacht matching pipeline, celebration screen, ≥80% completion target.
+
+**Founder UX Principles Captured:**
+- "Seamless beautiful experience — amazed by the ease"
+- "Never left wondering what is happening"
+- "Loading times filled interactively"
+- "If it's going to fail we need to know super early, but ideally it never fails"
+- "Once CV parse is done the profile should be at minimum 80% complete"
+- "Batched in ways that make sense — asked if it looks good — edit only if not"
+- "They can edit everything in the app so the wizard is just a tool to fast track"
+- "Yacht matching is going to require an elegant touch"
+
+### Context
+- All 8 spec files now reflect the batch-confirm UX model and founder's vision
+- Specs are co-authored across 2 sessions — treat as ground truth
+- The merge-ux.md and wave-4-import-wizard.md were complete rewrites, not patches
+- Yacht matching pipeline (Step 2) is the most complex step — 4 card states, scoring, former names
+- `lib/cv/types.ts` is the shared type contract — all Confirmed* and Parsed* types defined there
+
+### Next
+- Begin Wave 1 build (migration already written, needs `supabase db push`)
+- Wave 2 can start in parallel (edit pages use existing patterns)
+- Wave 3 before Wave 4 (types + prompt needed before wizard)
+- Founder to provide real CVs for Wave 7 validation
+
+### Flags
+- **Specs are co-authored over 2 sessions** — founder refined UX direction, agent refined technical detail. Both are ground truth.
+- **The wizard is 5 steps, not 7** — certs+education combined, skills+social combined, references folded into summary
+- **"Never make them type"** — empty fields hidden on confirm cards, available under "Add more details" expandable in edit view
+- **Yacht matching is the craft moment** — 4 card states with scoring pipeline. "Needs pick" should be rare if matching is good.
+- **max_tokens is 8000** — heavy CVs (20+ positions) need room. 4000 was too low.
+- **Pre-flight validation is a new file** (`lib/cv/validate.ts`) — must exist before parse route changes
+
+---
+
+## 2026-03-23 — Claude Code (Opus 4.6) — CV Parse Sprint Full Spec
+
+### Done
+
+**Sprint CV-Parse — Complete Build Specs (7 Waves):**
+
+Wrote implementation-ready specs for the entire CV parse-and-populate sprint. 8 spec files in `sprints/major/phase-1b/sprint-cv-parse/specs/`:
+
+| Wave | Spec | Scope |
+|------|------|-------|
+| — | `merge-ux.md` | ConfirmCard, ConflictInput, ChipSelect — field-level merge UX pattern |
+| 1 | `wave-1-migration.md` | 14 new columns (users/yachts/attachments), DOB column-level REVOKE |
+| 2 | `wave-2-edit-pages.md` | Settings page, attachment edit, languages edit + API, cert issuing body, ProfileHeroCard nationality+sea time, countryToFlag helper |
+| 3 | `wave-3-ai-prompt.md` | Pre-flight text validation, retry logic, AI prompt rewrite (6→40 fields), shared types file (`lib/cv/types.ts`), parse route hardening |
+| 4 | `wave-4-import-wizard.md` | 5-step guided wizard (review flow, not a form), yacht matching pipeline, confirm cards, celebration screen with completion % |
+| 5 | `wave-5-save-function.md` | Batch save with insert/update/create split, skill deduplication, profile completion calculation, partial failure resilience |
+| 6 | `wave-6-pdf-preview.md` | PDF template with all new fields, CvPreview component (owner + viewer), `/u/[handle]/cv` public viewer, uploaded CV iframe path |
+| 7 | `wave-7-verification.md` | Pre-flight validation tests, 9 real CV tests, wizard UX tests (speed <60s), merge UX tests, two-phase review |
+
+**Key Design Decisions (Founder-Driven):**
+- Wizard is a review flow — show ConfirmCards, user taps "Looks good" or "Edit". Never show empty inputs.
+- Progressive loading — parse runs in background while Step 1 shows existing data. By Step 2, yacht matching done.
+- Two upload paths: "Build my profile" (wizard) vs "Just upload" (store only)
+- CV preview serves two audiences: owner at `/app/cv/preview`, viewer at `/u/[handle]/cv`
+- Users can present their own uploaded CV or the generated one
+- Celebration screen: completion %, stats, next steps — the payoff moment
+
+**Founder directly edited 5 of 7 spec files** with significant refinements:
+- Consolidated wizard from 7 steps to 5
+- Added pre-flight text validation (fail early on unreadable files)
+- Added retry logic for AI calls
+- Added yacht creation flow in save function
+- Added speed target (<60s), state persistence, parse failure graceful fallback
+
+**Sprint Prioritization Decision:**
+- Reviewed Sprint 12 (Yacht Graph, already built) and Sprint 13 (Launch Polish)
+- Founder decided: CV Parse and attachment transfer are critical Phase 1 — polish can wait
+- Recovered lost transcript context (ghost profiles, CV wizard vision) from compacted session
+
+### Context
+- Sprint CV-Parse has full build specs ready for execution — 8 files covering migration through verification
+- Build plan (`build_plan.md`) has the AI prompt, field mapping, and architectural decisions
+- Specs (`specs/`) have the wave-by-wave implementation detail
+- Founder has refined the specs directly — these are co-authored, not just agent-written
+- 9 real yachtie CVs identified for testing (varied formats, 1-4 pages, chefs + stewardesses)
+- Ghost profiles spec exists in backlog but needs its own sprint
+
+### Next
+- ~~Founder to send real CVs for field validation before build starts~~ (superseded — see session above)
+- ~~Begin Wave 1 build (migration) once specs approved~~ (superseded — see session above)
+- Ghost profiles sprint needs planning (foundational to endorsement growth loop)
+- Sprint 12 branch merged, Sprint 13 still draft
+
+### Flags
+- Build plan and specs are co-authored — founder edited 5 of 7 spec files directly. Treat these as ground truth.
+- The wizard is 5 steps (not 7) — founder consolidated certs+education and skills+social into combined steps
+- Wave 3 types file (`lib/cv/types.ts`) is the shared contract between prompt, save, and wizard — change it carefully
+- Pre-flight validation in Wave 3 is critical — catches bad files in <1s instead of after 30s timeout
+
+---
+
 ## 2026-03-22 — Claude Code (Opus 4.6) — Rally 003 Complete (All 10 Sprints) + v2 Review System + Sprint Planning
 
 ### Done
