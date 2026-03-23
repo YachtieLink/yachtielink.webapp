@@ -48,57 +48,57 @@ function autoMerge(existing: string | null, fromCv: string | null): {
 After auto-merge, render the user's details as a **preview card** — not a form:
 
 ```
-┌─────────────────────────────────────┐
-│  Your Details                       │
-│                                     │
-│  Christian Arnold                   │
-│  Head Chef · British · 36           │
-│  Antibes, France                    │
-│  +33 6 12 34 56 78                  │
-│                                     │
-│  Non Smoker · No Visible Tattoos    │
-│  B1/B2 · Schengen                   │
-│  Int'l Drivers License              │
-│                                     │
-│  English (native) · French (basic)  │
-│                                     │
-│  ⚡ 2 fields updated from your CV   │ ← subtle count, not per-field callout
-│                                     │
-│  [Looks good ✓]     [Edit details]  │
-└─────────────────────────────────────┘
++-----------------------------------------+
+|  Your Details                           |
+|                                         |
+|  {full_name}                            |
+|  {role} . {home_country} . {age}         |
+|  {location}                             |
+|  {phone}                                |
+|                                         |
+|  {smoke_pref_label} . {appearance_label}        |
+|  {visa_badges}                          |
+|  {license_label}                        |
+|                                         |
+|  {languages_list}                       |
+|                                         |
+|  * {n} fields updated from your CV      |  <-- subtle count, not per-field callout
+|                                         |
+|  [Looks good]          [Edit details]   |
++-----------------------------------------+
 ```
 
-**"Looks good"** → confirms all values, moves to next step.
+**"Looks good"** -> confirms all values, moves to next step.
 
-**"Edit details"** → expands into an editable form. Only conflict fields are highlighted (amber left border + "CV said: {value}" hint below the input). Non-conflict fields are plain inputs.
+**"Edit details"** -> expands into an editable form. Only conflict fields are highlighted (amber left border + "CV said: {value}" hint below the input). Non-conflict fields are plain inputs.
 
 ```
-┌─────────────────────────────────────┐
-│  Your Details                       │
-│                                     │
-│  Full Name     [Christian Arnold  ] │
-│  Primary Role  [Head Chef         ] │
-│                                     │
-│ ┃ Nationality  [British          ▾] │ ← amber border = conflict
-│ ┃              Was: "UK"            │ ← shows what existed before
-│                                     │
-│  Date of Birth [18/08/1988        ] │
-│  Location      [France ▾] [Antibes] │
-│  Phone         [+33 6 12 34 56 78 ] │
-│                                     │
-│  ── Quick Facts ─────────────────── │
-│  Smoker        [Non Smoker       ▾] │
-│  Tattoos       [No Visible       ▾] │
-│  License       [Int'l License     ] │
-│  Visas         [x] B1/B2 [x] Schen │
-│                                     │
-│  ── Languages ───────────────────── │
-│  English  [Native        ▾]    [✕] │
-│  French   [Basic         ▾]    [✕] │
-│  [+ Add language]                   │
-│                                     │
-│  [Done editing ✓]     [Cancel]      │
-└─────────────────────────────────────┘
++-----------------------------------------+
+|  Your Details                           |
+|                                         |
+|  Full Name     [{full_name}           ] |
+|  Primary Role  [{role}                ] |
+|                                         |
+| | Nationality  [{home_country}        v] |  <-- amber border = conflict
+| |              Was: "{old_value}"       |  <-- shows what existed before
+|                                         |
+|  Date of Birth [{dob}                 ] |
+|  Location      [{country} v] [{city}  ] |
+|  Phone         [{phone}               ] |
+|                                         |
+|  -- Quick Facts ------------------------|
+|  Smoke Pref        [{smoke_pref_option}      v] |
+|  Appearance       [{appearance_option}      v] |
+|  License       [{license}             ] |
+|  Visas         [x] {visa_1} [x] {visa_2}|
+|                                         |
+|  -- Languages --------------------------|
+|  {lang_1}  [{proficiency}           v] x|
+|  {lang_2}  [{proficiency}           v] x|
+|  [+ Add language]                       |
+|                                         |
+|  [Done editing]             [Cancel]    |
++-----------------------------------------+
 ```
 
 ### Yacht Cards
@@ -107,68 +107,68 @@ Each yacht from the CV is a confirm card:
 
 **New yacht (no duplicate):**
 ```
-┌─────────────────────────────────────┐
-│  M/Y Amevi                          │
-│  80m · Oceanco · Private · 🇲🇹      │
-│  Head Chef · Oct 2020 – Sep 2021    │
-│  Mediterranean, Maldives            │
-│                                     │
-│  ☑ Add to profile    [Edit] [Skip]  │
-└─────────────────────────────────────┘
++-----------------------------------------+
+|  {yacht_name}                           |
+|  {length} . {builder} . {program} . {flag}|
+|  {role} . {start_date} - {end_date}    |
+|  {cruising_area}                        |
+|                                         |
+|  [v] Add to profile    [Edit] [Skip]    |
++-----------------------------------------+
 ```
 
 **Duplicate detected (same yacht, overlapping dates):**
 ```
-┌─────────────────────────────────────┐
-│  M/Y Amevi                          │
-│  80m · Oceanco · Private · 🇲🇹      │
-│  Head Chef · Oct 2020 – Sep 2021    │
-│  Mediterranean, Maldives            │
-│                                     │
-│  Already on your profile — we'll    │
-│  add the new details (builder,      │
-│  program, cruising area).           │
-│                                     │
-│  [Looks good ✓]     [Edit] [Skip]   │
-└─────────────────────────────────────┘
++-----------------------------------------+
+|  {yacht_name}                           |
+|  {length} . {builder} . {program} . {flag}|
+|  {role} . {start_date} - {end_date}    |
+|  {cruising_area}                        |
+|                                         |
+|  Already on your profile -- we'll       |
+|  add the new details (builder,          |
+|  program, cruising area).               |
+|                                         |
+|  [Looks good]          [Edit] [Skip]    |
++-----------------------------------------+
 ```
 
 The system auto-decides to merge enrichment fields into the existing entry. The user just confirms. No radio buttons for keep/update/add-separate — that's over-engineering for a rare edge case. If the dates are different enough that it's clearly a separate stint, offer "Add as new entry" as a secondary option.
 
 **Yacht edit view** (when "Edit" is tapped):
 ```
-┌─────────────────────────────────────┐
-│  M/Y Amevi                          │
-│                                     │
-│  Role         [Head Chef         ]  │
-│  From         [Oct 2020          ]  │
-│  To           [Sep 2021          ]  │
-│  Type         [Permanent        ▾]  │
-│  Program      [Private          ▾]  │
-│  Cruising     [Mediterranean     ]  │
-│  Description  [Responsible for...]  │
-│                                     │
-│  [Done ✓]                [Cancel]   │
-└─────────────────────────────────────┘
++-----------------------------------------+
+|  {yacht_name}                           |
+|                                         |
+|  Role         [{role}                ]  |
+|  From         [{start_date}          ]  |
+|  To           [{end_date}            ]  |
+|  Type         [{employment_type}    v]  |
+|  Program      [{yacht_program}      v]  |
+|  Cruising     [{cruising_area}       ]  |
+|  Description  [{description}         ]  |
+|                                         |
+|  [Done]                      [Cancel]   |
++-----------------------------------------+
 ```
 
 **All yachts shown together as a scrollable list**, not one-at-a-time pagination. "Yacht 1 of N" makes a 10-yacht CV feel like a slog. Show the full list — most users will scroll through, confirm the batch, and move on.
 
 ```
-┌─────────────────────────────────────┐
-│  Your Experience                    │
-│  We found 8 yachts on your CV      │
-│                                     │
-│  [Yacht card 1]  ☑ [Edit] [Skip]   │
-│  [Yacht card 2]  ☑ [Edit] [Skip]   │
-│  [Yacht card 3]  ☑ [Edit] [Skip]   │
-│  ...                                │
-│                                     │
-│  ⚡ 2 already on your profile —     │
-│     we'll add the new details       │
-│                                     │
-│  [Confirm all ✓]                    │
-└─────────────────────────────────────┘
++-----------------------------------------+
+|  Your Experience                        |
+|  We found {n} yachts on your CV         |
+|                                         |
+|  [Yacht card 1]  [v] [Edit] [Skip]     |
+|  [Yacht card 2]  [v] [Edit] [Skip]     |
+|  [Yacht card 3]  [v] [Edit] [Skip]     |
+|  ...                                    |
+|                                         |
+|  * {n} already on your profile --       |
+|     we'll add the new details           |
+|                                         |
+|  [Confirm all]                          |
++-----------------------------------------+
 ```
 
 ### Certification Cards
@@ -176,28 +176,28 @@ The system auto-decides to merge enrichment fields into the existing entry. The 
 All certs shown as a batch list:
 
 ```
-┌─────────────────────────────────────┐
-│  Your Certifications                │
-│  We found 12 on your CV            │
-│                                     │
-│  ✓ STCW Basic Safety               │
-│    Valid until Jan 2027 · Romanian  │
-│    Naval Authority                  │
-│                                     │
-│  ⚠ ENG1 Medical                    │
-│    Expired May 2025                 │
-│                                     │
-│  ✓ Powerboat Level 2               │
-│    Issued 2019 · RYA               │
-│                                     │
-│  ✓ Food Hygiene Level 3            │
-│    ⚠ Already on your profile       │
-│    Updated with issuing body        │
-│                                     │
-│  ...                                │
-│                                     │
-│  [Looks good ✓]      [Edit certs]  │
-└─────────────────────────────────────┘
++-----------------------------------------+
+|  Your Certifications                    |
+|  We found {n} on your CV               |
+|                                         |
+|  [ok] {cert_name_1}                     |
+|    Valid until {expiry}                  |
+|    {issuing_body}                       |
+|                                         |
+|  [!] {cert_name_2}                      |
+|    Expired {expiry}                     |
+|                                         |
+|  [ok] {cert_name_3}                     |
+|    Issued {year} . {issuing_body}       |
+|                                         |
+|  [ok] {cert_name_4}                     |
+|    [!] Already on your profile          |
+|    Updated with issuing body            |
+|                                         |
+|  ...                                    |
+|                                         |
+|  [Looks good]            [Edit certs]   |
++-----------------------------------------+
 ```
 
 "Edit certs" expands each into an editable row. Per-cert: cert type (SearchableSelect), issued, expires, issuing body, remove button.
@@ -207,44 +207,44 @@ All certs shown as a batch list:
 **Skills & Hobbies:** shown as chip clouds, all pre-selected. Tap a chip to deselect. Add more with free text input.
 
 ```
-┌─────────────────────────────────────┐
-│  Skills & Interests                 │
-│                                     │
-│  Skills from your CV:               │
-│  [Silver Service ✓] [Wine ✓]       │
-│  [Menu Development ✓] [French ✓]   │
-│  [Food Presentation ✓]             │
-│  [+ Add more]                       │
-│                                     │
-│  Hobbies from your CV:             │
-│  [Diving ✓] [Yoga ✓] [Travel ✓]   │
-│  [+ Add more]                       │
-│                                     │
-│  Already on your profile:           │
-│  Silver Service · Wine Knowledge    │
-│  (kept, not duplicated)             │
-│                                     │
-│  [Looks good ✓]                     │
-└─────────────────────────────────────┘
++-----------------------------------------+
+|  Skills & Interests                     |
+|                                         |
+|  Skills from your CV:                   |
+|  [{skill_1} ok] [{skill_2} ok]         |
+|  [{skill_3} ok] [{skill_4} ok]         |
+|  [{skill_5} ok]                         |
+|  [+ Add more]                           |
+|                                         |
+|  Hobbies from your CV:                  |
+|  [{hobby_1} ok] [{hobby_2} ok]         |
+|  [+ Add more]                           |
+|                                         |
+|  Already on your profile:               |
+|  {existing_1} . {existing_2}            |
+|  (kept, not duplicated)                 |
+|                                         |
+|  [Looks good]                           |
++-----------------------------------------+
 ```
 
 **Education:** rendered as cards, same pattern as yachts but simpler (no matching needed).
 
 ```
-┌─────────────────────────────────────┐
-│  Education                          │
-│                                     │
-│  Le Cordon Bleu                     │
-│  Culinary Arts · 2010 – 2011       │
-│  Austin, TX                         │
-│                                     │
-│  City & Guilds                      │
-│  NVQ Level 3 Catering · 2008       │
-│                                     │
-│  ☑ Add to profile    [Edit] [Skip]  │
-│                                     │
-│  [Looks good ✓]                     │
-└─────────────────────────────────────┘
++-----------------------------------------+
+|  Education                              |
+|                                         |
+|  {institution_1}                        |
+|  {qualification} . {start} - {end}      |
+|  {location}                             |
+|                                         |
+|  {institution_2}                        |
+|  {qualification} . {year}               |
+|                                         |
+|  [v] Add to profile    [Edit] [Skip]    |
+|                                         |
+|  [Looks good]                           |
++-----------------------------------------+
 ```
 
 ## Conflict Highlighting
@@ -284,7 +284,7 @@ interface ConfirmCardProps {
 
 ## Re-upload Scenario
 
-Same flow. More fields will have existing values → more potential conflicts → the auto-merge resolves most of them silently. The confirm card might show "5 fields updated from your new CV" instead of "2". User taps "Looks good" or edits the few that changed.
+Same flow. More fields will have existing values, so more potential conflicts. The auto-merge resolves most of them silently. The confirm card might show "{n} fields updated from your new CV" instead of "2". User taps "Looks good" or edits the few that changed.
 
 ## Smart Merge Rules by Data Type
 
@@ -292,12 +292,12 @@ Same flow. More fields will have existing values → more potential conflicts �
 |-----------|-------------------|
 | **Text fields** (name, role, city) | CV wins if conflict (it's newer). Show "Was: {old}" in edit view. |
 | **Dates** | Keep the more precise value. Existing "2020-06-15" beats CV "2020". CV "2020-06" beats existing null. |
-| **Enums** (smoker, tattoo, program) | CV wins if conflict. |
-| **Arrays** (visa_types, skills, hobbies) | Union. Existing items kept, new items added. Duplicates auto-removed. |
-| **Languages** | Union by language name. If both have "French" with different proficiency → keep the higher proficiency. |
-| **Yachts** | Match by yacht name + overlapping dates. If matched → enrich existing entry with new fields (builder, program, description, cruising area). If new → add. |
-| **Certs** | Match by cert type. If matched → enrich (add issuing body, keep more precise dates). If new → add. |
-| **Education** | Match by institution + overlapping dates. If matched → enrich. If new → add. |
+| **Enums** (smoke_pref, appearance, program) | CV wins if conflict. |
+| **Arrays** (travel_docs, skills, hobbies) | Union. Existing items kept, new items added. Duplicates auto-removed. |
+| **Languages** | Union by language name. If both have same language with different proficiency, keep the higher proficiency. |
+| **Yachts** | Match by yacht name + overlapping dates. If matched, enrich existing entry with new fields (builder, program, description, cruising area). If new, add. |
+| **Certs** | Match by cert type. If matched, enrich (add issuing body, keep more precise dates). If new, add. |
+| **Education** | Match by institution + overlapping dates. If matched, enrich. If new, add. |
 
 ## Design Tokens
 

@@ -3,10 +3,50 @@ import { createClient } from '@/lib/supabase/server'
 import { createServiceClient } from '@/lib/supabase/admin'
 import OpenAI from 'openai'
 import { CV_EXTRACTION_PROMPT } from '@/lib/cv/prompt'
+import { validateExtractedText } from '@/lib/cv/validate'
 import { validateBody } from '@/lib/validation/validate'
 import { parseCVSchema } from '@/lib/validation/schemas'
 import { applyRateLimit } from '@/lib/rate-limit/helpers'
 import { trackServerEvent } from '@/lib/analytics/server'
+import type { ParsedCvData } from '@/lib/cv/types'
+
+async function callAiWithRetry(openai: OpenAI, text: string, maxRetries = 1): Promise<ParsedCvData> {
+  let lastError: Error | null = null
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 30000)
+
+    try {
+      const completion = await openai.chat.completions.create(
+        {
+          model: 'gpt-4o-mini',
+          max_tokens: 8000,
+          response_format: { type: 'json_object' },
+          messages: [
+            { role: 'system', content: CV_EXTRACTION_PROMPT },
+            { role: 'user', content: text },
+          ],
+        },
+        { signal: controller.signal },
+      )
+
+      clearTimeout(timeout)
+
+      const content = completion.choices[0]?.message?.content
+      if (!content) throw new Error('No content in response')
+
+      return JSON.parse(content) as ParsedCvData
+    } catch (err) {
+      clearTimeout(timeout)
+      lastError = err instanceof Error ? err : new Error(String(err))
+
+      if (attempt < maxRetries) continue
+    }
+  }
+
+  throw lastError!
+}
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -23,6 +63,14 @@ export async function POST(req: NextRequest) {
   // Ownership guard: users can only parse their own CV files
   if (!storagePath.startsWith(`${user.id}/`)) {
     return NextResponse.json({ error: 'Access denied' }, { status: 403 })
+  }
+
+  // .doc rejection
+  if (storagePath.endsWith('.doc') && !storagePath.endsWith('.docx')) {
+    return NextResponse.json(
+      { error: "Can't read .doc files. Please save as .pdf or .docx and try again." },
+      { status: 400 },
+    )
   }
 
   // Rate limit check
@@ -69,15 +117,14 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  if (!extractedText.trim()) {
-    return NextResponse.json(
-      { error: 'No text found in the CV. The file may be a scanned image. Try entering your details manually.' },
-      { status: 422 },
-    )
+  // Pre-flight validation
+  const validation = validateExtractedText(extractedText.trim())
+  if (!validation.valid) {
+    return NextResponse.json({ error: validation.error }, { status: 400 })
   }
 
-  // Truncate to 15000 chars
-  const truncated = extractedText.slice(0, 15000)
+  // Truncate to 25K chars
+  const truncated = extractedText.slice(0, 25000)
 
   // Call OpenAI API
   const apiKey = process.env.OPENAI_API_KEY
@@ -87,38 +134,9 @@ export async function POST(req: NextRequest) {
 
   const openai = new OpenAI({ apiKey })
 
-  let parsedData: Record<string, unknown>
+  let parsedData: ParsedCvData
   try {
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 15000)
-
-    const completion = await openai.chat.completions.create(
-      {
-        model: 'gpt-4o-mini',
-        max_tokens: 2000,
-        response_format: { type: 'json_object' },
-        messages: [
-          {
-            role: 'system',
-            content: CV_EXTRACTION_PROMPT,
-          },
-          {
-            role: 'user',
-            content: truncated,
-          },
-        ],
-      },
-      { signal: controller.signal },
-    )
-
-    clearTimeout(timeout)
-
-    const content = completion.choices[0]?.message?.content
-    if (!content) {
-      throw new Error('No content in response')
-    }
-
-    parsedData = JSON.parse(content)
+    parsedData = await callAiWithRetry(openai, truncated)
   } catch (err) {
     if (err instanceof Error && err.name === 'AbortError') {
       trackServerEvent(user.id, 'cv.parse_failed', { reason: 'timeout' })
@@ -141,5 +159,5 @@ export async function POST(req: NextRequest) {
     .eq('id', user.id)
 
   trackServerEvent(user.id, 'cv.parsed')
-  return NextResponse.json({ ok: true, data: parsedData })
+  return NextResponse.json({ ok: true, data: parsedData, warning: validation.warning })
 }

@@ -305,19 +305,24 @@ export function PublicProfileContent({
             </div>
           )}
 
-          {/* CV Download — shown only when the selected public source has a file */}
+          {/* CV — View + Download */}
           {user.cv_public && (
             (user.cv_public_source === 'uploaded' ? user.cv_storage_path : user.latest_pdf_path)
           ) && (
-            <div className="bg-[var(--color-surface)] rounded-2xl p-4 border border-[var(--color-border-subtle)]">
+            <div className="bg-[var(--color-surface)] rounded-2xl p-4 border border-[var(--color-border-subtle)] flex items-center justify-between">
+              <a
+                href={`/u/${user.handle}/cv`}
+                className="flex items-center gap-2 text-sm font-medium text-[var(--color-interactive)] hover:underline"
+              >
+                View CV
+              </a>
               <a
                 href={`/api/cv/public-download/${user.handle}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm font-medium text-[var(--color-interactive)] hover:underline"
+                className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors"
               >
                 <Download size={16} />
-                Download CV
               </a>
             </div>
           )}
