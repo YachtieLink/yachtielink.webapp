@@ -13,6 +13,7 @@ Keep them tight. If a feature sprint starts growing, it probably belongs in the 
 | feature-pro-subdomain-link | 2026-03-22 | Pro custom subdomain (`{handle}.yachtie.link`) with reserved upsell page |
 | feature-cv-sharing-rework | 2026-03-22 | Full CV & Sharing page rework — always-on QR, share modal, CV toggle |
 | feature-saved-profiles-rework | 2026-03-22 | Saved profiles rework — notes, availability watch, relationship context, folders |
+| feature-two-pass-cv-parse | 2026-03-23 | Split CV parse into fast personal + background full parse for better UX |
 
 ---
 

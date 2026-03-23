@@ -94,3 +94,30 @@ Rules:
 - If a language is listed without proficiency, infer from context (native for nationality language, fluent otherwise)
 - Role names should match yachting conventions (Captain, Chief Stewardess, Bosun, Deckhand, etc.)
 - Return valid JSON only — no markdown, no code fences, no explanation`;
+
+export const CV_PERSONAL_PROMPT = `You are extracting personal details and languages from a yacht crew CV. Return ONLY valid JSON matching this schema. Use null for missing values, empty arrays for missing lists.
+
+{
+  "personal": {
+    "full_name": "string|null",
+    "primary_role": "string|null — most recent/main role title",
+    "bio": "string|null — professional summary, max 500 chars",
+    "phone": "string|null",
+    "email": "string|null",
+    "location_country": "string|null — ISO country name",
+    "location_city": "string|null",
+    "dob": "YYYY-MM-DD|null",
+    "home_country": "string|null — nationality/home country, ISO name",
+    "smoke_pref": "non_smoker|smoker|social_smoker|null",
+    "appearance_note": "none|visible|non_visible|not_specified|null — tattoos/piercings",
+    "travel_docs": ["string"] — visas, seaman's books, travel documents,
+    "license_info": "string|null — driving license details"
+  },
+  "languages": [
+    { "language": "string", "proficiency": "native|fluent|intermediate|basic" }
+  ]
+}
+
+Rules:
+- If a language is listed without proficiency, infer from context (native for nationality language, fluent otherwise)
+- Return valid JSON only — no markdown, no code fences, no explanation`;

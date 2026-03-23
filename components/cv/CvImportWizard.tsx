@@ -1,11 +1,84 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+
+const PARSE_STEPS = [
+  { label: 'Opening your CV...', icon: '📄' },
+  { label: 'Extracting text from the document...', icon: '🔍' },
+  { label: 'Reading your work history...', icon: '⚓' },
+  { label: 'Identifying qualifications & certificates...', icon: '📜' },
+  { label: 'Matching yachts in our database...', icon: '🛥️' },
+  { label: 'Picking up skills & languages...', icon: '🌍' },
+  { label: 'Organising everything...', icon: '✨' },
+  { label: 'Almost there — final checks...', icon: '✅' },
+]
+
+function ParseProgress() {
+  const [activeStep, setActiveStep] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveStep(prev => Math.min(prev + 1, PARSE_STEPS.length - 1))
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="flex flex-col items-center gap-6 py-8 px-4">
+      <div className="h-10 w-10 animate-spin rounded-full border-2 border-[var(--color-text-tertiary)] border-t-[var(--color-interactive)]" />
+
+      <div className="w-full max-w-xs">
+        {/* Progress bar */}
+        <div className="w-full h-1.5 bg-[var(--color-surface-raised)] rounded-full overflow-hidden mb-6">
+          <motion.div
+            className="h-full bg-[var(--color-interactive)] rounded-full"
+            initial={{ width: '5%' }}
+            animate={{ width: `${Math.min(((activeStep + 1) / PARSE_STEPS.length) * 100, 95)}%` }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          />
+        </div>
+
+        {/* Step list */}
+        <div className="flex flex-col gap-2.5">
+          {PARSE_STEPS.map((s, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{
+                opacity: i <= activeStep ? 1 : 0.3,
+                y: 0,
+              }}
+              transition={{ duration: 0.3, delay: i <= activeStep ? 0 : 0 }}
+              className="flex items-center gap-2.5"
+            >
+              <span className="text-base w-6 text-center flex-shrink-0">
+                {i < activeStep ? '✓' : s.icon}
+              </span>
+              <span className={`text-sm ${
+                i < activeStep
+                  ? 'text-[var(--color-text-tertiary)]'
+                  : i === activeStep
+                    ? 'text-[var(--color-text-primary)] font-medium'
+                    : 'text-[var(--color-text-tertiary)]'
+              }`}>
+                {s.label}
+              </span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      <p className="text-xs text-[var(--color-text-tertiary)] text-center mt-2">
+        This usually takes 30–45 seconds
+      </p>
+    </div>
+  )
+}
 import { saveConfirmedImport } from '@/lib/cv/save-parsed-cv-data'
 import { StepPersonal } from '@/components/cv/steps/StepPersonal'
 import { StepExperience } from '@/components/cv/steps/StepExperience'
@@ -44,8 +117,15 @@ export function CvImportWizard({
 
   const [step, setStep] = useState(1)
   const [parseLoading, setParseLoading] = useState(true)
+  const [parsePersonalLoading, setParsePersonalLoading] = useState(true)
   const [parseError, setParseError] = useState<string | null>(null)
   const [parsed, setParsed] = useState<ParsedCvData | null>(null)
+  const [parsedPersonal, setParsedPersonal] = useState<ParsedPersonal | null>(null)
+  const [parsedLanguages, setParsedLanguages] = useState<ParsedLanguage[]>([])
+
+  // Ref to track full parse completion for race guard
+  const parsedRef = useRef<ParsedCvData | null>(null)
+  useEffect(() => { parsedRef.current = parsed }, [parsed])
 
   // Confirmed data per step
   const [confirmedPersonal, setConfirmedPersonal] = useState<ParsedPersonal | null>(null)
@@ -56,27 +136,33 @@ export function CvImportWizard({
   const [skills, setSkills] = useState<string[]>(existingSkills)
   const [hobbies, setHobbies] = useState<string[]>(existingHobbies)
 
-  // Fire parse on mount
-  useEffect(() => {
-    // Check sessionStorage for resume
-    const key = `cv-wizard-${storagePath}`
-    const stored = sessionStorage.getItem(key)
-    if (stored) {
-      try {
-        const state = JSON.parse(stored)
-        if (state.parsed) { setParsed(state.parsed); setParseLoading(false) }
-        if (state.step) setStep(state.step)
-        if (state.confirmedPersonal) setConfirmedPersonal(state.confirmedPersonal)
-        if (state.confirmedLanguages) setConfirmedLanguages(state.confirmedLanguages)
-        if (state.confirmedYachts) setConfirmedYachts(state.confirmedYachts)
-        if (state.confirmedCerts) setConfirmedCerts(state.confirmedCerts)
-        if (state.confirmedEducation) setConfirmedEducation(state.confirmedEducation)
-        if (state.skills) setSkills(state.skills)
-        if (state.hobbies) setHobbies(state.hobbies)
-        return
-      } catch { /* ignore corrupt storage */ }
-    }
+  // Fast parse — personal + languages only
+  const firePersonalParse = useCallback(() => {
+    fetch('/api/cv/parse-personal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ storagePath }),
+    })
+      .then(async (res) => {
+        if (!res.ok) return // Silent fail — full parse will handle it
+        const { data } = await res.json()
+        // Race guard: if full parse already completed, ignore fast parse result
+        if (parsedRef.current) {
+          setParsePersonalLoading(false)
+          return
+        }
+        setParsedPersonal(data.personal)
+        setParsedLanguages(data.languages ?? [])
+        setParsePersonalLoading(false)
+      })
+      .catch(() => {
+        // Network failure — clear loading so we don't hang forever if full parse also fails
+        setParsePersonalLoading(false)
+      })
+  }, [storagePath])
 
+  // Full parse — everything
+  const fireFullParse = useCallback(() => {
     fetch('/api/cv/parse', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -87,11 +173,18 @@ export function CvImportWizard({
           const body = await res.json().catch(() => ({}))
           setParseError(body.error || 'Could not parse CV')
           setParseLoading(false)
+          setParsePersonalLoading(false)
           return
         }
         const { data, warning } = await res.json()
         if (warning) toast(warning, 'success')
+
         setParsed(data as ParsedCvData)
+
+        // If fast parse hasn't returned yet, populate personal from full parse
+        setParsedPersonal(prev => prev ?? (data as ParsedCvData).personal)
+        setParsedLanguages(prev => prev.length ? prev : ((data as ParsedCvData).languages ?? []))
+        setParsePersonalLoading(false)
 
         // Merge skills/hobbies
         const newSkills = [...new Set([...existingSkills, ...(data.skills ?? [])])]
@@ -104,18 +197,56 @@ export function CvImportWizard({
       .catch(() => {
         setParseError('Something went wrong. Try again or enter your details manually.')
         setParseLoading(false)
+        setParsePersonalLoading(false)
       })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storagePath, existingSkills, existingHobbies])
+
+  // Fire parses on mount (or resume from sessionStorage)
+  useEffect(() => {
+    const key = `cv-wizard-${storagePath}`
+    const stored = sessionStorage.getItem(key)
+    if (stored) {
+      try {
+        const state = JSON.parse(stored)
+        if (state.parsed) { setParsed(state.parsed); setParseLoading(false); parsedRef.current = state.parsed }
+        if (state.parsedPersonal) { setParsedPersonal(state.parsedPersonal); setParsePersonalLoading(false) }
+        if (state.parsedLanguages) setParsedLanguages(state.parsedLanguages)
+        if (state.step) setStep(state.step)
+        if (state.confirmedPersonal) setConfirmedPersonal(state.confirmedPersonal)
+        if (state.confirmedLanguages) setConfirmedLanguages(state.confirmedLanguages)
+        if (state.confirmedYachts) setConfirmedYachts(state.confirmedYachts)
+        if (state.confirmedCerts) setConfirmedCerts(state.confirmedCerts)
+        if (state.confirmedEducation) setConfirmedEducation(state.confirmedEducation)
+        if (state.skills) setSkills(state.skills)
+        if (state.hobbies) setHobbies(state.hobbies)
+
+        // If full parse is already cached, skip both fetches
+        if (state.parsed) return
+        // If only personal is cached, skip fast fetch, re-fire full only
+        if (state.parsedPersonal) {
+          fireFullParse()
+          return
+        }
+      } catch { /* ignore corrupt storage */ }
+    }
+
+    // Fire both parses in parallel
+    firePersonalParse()
+    fireFullParse()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storagePath])
 
   // Persist to sessionStorage on change
   useEffect(() => {
-    if (parseLoading) return
+    if (parsePersonalLoading && parseLoading) return
     const key = `cv-wizard-${storagePath}`
     sessionStorage.setItem(key, JSON.stringify({
-      parsed, step, confirmedPersonal, confirmedLanguages,
+      parsed, parsedPersonal, parsedLanguages,
+      step, confirmedPersonal, confirmedLanguages,
       confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies,
     }))
-  }, [parsed, step, confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, parseLoading, storagePath])
+  }, [parsed, parsedPersonal, parsedLanguages, step, confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, parsePersonalLoading, parseLoading, storagePath])
 
   const handleSave = useCallback(async (): Promise<SaveStats | null> => {
     const existingSkillsLower = existingSkills.map(s => s.toLowerCase())
@@ -142,8 +273,9 @@ export function CvImportWizard({
     }
   }, [confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, existingSkills, existingHobbies, parsed, supabase, userId, storagePath])
 
-  // Parse error screen
-  if (parseError && !parsed) {
+  // Parse error screen — only show if we have no data at all
+  // If fast parse succeeded and user has personal data, let them continue
+  if (parseError && !parsed && !parsedPersonal) {
     return (
       <div className="flex flex-col gap-4 items-center text-center py-8">
         <p className="text-sm text-[var(--color-text-secondary)]">
@@ -157,6 +289,15 @@ export function CvImportWizard({
             Try again
           </Button>
         </div>
+      </div>
+    )
+  }
+
+  // Show dedicated parse progress screen while personal data is loading
+  if (parsePersonalLoading) {
+    return (
+      <div className="flex flex-col gap-4 pb-24">
+        <ParseProgress />
       </div>
     )
   }
@@ -198,10 +339,10 @@ export function CvImportWizard({
         >
           {step === 1 && (
             <StepPersonal
-              parsed={parsed?.personal ?? null}
-              languages={parsed?.languages ?? []}
+              parsed={parsedPersonal}
+              languages={parsedLanguages}
               existing={existingProfile}
-              parseLoading={parseLoading}
+              parsePersonalLoading={parsePersonalLoading}
               onConfirm={(personal, langs) => {
                 setConfirmedPersonal(personal)
                 setConfirmedLanguages(langs)
@@ -257,8 +398,8 @@ export function CvImportWizard({
                 yachts: confirmedYachts,
                 certifications: confirmedCerts,
                 education: confirmedEducation,
-                skills: skills.filter(s => !existingSkills.includes(s)),
-                hobbies: hobbies.filter(h => !existingHobbies.includes(h)),
+                skills: skills.filter(s => !existingSkills.some(e => e.toLowerCase() === s.toLowerCase())),
+                hobbies: hobbies.filter(h => !existingHobbies.some(e => e.toLowerCase() === h.toLowerCase())),
                 endorsementRequests: [],
                 socialMedia: parsed?.social_media ?? { instagram: null, website: null },
               }}
