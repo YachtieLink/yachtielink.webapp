@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const limited = await applyRateLimit(req, 'fileUpload', user.id)
+  const limited = await applyRateLimit(req, 'cvParse', user.id)
   if (limited) return limited
 
   const result = await validateBody(req, parseCVSchema)

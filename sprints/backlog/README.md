@@ -46,3 +46,6 @@ Any context, constraints, or open questions.
 | [Attachment Transfer](./attachment-transfer.md) | promoted (Sprint 12) | P2 |
 | [Reporting & Flagging](./reporting-flagging.md) | idea | P2 |
 | [Yacht Name Timeline](./yacht-name-timeline.md) | idea (DB foundation in Sprint 12) | P2 |
+| [Ghost Profiles & Claimable Accounts](./ghost-profiles-claimable-accounts.md) | design complete | P1 |
+| [Endorsement Writing Assist](./endorsement-writing-assist.md) | design complete | P2 |
+| [CV Actions Card Redesign](./cv-actions-card-redesign.md) | idea | P2 |

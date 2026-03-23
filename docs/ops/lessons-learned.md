@@ -6,12 +6,22 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 67 lessons
+**Current count:** 68 lessons
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## React StrictMode Double-Fires API Calls in Effects
+
+**What happened:** CvImportWizard's mount effect fired both `/api/cv/parse-personal` and `/api/cv/parse` twice — 4 OpenAI calls instead of 2, burning 2x rate limits and 2x cost per upload.
+**Root cause:** React StrictMode in dev remounts components. Any `useEffect` that fires an API call without a guard will double-fire. This is especially dangerous for rate-limited or paid external APIs.
+**Fix applied:** Added `hasFiredRef = useRef(false)` guard at the top of the mount effect. First mount sets it to `true`; second mount exits immediately.
+**Lesson:** Any `useEffect` that calls a paid/rate-limited API must have a ref guard against StrictMode double-mount. Grep for `useEffect.*fetch\|useEffect.*api` periodically to catch unguarded ones.
+**Sprint:** Two-Pass CV Parse | **Caught by:** Claude Code (Opus 4.6) | **Date:** 2026-03-24
 
 ---
 

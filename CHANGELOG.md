@@ -24,6 +24,140 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-24 — Claude Code (Opus 4.6) — QA Rally: 37 Bugs Documented + Bugfix Sprint Planned
+
+### Done
+
+**Founder QA Walkthrough — 37 bugs documented across 7 groups:**
+- Group A (5 bugs): Data integrity — cert/attachment/skill stacking on multiple CV uploads, no dedup
+- Group B (6 bugs): Public profile hero missing age, sea time, country flag; CV view 404
+- Group C (2 bugs): CV view horizontal scroll on mobile, no share/download buttons
+- Group D (11 bugs): Import wizard — no language input, no bio edit, inconsistent dates, unclear yacht matching, non-editable certs/education
+- Group E (1 bug): Skills chip UX — clicking deletes with no indication, can't add back
+- Group F (6 bugs): Profile page doesn't surface new CV parse fields, edit pages only add new (can't edit existing)
+- Group G (4 bugs): Network tab missing yacht graph, endorsements/colleagues not grouped by yacht
+
+**Bugfix sprint plan written and reviewed:**
+- Created `sprints/major/phase-1b/sprint-cv-parse-bugfix/README.md` — 5 waves, 8 decisions, full file lists
+- Subagent review applied: Bug 38 added (attachment dedup), Bug 33 removed (duplicate), Bug 3 recharacterized (route exists, data state issue), Bug 1 merged into 12
+
+**Code fixes shipped (from earlier in session):**
+- StrictMode double-fire fix (`hasFiredRef` guard) — was burning 2x rate limits and 2x OpenAI cost
+- Rate limit 429 friendly banner — user sees "3 free CV reads per day" instead of error screen
+- Backlog item created: `cv-actions-card-redesign.md`
+
+### Context
+
+- CV parse works end-to-end on localhost (3 pages, 8261 chars, personal in 8.5s, full in 19s)
+- Vercel Hobby 10s timeout still blocks deployed parsing — Pro upgrade logged as pre-launch blocker
+- 37 bugs documented, bugfix sprint plan reviewed by subagent, ready for build specs
+- Uncommitted code: StrictMode fix, rate limit banner, extract-text refactor, parse-personal route
+
+### Next
+
+1. Answer 8 design decisions (D1-D8) in the bugfix sprint plan
+2. Write build specs for Wave 1 (data integrity — cert/attachment dedup)
+3. Execute Wave 1, then Waves 2-5 sequentially
+4. Commit and push all uncommitted changes from this + previous session
+
+### Flags
+
+- ⚠️ Yacht ensign flags (not country flags) needed — founder explicitly corrected this. Don't use emoji country flags for yachts.
+- ⚠️ Don't make assumptions about backlog vs bug priority — if the founder says it's a bug, it's a bug to fix, not a backlog item
+- ⚠️ 37 bugs is a lot — Wave 1 (data integrity) is P0 and blocks everything else
+
+---
+
+## 2026-03-24 — Claude Code (Opus 4.6) — CV Parse Bug Fixes + Rate Limit UX + Backlog
+
+### Done
+
+**StrictMode Double-Fire Fix:**
+- React StrictMode was double-mounting CvImportWizard, firing both parse routes twice per upload — burning 2x rate limits and 2x OpenAI cost
+- Added `hasFiredRef` guard to prevent second mount from re-triggering parses
+
+**Rate Limit UX:**
+- 429 from full parse now shows friendly amber banner: "You've used your 3 free CV reads for today" instead of cryptic error screen
+- User keeps personal data from fast parse and can fill in the rest manually
+
+**Backlog Items Created:**
+- `cv-actions-card-redesign.md` — CV section on profile needs unified card layout, relative timestamps, multi-page uploaded CV viewer
+
+**Bugs Identified (Not Yet Fixed):**
+- ParseProgress bar does jarring animated jump when resuming on Step 2 (should start at correct position without animation)
+- `/u/[handle]/cv` returns 404 — public CV route not wired up
+- Profile "No experience added yet" header may display while experience entries are visible (needs verification)
+
+### Context
+
+- CV parse works end-to-end on localhost: 3 pages extracted, personal parse 8.5s, full parse 19s
+- Vercel Hobby tier still blocks deployed parsing (10s limit) — Pro upgrade logged as pre-launch blocker
+- Two-pass architecture working well: user sees Step 1 data in ~10s while full parse continues in background
+- Turbopack cache corruption hit mid-session — fixed by nuking `.next/`
+
+### Next
+
+- Bug fix session: ParseProgress bar jump, public CV 404, experience header display
+- Commit and push all uncommitted changes (StrictMode fix, rate limit banner, backlog item)
+- Consider promoting CV Actions Card Redesign to a junior sprint
+
+### Flags
+
+- ⚠️ StrictMode double-fire was burning real money (2x OpenAI calls per upload) — now fixed but watch for similar patterns in other effect-driven API calls
+- ⚠️ Turbopack cache corruption (`rm -rf .next` fixes it) — add to lessons-learned if it recurs
+
+---
+
+## 2026-03-23 — Claude Code (Opus 4.6) — Ghost Profiles & Endorsement Assist Design
+
+### Done
+
+**Ghost Profiles & Claimable Accounts — Design Complete (24 decisions):**
+- Full design interview (/grill-me) walking every branch: scope, data model, auth, API, UX, GDPR, edge cases
+- Split into Wave 1 (core ghost+claim loop) and Wave 2 (CV auto-requests, nudge emails, fraud detection)
+- Key architectural decision: separate `ghost_profiles` table (not `users`) — the `users.id` FK to `auth.users(id)` makes ghost rows in `users` impossible
+- Dual nullable endorser columns on `endorsements` with CHECK constraint for ghost vs real endorsers
+- Separate `/api/endorsements/guest` route isolated from authenticated flow
+- Three-option landing page, CV-powered endorsement suggestions, signup shortcut bypassing onboarding
+- Claim flow: password/OAuth only, contact consolidation, no onboarding wizard
+- Updated `sprints/backlog/ghost-profiles-claimable-accounts.md` with full spec
+
+**Endorsement Writing Assist — Design Complete (12 decisions):**
+- Spun out from Ghost Profiles interview as independent backlog item
+- "Help me start writing" / "Help me finish this" adaptive button on endorsement form
+- On-demand LLM generation using both sides' context (endorsee CV + endorser role/seniority)
+- User's partial text sent as context — builds on their voice rather than replacing
+- Free for everyone, `gpt-4o-mini`, 5 per session rate limit, no schema changes
+- Created `sprints/backlog/endorsement-writing-assist.md` with full spec
+
+**Backlog index updated** with both new items.
+
+**Skills created:**
+- `/grill-me` — relentless design interview skill. Walks every branch of a design tree, one question at a time, with recommended answers. Explores codebase before asking.
+- `/log` — session logging skill. Updates CHANGELOG, session log, module files, lessons-learned, feedback, and sprint indexes in one pass.
+
+### Context
+
+- No code written this session — pure design work + tooling
+- Ghost Profiles is the viral growth loop: one endorsement request can create a new (ghost) user with real content
+- Endorsement Writing Assist can ship independently and also benefits the ghost flow
+- Both specs are ready for sprint planning and build plan creation
+- CV parse two-pass work happening in parallel (separate terminal)
+
+### Next
+
+- Promote Ghost Profiles to a sprint when ready (major sprint, ~2-3 days)
+- Endorsement Writing Assist could ship as a quick junior sprint (no schema changes)
+- Both features share LLM endorsement generation logic — build the shared prompt first
+
+### Flags
+
+- ⚠️ Ghost Profiles Wave 1 has no dependency on CV parse, but Wave 2 (auto-requests from parsed references) does
+- ⚠️ Founder preference: no magic links anywhere in auth flows (added to feedback.md)
+- ⚠️ Founder preference: never persist generated endorsement text (added to feedback.md)
+
+---
+
 ## 2026-03-23 — Claude Code (Opus 4.6) — Two-Pass CV Parse + Content Filter Diagnosis + Vercel Timeout Fix
 
 ### Done

@@ -18,15 +18,18 @@ const PARSE_STEPS = [
   { label: 'Almost there — final checks...', icon: '✅' },
 ]
 
-function ParseProgress() {
-  const [activeStep, setActiveStep] = useState(0)
+function ParseProgress({ startedAt }: { startedAt: number }) {
+  const [activeStep, setActiveStep] = useState(() =>
+    Math.min(Math.floor((Date.now() - startedAt) / 5000), PARSE_STEPS.length - 1)
+  )
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setActiveStep(prev => Math.min(prev + 1, PARSE_STEPS.length - 1))
-    }, 5000)
+      const elapsed = Math.floor((Date.now() - startedAt) / 5000)
+      setActiveStep(Math.min(elapsed, PARSE_STEPS.length - 1))
+    }, 1000)
     return () => clearInterval(interval)
-  }, [])
+  }, [startedAt])
 
   return (
     <div className="flex flex-col items-center gap-6 py-8 px-4">
@@ -117,8 +120,10 @@ export function CvImportWizard({
 
   const [step, setStep] = useState(1)
   const [parseLoading, setParseLoading] = useState(true)
+  const [parseStartedAt] = useState(() => Date.now())
   const [parsePersonalLoading, setParsePersonalLoading] = useState(true)
   const [parseError, setParseError] = useState<string | null>(null)
+  const [parseRateLimited, setParseRateLimited] = useState(false)
   const [parsed, setParsed] = useState<ParsedCvData | null>(null)
   const [parsedPersonal, setParsedPersonal] = useState<ParsedPersonal | null>(null)
   const [parsedLanguages, setParsedLanguages] = useState<ParsedLanguage[]>([])
@@ -170,6 +175,13 @@ export function CvImportWizard({
     })
       .then(async (res) => {
         if (!res.ok) {
+          if (res.status === 429) {
+            // Daily parse limit reached — not an error, just a limit
+            setParseRateLimited(true)
+            setParseLoading(false)
+            setParsePersonalLoading(false)
+            return
+          }
           const body = await res.json().catch(() => ({}))
           setParseError(body.error || 'Could not parse CV')
           setParseLoading(false)
@@ -202,8 +214,14 @@ export function CvImportWizard({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storagePath, existingSkills, existingHobbies])
 
+  // Guard against StrictMode double-mount firing parses twice
+  const hasFiredRef = useRef(false)
+
   // Fire parses on mount (or resume from sessionStorage)
   useEffect(() => {
+    if (hasFiredRef.current) return
+    hasFiredRef.current = true
+
     const key = `cv-wizard-${storagePath}`
     const stored = sessionStorage.getItem(key)
     if (stored) {
@@ -273,9 +291,9 @@ export function CvImportWizard({
     }
   }, [confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, existingSkills, existingHobbies, parsed, supabase, userId, storagePath])
 
-  // Parse error screen — only show if we have no data at all
-  // If fast parse succeeded and user has personal data, let them continue
-  if (parseError && !parsed && !parsedPersonal) {
+  // Parse error screen — only show if we have no data at all AND both parses are done
+  // Don't show while fast parse is still in flight (it might succeed)
+  if (parseError && !parsed && !parsedPersonal && !parsePersonalLoading) {
     return (
       <div className="flex flex-col gap-4 items-center text-center py-8">
         <p className="text-sm text-[var(--color-text-secondary)]">
@@ -297,7 +315,7 @@ export function CvImportWizard({
   if (parsePersonalLoading) {
     return (
       <div className="flex flex-col gap-4 pb-24">
-        <ParseProgress />
+        <ParseProgress startedAt={parseStartedAt} />
       </div>
     )
   }
@@ -306,6 +324,18 @@ export function CvImportWizard({
 
   return (
     <div className="flex flex-col gap-4 pb-24">
+      {/* Rate limit banner */}
+      {parseRateLimited && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
+          <p className="text-sm font-medium text-amber-900">
+            You&apos;ve used your 3 free CV reads for today
+          </p>
+          <p className="text-xs text-amber-700 mt-1">
+            Running these costs us real money! Your personal details were imported above — you can fill in the rest manually from your profile, or try again tomorrow.
+          </p>
+        </div>
+      )}
+
       {/* Progress header */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
@@ -351,11 +381,15 @@ export function CvImportWizard({
             />
           )}
 
-          {step === 2 && (
+          {step >= 2 && step <= 4 && parseLoading && !parseRateLimited && (
+            <ParseProgress startedAt={parseStartedAt} />
+          )}
+
+          {step === 2 && (!parseLoading || parseRateLimited) && (
             <StepExperience
               yachts={parsed?.employment_yacht ?? []}
               landJobs={parsed?.employment_land ?? []}
-              parseLoading={parseLoading}
+              parseLoading={false}
               onConfirm={(yachts) => {
                 setConfirmedYachts(yachts)
                 setStep(3)
@@ -363,11 +397,11 @@ export function CvImportWizard({
             />
           )}
 
-          {step === 3 && (
+          {step === 3 && (!parseLoading || parseRateLimited) && (
             <StepQualifications
               certifications={parsed?.certifications ?? []}
               education={parsed?.education ?? []}
-              parseLoading={parseLoading}
+              parseLoading={false}
               onConfirm={(certs, edu) => {
                 setConfirmedCerts(certs)
                 setConfirmedEducation(edu)
@@ -376,14 +410,14 @@ export function CvImportWizard({
             />
           )}
 
-          {step === 4 && (
+          {step === 4 && (!parseLoading || parseRateLimited) && (
             <StepExtras
               skills={skills}
               hobbies={hobbies}
               socialMedia={parsed?.social_media ?? { instagram: null, website: null }}
               existingSkills={existingSkills}
               existingHobbies={existingHobbies}
-              parseLoading={parseLoading}
+              parseLoading={false}
               onSkillsChange={setSkills}
               onHobbiesChange={setHobbies}
               onConfirm={() => setStep(5)}

@@ -6,6 +6,12 @@ When making a decision that affects this module, append it here with the date, d
 
 ---
 
+**2026-03-23** — Ghost Profiles: ghost endorsements bypass the `are_coworkers_on_yacht` gate. The endorsement request token is the trust mechanism — the real user vouched for the relationship by sending the request. Ghost endorsements get a subtle visual distinction (no profile link, softer presentation) and upgrade to full weight when ghost claims account with matching yacht attachment. — Ari
+
+**2026-03-23** — Ghost Profiles: separate `ghost_profiles` table, not `users`. The `users.id` FK to `auth.users(id) ON DELETE CASCADE` makes ghost rows in `users` impossible without fake auth records. Dual nullable endorser columns on `endorsements` (`endorser_id` + `ghost_endorser_id`) with CHECK constraint ensuring exactly one is set. Endorsements migrate on claim. — Ari
+
+**2026-03-23** — Endorsement Writing Assist: never persist AI-generated endorsement text. Always generate on demand. Storing drafts creates a library of generic recycled snippets — the value is fresh, context-specific generation each time. Exception: ghost pre-generated suggestions on `endorsement_requests` (approved as lower-signal quick interactions). — Ari
+
 **2026-01-28** — D-020: No caps on endorsements received. Senior crew with long careers can plausibly receive many endorsements; only endorsements given may ever be constrained. — Ari
 
 **2026-01-28** — D-019: Endorsement signals (thumbs up/down) available to users with overlapping attachment. Display-only in Phase 1; feeds trust weight in Phase 2+. Signals alone never remove an endorsement. — Ari

@@ -4,6 +4,8 @@ Append-only. Never edit existing entries. Newest at top.
 
 When you make changes to this module, append a one-line entry with date, agent name, and what changed.
 
+**2026-03-24** — Claude Code (Opus 4.6) (QA Rally): Documented 8 bugs on public profile — missing age/sea time/flag in hero, CV view 404/blank/horizontal scroll, yacht names not clickable, no ensign flags. Bugfix sprint Wave 2 covers all.
+
 ---
 
 **2026-03-23** — Claude Code (Opus 4.6, CV Parse Sprint): Public CV viewer at /u/[handle]/cv (generated HTML via CvPreview or uploaded PDF iframe, gated by cv_public). PublicProfileContent "View CV" + download icon split replacing single download link. getUserByHandle extended with new personal fields (excluding dob due to column-level REVOKE). show_home_country + show_dob privacy respected in CvPreview viewer mode.

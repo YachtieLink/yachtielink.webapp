@@ -1,4 +1,4 @@
-export const CV_EXTRACTION_PROMPT = `You are extracting structured data from a yacht crew CV. Return ONLY valid JSON matching the schema below. Every key must be present. Use null for missing values, empty arrays for missing lists.
+export const CV_EXTRACTION_PROMPT = `You are extracting structured data from a yacht crew CV. The text below may span MULTIPLE PAGES — read the ENTIRE document from start to finish before extracting. Do not stop after the first page. Return ONLY valid JSON matching the schema below. Every key must be present. Use null for missing values, empty arrays for missing lists.
 
 {
   "personal": {
@@ -95,7 +95,7 @@ Rules:
 - Role names should match yachting conventions (Captain, Chief Stewardess, Bosun, Deckhand, etc.)
 - Return valid JSON only — no markdown, no code fences, no explanation`;
 
-export const CV_PERSONAL_PROMPT = `You are extracting personal details and languages from a yacht crew CV. Return ONLY valid JSON matching this schema. Use null for missing values, empty arrays for missing lists.
+export const CV_PERSONAL_PROMPT = `You are extracting personal details and languages from a yacht crew CV. The text below may span MULTIPLE PAGES — scan the ENTIRE document for personal details and languages, not just the first page. Return ONLY valid JSON matching this schema. Use null for missing values, empty arrays for missing lists.
 
 {
   "personal": {

@@ -4,6 +4,8 @@ Append-only. Never edit existing entries. Newest at top.
 
 When you make changes to this module, append a one-line entry with date, agent name, and what changed.
 
+**2026-03-24** — Claude Code (Opus 4.6) (QA Rally): Fixed StrictMode double-fire in CvImportWizard (hasFiredRef guard). Added 429 rate limit banner. Documented 37 bugs from founder QA walkthrough — bugfix sprint plan written and reviewed.
+
 ---
 
 **2026-03-23** — Claude Code (Opus 4.6, CV Parse Sprint): Profile settings page — 8 new fields (DOB, home country, smoke pref, appearance, travel docs, license, show_dob, show_home_country). Languages edit page (CRUD via API, max 10). Profile page: flag emoji + sea time in hero card, languages row, CV completeness prompt, SeaTimeSummary removed. getUserById extended with 9 new columns. show_home_country privacy enforced.

@@ -272,15 +272,17 @@ export async function saveConfirmedImport(
   } catch { /* partial failure OK */ }
 
   // 2. Create yachts + attachments
+  console.log(`[saveConfirmedImport] Processing ${data.yachts.length} yachts`)
   for (const yacht of data.yachts) {
     try {
       let yachtId: string | null = null
 
       // Search existing
-      const { data: matches } = await supabase.rpc('search_yachts', {
+      const { data: matches, error: searchErr } = await supabase.rpc('search_yachts', {
         p_query: yacht.yacht_name,
         p_limit: 3,
       })
+      console.log(`[saveConfirmedImport] search_yachts "${yacht.yacht_name}":`, matches?.length ?? 0, 'matches, error:', searchErr?.message ?? 'none')
 
       if (matches && matches.length > 0) {
         const best = matches[0] as { id: string; sim: number }
@@ -288,7 +290,7 @@ export async function saveConfirmedImport(
       }
 
       if (!yachtId) {
-        const { data: newYacht } = await supabase.from('yachts').insert({
+        const { data: newYacht, error: yachtErr } = await supabase.from('yachts').insert({
           name: yacht.yacht_name,
           yacht_type: yacht.yacht_type,
           length_meters: yacht.length_meters,
@@ -296,6 +298,7 @@ export async function saveConfirmedImport(
           builder: yacht.builder,
           created_by: userId,
         }).select('id').single()
+        console.log(`[saveConfirmedImport] create yacht "${yacht.yacht_name}":`, newYacht?.id ?? 'FAILED', 'error:', yachtErr?.message ?? 'none')
         if (newYacht) yachtId = newYacht.id
       }
 
@@ -303,7 +306,7 @@ export async function saveConfirmedImport(
         const startDate = yacht.start_date ? normalizeDateToISO(yacht.start_date) : null
         const endDate = yacht.end_date && yacht.end_date !== 'Current' ? normalizeDateToISO(yacht.end_date) : null
 
-        await supabase.from('attachments').insert({
+        const { error: attErr } = await supabase.from('attachments').insert({
           user_id: userId,
           yacht_id: yachtId,
           role_label: yacht.role,
@@ -314,9 +317,12 @@ export async function saveConfirmedImport(
           description: yacht.description,
           cruising_area: yacht.cruising_area,
         })
-        stats.yachtsCreated++
+        console.log(`[saveConfirmedImport] attachment for "${yacht.yacht_name}":`, attErr ? `FAILED: ${attErr.message}` : 'OK')
+        if (!attErr) stats.yachtsCreated++
       }
-    } catch { /* partial failure OK */ }
+    } catch (err) {
+      console.error(`[saveConfirmedImport] yacht error:`, err)
+    }
   }
 
   // 3. Certifications
