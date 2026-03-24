@@ -24,6 +24,38 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-24 — Claude Code (Opus 4.6) — /log Skill Upgrade: Subagent Audit + Drift Prevention
+
+### Done
+
+- **Deep audit of entire logging stack** — 5 parallel agents analyzed STATUS↔CHANGELOG drift, session log quality, module doc consistency, lessons-learned/feedback health, sprint index accuracy
+- **Upgraded `/log` skill** (`~/.claude/skills/log/SKILL.md`) with 4 changes based on audit findings and Claude.VPS recommendations:
+  - **(D) Explicit skip report** — Step 4 now requires Updated/Skipped status for all 10 file types; prevents silent omissions
+  - **(C) Durable knowledge step** (7.5) — forces check for knowledge that belongs in `docs/disciplines/` instead of lessons-learned
+  - **(A) Sonnet subagent audit** (Step 5) — zero-context agent audits all written files for drift, vague entries, format violations, data mismatches; fixes gaps before reporting
+  - **(B-lite) Derivation rules** — STATUS must derive from CHANGELOG (not authored independently); only shipped code in "Recently Shipped"
+
+### Context
+
+- This was a tooling/process session, not a coding session — no webapp code touched
+- The audit found real issues: STATUS listing design specs as "shipped", employment module state 2 days behind its activity log, payments pricing discrepancy (€8.99 vs €12), near-duplicate lessons-learned entries, Sprint 11 README blank despite shipping
+- Claude.VPS sent recommendations via Obsidian note; we evaluated independently rather than accepting blindly
+- The skill file lives at `~/.claude/skills/log/SKILL.md` (outside the repo)
+
+### Next
+
+1. Answer 8 design decisions (D1-D8) in the bugfix sprint plan
+2. Write build specs for Wave 1 (data integrity — cert/attachment dedup)
+3. Execute Wave 1, then Waves 2-5 sequentially
+4. Commit and push all uncommitted changes from previous sessions
+
+### Flags
+
+- ⚠️ The /log skill now spawns a Sonnet subagent at the end — expect ~15-20s extra per /log run
+- ⚠️ First run of upgraded skill — watch for unexpected behavior and adjust
+
+---
+
 ## 2026-03-24 — Claude Code (Opus 4.6) — QA Rally: 37 Bugs Documented + Bugfix Sprint Planned
 
 ### Done
