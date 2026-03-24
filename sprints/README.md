@@ -10,7 +10,8 @@ This is the canonical home for all execution work — building (sprints) and aud
 
 | Type | Sprint | Status | Focus |
 |------|--------|--------|-------|
-| Major | [Phase 1A — Sprint 10](./major/phase-1a/sprint-10/README.md) | 🔨 In Progress | Profile robustness, photo-forward UX |
+| Major | [Phase 1B — CV Parse Bugfix](./major/phase-1b/sprint-cv-parse-bugfix/README.md) | 📋 Planning | 37 QA bugs in 5 waves — data integrity, public profile, wizard UX, profile page, network |
+| Major | [Phase 1A — Sprint 10](./major/phase-1a/sprint-10/README.md) | ✅ Complete | Profile robustness, photo-forward UX |
 | Major | [Phase 1A — Sprint 10.1](./major/phase-1a/sprint-10.1/README.md) | 📋 Draft | Close Phase 1A — education edit, saved profiles, animation, QA |
 | Major | [Phase 1B — Sprint 11](./major/phase-1b/sprint-11/README.md) | 📋 Draft | Crew landing pages, Salty, section colours, OG images |
 | Major | [Phase 1B — Sprint 12](./major/phase-1b/sprint-12/README.md) | 📋 Draft | Yacht graph, colleague network, sea time |

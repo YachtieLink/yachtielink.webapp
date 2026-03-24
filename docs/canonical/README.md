@@ -1,17 +1,21 @@
-# YachtieLink Canonical Planning
+# HISTORICAL SNAPSHOT — DO NOT EDIT
 
-This folder holds the implementation-facing planning truth.
+**Frozen on:** 2026-02-11
 
-## Canonical naming convention
-- Active canonical docs use stable filenames without `.vNext` suffix.
-- Example: `yl_phase_scope.json` (canonical) was promoted from `yl_phase_scope.vNext.json` (intake).
+This folder is a frozen baseline. It is **not** the source of truth.
+
+The current working versions of these documents live in the parent `docs/` folder. This snapshot exists only for historical reference — to see what the project looked like at that point in time.
+
+**Do not:**
+- Edit files in this folder
+- Copy files from here into `docs/` without founder review
+- Treat these as current instructions
+
+If you need the current version of any document, look in `docs/` (one level up).
+
+---
 
 ## Source lineage
-- Intake source batch: `/Users/ari/yachtielink.webapp/docs/intake/2026-02-11`
-- Legacy counterparts: `/Users/ari/yachtielink.webapp/docs/intake/2026-02-11/archive/legacy_counterparts/`
-- Metadata registry: `/Users/ari/yachtielink.webapp/docs/canonical/METADATA.json`
-
-## Current status
-- Coherence audit completed: see `/Users/ari/yachtielink.webapp/docs/canonical/COHERENCE_AUDIT_2026-02-11.md`
-- `vNext` set promoted into canonical filenames with lineage metadata.
-- Next step: resolve open items in the audit and update canonical checksums in metadata when files change.
+- Intake source batch: `docs/intake/2026-02-11`
+- Metadata registry: `METADATA.json` (this folder)
+- Coherence audit: `COHERENCE_AUDIT_2026-02-11.md` (this folder)

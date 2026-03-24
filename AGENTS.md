@@ -10,12 +10,13 @@ You are a senior software engineer working on a production Next.js application. 
 
 Every session, read in this order:
 
-### Tier 1 — Always (orientation, ~5 files, <500 lines)
+### Tier 1 — Always (orientation, ~6 files, <600 lines)
 1. This file (AGENTS.md)
-2. `CHANGELOG.md` — last 3 sessions (your external memory)
-3. `docs/ops/lessons-learned.md` — don't repeat known mistakes
-4. `docs/ops/feedback.md` — standing behavioral corrections
-5. Your agent profile: `docs/agents/claude-code.md` or `docs/agents/codex.md`
+2. `STATUS.md` — quick-glance dashboard: current phase, active sprint, what shipped, what's next, blockers
+3. `CHANGELOG.md` — last 3 sessions (your external memory)
+4. `docs/ops/lessons-learned.md` — don't repeat known mistakes
+5. `docs/ops/feedback.md` — standing behavioral corrections
+6. Your agent profile: `docs/agents/claude-code.md` or `docs/agents/codex.md`
 
 ### Tier 2 — Task-specific (load what you need)
 6. Module state files for modules you'll touch (`docs/modules/<module>.md`)
@@ -189,6 +190,7 @@ A real Supabase account exists for automated testing. No code bypasses — it go
 
 | Doc | Purpose |
 |-----|---------|
+| `STATUS.md` | Quick-glance dashboard — current sprint, recently shipped, up next, blockers, pending decisions |
 | `docs/yl_system_state.json` | Current phase, build target, what's active |
 | `docs/yl_build_plan.md` | Historical sprint record (sprints 1–7) |
 | `sprints/README.md` | Active sprint + rally index — what's live, what's next |
@@ -220,10 +222,10 @@ If docs conflict, follow `yl_system_state.json`, `yl_phase1_execution.md`, and t
 **Keep the design system current.** If you add a new page, update the route map in `docs/design-system/flows/app-navigation.md`. If you create a new component pattern, add it to the relevant `patterns/` file. If you make or reject a design choice, log it in `decisions/`. If you take screenshots during a UI session, drop them in `reference/screenshots/`.
 
 **CRITICAL — before every `git commit`:**
-You MUST update `CHANGELOG.md` to reflect all work being committed BEFORE running `git commit`. This is a blocking pre-commit requirement. If the changelog does not cover the changes in the commit, stop and update it first. No exceptions — this has been missed repeatedly.
+You MUST update `CHANGELOG.md` and `STATUS.md` to reflect all work being committed BEFORE running `git commit`. This is a blocking pre-commit requirement. If the changelog does not cover the changes in the commit, stop and update it first. No exceptions — this has been missed repeatedly.
 
 **CRITICAL — before every `git commit`:**
-You MUST also update module state files (`docs/modules/`) for any modules you touched. Both CHANGELOG.md AND relevant module state files must be current before committing.
+You MUST also update module state files (`docs/modules/`) for any modules you touched. CHANGELOG.md, STATUS.md, AND relevant module state files must be current before committing.
 
 Format: reverse chronological, one entry per session, with Done / Context / Next / Flags sections. If a session ends unexpectedly or you commit mid-session, the log should already reflect what happened.
 
@@ -267,6 +269,7 @@ yachtielink.webapp/
 ├── notes/               # Scratchpad — strategy docs only (sprint/rally files superseded by /sprints/)
 ├── archive/             # Legacy files — superseded originals, kept for reference
 ├── AGENTS.md            # This file — primary instructions for all agents
+├── STATUS.md            # Quick-glance dashboard — where are we right now
 ├── CLAUDE.md            # Claude Code-specific config — defers here
 ├── CHANGELOG.md         # Cross-agent handover log
 └── package.json

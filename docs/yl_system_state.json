@@ -7,7 +7,7 @@
     ],
     "one_line": "A crew-owned professional identity network where yacht-backed work history creates the foundation for trusted references.",
     "status": "Building",
-    "current_phase": "Phase 1A - Portable Profile + Yacht Graph + Endorsements",
+    "current_phase": "Phase 1A → 1B transition — 1A core complete, active work is 1B bugfixes and polish",
     "build_plan": "docs/yl_build_plan.md",
     "north_star": "Build crew-owned profile infrastructure that turns yacht-backed work history into a living colleague graph and endorsement loop, then fund it with paid presentation upgrades."
   },
