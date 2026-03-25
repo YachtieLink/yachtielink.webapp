@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-25
+**Last updated:** 2026-03-26
 
 ---
 
@@ -18,7 +18,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 |--------|-------|--------|-------|
 | [CV Parse Bugfix](./sprints/major/phase-1b/sprint-cv-parse-bugfix/README.md) | 1B | Planning | 37 QA bugs across 5 waves — data integrity, public profile, wizard UX, profile page, network tab |
 
-**Next action:** D1-D8 resolved. Write Wave 1 build specs (data integrity dedup + CV consolidation).
+**Next action:** Waves 1-3 shipped. Execute Wave 4 (Profile Page + Skills).
 
 ---
 
@@ -30,6 +30,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 | CV parse full build (Waves 1-7) | 2026-03-23 | 5-step import wizard, AI prompt, save function, PDF templates, CV preview, public CV view |
 | StrictMode double-fire fix | 2026-03-24 | Was burning 2x OpenAI cost per upload — guarded with `hasFiredRef` |
 | Rate limit 429 banner | 2026-03-24 | Friendly "3 free CV reads per day" instead of error screen |
+| Wave 3: Import wizard UX + onboarding | 2026-03-25 | Phone formatting (libphonenumber-js), bio editing, date display consistency, add-language inline, editable review cards with edit-from-review navigation, ConfirmedImportData factory extraction |
 | Drift guardrails + smoke discipline | 2026-03-25 | Added `npm run drift-check`, canonical-owner docs, critical-flow smoke checklist, and workflow/review updates to stop more SRP/DRY drift landing unnoticed |
 
 ---
@@ -37,9 +38,9 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 ## Up Next (ordered)
 
 1. ~~Answer D1-D8 design decisions~~ — resolved 2026-03-25
-2. **Wave 1: Data integrity** — cert/attachment dedup, overlap validation (P0, blocks everything)
-3. **Wave 2: Public profile + CV view** — hero fields, CV 404 fix, responsive, share/download
-4. **Wave 3: Import wizard UX** — languages, bio, phone formatting, date consistency, editable cards
+2. ~~**Wave 1: Data integrity**~~ — shipped 2026-03-25
+3. ~~**Wave 2: Public profile + CV view**~~ — shipped 2026-03-25
+4. ~~**Wave 3: Import wizard UX**~~ — shipped 2026-03-25
 5. **Wave 4: Profile page + skills** — personal details card, editability, skills chip UX
 6. **Wave 5: Network tab** — yacht graph, endorsement/colleague grouping by yacht
 7. **Media/CRUD standardization** (follow-up junior sprint after bugfix waves — photo/gallery dedup, shared Pro gating)
@@ -60,32 +61,13 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Pending Decisions
 
-| ID | Question | Recommendation | Sprint |
-|----|----------|----------------|--------|
-| D1 | Cert dedup threshold — how fuzzy? | Levenshtein <= 2 or normalized match >= 0.85 | CV Parse Bugfix |
-| D2 | Date overlap tolerance? | Allow 1 month overlap, warn but don't block | CV Parse Bugfix |
-| D3 | Nationality display — demonym or label? | Label change to "Nationality" with country name | CV Parse Bugfix |
-| D4 | Phone formatting — library or custom? | `libphonenumber-js` | CV Parse Bugfix |
-| D5 | Ensign images — source? | Maritime flag databases, static assets in `/public/ensigns/` | CV Parse Bugfix |
-| D6 | CV view scaling approach? | `transform: scale()` preserving A4 layout | CV Parse Bugfix |
-| D7 | Yacht graph scope? | List-based for now, graph viz in Phase 2 | CV Parse Bugfix |
-| D8 | Attachment dedup match strategy? | Match on user_id + yacht_id + role, enrich if match found | CV Parse Bugfix |
+D1-D8 all resolved 2026-03-25 — see `sprints/PHASE1-CLOSEOUT.md` Blockers section for details. D5 (ensign flags) deferred to post-launch.
 
 ---
 
 ## Uncommitted Code
 
-- StrictMode double-fire fix (`hasFiredRef` guard) — feature-complete, awaiting git commit
-- Rate limit 429 friendly banner — feature-complete, awaiting git commit
-- `extract-text.ts` refactor (shared helper) — feature-complete, awaiting git commit
-- `parse-personal` route (two-pass fast extraction) — feature-complete, awaiting git commit
-- `scripts/drift-check.mjs` with baseline support (`.drift-baseline.json`) — feature-complete, awaiting git commit
-- Canonical-owner docs (`docs/ops/canonical-owners/`) — feature-complete, awaiting git commit
-- Critical-flow smoke checklist (`docs/ops/critical-flow-smoke-checklist.md`) — feature-complete, awaiting git commit
-- Workflow and code-review doc updates for drift pass — feature-complete, awaiting git commit
-- Rally 004 execution plan (`sprints/rallies/rally-004-execution-plan.md`) — report-only, awaiting git commit
-- Rally 004 SRP/DRY audit (`sprints/rallies/rally-004-srp-dry-complexity-audit.md`) — report-only, awaiting git commit
-- `CHANGELOG.md`, `STATUS.md`, session logs — doc updates, awaiting git commit
+- **Wave 3 branch** (`fix/phase1-wave3-wizard-onboarding`): phone formatting, bio editing, date display, add-language, editable review cards, buildImportData factory — ready for commit + push
 
 ---
 

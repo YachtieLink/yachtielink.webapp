@@ -6,6 +6,8 @@ When you make changes to this module, append a one-line entry with date, agent n
 
 ---
 
+**2026-03-25** — Claude Code (Opus 4.6, Phase 1 Close-Out Wave 3): Import wizard UX improvements — phone formatting (libphonenumber-js/min), bio textarea in StepPersonal, `formatDateDisplay()` across all steps, inline add-language, editable review cards with edit-from-review navigation, `buildImportData()` factory replacing duplicate ConfirmedImportData construction. Onboarding Wizard.tsx unchanged (already on canonical save pipeline).
+
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.3): Dark mode sidelined; Sprint 11 flagged as next sprint covering auth pages and welcome page redesign.
 
 **2026-03-17** — Claude Code (Opus 4.6, Phase 1A Cleanup, Spec 01): Fixed legal page links in welcome page — `/legal/terms` → `/terms`, `/legal/privacy` → `/privacy`.
