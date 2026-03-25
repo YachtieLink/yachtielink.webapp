@@ -11,8 +11,8 @@
 ## Blockers (resolve before anything moves)
 
 - [x] **D1-D8 design decisions** — Resolved 2026-03-25. D1: two-step normalize+fuzzy (maritime cert alias map). D2: 1mo overlap OK. D3: country name. D4: libphonenumber-js. D5: deferred post-launch. D6: scale, no h-scroll ever. D7: list-based. D8: upsert on user+yacht+role.
-- [ ] **Vercel Pro upgrade** — Purchase ($20/mo), update env config. Blocks production deploy. 30 min.
-- [ ] **Legal business address** — Add real address to terms/privacy pages. Blocks public launch. No code.
+- [x] **Vercel Pro upgrade** — Purchased 2026-03-25 on YachtieLink credit card (ari@yachtie.link). Env config TBD at deploy time.
+- [x] **Legal business address** — Deferred. Using ari@yachtie.link as GDPR contact until a physical desk is secured.
 
 ---
 

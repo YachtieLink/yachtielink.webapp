@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { uploadCV } from "@/lib/storage/upload";
-import { saveParsedCvData, type ParsedCvData, type SaveStats } from "@/lib/cv/save-parsed-cv-data";
+import { saveConfirmedImport, parsedToConfirmedImport } from "@/lib/cv/save-parsed-cv-data";
+import type { ParsedCvData, SaveStats } from "@/lib/cv/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -162,18 +163,18 @@ function StepCvUpload({
       const { data } = await res.json();
       const parsed = data as ParsedCvData;
 
-      if (!parsed.full_name && !parsed.employment_history?.length && !parsed.certifications?.length) {
+      if (!parsed.personal?.full_name && !parsed.employment_yacht?.length && !parsed.certifications?.length) {
         setErrorMessage("We couldn't find much in that file. Try a different one, or add details manually.");
         setPhase("error");
         return;
       }
 
-      // Save — auto-generate handle + save all data
+      // Save — auto-generate handle + save all data via canonical pipeline
       setPhase("saving");
       setParsedData(parsed);
 
       // Generate handle from parsed name
-      const nameForHandle = parsed.full_name || "user";
+      const nameForHandle = parsed.personal?.full_name || "user";
       let autoHandle = "";
 
       try {
@@ -181,7 +182,6 @@ function StepCvUpload({
           p_full_name: nameForHandle,
         });
         if (suggestions && suggestions.length > 0) {
-          // Check each suggestion for availability
           for (const suggestion of suggestions as string[]) {
             const { data: isAvailable } = await supabase.rpc("handle_available", {
               p_handle: suggestion,
@@ -196,30 +196,37 @@ function StepCvUpload({
         // Non-critical — fall through to fallback
       }
 
-      // Fallback handle if nothing worked
       if (!autoHandle) {
         autoHandle = `user-${Math.random().toString(36).slice(2, 8)}`;
       }
 
-      const displayName = parsed.full_name?.split(" ")[0] ?? "";
+      const displayName = parsed.personal?.full_name?.split(" ")[0] ?? "";
 
-      const saveResult = await saveParsedCvData(supabase, userId, parsed, {
-        additionalUserFields: {
-          handle: autoHandle,
-          display_name: displayName,
-          onboarding_complete: true,
-          cv_parsed_at: new Date().toISOString(),
-        },
-      });
-
-      if (!saveResult.ok) {
+      // Save CV data through canonical pipeline
+      const confirmedData = parsedToConfirmedImport(parsed);
+      let saveStats: SaveStats;
+      try {
+        saveStats = await saveConfirmedImport(supabase, userId, confirmedData);
+      } catch {
         setErrorMessage("Something went wrong saving your data. Let's try the manual route.");
         setPhase("error");
         return;
       }
 
-      setStats(saveResult.stats);
-      onComplete(parsed, saveResult.stats);
+      // Set onboarding-specific fields separately
+      const { error: onboardingErr } = await supabase.from("users").update({
+        handle: autoHandle,
+        display_name: displayName || undefined,
+        onboarding_complete: true,
+      }).eq("id", userId);
+
+      if (onboardingErr) {
+        // CV data saved but onboarding fields failed — user can still proceed
+        console.error("[onboarding] Failed to set handle/onboarding_complete:", onboardingErr.message);
+      }
+
+      setStats(saveStats);
+      onComplete(parsed, saveStats);
     } catch {
       setErrorMessage("Something went wrong. Try a different file, or add details manually.");
       setPhase("error");
@@ -624,7 +631,7 @@ export function Wizard({ userId, initialData }: WizardProps) {
 
   function handleCvComplete(data: ParsedCvData, _stats: SaveStats) {
     // Everything already saved by StepCvUpload (including handle + onboarding_complete)
-    const name = data.full_name ?? "";
+    const name = data.personal?.full_name ?? "";
     setFullName(name);
     setDisplayName(name.split(" ")[0]);
     // Go straight to done

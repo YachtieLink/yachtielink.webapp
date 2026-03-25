@@ -11,7 +11,7 @@
 
 | Component | Service | Tier | Cost (Phase 1) | Cost (10k paying) | Notes |
 |-----------|---------|------|----------------|-------------------|-------|
-| **Hosting** | Vercel | Free â†’ Pro | Free | ~â‚¬20/mo | Upgrade to Pro before public beta |
+| **Hosting** | Vercel | Pro | â‚¬20/mo | ~â‚¬20/mo | Upgraded 2026-03-25. Account: ari@yachtie.link |
 | **Frontend** | Next.js 14 (App Router) | â€” | Free | Free | React framework |
 | **Backend** | Next.js API Routes | â€” | Free | Free | Serverless functions |
 | **Database** | Supabase Postgres | Free â†’ Pro | Free | â‚¬25-50/mo | Upgrade to Pro for backups before beta |

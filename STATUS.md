@@ -52,8 +52,9 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Blocker | Impact | Resolution |
 |---------|--------|------------|
-| Vercel Hobby tier 10s function limit | CV parse won't work in production | Upgrade to Vercel Pro ($20/mo) — pre-launch blocker. Cost analysis confirms worthwhile: stack scales to 100k users at ~$1k/mo infra. |
+| ~~Vercel Hobby tier 10s function limit~~ | ~~Resolved 2026-03-25~~ | Upgraded to Vercel Pro ($20/mo) on YachtieLink credit card. Account: ari@yachtie.link. |
 | ~~8 design decisions (D1-D8)~~ | ~~Resolved 2026-03-25~~ | All 8 answered — see sprint README. D5 (ensign flags) deferred to post-launch. |
+| ~~Legal business address~~ | ~~Deferred~~ | Using ari@yachtie.link as GDPR contact until physical desk secured. Not blocking launch. |
 
 ---
 

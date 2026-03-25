@@ -1,54 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js'
-import type { ConfirmedImportData, SaveStats as ImportSaveStats } from '@/lib/cv/types'
-
-// ── Types ────────────────────────────────────────────────────────────────────
-
-interface ParsedEmployment {
-  yacht_name: string
-  yacht_type?: string | null
-  length_meters?: number | null
-  role: string
-  start_date?: string | null
-  end_date?: string | null
-  flag_state?: string | null
-}
-
-interface ParsedCertification {
-  name: string
-  category?: string | null
-  issued_date?: string | null
-  expiry_date?: string | null
-}
-
-export interface ParsedCvData {
-  full_name?: string | null
-  bio?: string | null
-  location?: { country?: string | null; city?: string | null } | null
-  employment_history?: ParsedEmployment[]
-  certifications?: ParsedCertification[]
-  languages?: string[]
-  primary_role?: string | null
-}
-
-interface SaveOptions {
-  /** Extra fields to set on the user record (e.g. handle, display_name, onboarding_complete) */
-  additionalUserFields?: Record<string, unknown>
-  /** Only update profile fields that are currently null/empty */
-  skipExistingFields?: boolean
-  /** Fields to exclude from the profile update (e.g. full_name if already set) */
-  excludeFields?: string[]
-}
-
-export interface SaveStats {
-  yachtsCreated: number
-  attachmentsCreated: number
-  certificationsCreated: number
-  profileFieldsUpdated: string[]
-}
-
-type SaveResult =
-  | { ok: true; stats: SaveStats }
-  | { ok: false; error: string }
+import type { ParsedCvData, ConfirmedImportData, SaveStats } from '@/lib/cv/types'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -59,169 +10,165 @@ function normalizeDateToISO(dateStr: string): string {
   return dateStr
 }
 
-// ── Main (legacy — used by old CvReviewClient) ──────────────────────────────
+// ── D1: Cert dedup helpers ──────────────────────────────────────────────────
 
-/** @deprecated Use saveConfirmedImport() from the new wizard flow */
-export async function saveParsedCvData(
-  supabase: SupabaseClient,
-  userId: string,
-  data: ParsedCvData,
-  options?: SaveOptions,
-): Promise<SaveResult> {
-  const stats: SaveStats = {
-    yachtsCreated: 0,
-    attachmentsCreated: 0,
-    certificationsCreated: 0,
-    profileFieldsUpdated: [],
+/** Maritime certification alias map — normalizes common variants to canonical names */
+const CERT_ALIASES: Record<string, string> = {
+  // STCW variants
+  'stcw': 'STCW Basic Safety',
+  'stcw95': 'STCW Basic Safety',
+  'stcw 95': 'STCW Basic Safety',
+  'stcw10': 'STCW Basic Safety',
+  'stcw 2010': 'STCW Basic Safety',
+  'stcw basic safety': 'STCW Basic Safety',
+  'stcw basic safety training': 'STCW Basic Safety',
+  'basic safety training': 'STCW Basic Safety',
+  'bst': 'STCW Basic Safety',
+  // Medical
+  'eng1': 'ENG1 Medical',
+  'eng 1': 'ENG1 Medical',
+  'eng1 medical': 'ENG1 Medical',
+  'mca medical': 'ENG1 Medical',
+  'maritime medical': 'ENG1 Medical',
+  'seafarer medical': 'ENG1 Medical',
+  // GMDSS
+  'gmdss': 'GMDSS GOC',
+  'gmdss goc': 'GMDSS GOC',
+  'goc': 'GMDSS GOC',
+  'general operators certificate': 'GMDSS GOC',
+  'gmdss sroc': 'GMDSS SRC',
+  'src': 'GMDSS SRC',
+  'short range certificate': 'GMDSS SRC',
+  // Proficiency in Survival Craft
+  'psc': 'Proficiency in Survival Craft',
+  'pscrb': 'Proficiency in Survival Craft',
+  'proficiency in survival craft': 'Proficiency in Survival Craft',
+  'proficiency in survival craft and rescue boats': 'Proficiency in Survival Craft',
+  // Powerboat
+  'powerboat level 2': 'RYA Powerboat Level 2',
+  'rya powerboat': 'RYA Powerboat Level 2',
+  'rya powerboat level 2': 'RYA Powerboat Level 2',
+  // Food safety / ship's cook
+  'food safety level 2': 'Food Safety Level 2',
+  'food hygiene': 'Food Safety Level 2',
+  'food hygiene level 2': 'Food Safety Level 2',
+  'ships cook': "Ship's Cook Certificate",
+  "ship's cook": "Ship's Cook Certificate",
+  "ship's cook certificate": "Ship's Cook Certificate",
+}
+
+/** Normalize a cert name through the alias map */
+function normalizeCertName(name: string): string {
+  return CERT_ALIASES[name.toLowerCase().trim()] ?? name.trim()
+}
+
+/** Levenshtein edit distance between two strings */
+function levenshtein(a: string, b: string): number {
+  if (a.length === 0) return b.length
+  if (b.length === 0) return a.length
+
+  const matrix: number[][] = Array.from({ length: a.length + 1 }, (_, i) =>
+    Array.from({ length: b.length + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
+  )
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1
+      matrix[i][j] = Math.min(
+        matrix[i - 1][j] + 1,
+        matrix[i][j - 1] + 1,
+        matrix[i - 1][j - 1] + cost,
+      )
+    }
   }
 
-  try {
-    // 1. Update user profile fields
-    const profileFields: Record<string, string> = {}
-    const excluded = new Set(options?.excludeFields ?? [])
+  return matrix[a.length][b.length]
+}
 
-    if (data.full_name && !excluded.has('full_name'))
-      profileFields.full_name = data.full_name
-    if (data.primary_role && !excluded.has('primary_role'))
-      profileFields.primary_role = data.primary_role
-    if (data.bio && !excluded.has('bio'))
-      profileFields.bio = data.bio
-    if (data.location?.country && !excluded.has('location_country'))
-      profileFields.location_country = data.location.country
-    if (data.location?.city && !excluded.has('location_city'))
-      profileFields.location_city = data.location.city
+/** Check if two cert names match via alias normalization + fuzzy match (D1) */
+function certNamesMatch(a: string, b: string): boolean {
+  const normA = normalizeCertName(a).toLowerCase()
+  const normB = normalizeCertName(b).toLowerCase()
 
-    // If skipExistingFields, fetch current profile and remove already-set fields
-    if (options?.skipExistingFields && Object.keys(profileFields).length > 0) {
-      const { data: existing } = await supabase
-        .from('users')
-        .select('full_name, primary_role, bio, location_country, location_city')
-        .eq('id', userId)
-        .single()
+  // Exact match after normalization
+  if (normA === normB) return true
 
-      if (existing) {
-        for (const key of Object.keys(profileFields)) {
-          if (existing[key as keyof typeof existing]) {
-            delete profileFields[key]
-          }
-        }
-      }
-    }
+  // Fuzzy match only for strings long enough to avoid false positives
+  // (e.g. "GMDSS GOC" vs "GMDSS SRC" are Levenshtein 2 but distinct certs)
+  const minLen = Math.min(normA.length, normB.length)
+  if (minLen < 12) return false
 
-    // Merge additional fields (handle, display_name, onboarding_complete, etc.)
-    const allUpdates: Record<string, unknown> = { ...profileFields }
-    if (options?.additionalUserFields) {
-      Object.assign(allUpdates, options.additionalUserFields)
-    }
+  const dist = levenshtein(normA, normB)
 
-    if (Object.keys(allUpdates).length > 0) {
-      const { error } = await supabase.from('users').update(allUpdates).eq('id', userId)
-      if (error) throw error
-      stats.profileFieldsUpdated = Object.keys(profileFields)
-    }
+  // Levenshtein ≤ 2
+  if (dist <= 2) return true
 
-    // 2. Create yachts and attachments
-    if (data.employment_history?.length) {
-      for (const emp of data.employment_history) {
-        let yachtId: string | null = null
+  // Normalized similarity ≥ 0.85
+  const maxLen = Math.max(normA.length, normB.length)
+  if (maxLen > 0 && (1 - dist / maxLen) >= 0.85) return true
 
-        // Search for existing yacht
-        const { data: matches } = await supabase.rpc('search_yachts', {
-          p_query: emp.yacht_name,
-          p_limit: 3,
-        })
+  return false
+}
 
-        if (matches && matches.length > 0) {
-          const best = matches[0] as { id: string; sim: number }
-          if (best.sim > 0.3) {
-            yachtId = best.id
-          }
-        }
+// ── D2: Date overlap helpers ────────────────────────────────────────────────
 
-        // Create new yacht if no match
-        if (!yachtId) {
-          const { data: newYacht, error: yachtErr } = await supabase
-            .from('yachts')
-            .insert({
-              name: emp.yacht_name,
-              yacht_type: emp.yacht_type ?? null,
-              length_meters: emp.length_meters ?? null,
-              flag_state: emp.flag_state ?? null,
-              created_by: userId,
-            })
-            .select('id')
-            .single()
+/** Calculate overlap in months between two date ranges. Returns 0 if no overlap. */
+function overlapMonths(
+  startA: string | null, endA: string | null,
+  startB: string | null, endB: string | null,
+): number {
+  if (!startA || !startB) return 0
 
-          if (yachtErr || !newYacht) continue
-          yachtId = newYacht.id
-          stats.yachtsCreated++
-        }
+  const a0 = new Date(normalizeDateToISO(startA))
+  const a1 = endA && endA !== 'Current' ? new Date(normalizeDateToISO(endA)) : new Date()
+  const b0 = new Date(normalizeDateToISO(startB))
+  const b1 = endB && endB !== 'Current' ? new Date(normalizeDateToISO(endB)) : new Date()
 
-        // Create attachment
-        const startDate = emp.start_date ? normalizeDateToISO(emp.start_date) : null
-        const endDate = emp.end_date && emp.end_date !== 'Current'
-          ? normalizeDateToISO(emp.end_date)
-          : null
+  const overlapStart = a0 > b0 ? a0 : b0
+  const overlapEnd = a1 < b1 ? a1 : b1
 
-        const { error: attErr } = await supabase.from('attachments').insert({
-          user_id: userId,
-          yacht_id: yachtId,
-          role_label: emp.role,
-          started_at: startDate,
-          ended_at: endDate,
-        })
+  if (overlapStart >= overlapEnd) return 0
 
-        if (!attErr) stats.attachmentsCreated++
-      }
-    }
+  const diffMs = overlapEnd.getTime() - overlapStart.getTime()
+  return diffMs / (1000 * 60 * 60 * 24 * 30.44) // approximate months
+}
 
-    // 3. Create certifications
-    if (data.certifications?.length) {
-      const { data: certTypes } = await supabase
-        .from('certification_types')
-        .select('id, name, short_name')
+// ── Converter: ParsedCvData → ConfirmedImportData ────────────────────────────
 
-      for (const cert of data.certifications) {
-        let certTypeId: string | null = null
-
-        if (certTypes) {
-          const match = certTypes.find(
-            (ct) =>
-              ct.name.toLowerCase() === cert.name.toLowerCase() ||
-              ct.short_name?.toLowerCase() === cert.name.toLowerCase(),
-          )
-          if (match) certTypeId = match.id
-        }
-
-        const { error: certErr } = await supabase.from('certifications').insert({
-          user_id: userId,
-          certification_type_id: certTypeId,
-          custom_cert_name: certTypeId ? null : cert.name,
-          issued_at: cert.issued_date ? normalizeDateToISO(cert.issued_date) : null,
-          expires_at: cert.expiry_date ? normalizeDateToISO(cert.expiry_date) : null,
-        })
-
-        if (!certErr) stats.certificationsCreated++
-      }
-    }
-
-    return { ok: true, stats }
-  } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : 'Failed to save CV data' }
+/** Convert AI parse output into the shape expected by saveConfirmedImport() */
+export function parsedToConfirmedImport(parsed: ParsedCvData): ConfirmedImportData {
+  return {
+    personal: { ...parsed.personal },
+    languages: parsed.languages,
+    yachts: (parsed.employment_yacht ?? []).map(
+      // Drop runtime-only AI fields not stored in attachments
+      ({ crew_count: _, guest_count: _g, former_names: _f, ...rest }) => rest,
+    ),
+    certifications: parsed.certifications,
+    education: (parsed.education ?? []).map(
+      ({ location: _, ...rest }) => rest,
+    ),
+    skills: parsed.skills ?? [],
+    hobbies: parsed.hobbies ?? [],
+    endorsementRequests: [],
+    socialMedia: parsed.social_media ?? { instagram: null, website: null },
   }
 }
 
-// ── New wizard save function ─────────────────────────────────────────────────
+// ── Canonical save function ──────────────────────────────────────────────────
 
 export async function saveConfirmedImport(
   supabase: SupabaseClient,
   userId: string,
   data: ConfirmedImportData,
-): Promise<ImportSaveStats> {
-  const stats: ImportSaveStats = {
+): Promise<SaveStats> {
+  const stats: SaveStats = {
     personalUpdated: false,
     yachtsCreated: 0,
     certsCreated: 0,
+    certsSkippedDuplicate: 0,
+    attachmentsEnriched: 0,
+    dateOverlaps: 0,
     educationCreated: 0,
     skillsAdded: 0,
     hobbiesAdded: 0,
@@ -271,18 +218,23 @@ export async function saveConfirmedImport(
     }
   } catch { /* partial failure OK */ }
 
-  // 2. Create yachts + attachments
-  console.log(`[saveConfirmedImport] Processing ${data.yachts.length} yachts`)
+  // 2. Create yachts + attachments (D8: upsert on user+yacht+role, D2: overlap detection)
+  // Fetch existing attachments for dedup and overlap checks
+  const { data: existingAttachments } = await supabase
+    .from('attachments')
+    .select('id, yacht_id, role_label, started_at, ended_at, employment_type, yacht_program, description, cruising_area')
+    .eq('user_id', userId)
+    .is('deleted_at', null)
+
   for (const yacht of data.yachts) {
     try {
       let yachtId: string | null = null
 
-      // Search existing
-      const { data: matches, error: searchErr } = await supabase.rpc('search_yachts', {
+      // Search existing yacht
+      const { data: matches } = await supabase.rpc('search_yachts', {
         p_query: yacht.yacht_name,
         p_limit: 3,
       })
-      console.log(`[saveConfirmedImport] search_yachts "${yacht.yacht_name}":`, matches?.length ?? 0, 'matches, error:', searchErr?.message ?? 'none')
 
       if (matches && matches.length > 0) {
         const best = matches[0] as { id: string; sim: number }
@@ -298,13 +250,44 @@ export async function saveConfirmedImport(
           builder: yacht.builder,
           created_by: userId,
         }).select('id').single()
-        console.log(`[saveConfirmedImport] create yacht "${yacht.yacht_name}":`, newYacht?.id ?? 'FAILED', 'error:', yachtErr?.message ?? 'none')
-        if (newYacht) yachtId = newYacht.id
+        if (yachtErr || !newYacht) continue
+        yachtId = newYacht.id
       }
 
-      if (yachtId) {
-        const startDate = yacht.start_date ? normalizeDateToISO(yacht.start_date) : null
-        const endDate = yacht.end_date && yacht.end_date !== 'Current' ? normalizeDateToISO(yacht.end_date) : null
+      const startDate = yacht.start_date ? normalizeDateToISO(yacht.start_date) : null
+      const endDate = yacht.end_date && yacht.end_date !== 'Current' ? normalizeDateToISO(yacht.end_date) : null
+
+      // D8: Check for existing attachment with same user+yacht+role
+      const existingMatch = (existingAttachments ?? []).find(ea =>
+        ea.yacht_id === yachtId &&
+        ea.role_label?.toLowerCase() === yacht.role?.toLowerCase()
+      )
+
+      if (existingMatch) {
+        // Upsert — enrich existing attachment only where currently empty
+        const enrichFields: Record<string, unknown> = {}
+        if (!existingMatch.employment_type && yacht.employment_type) enrichFields.employment_type = yacht.employment_type
+        if (!existingMatch.yacht_program && yacht.yacht_program) enrichFields.yacht_program = yacht.yacht_program
+        if (!existingMatch.description && yacht.description) enrichFields.description = yacht.description
+        if (!existingMatch.cruising_area && yacht.cruising_area) enrichFields.cruising_area = yacht.cruising_area
+        if (!existingMatch.started_at && startDate) enrichFields.started_at = startDate
+        if (!existingMatch.ended_at && endDate) enrichFields.ended_at = endDate
+
+        if (Object.keys(enrichFields).length > 0) {
+          await supabase.from('attachments').update(enrichFields).eq('id', existingMatch.id)
+          stats.attachmentsEnriched++
+        }
+      } else {
+        // D2: Check date overlaps against existing attachments before insert
+        for (const ea of existingAttachments ?? []) {
+          const months = overlapMonths(startDate, endDate, ea.started_at, ea.ended_at)
+          if (months > 0) {
+            stats.dateOverlaps++
+            if (months > 1) {
+              console.warn(`[saveConfirmedImport] date overlap >1 month: "${yacht.yacht_name}" (${yacht.role}) overlaps existing attachment ${ea.id} by ${months.toFixed(1)} months`)
+            }
+          }
+        }
 
         const { error: attErr } = await supabase.from('attachments').insert({
           user_id: userId,
@@ -317,24 +300,53 @@ export async function saveConfirmedImport(
           description: yacht.description,
           cruising_area: yacht.cruising_area,
         })
-        console.log(`[saveConfirmedImport] attachment for "${yacht.yacht_name}":`, attErr ? `FAILED: ${attErr.message}` : 'OK')
-        if (!attErr) stats.yachtsCreated++
+        if (!attErr) {
+          stats.yachtsCreated++
+          // Track new attachment for overlap checks within same batch
+          existingAttachments?.push({
+            id: 'new', yacht_id: yachtId, role_label: yacht.role,
+            started_at: startDate, ended_at: endDate,
+            employment_type: yacht.employment_type, yacht_program: yacht.yacht_program,
+            description: yacht.description, cruising_area: yacht.cruising_area,
+          })
+        }
       }
     } catch (err) {
       console.error(`[saveConfirmedImport] yacht error:`, err)
     }
   }
 
-  // 3. Certifications
+  // 3. Certifications (D1: dedup via alias map + fuzzy match)
   try {
-    const { data: certTypes } = await supabase.from('certification_types').select('id, name, short_name')
+    const [{ data: certTypes }, { data: existingCerts }] = await Promise.all([
+      supabase.from('certification_types').select('id, name, short_name'),
+      supabase.from('certifications').select('id, certification_type_id, custom_cert_name, certification_types(name)').eq('user_id', userId),
+    ])
+
+    // Build list of existing cert names for dedup
+    const existingCertNames: string[] = (existingCerts ?? []).map(ec => {
+      const ct = ec.certification_types as unknown as { name: string } | null
+      const typeName = ct?.name
+      return typeName ?? ec.custom_cert_name ?? ''
+    }).filter(Boolean)
 
     for (const cert of data.certifications) {
+      // Check if this cert already exists (D1: normalize + fuzzy)
+      const isDuplicate = existingCertNames.some(existing => certNamesMatch(existing, cert.name))
+      if (isDuplicate) {
+        stats.certsSkippedDuplicate++
+        continue
+      }
+
       let certTypeId: string | null = null
       if (certTypes) {
+        // Also try alias-normalized name for type matching
+        const normalizedName = normalizeCertName(cert.name)
         const match = certTypes.find(ct =>
           ct.name.toLowerCase() === cert.name.toLowerCase() ||
-          ct.short_name?.toLowerCase() === cert.name.toLowerCase()
+          ct.short_name?.toLowerCase() === cert.name.toLowerCase() ||
+          ct.name.toLowerCase() === normalizedName.toLowerCase() ||
+          ct.short_name?.toLowerCase() === normalizedName.toLowerCase()
         )
         if (match) certTypeId = match.id
       }
@@ -347,7 +359,10 @@ export async function saveConfirmedImport(
         expires_at: cert.expiry_date ? normalizeDateToISO(cert.expiry_date) : null,
         issuing_body: cert.issuing_body,
       })
-      if (!error) stats.certsCreated++
+      if (!error) {
+        stats.certsCreated++
+        existingCertNames.push(normalizeCertName(cert.name)) // prevent dups within same import batch
+      }
     }
   } catch { /* partial failure OK */ }
 
