@@ -159,18 +159,18 @@ Yacht graph and proper grouping.
 
 ---
 
-## Decisions Needed
+## Decisions — Resolved 2026-03-25
 
-| ID | Question | Recommendation |
-|----|----------|----------------|
-| D1 | Cert dedup threshold — how fuzzy? | Levenshtein distance <= 2, or normalized string match >= 0.85 |
-| D2 | Date overlap tolerance — allow brief handover? | Allow 1 month overlap, warn but don't block |
-| D3 | Nationality display — demonym or label change? | Change label to "Nationality" with country name (simpler, no demonym DB needed) |
-| D4 | Phone formatting — library or custom? | `libphonenumber-js` (lightweight, handles all country formats) |
-| D5 | Ensign images — source? | Commission or source from maritime flag databases, store as static assets in `/public/ensigns/` |
-| D6 | CV view scaling — transform or responsive reflow? | `transform: scale()` preserving A4 layout, simpler than reflow |
-| D7 | Yacht graph scope — full graph viz or list-based? | List-based for now (yacht to crew list), graph viz in Phase 2 |
-| D8 | Attachment dedup — match strategy? | Match on user_id + yacht_id + role. If match, enrich existing attachment with new fields (dates, description, etc.) |
+| ID | Question | Decision |
+|----|----------|----------|
+| D1 | Cert dedup threshold — how fuzzy? | **Two-step: normalize then fuzzy match.** Build a maritime cert alias map (STCW95/STCW10/STCW → STCW Basic Safety, etc.) to normalize domain-equivalent names first. Then Levenshtein <= 2 or normalized match >= 0.85 for typo tolerance. Alias map catches domain knowledge, fuzzy match catches typos. |
+| D2 | Date overlap tolerance — allow brief handover? | **Allow 1 month overlap, warn but don't block.** Crew handovers and trials overlap routinely. |
+| D3 | Nationality display — demonym or label change? | **Label "Nationality" with country name.** No demonym database needed. |
+| D4 | Phone formatting — library or custom? | **`libphonenumber-js`** — lightweight, handles all country formats. |
+| D5 | Ensign images — source? | **Deferred to post-launch.** Ship yacht entries without ensign flags for now. Source maritime flag SVGs and store in `/public/ensigns/` as a follow-up. Tracked in PHASE1-CLOSEOUT.md post-launch queue. |
+| D6 | CV view scaling — transform or responsive reflow? | **`transform: scale()` to fit viewport width.** Preserve A4 layout, no horizontal scrolling ever. |
+| D7 | Yacht graph scope — full graph viz or list-based? | **List-based for now** (yacht → crew list). Graph viz deferred to Phase 2. |
+| D8 | Attachment dedup — match strategy? | **Upsert on `user_id + yacht_id + role`.** If match found, enrich existing attachment with new fields. Don't lose existing data. |
 
 ---
 

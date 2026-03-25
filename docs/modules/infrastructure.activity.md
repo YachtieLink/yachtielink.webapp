@@ -6,6 +6,8 @@ When you make changes to this module, append a one-line entry with date, agent n
 
 ---
 
+**2026-03-25** — Codex: Added repo guardrails — `scripts/drift-check.mjs`, `npm run drift-check`, canonical-owner docs under `docs/ops/canonical-owners/`, critical-flow smoke checklist, and workflow/code-review updates to enforce them.
+
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.1): Migration `20260321000001_fix_storage_buckets.sql` — bucket creation (user-photos, user-gallery), yacht-photos RLS fix (ex-crew write block), `get_sea_time()` SECURITY DEFINER consistency.
 
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.1, Wave 1 F): API hardening — try/catch + handleApiError on stripe/portal, endorsement-requests, cron routes; health endpoint fixed to query `users` table with sanitised errors.

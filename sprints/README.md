@@ -6,6 +6,12 @@ This is the canonical home for all execution work — building (sprints) and aud
 
 ---
 
+## Phase 1 Close-Out
+
+**[PHASE1-CLOSEOUT.md](./PHASE1-CLOSEOUT.md)** — Master checklist for the full Phase 1 ship. Start every session here.
+
+---
+
 ## Active Right Now
 
 | Type | Sprint | Status | Focus |

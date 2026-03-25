@@ -1,8 +1,8 @@
 # STATUS.md — Where Are We
 
-Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/log` skill).
+Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-24
+**Last updated:** 2026-03-25
 
 ---
 
@@ -18,7 +18,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 |--------|-------|--------|-------|
 | [CV Parse Bugfix](./sprints/major/phase-1b/sprint-cv-parse-bugfix/README.md) | 1B | Planning | 37 QA bugs across 5 waves — data integrity, public profile, wizard UX, profile page, network tab |
 
-**Next action:** Answer 8 design decisions (D1-D8), then write Wave 1 build specs (data integrity dedup).
+**Next action:** D1-D8 resolved. Write Wave 1 build specs (data integrity dedup + CV consolidation).
 
 ---
 
@@ -30,20 +30,21 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 | CV parse full build (Waves 1-7) | 2026-03-23 | 5-step import wizard, AI prompt, save function, PDF templates, CV preview, public CV view |
 | StrictMode double-fire fix | 2026-03-24 | Was burning 2x OpenAI cost per upload — guarded with `hasFiredRef` |
 | Rate limit 429 banner | 2026-03-24 | Friendly "3 free CV reads per day" instead of error screen |
-| /log skill upgrade | 2026-03-24 | Subagent audit, explicit skip report, durable knowledge routing, derivation rules (skill file only — `~/.claude/skills/log/SKILL.md`, outside repo) |
+| Drift guardrails + smoke discipline | 2026-03-25 | Added `npm run drift-check`, canonical-owner docs, critical-flow smoke checklist, and workflow/review updates to stop more SRP/DRY drift landing unnoticed |
 
 ---
 
 ## Up Next (ordered)
 
-1. **Answer D1-D8 design decisions** in CV parse bugfix sprint plan
+1. ~~Answer D1-D8 design decisions~~ — resolved 2026-03-25
 2. **Wave 1: Data integrity** — cert/attachment dedup, overlap validation (P0, blocks everything)
 3. **Wave 2: Public profile + CV view** — hero fields, CV 404 fix, responsive, share/download
 4. **Wave 3: Import wizard UX** — languages, bio, phone formatting, date consistency, editable cards
 5. **Wave 4: Profile page + skills** — personal details card, editability, skills chip UX
 6. **Wave 5: Network tab** — yacht graph, endorsement/colleague grouping by yacht
-7. **Promote Ghost Profiles to sprint** (major sprint, ~2-3 days, when bugfixes are done)
-8. **Endorsement Writing Assist** (quick junior sprint, no schema changes)
+7. **Media/CRUD standardization** (follow-up junior sprint after bugfix waves — photo/gallery dedup, shared Pro gating)
+8. **Promote Ghost Profiles to sprint** (major sprint, ~2-3 days, when bugfixes are done)
+9. **Endorsement Writing Assist** (quick junior sprint, no schema changes)
 
 ---
 
@@ -51,8 +52,8 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Blocker | Impact | Resolution |
 |---------|--------|------------|
-| Vercel Hobby tier 10s function limit | CV parse won't work in production | Upgrade to Vercel Pro ($20/mo) — pre-launch blocker |
-| 8 design decisions (D1-D8) pending | Can't write Wave 1 build specs until answered | Founder needs to review recommendations in bugfix sprint README |
+| Vercel Hobby tier 10s function limit | CV parse won't work in production | Upgrade to Vercel Pro ($20/mo) — pre-launch blocker. Cost analysis confirms worthwhile: stack scales to 100k users at ~$1k/mo infra. |
+| ~~8 design decisions (D1-D8)~~ | ~~Resolved 2026-03-25~~ | All 8 answered — see sprint README. D5 (ensign flags) deferred to post-launch. |
 
 ---
 
@@ -77,7 +78,13 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 - Rate limit 429 friendly banner — feature-complete, awaiting git commit
 - `extract-text.ts` refactor (shared helper) — feature-complete, awaiting git commit
 - `parse-personal` route (two-pass fast extraction) — feature-complete, awaiting git commit
-- CHANGELOG.md, STATUS.md, session log updates from /log skill upgrade session (2026-03-24)
+- `scripts/drift-check.mjs` with baseline support (`.drift-baseline.json`) — feature-complete, awaiting git commit
+- Canonical-owner docs (`docs/ops/canonical-owners/`) — feature-complete, awaiting git commit
+- Critical-flow smoke checklist (`docs/ops/critical-flow-smoke-checklist.md`) — feature-complete, awaiting git commit
+- Workflow and code-review doc updates for drift pass — feature-complete, awaiting git commit
+- Rally 004 execution plan (`sprints/rallies/rally-004-execution-plan.md`) — report-only, awaiting git commit
+- Rally 004 SRP/DRY audit (`sprints/rallies/rally-004-srp-dry-complexity-audit.md`) — report-only, awaiting git commit
+- `CHANGELOG.md`, `STATUS.md`, session logs — doc updates, awaiting git commit
 
 ---
 

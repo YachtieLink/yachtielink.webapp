@@ -46,6 +46,23 @@ Verdict: WARNING — 2 HIGH issues should be resolved before merge.
 
 **Verdicts:** APPROVE (no CRITICAL/HIGH), WARNING (HIGH only), BLOCK (CRITICAL found).
 
+## YachtieLink Drift Pass
+
+After the normal bug review, run a second pass for codebase drift on any non-trivial branch. The drift checker is a **tripwire for known bad patterns** (inline Pro gates, legacy CV paths, weak typing, auth re-fetches, hotspot growth) — it does not catch novel architectural drift. Use canonical-owner docs and review judgement for that.
+
+1. Run `npm run drift-check`
+2. Compare the touched area against `docs/ops/canonical-owners/`
+3. If the branch touched launch-critical flows, run `docs/ops/critical-flow-smoke-checklist.md`
+4. Treat a replacement as incomplete until the old path is removed or explicitly retired in the same sprint notes
+
+### Hotspot budgets
+
+- `400+` LOC stateful file: split candidate
+- `500+` LOC: strong review concern
+- `600+` LOC: hotspot, justify or split
+
+Touching a hotspot is not automatically wrong, but it must be visible in review and paired with a split plan or a clear reason not to split yet.
+
 ---
 
 ## Review Checklist
@@ -92,9 +109,10 @@ Run through this on every review pass or before merging:
 - [ ] No `console.log` left behind (console.error for real errors only)
 - [ ] No hardcoded values (URLs, IDs, magic numbers)
 - [ ] No dead code or commented-out blocks
-- [ ] No duplicate code — check for existing helpers before writing new ones
+- [ ] No duplicate live flows — replacement work removes or explicitly retires the old path
+- [ ] Shared owners used before new inline logic (`lib/stripe/pro.ts`, `lib/queries/profile.ts`, `docs/ops/canonical-owners/`)
 - [ ] File naming follows conventions (PascalCase components, kebab-case routes)
-- [ ] Functions under 50 lines, files under 400 lines
+- [ ] Hotspot files (`400+` LOC) have a split plan or explicit justification
 
 ---
 
@@ -117,6 +135,12 @@ These have been caught before — check for them specifically:
 7. **`as any` casts** — a few exist at page/component boundaries. Don't add more. If types don't fit, fix the type, don't cast.
 
 8. **Soft delete filter missing** — every query on user data must include `.is('deleted_at', null)`. Easy to forget on new queries.
+
+9. **Parallel live flows** — a replacement is not done while the old path is still active beside it. Remove or explicitly retire the old path in the same sprint.
+
+10. **Canonical helper bypass** — Pro gates belong in `lib/stripe/pro.ts`; shared profile reads belong in `lib/queries/profile.ts`; use `docs/ops/canonical-owners/` when deciding where new logic belongs.
+
+11. **Hotspot growth** — if a touched file is already over `400` LOC, call that out in review and decide whether it needs a split now.
 
 ---
 
@@ -192,10 +216,13 @@ npx ts-prune                                # Unused TypeScript exports
 
 Before merging a feature branch to main:
 
-1. Run `tsc --noEmit` — fix any type errors (ignore stale `.next/types` cache artifacts)
-2. Check every new API route for auth, validation, error handling, rate limiting
-3. Check every new client component for error handling on fetch calls
-4. Test the flow end-to-end with the dev account
-5. Test dark mode on all new/changed components
-6. Test at 375px width (mobile) and 1280px (desktop)
-7. Update `CHANGELOG.md` before committing
+1. Run `npm run drift-check`
+2. Run `tsc --noEmit` — fix any type errors (ignore stale `.next/types` cache artifacts)
+3. Check every new API route for auth, validation, error handling, rate limiting
+4. Check every new client component for error handling on fetch calls
+5. If the branch touched CV, onboarding, public profile, endorsements, media, or PDF flows, run `docs/ops/critical-flow-smoke-checklist.md`
+6. Compare the touched area against `docs/ops/canonical-owners/` before calling the review complete
+7. Test the flow end-to-end with the dev account
+8. Test dark mode on all new/changed components
+9. Test at 375px width (mobile) and 1280px (desktop)
+10. Update `CHANGELOG.md` before committing
