@@ -1,14 +1,13 @@
 /**
  * PublicProfileContent — Bumble-style hero photo with identity overlaid,
  * then scrollable accordion sections below.
+ *
+ * Section rendering is delegated to components/public/sections/ to keep this
+ * file focused on layout and the desktop hero.
  */
-import Image from 'next/image'
 import Link from 'next/link'
 import { MapPin, ChevronLeft, Pencil, Download } from 'lucide-react'
 import { ShareButton } from './ShareButton'
-import { EndorsementCard } from './EndorsementCard'
-import { ShowMoreButton } from './ShowMoreButton'
-import { StaggeredList, StaggeredItem } from './StaggeredList'
 import { HeroSection } from './HeroSection'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { PhotoGallery } from '@/components/profile/PhotoGallery'
@@ -16,17 +15,17 @@ import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { formatSeaTime } from '@/lib/sea-time'
 import { SaveProfileButton } from '@/components/profile/SaveProfileButton'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
-import {
-  aboutSummary,
-  experienceSummary,
-  endorsementsSummary,
-  certificationsSummary,
-  educationSummary,
-  hobbiesSummary,
-  skillsSummary,
-  gallerySummary,
-  countExpiringCerts,
-} from '@/lib/profile-summaries'
+import { aboutSummary, hobbiesSummary, educationSummary } from '@/lib/profile-summaries'
+import { ExperienceSection } from './sections/ExperienceSection'
+import { EndorsementsSection } from './sections/EndorsementsSection'
+import { CertificationsSection } from './sections/CertificationsSection'
+import { SkillsSection } from './sections/SkillsSection'
+import { GallerySection } from './sections/GallerySection'
+import type {
+  PublicAttachment, PublicCertification, PublicEndorsement,
+  ProfilePhoto, Hobby, Education, Skill, GalleryItem,
+  ViewerRelationship,
+} from '@/lib/queries/types'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -60,46 +59,25 @@ interface UserProfile {
 
 export interface PublicProfileContentProps {
   user: UserProfile
-  attachments: any[]
-  certifications: any[]
-  endorsements: any[]
-  profilePhotos: Array<{ id: string; photo_url: string; sort_order: number }>
-  hobbies: Array<{ id: string; name: string; emoji?: string | null }>
-  education: Array<{ id: string; institution: string; qualification?: string | null; field_of_study?: string | null; started_at?: string | null; ended_at?: string | null }>
-  skills: Array<{ id: string; name: string; category?: string | null }>
-  gallery: Array<{ id: string; image_url: string; caption?: string | null; yachts?: { name: string } | null }>
+  attachments: PublicAttachment[]
+  certifications: PublicCertification[]
+  endorsements: PublicEndorsement[]
+  profilePhotos: ProfilePhoto[]
+  hobbies: Hobby[]
+  education: Education[]
+  skills: Skill[]
+  gallery: GalleryItem[]
   isFoundingMember?: boolean
   isLoggedIn?: boolean
-  viewerRelationship?: {
-    isOwnProfile: boolean
-    sharedYachtIds: string[]
-    mutualColleagues: Array<{
-      id: string; name: string; photoUrl: string | null
-      throughYachtWithProfile: string; throughYachtWithViewer: string
-    }>
-  }
+  viewerRelationship?: ViewerRelationship
   sectionVisibility?: Record<string, boolean>
   savedStatus?: { id: string; folder_id: string | null } | null
   seaTimeTotalDays?: number
   seaTimeYachtCount?: number
+  age?: number | null
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
-}
-
-function certStatus(expiryDate: string | null | undefined): { label: string; color: string } {
-  if (!expiryDate) return { label: '', color: '' }
-  const expiry = new Date(expiryDate)
-  const now = new Date()
-  const soon = new Date(); soon.setMonth(soon.getMonth() + 3)
-  if (expiry < now) return { label: 'Expired', color: 'text-[var(--color-error)]' }
-  if (expiry < soon) return { label: `Expires ${formatDate(expiryDate)}`, color: 'text-[var(--color-warning)]' }
-  return { label: `Valid until ${formatDate(expiryDate)}`, color: 'text-[var(--color-success)]' }
-}
 
 function sectionVisible(visibility: Record<string, boolean>, key: string, hasData: boolean): boolean {
   return visibility[key] !== false && hasData
@@ -124,6 +102,7 @@ export function PublicProfileContent({
   savedStatus,
   seaTimeTotalDays = 0,
   seaTimeYachtCount = 0,
+  age,
 }: PublicProfileContentProps) {
   const displayName = user.display_name ?? user.full_name
   const firstName = displayName.split(' ')[0]
@@ -135,13 +114,17 @@ export function PublicProfileContent({
   const firstMutual = mutualColleagues[0]
 
   const profileUrl = `https://yachtie.link/u/${user.handle}`
-  const expiringCount = countExpiringCerts(certifications)
-  const mutualColleagueIds = new Set((viewerRelationship?.mutualColleagues ?? []).map((c) => c.id))
+  const mutualColleagueIds = new Set(mutualColleagues.map((c) => c.id))
   const mutualEndorserCount = endorsements.filter(
-    (e: any) => e.endorser?.id && mutualColleagueIds.has(e.endorser.id)
+    (e) => e.endorser?.id && mutualColleagueIds.has(e.endorser.id)
   ).length
 
   const location = [user.location_city, user.location_country].filter(Boolean).join(', ')
+
+  // Hero stat parts: age (server-computed) + sea time
+  const heroStats: string[] = []
+  if (age) heroStats.push(`${age} years old`)
+  if (seaTimeTotalDays > 0) heroStats.push(`${formatSeaTime(seaTimeTotalDays).displayLong} at sea`)
 
   return (
     // ── Outer: stacked on mobile, side-by-side on desktop ────────────────────
@@ -168,6 +151,7 @@ export function PublicProfileContent({
         profileUrl={profileUrl}
         savedUserId={user.id}
         savedStatus={savedStatus}
+        heroStats={heroStats}
       />
 
       {/* ── LEFT: Desktop hero photo panel (hidden on mobile) ─────────────── */}
@@ -185,9 +169,7 @@ export function PublicProfileContent({
 
         {/* Strong gradient — dark at top (for buttons) and bottom (for identity) */}
         <div className="absolute inset-0 pointer-events-none">
-          {/* Top fade for nav readability */}
           <div className="h-28 bg-gradient-to-b from-black/50 to-transparent" />
-          {/* Bottom fade for identity readability */}
           <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
         </div>
 
@@ -222,7 +204,6 @@ export function PublicProfileContent({
 
         {/* Identity — overlaid at bottom of photo */}
         <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 z-10 flex flex-col gap-3">
-          {/* Availability badge */}
           {user.available_for_work && (
             <span className="self-start flex items-center gap-1.5 bg-green-500/25 backdrop-blur-md border border-green-400/40 rounded-full px-3 py-1 text-xs font-semibold text-green-300 tracking-wide uppercase">
               <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
@@ -230,10 +211,8 @@ export function PublicProfileContent({
             </span>
           )}
 
-          {/* Name — large, confident */}
           <h1 className="text-white font-serif text-4xl md:text-5xl leading-[1.1] drop-shadow-lg tracking-tight">{displayName}</h1>
 
-          {/* Role + Department — unified line */}
           {(user.primary_role || (user.departments && user.departments.length > 0)) && (
             <p className="text-white/90 text-base font-medium drop-shadow-sm">
               {user.primary_role}
@@ -246,14 +225,19 @@ export function PublicProfileContent({
             </p>
           )}
 
-          {/* Location */}
+          {/* Hero stats: age, sea time */}
+          {heroStats.length > 0 && (
+            <p className="text-white/70 text-sm font-medium drop-shadow-sm">
+              {heroStats.join(' · ')}
+            </p>
+          )}
+
           {user.show_location && location && (
             <p className="text-white/60 text-sm flex items-center gap-1.5 font-medium">
               <MapPin size={13} className="text-white/50" />{location}
             </p>
           )}
 
-          {/* Social links row (white variant on dark bg) */}
           {user.social_links && user.social_links.length > 0 && (
             <SocialLinksRow links={user.social_links as any} variant="light" />
           )}
@@ -262,12 +246,12 @@ export function PublicProfileContent({
           <div className="flex flex-wrap gap-2">
             {isFoundingMember && (
               <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 backdrop-blur-sm border border-amber-400/30 px-2.5 py-0.5 text-xs font-semibold text-amber-300">
-                ⚓ Founding Member
+                Founding Member
               </span>
             )}
             {isColleague && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-400/20 backdrop-blur-sm border border-teal-400/30 px-2.5 py-0.5 text-xs font-medium text-teal-300">
-                🤝 Colleague{sharedYachtIdSet.size > 1 ? ` · ${sharedYachtIdSet.size} yachts` : ''}
+                Colleague{sharedYachtIdSet.size > 1 ? ` · ${sharedYachtIdSet.size} yachts` : ''}
               </span>
             )}
             {showMutual && firstMutual && (
@@ -305,8 +289,8 @@ export function PublicProfileContent({
             </div>
           )}
 
-          {/* CV — View + Download */}
-          {user.cv_public && (
+          {/* CV — View + Download (cv_public defaults to true when null) */}
+          {user.cv_public !== false && (
             (user.cv_public_source === 'uploaded' ? user.cv_storage_path : user.latest_pdf_path)
           ) && (
             <div className="bg-[var(--color-surface)] rounded-2xl p-4 border border-[var(--color-border-subtle)] flex items-center justify-between">
@@ -346,115 +330,24 @@ export function PublicProfileContent({
           {seaTimeTotalDays > 0 && (
             <div className="px-1 py-2">
               <p className="text-sm text-[var(--color-text-secondary)]">
-                ⚓ {formatSeaTime(seaTimeTotalDays).displayLong} at sea · {seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}
+                {formatSeaTime(seaTimeTotalDays).displayLong} at sea · {seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}
               </p>
             </div>
           )}
 
           {/* Experience */}
           {sectionVisible(sectionVisibility, 'experience', attachments.length > 0) && (
-            <ScrollReveal>
-            <ProfileAccordion
-              title="Experience"
-              summary={experienceSummary(attachments)}
-              accentColor="navy"
-            >
-              <div className="flex flex-col gap-3">
-                {attachments.map((att: any) => {
-                  const isShared = att.yachts?.id ? sharedYachtIdSet.has(att.yachts.id) : false
-                  return (
-                    <div key={att.id} className="flex gap-3">
-                      <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--color-interactive)]" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-[var(--color-text-primary)]">
-                          {att.yachts?.name ?? 'Unknown Yacht'}
-                          {att.role_label && <span className="font-normal text-[var(--color-text-secondary)]"> — {att.role_label}</span>}
-                          {isShared && <span className="ml-2 text-xs text-[var(--color-interactive)]">You worked here</span>}
-                        </p>
-                        {(att.started_at || att.ended_at) && (
-                          <p className="text-xs text-[var(--color-text-secondary)]">
-                            {formatDate(att.started_at)}{att.started_at && ' – '}{att.ended_at ? formatDate(att.ended_at) : 'Present'}
-                          </p>
-                        )}
-                        {att.yachts?.flag_state && (
-                          <p className="text-xs text-[var(--color-text-secondary)]">
-                            🏳 {att.yachts.flag_state}{att.yachts.length_meters ? ` · ${att.yachts.length_meters}m` : ''}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </ProfileAccordion>
-            </ScrollReveal>
+            <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} />
           )}
 
           {/* Endorsements */}
           {sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) && (
-            <ScrollReveal>
-            <ProfileAccordion
-              title="Endorsements"
-              summary={endorsementsSummary(endorsements.length, mutualEndorserCount)}
-              accentColor="coral"
-            >
-              <StaggeredList className="flex flex-col gap-3">
-                {endorsements.slice(0, 5).map((end: any) => (
-                  <StaggeredItem key={end.id}>
-                    <EndorsementCard
-                      endorserName={end.endorser?.display_name ?? end.endorser?.full_name ?? 'Anonymous'}
-                      endorserRole={end.endorser_role_label}
-                      endorserPhoto={end.endorser?.profile_photo_url}
-                      yachtName={end.yacht?.name}
-                      date={end.created_at}
-                      content={end.content}
-                    />
-                  </StaggeredItem>
-                ))}
-                {endorsements.length > 5 && (
-                  <ShowMoreButton label={`${endorsements.length - 5} more endorsements`}>
-                    {endorsements.slice(5).map((end: any) => (
-                      <EndorsementCard
-                        key={end.id}
-                        endorserName={end.endorser?.display_name ?? end.endorser?.full_name ?? 'Anonymous'}
-                        endorserRole={end.endorser_role_label}
-                        endorserPhoto={end.endorser?.profile_photo_url}
-                        yachtName={end.yacht?.name}
-                        date={end.created_at}
-                        content={end.content}
-                      />
-                    ))}
-                  </ShowMoreButton>
-                )}
-              </StaggeredList>
-            </ProfileAccordion>
-            </ScrollReveal>
+            <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} />
           )}
 
           {/* Certifications */}
           {sectionVisible(sectionVisibility, 'certifications', certifications.length > 0) && (
-            <ScrollReveal>
-            <ProfileAccordion
-              title="Certifications"
-              summary={certificationsSummary(certifications.length, expiringCount)}
-              accentColor="amber"
-            >
-              <div className="flex flex-col gap-2">
-                {certifications.map((cert: any) => {
-                  const name = cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'
-                  const status = certStatus(cert.expires_at)
-                  return (
-                    <div key={cert.id} className="flex items-start justify-between gap-2">
-                      <p className="text-sm text-[var(--color-text-primary)]">{name}</p>
-                      {status.label && (
-                        <span className={`shrink-0 text-xs font-medium ${status.color}`}>{status.label}</span>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </ProfileAccordion>
-            </ScrollReveal>
+            <CertificationsSection certifications={certifications} />
           )}
 
           {/* Education */}
@@ -503,73 +396,12 @@ export function PublicProfileContent({
 
           {/* Skills */}
           {sectionVisible(sectionVisibility, 'skills', skills.length > 0) && (
-            <ScrollReveal>
-            <ProfileAccordion
-              title="Extra Skills"
-              summary={skillsSummary(skills)}
-            >
-              {(() => {
-                const grouped = skills.reduce((acc, s) => {
-                  const cat = s.category ?? 'other'
-                  if (!acc[cat]) acc[cat] = []
-                  acc[cat].push(s)
-                  return acc
-                }, {} as Record<string, typeof skills>)
-                return Object.entries(grouped).map(([cat, items]) => (
-                  <div key={cat} className="mb-3">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-1.5 capitalize">{cat}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {items.map((s) => (
-                        <span key={s.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]">
-                          {s.name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))
-              })()}
-            </ProfileAccordion>
-            </ScrollReveal>
+            <SkillsSection skills={skills} />
           )}
 
           {/* Gallery */}
           {sectionVisible(sectionVisibility, 'gallery', gallery.length > 0) && (
-            <ScrollReveal>
-            <ProfileAccordion
-              title="Gallery"
-              summary={gallerySummary(gallery.length)}
-              accentColor="teal"
-            >
-              <div className="grid grid-cols-3 gap-1.5">
-                {gallery.slice(0, 9).map((item) => (
-                  <div key={item.id} className="relative aspect-square rounded-lg overflow-hidden bg-[var(--color-surface-raised)]">
-                    <Image
-                      src={item.image_url}
-                      alt={item.caption ?? 'Gallery photo'}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-              {gallery.length > 9 && (
-                <ShowMoreButton label={`${gallery.length - 9} more photos`}>
-                  <div className="grid grid-cols-3 gap-1.5 pt-1.5">
-                    {gallery.slice(9).map((item) => (
-                      <div key={item.id} className="relative aspect-square rounded-lg overflow-hidden bg-[var(--color-surface-raised)]">
-                        <Image
-                          src={item.image_url}
-                          alt={item.caption ?? 'Gallery photo'}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </ShowMoreButton>
-              )}
-            </ProfileAccordion>
-            </ScrollReveal>
+            <GallerySection gallery={gallery} />
           )}
         </div>
 
@@ -611,14 +443,14 @@ export function PublicProfileContent({
               href="/app/profile"
               className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
             >
-              ← Back to my profile
+              Back to my profile
             </Link>
           ) : (
             <Link
               href="/app/profile"
               className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
             >
-              ← Back to dashboard
+              Back to dashboard
             </Link>
           )}
         </div>

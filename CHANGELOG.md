@@ -22,6 +22,54 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-25 — Claude Code (Opus 4.6) — Phase 1 Closeout Waves 1 + 2
+
+### Done
+
+**Wave 1: Data Integrity + CV Consolidation (PR #89)**
+- Consolidated dual CV save path: collapsed `saveParsedCvData()` into canonical `saveConfirmedImport()` (net −301 LOC)
+- Added cert/attachment dedup (D1: maritime alias map + Levenshtein fuzzy match; D8: upsert on user+yacht+role)
+- Added date overlap validation (D2: 1mo tolerance, warn but save)
+- Deleted `CvReviewClient.tsx` (301 LOC dead code), legacy `ParsedCvData` type, unused `CvImportWizard` props
+- Routed onboarding CV persistence through canonical pipeline
+
+**Wave 2: Public Profile + Shared Read Models**
+- Created `lib/queries/types.ts` — typed interfaces replacing `any[]` across all profile surfaces
+- Created `getPublicProfileSections()`, `getCvSections()`, `getViewerRelationship()` in `lib/queries/profile.ts`
+- Extracted 80 lines of inline viewer-relationship logic from `page.tsx` to shared helper
+- Split `PublicProfileContent.tsx` (646 → ~420 LOC) into 5 section components in `components/public/sections/`
+- Fixed hero: added age (server-computed, respects dob REVOKE from anon) + sea time display
+- Fixed `available_for_work` missing from `getUserByHandle` — availability badge now renders on public profiles
+- Fixed CV 404 bug: `cv_public` null now treated as public across page, download route, and profile card (was incorrectly 404ing legacy users)
+- Public CV page now uses shared `getCvSections()` instead of inline 6-query pattern
+- Updated `profile-summaries.ts` to handle null `started_at` and array/object FK yacht references
+
+**Process**
+- Created `docs/ops/test-backlog.md` — canonical pre-commit requirement for untested changes
+- Wired test backlog into AGENTS.md pre-commit requirements, code-review discipline, smoke checklist
+- Three-phase review: Sonnet (8 findings), Opus (3 P1 + 4 P2 findings), YachtieLink drift (PASS)
+- Critical catch: Opus found `dob` column REVOKE from anon would have 404'd all public profiles for logged-out visitors (exact pattern from lessons-learned.md). Fixed by computing age server-side via authenticated query.
+
+### Context
+
+- Two closeout waves executed back-to-back. Wave 1 was committed as PR #89 and pushed. Wave 2 is on the same branch, ready to commit.
+- `lib/queries/profile.ts` grew to 446 LOC (justified — consolidated scattered inline queries; split candidate when Wave 5 touches it)
+- Responsive layout fixes (D6 transform:scale) deferred — not in this wave's scope
+
+### Next
+
+1. **Wave 3: Import wizard UX** — languages, bio, phone formatting (D4: libphonenumber-js), date consistency, editable cards
+3. **Wave 4: Profile page + skills** — personal details card, editability, skills chip UX
+4. **Wave 5: Network tab** — yacht graph (D7: list-based), endorsement/colleague grouping
+
+### Flags
+
+- ⚠️ Age only displays for logged-in viewers (dob is REVOKE'd from anon). If age should show for all visitors, need an RPC that returns computed age without exposing raw DOB.
+- ⚠️ `lib/queries/profile.ts` at 446 LOC — split into `profile.ts` + `public-profile.ts` when Wave 5 adds network queries.
+- ⚠️ Founder has not tested any Wave 1 or Wave 2 changes yet — all items tracked in `docs/ops/test-backlog.md`.
+
+---
+
 ## 2026-03-25 — Codex + Claude Code (Opus 4.6) — Drift Guardrails, Canonical Owners, Smoke Discipline
 
 ### Done

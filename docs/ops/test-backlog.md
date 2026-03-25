@@ -37,6 +37,47 @@ Use both: the smoke checklist catches regressions, the test backlog catches whet
 
 ## Untested Changes
 
+### Wave 2 — Public Profile Refactor + Shared Read Models
+Branch: `fix/phase1-wave1-cv-consolidation` | Date: 2026-03-25
+
+#### Public Profile (`/u/[handle]`)
+
+- [ ] Visit a public profile while logged out → page loads, no errors
+- [ ] Visit a public profile while logged in → page loads, shows "You worked here" on shared yachts
+- [ ] Hero displays age and sea time for logged-in viewers (age hidden for logged-out due to dob REVOKE)
+- [ ] Available-for-work badge renders when user has `available_for_work = true`
+- [ ] Section visibility respected: hidden sections don't render
+- [ ] Endorsements section: "Show more" button works when >5 endorsements
+- [ ] Gallery section: "Show more" button works when >9 photos
+- [ ] Certifications section: expiry status badges (valid/expired/expiring) display correctly
+- [ ] Skills section: grouped by category
+- [ ] Experience section: yacht names and roles display correctly
+
+#### Public CV View (`/u/[handle]/cv`)
+
+- [ ] Visit `/u/[handle]/cv` for a user with `cv_public = null` → page loads (not 404)
+- [ ] Visit `/u/[handle]/cv` for a user with `cv_public = false` → 404
+- [ ] Visit `/u/[handle]/cv` for a user with `cv_public = true` → page loads
+- [ ] CV sections display: attachments, certifications, endorsements, education, skills
+
+#### CV Download (`/api/cv/public-download/[handle]`)
+
+- [ ] Download PDF for user with `cv_public = null` → succeeds (not 403/404)
+- [ ] Download PDF for user with `cv_public = false` → rejected
+
+#### Profile Card (CV link)
+
+- [ ] "View CV" link on public profile card shows when `cv_public !== false`
+- [ ] "View CV" link hidden when `cv_public === false`
+
+#### Internal (no user-facing test needed)
+
+- Shared query helpers (`getPublicProfileSections`, `getCvSections`, `getViewerRelationship`) — covered by above functional tests
+- Typed interfaces (`lib/queries/types.ts`) — compile-time only, no runtime behavior change
+- Section component extraction — same visual output, just refactored code structure
+
+---
+
 ### PR #89 — Phase 1 Wave 1: CV Save Consolidation
 Branch: `fix/phase1-wave1-cv-consolidation` | Date: 2026-03-25
 
