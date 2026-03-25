@@ -22,6 +22,34 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-26 — Claude Code (Opus 4.6) — Wave 5: Network Tab + Endorsement Cleanup
+
+### Done
+
+- **Yacht-grouped colleagues:** Rewrote ColleaguesTab from flat list to yacht-grouped view (D7: list-based). Colleagues sorted by yacht, with yacht link headers showing colleague count. Dedup guard prevents same colleague appearing twice in one group.
+- **Endorsement send helper:** Extracted `sendEndorsementRequest()` and `sendBatchRequests()` into `lib/endorsements/send-request.ts`. Shared by both colleague and contact send flows.
+- **RequestEndorsementClient slimmed:** Replaced inline fetch logic with shared helper calls. Removed duplicate POST pattern between colleague and contact flows.
+- **Review fixes:** Fixed wrong yacht_id in Endorse link for multi-yacht colleagues (now passes yachtId from group context), added dedup guard in yacht grouping.
+- **Drift check:** PASS (0 new warnings).
+
+### Context
+
+- Branch: `fix/phase1-wave5-network-endorsement` off main
+- 3 files changed: AudienceTabs.tsx, RequestEndorsementClient.tsx, send-request.ts (new)
+- ColleagueExplorer at `/app/network/colleagues` already had yacht grouping — this brings the same pattern to the main network tab
+
+### Next
+
+1. **Session 8: Media/CRUD Standardization** — consolidate photo/gallery routes, shared Pro gating
+2. **Sprint 10.1: Phase 1A Polish** — education edit, saved profiles, dark mode, animations
+3. **Sprint 11-13: Onboarding rebuild, yacht graph, launch**
+
+### Flags
+
+- ⚠️ Pre-existing: `skipped` endorsement requests still decrement the displayed remaining counter (cosmetic, server-side count is correct)
+
+---
+
 ## 2026-03-25 — Claude Code (Opus 4.6) — Phase 1 Closeout Waves 1 + 2
 
 ### Done

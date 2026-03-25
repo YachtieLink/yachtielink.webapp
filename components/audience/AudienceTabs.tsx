@@ -390,6 +390,37 @@ function SavedTab() {
 
 // ─── Colleagues Tab ───────────────────────────────────────────────────────────
 
+function ColleagueCard({ entry, yachtId }: { entry: ColleagueEntry; yachtId: string }) {
+  const profile = entry.profile
+  if (!profile) return null
+  const name = profile.display_name ?? profile.full_name
+
+  return (
+    <motion.div variants={fadeUp} {...cardHover} className="card-soft rounded-2xl p-3 flex items-center gap-3">
+      <Link href={profile.handle ? `/u/${profile.handle}` : '#'} className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="w-9 h-9 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
+          {profile.profile_photo_url ? (
+            <Image src={profile.profile_photo_url} alt={name} width={36} height={36} className="object-cover w-full h-full" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--color-text-secondary)]">
+              {name[0]?.toUpperCase()}
+            </div>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">{name}</p>
+          {profile.primary_role && (
+            <p className="text-xs text-[var(--color-text-secondary)] truncate">{profile.primary_role}</p>
+          )}
+        </div>
+      </Link>
+      <Link href={`/app/endorsement/request?colleague_id=${entry.colleague_id}&yacht_id=${yachtId}`} className="shrink-0">
+        <Button variant="outline" size="sm">Endorse</Button>
+      </Link>
+    </motion.div>
+  )
+}
+
 function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
   if (colleagues.length === 0) {
     return (
@@ -401,69 +432,54 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
     )
   }
 
+  // Group colleagues by yacht (D7: list-based yacht graph)
+  const yachtGroups = new Map<string, { yachtName: string; colleagues: ColleagueEntry[] }>()
+  for (const entry of colleagues) {
+    for (let i = 0; i < entry.sharedYachtNames.length; i++) {
+      const yachtId = entry.shared_yachts[i]
+      const yachtName = entry.sharedYachtNames[i]
+      if (!yachtId || !yachtName) continue
+      const group = yachtGroups.get(yachtId)
+      if (group) {
+        if (!group.colleagues.some(c => c.colleague_id === entry.colleague_id)) {
+          group.colleagues.push(entry)
+        }
+      } else {
+        yachtGroups.set(yachtId, { yachtName, colleagues: [entry] })
+      }
+    }
+  }
+
+  // Sort groups by colleague count (most connections first)
+  const sortedGroups = Array.from(yachtGroups.entries())
+    .sort((a, b) => b[1].colleagues.length - a[1].colleagues.length)
+
   return (
-    <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="flex flex-col gap-3">
-      {colleagues.map((entry) => {
-        const profile = entry.profile
-        if (!profile) return null
-        const name = profile.display_name ?? profile.full_name
-
-        return (
-          <motion.div
-            key={entry.colleague_id}
-            variants={fadeUp}
-            {...cardHover}
-            className="card-soft rounded-2xl p-4 flex items-center gap-3"
-          >
-            <Link href={profile.handle ? `/u/${profile.handle}` : '#'} className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-11 h-11 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
-                {profile.profile_photo_url ? (
-                  <Image
-                    src={profile.profile_photo_url}
-                    alt={name}
-                    width={44}
-                    height={44}
-                    className="object-cover w-full h-full"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-base font-semibold text-[var(--color-text-secondary)]">
-                    {name[0]?.toUpperCase()}
-                  </div>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">{name}</p>
-                {profile.primary_role && (
-                  <p className="text-xs text-[var(--color-text-secondary)] truncate">
-                    {profile.primary_role}
-                  </p>
-                )}
-                {entry.sharedYachtNames.length > 0 && (
-                  <p className="text-xs text-[var(--color-interactive)] truncate mt-0.5">
-                    {entry.sharedYachtNames.length === 1
-                      ? entry.sharedYachtNames[0]
-                      : `${entry.sharedYachtNames[0]} +${entry.sharedYachtNames.length - 1} more`}
-                  </p>
-                )}
-              </div>
-            </Link>
-            <Link
-              href={`/app/endorsement/request?colleague_id=${entry.colleague_id}&yacht_id=${entry.shared_yachts[0]}`}
-              className="shrink-0"
-            >
-              <Button variant="outline" size="sm">Endorse</Button>
-            </Link>
+    <div className="flex flex-col gap-4">
+      {sortedGroups.map(([yachtId, group]) => (
+        <div key={yachtId}>
+          <Link href={`/app/yacht/${yachtId}`} className="flex items-center gap-2 mb-2 group">
+            <span className="text-sm font-semibold text-[var(--color-text-primary)] group-hover:text-[var(--color-interactive)] transition-colors">
+              {group.yachtName}
+            </span>
+            <span className="text-xs text-[var(--color-text-tertiary)]">
+              {group.colleagues.length} colleague{group.colleagues.length === 1 ? '' : 's'}
+            </span>
+          </Link>
+          <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="flex flex-col gap-2">
+            {group.colleagues.map((entry) => (
+              <ColleagueCard key={`${yachtId}-${entry.colleague_id}`} entry={entry} yachtId={yachtId} />
+            ))}
           </motion.div>
-        )
-      })}
+        </div>
+      ))}
 
-      {/* Explore full network link */}
       <Link
         href="/app/network/colleagues"
         className="mt-2 block text-center text-sm text-[var(--color-interactive)] font-medium py-2 hover:underline"
       >
         Explore your network →
       </Link>
-    </motion.div>
+    </div>
   )
 }
