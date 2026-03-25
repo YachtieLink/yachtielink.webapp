@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-26
+**Last updated:** 2026-03-26 (Wave 4 under review)
 
 ---
 
@@ -18,7 +18,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 |--------|-------|--------|-------|
 | [CV Parse Bugfix](./sprints/major/phase-1b/sprint-cv-parse-bugfix/README.md) | 1B | Planning | 37 QA bugs across 5 waves — data integrity, public profile, wizard UX, profile page, network tab |
 
-**Next action:** Waves 1-3 shipped. Execute Wave 4 (Profile Page + Skills).
+**Next action:** Wave 4 PR under review. Wave 5 queued after.
 
 ---
 
@@ -45,7 +45,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 2. ~~**Wave 1: Data integrity**~~ — shipped 2026-03-25
 3. ~~**Wave 2: Public profile + CV view**~~ — shipped 2026-03-25
 4. ~~**Wave 3: Import wizard UX**~~ — shipped 2026-03-25
-5. **Wave 4: Profile page + skills** — personal details card, editability, skills chip UX
+5. **Wave 4: Profile page + skills** — PR under review
 6. **Wave 5: Network tab** — yacht graph, endorsement/colleague grouping by yacht
 7. **Media/CRUD standardization** (follow-up junior sprint after bugfix waves — photo/gallery dedup, shared Pro gating)
 8. **Promote Ghost Profiles to sprint** (major sprint, ~2-3 days, when bugfixes are done)

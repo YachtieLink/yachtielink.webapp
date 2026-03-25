@@ -22,6 +22,8 @@ export interface SectionItem {
   count: number
   visible: boolean
   editHref: string
+  /** Optional chip-style preview items (e.g. skills, hobbies) */
+  chips?: string[]
 }
 
 interface ProfileSectionGridProps {
@@ -101,10 +103,25 @@ export function ProfileSectionGrid({ sections }: ProfileSectionGridProps) {
                 </button>
               </div>
 
-              {/* Summary */}
-              <p className="text-xs text-[var(--color-text-secondary)] line-clamp-2 min-h-[2rem]">
-                {section.summary}
-              </p>
+              {/* Summary or chips */}
+              {section.chips && section.chips.length > 0 ? (
+                <div className="flex flex-wrap gap-1 min-h-[2rem]">
+                  {section.chips.slice(0, 4).map((chip, i) => (
+                    <span key={`${section.key}-${i}`} className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] truncate max-w-[90px]">
+                      {chip}
+                    </span>
+                  ))}
+                  {section.chips.length > 4 && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-tertiary)]">
+                      +{section.chips.length - 4}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-[var(--color-text-secondary)] line-clamp-2 min-h-[2rem]">
+                  {section.summary}
+                </p>
+              )}
 
               {/* Edit / Add button */}
               <Link
