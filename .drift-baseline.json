@@ -1,0 +1,158 @@
+{
+  "generated": "2026-03-25",
+  "errors": {
+    "app/(protected)/app/cv/page.tsx": {
+      "pro-gate": 1
+    },
+    "app/(protected)/app/more/page.tsx": {
+      "pro-gate": 1
+    },
+    "app/(protected)/app/profile/photos/page.tsx": {
+      "pro-gate": 1
+    },
+    "app/api/cv/generate-pdf/route.ts": {
+      "pro-gate": 2
+    },
+    "app/api/endorsement-requests/[id]/route.ts": {
+      "pro-gate": 1
+    },
+    "app/api/endorsement-requests/route.ts": {
+      "pro-gate": 1
+    },
+    "app/api/user-gallery/route.ts": {
+      "pro-gate": 1
+    },
+    "app/api/user-photos/route.ts": {
+      "pro-gate": 1
+    },
+    "components/cv/CvReviewClient.tsx": {
+      "legacy-cv-path": 7
+    },
+    "components/onboarding/Wizard.tsx": {
+      "legacy-cv-path": 2
+    }
+  },
+  "warnings": {
+    "app/(protected)/app/about/edit/page.tsx": {
+      "auth-refetch": 2
+    },
+    "app/(protected)/app/attachment/[id]/edit/page.tsx": {
+      "weak-typing": 4,
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/attachment/new/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/certification/[id]/edit/page.tsx": {
+      "weak-typing": 1,
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/certification/new/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/certs/page.tsx": {
+      "weak-typing": 1,
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/cv/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/cv/preview/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/cv/review/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/cv/upload/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/endorsement/[id]/edit/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/endorsement/request/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/endorsement/request/RequestEndorsementClient.tsx": {
+      "hotspot": 1
+    },
+    "app/(protected)/app/insights/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/more/account/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/more/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/network/colleagues/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/network/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/network/saved/page.tsx": {
+      "weak-typing": 5,
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/profile/gallery/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/profile/page.tsx": {
+      "weak-typing": 6,
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/profile/photo/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/profile/photos/page.tsx": {
+      "auth-refetch": 2
+    },
+    "app/(protected)/app/profile/sea-time/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(protected)/app/profile/settings/page.tsx": {
+      "hotspot": 1,
+      "auth-refetch": 2
+    },
+    "app/(protected)/app/yacht/[id]/page.tsx": {
+      "auth-refetch": 1
+    },
+    "app/(public)/u/[handle]/page.tsx": {
+      "weak-typing": 14
+    },
+    "app/api/cron/cert-expiry/route.ts": {
+      "weak-typing": 2
+    },
+    "app/api/cv/generate-pdf/route.ts": {
+      "weak-typing": 7
+    },
+    "app/api/profile/ai-summary/route.ts": {
+      "weak-typing": 2
+    },
+    "app/api/saved-profiles/route.ts": {
+      "weak-typing": 9
+    },
+    "components/audience/AudienceTabs.tsx": {
+      "hotspot": 1
+    },
+    "components/cv/CvImportWizard.tsx": {
+      "hotspot": 1
+    },
+    "components/cv/CvPreview.tsx": {
+      "weak-typing": 11
+    },
+    "components/onboarding/Wizard.tsx": {
+      "hotspot": 1
+    },
+    "components/pdf/ProfilePdfDocument.tsx": {
+      "hotspot": 1
+    },
+    "components/public/HeroSection.tsx": {
+      "weak-typing": 1
+    },
+    "components/public/PublicProfileContent.tsx": {
+      "hotspot": 1,
+      "weak-typing": 9
+    }
+  }
+}

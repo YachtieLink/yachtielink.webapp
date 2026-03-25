@@ -120,6 +120,7 @@ Each step has an approval gate and a failure mode. The discipline is in not skip
 **During the build:**
 - Create a session log at `sessions/YYYY-MM-DD-<slug>.md` (see `sessions/README.md` for the template). Log timestamps, decisions, blockers, and coordination notes as you work — not after.
 - If you discover something that changes the plan, **stop and update the plan** — don't drift
+- If you replace a flow, helper, or component, removal or explicit retirement of the old path is part of the same sprint. Don't leave parallel live implementations behind.
 - If you're blocked, surface it in the session log and ask the founder — don't brute-force
 
 **Approval gate:** Founder may review mid-build for large sprints. For junior sprints, proceed to verify.
@@ -134,14 +135,16 @@ Each step has an approval gate and a failure mode. The discipline is in not skip
 
 **What happens:**
 1. **Build check** — run `next build`, must pass clean
-2. **Run the app** — test every change end-to-end locally. Don't skip this — build passing doesn't mean the feature works. Check happy path, error states, empty states, mobile layout.
-3. **Execute exit criteria** — run the specific verification steps from the build plan (they should be runnable commands or testable user flows, not prose)
-4. **Spawn a Sonnet post-build code reviewer** (see Sonnet prompt below) — fast pass for schema bugs, logic errors, and UX regressions
-5. Fix all findings from the Sonnet review
-6. **Spawn the Opus deep reviewer** (see Opus prompt below) — final gate, traces every change to all downstream callers. This is the step that replaces third-party code review (Codex).
-7. **Classify findings** — **ADDED** (fix now, in scope), **DEFERRED** (log as junior sprint), **NOTED** (acceptable, no action)
-8. Fix all ADDED items before committing
-9. Review your own diff: no console.logs, no hardcoded values, no commented-out code
+2. **Drift check** — run `npm run drift-check` to catch direct Pro gates, hotspot growth, legacy CV paths, weak boundary typing, and protected-page auth drift on the touched files
+3. **Run the app** — test every change end-to-end locally. Don't skip this — build passing doesn't mean the feature works. Check happy path, error states, empty states, mobile layout.
+4. **Run critical-flow smoke checks when relevant** — if the branch touched onboarding, CV, public profile, endorsements, photos/gallery, or PDF generation, run `docs/ops/critical-flow-smoke-checklist.md`
+5. **Execute exit criteria** — run the specific verification steps from the build plan (they should be runnable commands or testable user flows, not prose)
+6. **Spawn a Sonnet post-build code reviewer** (see Sonnet prompt below) — fast pass for schema bugs, logic errors, and UX regressions
+7. Fix all findings from the Sonnet review
+8. **Spawn the Opus deep reviewer** (see Opus prompt below) — final gate, traces every change to all downstream callers. This is the step that replaces third-party code review (Codex).
+9. **Classify findings** — **ADDED** (fix now, in scope), **DEFERRED** (log as junior sprint), **NOTED** (acceptable, no action)
+10. Fix all ADDED items before committing
+11. Review your own diff: no console.logs, no hardcoded values, no commented-out code
 
 **Output:** Verification report. All ADDED items fixed. DEFERRED items logged.
 
@@ -471,6 +474,8 @@ A clean review is a valid outcome.
 
 Rallies follow their own loop. No code is written — the output is a plan that feeds into sprints. For rally types (PR / System / Full Audit), templates, and examples, see `sprints/rallies/README.md`. This section covers the execution workflow, approval gates, and failure modes that the template doesn't.
 
+If the same subsystem has absorbed 2-3 consecutive sprints and keeps growing hotspots or duplicate flows, pause and run a short drift rally before adding more work to it.
+
 ```
 1. TRIGGER   →  Founder defines what to investigate and why
 2. PASS 1    →  Deep analysis — understand the problem fully
@@ -643,6 +648,9 @@ These have all happened. Check for them explicitly:
 5. **CHANGELOG forgotten** — the most common mistake. Update it as you work, not at the end.
 6. **Plan drift without updating the plan** — discovering something mid-build and just handling it without updating the spec. Future agents won't know what changed.
 7. **Testing only the happy path** — test error states, empty states, mobile layout, dark mode tokens.
+8. **Parallel live flows** — adding a new path without deleting or retiring the old one. This is how CV/onboarding drift keeps reproducing.
+9. **Canonical helper bypass** — inline Pro checks, duplicated read models, or local save logic instead of shared helpers and canonical-owner docs.
+10. **Hotspot growth without a plan** — touching `400+` LOC stateful files without deciding whether they are being split, tolerated briefly, or actively reduced.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 module: infrastructure
-updated: 2026-03-21
+updated: 2026-03-25
 status: shipped
 phase: 1A
 ---
@@ -25,6 +25,7 @@ One-line: Supabase (Postgres + Auth + Storage + RLS), Vercel deployment with Sen
 - Security headers (HSTS, X-Frame-Options, CSP via Permissions-Policy, etc.): working
 - Health check endpoint (`/api/health/supabase`): working
 - Vercel Cron jobs (cert expiry daily, analytics nudge weekly): working
+- Drift guardrails: `npm run drift-check`, canonical-owner docs, and critical-flow smoke checklist: working
 - `next.config.ts` with Sentry wrapper and security headers: working
 - Image optimization for Supabase Storage URLs: working
 - RSC stale time cache (120s dynamic): working
@@ -55,6 +56,9 @@ One-line: Supabase (Postgres + Auth + Storage + RLS), Vercel deployment with Sen
 | Analytics nudge email | `lib/email/analytics-nudge.ts` |
 | Rate limiter (Redis) | `lib/rate-limit/limiter.ts` |
 | Rate limit helpers + presets | `lib/rate-limit/helpers.ts` |
+| Drift check script | `scripts/drift-check.mjs` |
+| Canonical owner docs | `docs/ops/canonical-owners/` |
+| Critical flow smoke checklist | `docs/ops/critical-flow-smoke-checklist.md` |
 | Health check | `app/api/health/supabase/route.ts` |
 | Cert expiry cron | `app/api/cron/cert-expiry/route.ts` |
 | Analytics nudge cron | `app/api/cron/analytics-nudge/route.ts` |

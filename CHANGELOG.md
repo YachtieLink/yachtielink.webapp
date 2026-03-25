@@ -22,6 +22,74 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-25 — Codex + Claude Code (Opus 4.6) — Drift Guardrails, Canonical Owners, Smoke Discipline
+
+### Done
+
+**Codex session:**
+- Added `scripts/drift-check.mjs` plus `npm run drift-check` / `npm run drift-check:all`. Tripwire for known bad patterns: direct Pro gates, legacy CV save/review paths, weak feature-boundary typing, protected-page auth re-fetches, and hotspot growth.
+- Added repo-native doctrine docs under `docs/ops/canonical-owners/` for CV/onboarding, profile read models, and media/Pro gating.
+- Added `docs/ops/critical-flow-smoke-checklist.md` — repeatable verification for 6 launch-critical flows.
+- Updated `docs/disciplines/code-review.md`, `sprints/WORKFLOW.md`, and infrastructure docs to wire these into normal flow.
+- Rally 004 SRP/DRY audit (`rally-004-srp-dry-complexity-audit.md`) — codebase graded 6/10, identified 8 findings.
+
+**Claude Code (Opus 4.6) review + fixes:**
+- Added persisted baseline support to drift-check: `npm run drift-check:baseline` generates `.drift-baseline.json`, default runs only report new findings above baseline. Initial baseline: 18 errors, 107 warnings.
+- Reordered smoke checklist: `build` → `drift-check` → `lint` (informational until lint goes green).
+- Fixed numbering collision in `code-review.md` (two item 8s → sequential 7-11).
+- Added explicit "tripwire, not architecture enforcer" framing to drift pass docs.
+- Added "Current divergence" and "Cleanup tracked in" sections to all three canonical-owner docs — makes them honest about current state vs target.
+- Rewrote execution plan: cleanup piggybacked into CV Parse Bugfix waves (not 8 standalone sprints). Deleted redundant `rally-004-remediation-phases.md`.
+- Restored explicit named bullets in STATUS.md uncommitted code section.
+- Renamed `/log` skill to `/shipslog` (folder + frontmatter + all references).
+
+### Context
+
+- Hardening/process session — no product code touched.
+- Codex laid good foundations; Opus follow-up fixed calibration issues (baseline noise, checklist ordering, doc honesty, redundant rally docs, over-serialized cleanup strategy).
+- The drift checker is now a useful CI-style tripwire that won't train agents to ignore output.
+
+### Next
+
+1. Answer D1-D8 design decisions in CV Parse Bugfix sprint plan
+2. Execute Wave 1 (data integrity + CV consolidation) — cleanup piggybacked per execution plan
+3. Execute Wave 2 (public profile + shared read models) — cleanup piggybacked
+
+### Flags
+
+- ⚠️ `npm run lint` still fails on pre-existing issues. Lint is informational until the baseline is clean.
+- ⚠️ Drift-check baseline (`.drift-baseline.json`) should be committed so all agents share it. Run `npm run drift-check:baseline` to update after cleanup work.
+- ⚠️ Critical-flow smoke coverage is manual but repeatable. Replace flow-by-flow when browser automation lands.
+
+---
+
+## 2026-03-24 — Claude Code (Opus 4.6) — Infrastructure Cost Analysis & Break-Even Modeling
+
+### Done
+
+- **Full stack cost audit at 100k users** — mapped every service (Vercel, Supabase, OpenAI, Stripe, Resend, Upstash, PostHog, Sentry, Cloudflare) with projected costs. Current stack: ~$620–1,540/mo infra at 100k users. Self-hosted (Hetzner + B2 + SES): ~$350–600/mo. Savings of $300–900/mo not worth the ops overhead at that scale.
+- **Self-hosting feasibility assessment** — Next.js runs anywhere with `next start`, no platform lock-in. Supabase is standard Postgres (portable). Only risk: adopting Vercel-proprietary services (KV, Blob, edge middleware) — currently not using any.
+- **Break-even analysis** — €200/mo to cover costs (Claude subscription is the lion's share at €100/mo). At €4.99 founding / €8.99 standard pricing with 10% Pro conversion and ~€6.50/mo blended avg: need ~300–400 registered users. One marina or crew agency partnership.
+- **Vercel Pro decision grounded** — $20/mo confirmed worthwhile. Unblocks CV parse in production (10s → 60s function timeout). Stack scales to serious revenue before costs become a conversation.
+
+### Context
+
+- Strategy/research session — no code touched, no sprints advanced
+- Founder's key insight: Claude subscription (€100/mo) > entire production infrastructure at current near-zero user load (~€6/mo). Stack is well-chosen.
+- Revenue at 15k paying users would be ~€105k/mo with 98.5% gross margin before Stripe fees (~€5,300/mo)
+- Consensus: stick with managed services, self-host commodity stuff (PostHog, Sentry, Redis) on Hetzner when it matters
+
+### Next
+
+1. Answer 8 design decisions (D1-D8) in the bugfix sprint plan
+2. Write build specs for Wave 1 (data integrity — cert/attachment dedup)
+3. Execute Wave 1, then Waves 2-5 sequentially
+4. Commit and push all uncommitted changes from previous sessions
+
+### Flags
+
+- ⚠️ Vercel Pro upgrade ($20/mo) still not done — remains a pre-launch production blocker
+
 ---
 
 ## 2026-03-24 — Claude Code (Opus 4.6) — /log Skill Upgrade: Subagent Audit + Drift Prevention
