@@ -73,13 +73,13 @@
 - [ ] **Cleanup:** Ensure onboarding completion uses canonical import pipeline
 - [ ] Run `/review`, update drift baseline
 
-### Session 6 — Wave 4: Profile Page + Skills
-- [ ] Personal details card
-- [ ] Editability improvements
-- [ ] Skills chip UX
-- [ ] Section counts
-- [ ] **Cleanup:** Extract settings load/save logic from `ProfileSettingsPage` (445 LOC)
-- [ ] Run `/review`, update drift baseline
+### Session 6 — Wave 4: Profile Page + Skills ✅
+- [x] Personal details card
+- [x] Editability improvements
+- [x] Skills chip UX
+- [x] Section counts
+- [x] **Cleanup:** Extract settings load/save logic from `ProfileSettingsPage` (445 LOC)
+- [x] Run `/review`, update drift baseline
 
 ### Session 7 — Wave 5: Network Tab + Endorsement Cleanup
 - [ ] Yacht graph (list-based, D7 decision applied)

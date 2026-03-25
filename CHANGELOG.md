@@ -22,6 +22,34 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-26 — Claude Code (Opus 4.6) — Wave 4: Profile Page + Skills
+
+### Done
+
+- **Personal details card:** New `PersonalDetailsCard` component on profile page showing age, nationality, smoking, tattoos, license, travel docs. Replaces the old CV completeness warning with a richer card + inline missing-fields prompt.
+- **Skills chip UX:** `ProfileSectionGrid` now supports chip-style previews. Skills and hobbies sections show up to 4 chips with "+N" overflow instead of text summaries.
+- **Section counts:** Verified already working — each grid cell shows count via Edit/Add toggle.
+- **Cleanup: Settings hook extraction:** Extracted `useProfileSettings` hook from `ProfileSettingsPage` (445 → 185 LOC page, 115 LOC hook). Reusable load/save logic with stable `supabase` ref via `useMemo`.
+- **Editability:** Hero card already has pencil edit icon, personal details card links to settings, section grid has per-section Edit/Add links. No inline editing needed — navigation-based editing is complete.
+- **Review fixes:** Fixed duplicate React key risk in chip rendering (index-based keys), stabilized supabase client in hook, documented PersonalDetailsCard as owner-only (visibility flags control public output only).
+- **Drift check:** PASS (0 new warnings).
+
+### Context
+
+- Branch: `fix/phase1-wave4-profile-skills` off main
+- 5 files changed: profile/page.tsx, ProfileSectionGrid.tsx, PersonalDetailsCard.tsx (new), settings/page.tsx, useProfileSettings.ts (new)
+- Settings page is functionally identical after refactor — just cleaner separation
+
+### Next
+
+1. **Wave 5: Network Tab + Endorsement Cleanup** — yacht graph (list-based), endorsement/colleague grouping, extract shared colleague assembly, slim RequestEndorsementClient.tsx
+
+### Flags
+
+- ⚠️ Dark mode: PersonalDetailsCard warning banner uses hardcoded amber Tailwind colors (pre-existing pattern in other components too — consistent but could be improved in a dark-mode pass)
+
+---
+
 ## 2026-03-25 — Claude Code (Opus 4.6) — Phase 1 Closeout Waves 1 + 2
 
 ### Done

@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-25 (late session — Waves 1+2 complete)
+**Last updated:** 2026-03-26 (Waves 1-4 complete)
 
 ---
 
@@ -18,7 +18,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 |--------|-------|--------|-------|
 | [CV Parse Bugfix](./sprints/major/phase-1b/sprint-cv-parse-bugfix/README.md) | 1B | Planning | 37 QA bugs across 5 waves — data integrity, public profile, wizard UX, profile page, network tab |
 
-**Next action:** Wave 1 + 2 complete. Next: Wave 3 (import wizard UX).
+**Next action:** Waves 1-4 complete. Next: Wave 5 (network tab + endorsement cleanup).
 
 ---
 
@@ -34,15 +34,16 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 | Phase 1 Wave 2: Public profile refactor | 2026-03-25 | Shared query helpers, typed props (eliminated any[]), 5 section components, hero age+sea time, CV 404 fix |
 | Test backlog process | 2026-03-25 | `docs/ops/test-backlog.md` — canonical pre-commit requirement for tracking untested changes |
 | Drift guardrails + smoke discipline | 2026-03-25 | Added `npm run drift-check`, canonical-owner docs, critical-flow smoke checklist |
+| Wave 4: Profile page + skills | 2026-03-26 | PersonalDetailsCard, skills/hobbies chip previews in grid, useProfileSettings hook extraction |
 
 ---
 
 ## Up Next (ordered)
 
 1. ~~Wave 1: Data integrity~~ — complete, PR #89
-2. ~~Wave 2: Public profile + shared read models~~ — complete, ready to commit
-3. **Wave 3: Import wizard UX** — languages, bio, phone formatting (D4: libphonenumber-js), date consistency, editable cards
-4. **Wave 4: Profile page + skills** — personal details card, editability, skills chip UX
+2. ~~Wave 2: Public profile + shared read models~~ — complete
+3. ~~Wave 3: Import wizard UX~~ — complete (separate branch, pending merge)
+4. ~~Wave 4: Profile page + skills~~ — complete (separate branch, pending merge)
 5. **Wave 5: Network tab** — yacht graph (D7: list-based), endorsement/colleague grouping by yacht
 6. **Media/CRUD standardization** (follow-up junior sprint after bugfix waves — photo/gallery dedup, shared Pro gating)
 7. **Promote Ghost Profiles to sprint** (major sprint, ~2-3 days, when bugfixes are done)
