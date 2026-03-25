@@ -4,6 +4,8 @@ Append-only. Never edit existing entries. Newest at top.
 
 When you make changes to this module, append a one-line entry with date, agent name, and what changed.
 
+**2026-03-25** — Claude Code (Opus 4.6) (Phase 1 Wave 2): Major refactor — extracted shared query helpers (getPublicProfileSections, getCvSections, getViewerRelationship), split PublicProfileContent into 5 section components, replaced all any[] with typed interfaces, added hero age+sea time, fixed CV 404 (cv_public null semantics), fixed available_for_work missing from getUserByHandle.
+
 **2026-03-24** — Claude Code (Opus 4.6) (QA Rally): Documented 8 bugs on public profile — missing age/sea time/flag in hero, CV view 404/blank/horizontal scroll, yacht names not clickable, no ensign flags. Bugfix sprint Wave 2 covers all.
 
 ---

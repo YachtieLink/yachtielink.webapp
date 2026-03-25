@@ -14,7 +14,8 @@ export async function GET(
     .eq('handle', handle)
     .single()
 
-  if (!user || !user.cv_public) {
+  // cv_public defaults to true when null (matching CvActions + public CV page behaviour)
+  if (!user || user.cv_public === false) {
     return NextResponse.json({ error: 'CV not available' }, { status: 404 })
   }
 

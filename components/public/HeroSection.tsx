@@ -28,6 +28,7 @@ interface HeroSectionProps {
   profileUrl: string
   savedUserId: string
   savedStatus?: { id: string; folder_id: string | null } | null
+  heroStats?: string[]
 }
 
 export function HeroSection({
@@ -50,6 +51,7 @@ export function HeroSection({
   profileUrl,
   savedUserId,
   savedStatus,
+  heroStats = [],
 }: HeroSectionProps) {
   const { scrollY } = useScroll()
   const heroHeight = useTransform(scrollY, [0, 200], ['70vh', '40vh'])
@@ -136,6 +138,13 @@ export function HeroSection({
             {departments && departments.length > 0 && (
               <span className="text-white/70">{departments.join(', ')}</span>
             )}
+          </p>
+        )}
+
+        {/* Hero stats: age, sea time */}
+        {heroStats.length > 0 && (
+          <p className="text-white/70 text-sm font-medium drop-shadow-sm">
+            {heroStats.join(' · ')}
           </p>
         )}
 

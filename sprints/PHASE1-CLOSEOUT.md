@@ -19,10 +19,10 @@
 ## Week 1: Unblock + Foundation + Core Fixes
 
 ### Session 1 — Unblock Everything
-- [ ] Answer D1-D8 (founder + agent walkthrough)
-- [ ] Upgrade Vercel to Pro
-- [ ] Commit all uncommitted docs/tooling from 2026-03-25 session
-- [ ] Update drift baseline after commit: `npm run drift-check:baseline`
+- [x] Answer D1-D8 (founder + agent walkthrough)
+- [x] Upgrade Vercel to Pro
+- [x] Commit all uncommitted docs/tooling from 2026-03-25 session
+- [x] Update drift baseline after commit: `npm run drift-check:baseline`
 
 ### Session 2 — Sprint 10.1 (Phase 1A Polish)
 - [ ] Education edit page
@@ -35,29 +35,29 @@
 - [ ] Tag `v1.0-phase-1a` after merge
 - [ ] Run `/review`, update drift baseline
 
-### Session 3 — Wave 1: Data Integrity + CV Consolidation
-- [ ] Cert/attachment dedup (D1, D8 decisions applied)
-- [ ] Date overlap validation (D2 decision applied)
-- [ ] **Cleanup:** Collapse `saveParsedCvData()` + `saveConfirmedImport()` into one save contract
-- [ ] **Cleanup:** Route onboarding CV persistence through canonical pipeline
-- [ ] **Cleanup:** Delete `CvReviewClient` (confirmed dead)
-- [ ] **Cleanup:** Remove `cv_parsed_data` sessionStorage flow
-- [ ] **Cleanup:** Remove unused props from `CvImportWizard` (`existingAttachments`, `existingCerts`, `existingEducation`)
-- [ ] Run `/review`, update drift baseline
-- [ ] **Baseline target:** legacy-cv-path errors → 0
+### Session 3 — Wave 1: Data Integrity + CV Consolidation ✅
+- [x] Cert/attachment dedup (D1, D8 decisions applied)
+- [x] Date overlap validation (D2 decision applied)
+- [x] **Cleanup:** Collapse `saveParsedCvData()` + `saveConfirmedImport()` into one save contract
+- [x] **Cleanup:** Route onboarding CV persistence through canonical pipeline
+- [x] **Cleanup:** Delete `CvReviewClient` (confirmed dead)
+- [x] **Cleanup:** Remove `cv_parsed_data` sessionStorage flow
+- [x] **Cleanup:** Remove unused props from `CvImportWizard` (`existingAttachments`, `existingCerts`, `existingEducation`)
+- [x] Run `/review`, update drift baseline
+- [x] **Baseline target:** legacy-cv-path errors → 0
 
-### Session 4 — Wave 2: Public Profile + Shared Read Models
-- [ ] Hero fields fix
-- [ ] CV 404 fix
-- [ ] Responsive layout fixes
-- [ ] Share/download functionality
-- [ ] **Cleanup:** Extract shared CV section query builder (used by owner preview, public CV, PDF)
-- [ ] **Cleanup:** Move viewer-relationship logic from `app/(public)/u/[handle]/page.tsx` to shared helper
-- [ ] **Cleanup:** Split `PublicProfileContent.tsx` (646 LOC) into section components
-- [ ] **Cleanup:** Replace `any[]` with typed props from shared reader
-- [ ] **Cleanup:** Consolidate duplicate 6-query patterns across CV pages
-- [ ] Run `/review`, update drift baseline
-- [ ] **Baseline target:** weak-typing warnings in profile surfaces halved, hotspot warnings reduced
+### Session 4 — Wave 2: Public Profile + Shared Read Models ✅
+- [x] Hero fields fix (age + sea time in hero; `available_for_work` badge on public profile)
+- [x] CV 404 fix (`cv_public` null treated as public, consistent across page/download/card)
+- [ ] Responsive layout fixes (deferred — needs D6 transform:scale implementation)
+- [x] Share/download functionality (already shipped — verified still working)
+- [x] **Cleanup:** Extract shared CV section query builder (`getCvSections` in `lib/queries/profile.ts`)
+- [x] **Cleanup:** Move viewer-relationship logic to `getViewerRelationship` shared helper
+- [x] **Cleanup:** Split `PublicProfileContent.tsx` (646 → ~420 LOC) into 5 section components
+- [x] **Cleanup:** Replace `any[]` with typed props from `lib/queries/types.ts`
+- [x] **Cleanup:** Consolidate duplicate 6-query patterns — public CV page now uses `getCvSections`
+- [x] Run `/review` (Sonnet + Opus) + `/yachtielink-review`, update drift baseline
+- [x] **Baseline target:** weak-typing warnings reduced, profile `any[]` eliminated
 
 ---
 

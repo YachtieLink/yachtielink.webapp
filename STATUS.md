@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-25
+**Last updated:** 2026-03-25 (late session — Waves 1+2 complete)
 
 ---
 
@@ -18,7 +18,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 |--------|-------|--------|-------|
 | [CV Parse Bugfix](./sprints/major/phase-1b/sprint-cv-parse-bugfix/README.md) | 1B | Planning | 37 QA bugs across 5 waves — data integrity, public profile, wizard UX, profile page, network tab |
 
-**Next action:** D1-D8 resolved. Write Wave 1 build specs (data integrity dedup + CV consolidation).
+**Next action:** Wave 1 + 2 complete. Next: Wave 3 (import wizard UX).
 
 ---
 
@@ -30,21 +30,23 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 | CV parse full build (Waves 1-7) | 2026-03-23 | 5-step import wizard, AI prompt, save function, PDF templates, CV preview, public CV view |
 | StrictMode double-fire fix | 2026-03-24 | Was burning 2x OpenAI cost per upload — guarded with `hasFiredRef` |
 | Rate limit 429 banner | 2026-03-24 | Friendly "3 free CV reads per day" instead of error screen |
-| Drift guardrails + smoke discipline | 2026-03-25 | Added `npm run drift-check`, canonical-owner docs, critical-flow smoke checklist, and workflow/review updates to stop more SRP/DRY drift landing unnoticed |
+| Phase 1 Wave 1: CV consolidation | 2026-03-25 | Collapsed dual save path, cert/attachment dedup, date overlap validation, deleted 301 LOC dead code (PR #89) |
+| Phase 1 Wave 2: Public profile refactor | 2026-03-25 | Shared query helpers, typed props (eliminated any[]), 5 section components, hero age+sea time, CV 404 fix |
+| Test backlog process | 2026-03-25 | `docs/ops/test-backlog.md` — canonical pre-commit requirement for tracking untested changes |
+| Drift guardrails + smoke discipline | 2026-03-25 | Added `npm run drift-check`, canonical-owner docs, critical-flow smoke checklist |
 
 ---
 
 ## Up Next (ordered)
 
-1. ~~Answer D1-D8 design decisions~~ — resolved 2026-03-25
-2. **Wave 1: Data integrity** — cert/attachment dedup, overlap validation (P0, blocks everything)
-3. **Wave 2: Public profile + CV view** — hero fields, CV 404 fix, responsive, share/download
-4. **Wave 3: Import wizard UX** — languages, bio, phone formatting, date consistency, editable cards
-5. **Wave 4: Profile page + skills** — personal details card, editability, skills chip UX
-6. **Wave 5: Network tab** — yacht graph, endorsement/colleague grouping by yacht
-7. **Media/CRUD standardization** (follow-up junior sprint after bugfix waves — photo/gallery dedup, shared Pro gating)
-8. **Promote Ghost Profiles to sprint** (major sprint, ~2-3 days, when bugfixes are done)
-9. **Endorsement Writing Assist** (quick junior sprint, no schema changes)
+1. ~~Wave 1: Data integrity~~ — complete, PR #89
+2. ~~Wave 2: Public profile + shared read models~~ — complete, ready to commit
+3. **Wave 3: Import wizard UX** — languages, bio, phone formatting (D4: libphonenumber-js), date consistency, editable cards
+4. **Wave 4: Profile page + skills** — personal details card, editability, skills chip UX
+5. **Wave 5: Network tab** — yacht graph (D7: list-based), endorsement/colleague grouping by yacht
+6. **Media/CRUD standardization** (follow-up junior sprint after bugfix waves — photo/gallery dedup, shared Pro gating)
+7. **Promote Ghost Profiles to sprint** (major sprint, ~2-3 days, when bugfixes are done)
+8. **Endorsement Writing Assist** (quick junior sprint, no schema changes)
 
 ---
 
@@ -60,32 +62,13 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Pending Decisions
 
-| ID | Question | Recommendation | Sprint |
-|----|----------|----------------|--------|
-| D1 | Cert dedup threshold — how fuzzy? | Levenshtein <= 2 or normalized match >= 0.85 | CV Parse Bugfix |
-| D2 | Date overlap tolerance? | Allow 1 month overlap, warn but don't block | CV Parse Bugfix |
-| D3 | Nationality display — demonym or label? | Label change to "Nationality" with country name | CV Parse Bugfix |
-| D4 | Phone formatting — library or custom? | `libphonenumber-js` | CV Parse Bugfix |
-| D5 | Ensign images — source? | Maritime flag databases, static assets in `/public/ensigns/` | CV Parse Bugfix |
-| D6 | CV view scaling approach? | `transform: scale()` preserving A4 layout | CV Parse Bugfix |
-| D7 | Yacht graph scope? | List-based for now, graph viz in Phase 2 | CV Parse Bugfix |
-| D8 | Attachment dedup match strategy? | Match on user_id + yacht_id + role, enrich if match found | CV Parse Bugfix |
+All D1-D8 resolved 2026-03-25. See `sprints/PHASE1-CLOSEOUT.md` Blockers section for final answers. D1 (cert dedup), D2 (date overlap), D8 (attachment dedup) implemented in Wave 1. D4 (libphonenumber-js) queued for Wave 3. D5 (ensign flags) deferred post-launch. D6 (transform:scale) deferred from Wave 2. D7 (list-based yacht graph) queued for Wave 5.
 
 ---
 
 ## Uncommitted Code
 
-- StrictMode double-fire fix (`hasFiredRef` guard) — feature-complete, awaiting git commit
-- Rate limit 429 friendly banner — feature-complete, awaiting git commit
-- `extract-text.ts` refactor (shared helper) — feature-complete, awaiting git commit
-- `parse-personal` route (two-pass fast extraction) — feature-complete, awaiting git commit
-- `scripts/drift-check.mjs` with baseline support (`.drift-baseline.json`) — feature-complete, awaiting git commit
-- Canonical-owner docs (`docs/ops/canonical-owners/`) — feature-complete, awaiting git commit
-- Critical-flow smoke checklist (`docs/ops/critical-flow-smoke-checklist.md`) — feature-complete, awaiting git commit
-- Workflow and code-review doc updates for drift pass — feature-complete, awaiting git commit
-- Rally 004 execution plan (`sprints/rallies/rally-004-execution-plan.md`) — report-only, awaiting git commit
-- Rally 004 SRP/DRY audit (`sprints/rallies/rally-004-srp-dry-complexity-audit.md`) — report-only, awaiting git commit
-- `CHANGELOG.md`, `STATUS.md`, session logs — doc updates, awaiting git commit
+None — Wave 2 committed and pushed on `fix/phase1-wave1-cv-consolidation`.
 
 ---
 

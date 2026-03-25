@@ -1,6 +1,6 @@
 ---
 module: profile
-updated: 2026-03-21
+updated: 2026-03-25
 status: shipped
 phase: 1A
 ---
@@ -49,6 +49,7 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 | Section manager (visibility) | `components/profile/SectionManager.tsx` |
 | Save profile button | `components/profile/SaveProfileButton.tsx` |
 | Profile queries | `lib/queries/profile.ts` |
+| Shared profile types | `lib/queries/types.ts` |
 | AI summary API | `app/api/profile/ai-summary/route.ts` |
 | Section visibility API | `app/api/profile/section-visibility/route.ts` |
 | Social links API | `app/api/profile/social-links/route.ts` |

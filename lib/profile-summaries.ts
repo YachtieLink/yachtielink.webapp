@@ -15,20 +15,31 @@ export function formatSeaTime(totalDays: number): string {
 }
 
 type Attachment = {
-  started_at: string
+  started_at: string | null
   ended_at: string | null
   yacht_id?: string
+  yachts?: { id: string } | { id: string }[] | null
+}
+
+function resolveYachtId(a: Attachment): string | undefined {
+  if (a.yacht_id) return a.yacht_id
+  if (!a.yachts) return undefined
+  // Supabase FK joins may be typed as array; runtime is single object
+  const y = Array.isArray(a.yachts) ? a.yachts[0] : a.yachts
+  return y?.id
 }
 
 export function computeSeaTime(attachments: Attachment[]): { totalDays: number; yachtCount: number } {
   const yachtIds = new Set<string>()
   let totalDays = 0
   for (const a of attachments) {
+    if (!a.started_at) continue
     const start = new Date(a.started_at)
     const end = a.ended_at ? new Date(a.ended_at) : new Date()
     const days = Math.max(0, Math.floor((end.getTime() - start.getTime()) / 86_400_000))
     totalDays += days
-    if (a.yacht_id) yachtIds.add(a.yacht_id)
+    const yachtId = resolveYachtId(a)
+    if (yachtId) yachtIds.add(yachtId)
   }
   return { totalDays, yachtCount: yachtIds.size }
 }
