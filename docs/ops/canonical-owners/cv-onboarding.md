@@ -15,12 +15,12 @@ There should be one canonical CV import/save path. New work should converge towa
 
 ## Legacy / Do Not Extend
 
-These surfaces may still exist, but they should not gain new logic:
+These have been deleted as of Wave 1 cleanup (2026-03-25):
 
-- `saveParsedCvData()` in `lib/cv/save-parsed-cv-data.ts`
-- `components/cv/CvReviewClient.tsx`
-- `cv_parsed_data` sessionStorage flow
-- duplicate save logic inside onboarding or page components
+- ~~`saveParsedCvData()` — deleted, replaced by `saveConfirmedImport()`~~
+- ~~`components/cv/CvReviewClient.tsx` — deleted (dead code)~~
+- ~~`cv_parsed_data` sessionStorage flow — deleted with CvReviewClient~~
+- Do not add duplicate save logic inside onboarding or page components
 
 ## Build Rules
 
@@ -30,11 +30,11 @@ These surfaces may still exist, but they should not gain new logic:
 
 ## Current Divergence
 
-- `components/onboarding/Wizard.tsx` still calls deprecated `saveParsedCvData()` directly instead of routing through `saveConfirmedImport()`
-- `components/cv/CvReviewClient.tsx` still carries a sessionStorage review flow keyed off `cv_parsed_data`, but no active writer sets that key anymore
-- `components/cv/CvImportWizard.tsx` accepts `existingAttachments`, `existingCerts`, `existingEducation` props but never uses them
-- `components/cv/CvImportWizard.tsx` builds `ConfirmedImportData` in two separate places
-- `lib/cv/save-parsed-cv-data.ts` keeps the deprecated saver alongside the canonical one in the same file
+- ~~`Wizard.tsx` calls `saveParsedCvData()` directly~~ — Fixed: now routes through `saveConfirmedImport()` via `parsedToConfirmedImport()`
+- ~~`CvReviewClient.tsx` sessionStorage flow~~ — Deleted
+- ~~`CvImportWizard.tsx` unused props~~ — Removed (`existingAttachments`, `existingCerts`, `existingEducation`)
+- ~~`save-parsed-cv-data.ts` dual saver~~ — `saveParsedCvData()` deleted, only canonical `saveConfirmedImport()` remains
+- `CvImportWizard.tsx` builds `ConfirmedImportData` in two separate places (still open)
 
 ## Cleanup Tracked In
 

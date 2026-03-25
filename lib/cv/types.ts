@@ -89,20 +89,6 @@ export interface ParsedCvData {
   references: ParsedReference[]
   social_media: ParsedSocialMedia
 
-  // Legacy fields for backward-compat with old sessionStorage data
-  full_name?: string | null
-  bio?: string | null
-  location?: { country?: string | null; city?: string | null } | null
-  employment_history?: Array<{
-    yacht_name?: string
-    yacht_type?: string | null
-    length_meters?: number | null
-    role?: string
-    start_date?: string | null
-    end_date?: string | null
-    flag_state?: string | null
-  }>
-  primary_role?: string | null
 }
 
 // ── Confirmed import types (wizard output → save function) ──
@@ -178,6 +164,9 @@ export interface SaveStats {
   personalUpdated: boolean
   yachtsCreated: number
   certsCreated: number
+  certsSkippedDuplicate: number
+  attachmentsEnriched: number
+  dateOverlaps: number
   educationCreated: number
   skillsAdded: number
   hobbiesAdded: number

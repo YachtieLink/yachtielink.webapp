@@ -24,12 +24,6 @@
     },
     "app/api/user-photos/route.ts": {
       "pro-gate": 1
-    },
-    "components/cv/CvReviewClient.tsx": {
-      "legacy-cv-path": 7
-    },
-    "components/onboarding/Wizard.tsx": {
-      "legacy-cv-path": 2
     }
   },
   "warnings": {
@@ -153,6 +147,9 @@
     "components/public/PublicProfileContent.tsx": {
       "hotspot": 1,
       "weak-typing": 9
+    },
+    "lib/cv/save-parsed-cv-data.ts": {
+      "hotspot": 1
     }
   }
 }

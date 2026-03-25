@@ -98,9 +98,6 @@ interface CvImportWizardProps {
   userId: string
   storagePath: string
   existingProfile: Record<string, unknown>
-  existingAttachments: unknown[]
-  existingCerts: unknown[]
-  existingEducation: unknown[]
   existingSkills: string[]
   existingHobbies: string[]
 }
