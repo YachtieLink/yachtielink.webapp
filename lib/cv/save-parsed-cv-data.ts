@@ -213,10 +213,11 @@ export async function saveConfirmedImport(
     }
 
     if (Object.keys(updates).length > 0) {
-      await supabase.from('users').update(updates).eq('id', userId)
-      stats.personalUpdated = true
+      const { error: userErr } = await supabase.from('users').update(updates).eq('id', userId)
+      if (userErr) console.error('[saveConfirmedImport] users update error:', userErr.message)
+      else stats.personalUpdated = true
     }
-  } catch { /* partial failure OK */ }
+  } catch (err) { console.error('[saveConfirmedImport] personal section error:', err) }
 
   // 2. Create yachts + attachments (D8: upsert on user+yacht+role, D2: overlap detection)
   // Fetch existing attachments for dedup and overlap checks
@@ -256,6 +257,12 @@ export async function saveConfirmedImport(
 
       const startDate = yacht.start_date ? normalizeDateToISO(yacht.start_date) : null
       const endDate = yacht.end_date && yacht.end_date !== 'Current' ? normalizeDateToISO(yacht.end_date) : null
+
+      // attachments.started_at is NOT NULL — skip if no start date parsed
+      if (!startDate) {
+        console.warn(`[saveConfirmedImport] skipping yacht "${yacht.yacht_name}" (${yacht.role}) — no start date parsed`)
+        continue
+      }
 
       // D8: Check for existing attachment with same user+yacht+role
       const existingMatch = (existingAttachments ?? []).find(ea =>
@@ -300,7 +307,9 @@ export async function saveConfirmedImport(
           description: yacht.description,
           cruising_area: yacht.cruising_area,
         })
-        if (!attErr) {
+        if (attErr) {
+          console.error(`[saveConfirmedImport] attachment insert error for "${yacht.yacht_name}" (${yacht.role}):`, attErr.message)
+        } else {
           stats.yachtsCreated++
           // Track new attachment for overlap checks within same batch
           existingAttachments?.push({
@@ -362,9 +371,11 @@ export async function saveConfirmedImport(
       if (!error) {
         stats.certsCreated++
         existingCertNames.push(normalizeCertName(cert.name)) // prevent dups within same import batch
+      } else {
+        console.error(`[saveConfirmedImport] cert insert error for "${cert.name}":`, error.message)
       }
     }
-  } catch { /* partial failure OK */ }
+  } catch (err) { console.error('[saveConfirmedImport] certifications section error:', err) }
 
   // 4. Education
   for (const edu of data.education) {
@@ -378,7 +389,8 @@ export async function saveConfirmedImport(
         ended_at: edu.end_date ? normalizeDateToISO(edu.end_date) : null,
       })
       if (!error) stats.educationCreated++
-    } catch { /* partial failure OK */ }
+      else console.error(`[saveConfirmedImport] education insert error for "${edu.institution}":`, error.message)
+    } catch (err) { console.error('[saveConfirmedImport] education section error:', err) }
   }
 
   // 5. Skills (deduplicate)
@@ -390,8 +402,9 @@ export async function saveConfirmedImport(
     for (const skill of newSkills) {
       const { error } = await supabase.from('user_skills').insert({ user_id: userId, name: skill })
       if (!error) stats.skillsAdded++
+      else console.error(`[saveConfirmedImport] skill insert error for "${skill}":`, error.message)
     }
-  } catch { /* partial failure OK */ }
+  } catch (err) { console.error('[saveConfirmedImport] skills section error:', err) }
 
   // 6. Hobbies (deduplicate)
   try {
@@ -402,11 +415,13 @@ export async function saveConfirmedImport(
     for (const hobby of newHobbies) {
       const { error } = await supabase.from('user_hobbies').insert({ user_id: userId, name: hobby })
       if (!error) stats.hobbiesAdded++
+      else console.error(`[saveConfirmedImport] hobby insert error for "${hobby}":`, error.message)
     }
-  } catch { /* partial failure OK */ }
+  } catch (err) { console.error('[saveConfirmedImport] hobbies section error:', err) }
 
   // 7. Endorsement requests — not yet implemented
   // TODO: implement endorsement request sending when ready
 
+  console.log('[saveConfirmedImport] stats:', JSON.stringify(stats))
   return stats
 }

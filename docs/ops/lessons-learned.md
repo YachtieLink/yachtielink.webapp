@@ -6,12 +6,22 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 68 lessons
+**Current count:** 69 lessons
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## Supabase Foreign-Key Joins Don't Include Raw FK Column
+
+**What happened:** Public profile page queried `attachments` with `.select('id, role_label, started_at, ended_at, yachts(id, name, ...)')`. The `computeSeaTime()` function reads `a.yacht_id` to count unique yachts. Result: `yacht_id` was always `undefined`, experience summary showed "No experience added yet" despite having 2 yachts. Sea time stat (from a Postgres RPC) showed correctly, making the bug confusing.
+**Root cause:** Supabase PostgREST only returns columns explicitly listed in the select. A foreign-key join like `yachts(id, name)` returns a nested `yachts` object but does NOT include the raw `yacht_id` FK column unless you add it to the select list.
+**Fix applied:** Added `yacht_id` to the select: `.select('id, yacht_id, role_label, ..., yachts(id, name, ...)')`.
+**Lesson:** When using Supabase joins, always include the raw FK column in the select if any downstream code reads it directly. The joined object and the raw FK are separate — having one doesn't give you the other.
+**Sprint:** CV Parse Bugfix (QA) | **Caught by:** Claude Code (Opus 4.6) | **Date:** 2026-03-26
 
 ---
 

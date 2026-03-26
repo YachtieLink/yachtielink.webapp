@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button, Input, Select } from '@/components/ui'
 import { Skeleton } from '@/components/ui/skeleton'
+import { formatDateDisplay } from '@/lib/cv/types'
 import type { ParsedYachtEmployment, ParsedLandEmployment, ConfirmedYacht } from '@/lib/cv/types'
 
 interface YachtCardState {
@@ -16,6 +17,8 @@ interface StepExperienceProps {
   landJobs: ParsedLandEmployment[]
   parseLoading: boolean
   onConfirm: (yachts: ConfirmedYacht[]) => void
+  /** Pre-confirmed yachts from a previous pass (e.g. when returning from review) */
+  initialConfirmed?: ConfirmedYacht[]
 }
 
 const EMPLOYMENT_TYPES = [
@@ -86,7 +89,7 @@ function YachtCard({ card, onUpdate, onToggleSkip }: {
       </div>
       {specs && <p className="text-xs text-[var(--color-text-tertiary)]">{specs}</p>}
       <p className="text-xs text-[var(--color-text-secondary)]">
-        {confirmed.role} · {confirmed.start_date ?? '?'} — {confirmed.end_date ?? 'Present'}
+        {confirmed.role} · {formatDateDisplay(confirmed.start_date) || '?'} — {formatDateDisplay(confirmed.end_date) || 'Present'}
       </p>
       {confirmed.cruising_area && (
         <p className="text-xs text-[var(--color-text-tertiary)]">{confirmed.cruising_area}</p>
@@ -105,26 +108,32 @@ function YachtCard({ card, onUpdate, onToggleSkip }: {
   )
 }
 
-export function StepExperience({ yachts, landJobs, parseLoading, onConfirm }: StepExperienceProps) {
+export function StepExperience({ yachts, landJobs, parseLoading, onConfirm, initialConfirmed }: StepExperienceProps) {
   const [cards, setCards] = useState<YachtCardState[]>(() =>
-    yachts.map((y) => ({
-      yacht: y,
-      status: 'new' as const,
-      confirmed: {
-        yacht_name: y.yacht_name,
-        yacht_type: y.yacht_type,
-        length_meters: y.length_meters,
-        flag_state: y.flag_state,
-        builder: y.builder,
-        role: y.role,
-        start_date: y.start_date,
-        end_date: y.end_date,
-        employment_type: y.employment_type,
-        yacht_program: y.yacht_program,
-        description: y.description,
-        cruising_area: y.cruising_area,
-      },
-    }))
+    initialConfirmed && initialConfirmed.length > 0
+      ? initialConfirmed.map((c) => ({
+          yacht: { ...c, crew_count: null, guest_count: null, former_names: null } as ParsedYachtEmployment,
+          status: 'new' as const,
+          confirmed: c,
+        }))
+      : yachts.map((y) => ({
+          yacht: y,
+          status: 'new' as const,
+          confirmed: {
+            yacht_name: y.yacht_name,
+            yacht_type: y.yacht_type,
+            length_meters: y.length_meters,
+            flag_state: y.flag_state,
+            builder: y.builder,
+            role: y.role,
+            start_date: y.start_date,
+            end_date: y.end_date,
+            employment_type: y.employment_type,
+            yacht_program: y.yacht_program,
+            description: y.description,
+            cruising_area: y.cruising_area,
+          },
+        }))
   )
 
   // Re-sync if parse finishes and yachts change

@@ -1,6 +1,6 @@
 ---
 module: onboarding
-updated: 2026-03-21
+updated: 2026-03-25
 status: shipped
 phase: 1A
 ---
@@ -22,7 +22,8 @@ One-line: Five-step wizard (name, handle, role, yacht, endorsement invites) that
 - Resume from last completed step: working — `getStartingStep()` inspects existing profile data and jumps ahead
 - Each step persists to DB immediately: working — `saveToDb()` calls `supabase.from('users').update()` after each step
 - `onboarding_complete` flag: set to `true` in `handleDone()`; onboarding layout checks this and redirects to `/app/profile` if already complete
-- CV import: working but separate from onboarding wizard — available at `/app/cv/upload` and `/app/cv/review`; uses OpenAI `gpt-4o-mini` for extraction from PDF/DOCX; 3 parses/day limit; stores `cv_storage_path` and `cv_parsed_at`
+- CV import wizard: 5-step review flow (personal, experience, qualifications, extras, review) with phone formatting via `libphonenumber-js/min`, bio editing, date display via `formatDateDisplay()`, inline add-language, editable review cards with edit-from-review navigation. Single `buildImportData()` factory for save data construction. Available at `/app/cv/upload` and `/app/cv/review`; uses OpenAI `gpt-4o-mini` for extraction from PDF/DOCX; 3 parses/day limit
+- Onboarding `Wizard.tsx` routes through canonical `saveConfirmedImport()` via `parsedToConfirmedImport()` — does not duplicate save logic
 - CV extraction prompt: defined in `lib/cv/prompt.ts`
 - Mini-onboard in deep link flow: working — when a user arrives via endorsement request deep link with incomplete profile, `DeepLinkFlow` component collects name + role + yacht details inline before showing the endorsement form (does not go through main wizard)
 - RLS: onboarding writes scoped to own user row via anon key

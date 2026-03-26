@@ -34,7 +34,7 @@ These have been deleted as of Wave 1 cleanup (2026-03-25):
 - ~~`CvReviewClient.tsx` sessionStorage flow~~ — Deleted
 - ~~`CvImportWizard.tsx` unused props~~ — Removed (`existingAttachments`, `existingCerts`, `existingEducation`)
 - ~~`save-parsed-cv-data.ts` dual saver~~ — `saveParsedCvData()` deleted, only canonical `saveConfirmedImport()` remains
-- `CvImportWizard.tsx` builds `ConfirmedImportData` in two separate places (still open)
+- ~~`CvImportWizard.tsx` builds `ConfirmedImportData` in two separate places~~ — Fixed: extracted `buildImportData()` factory (Wave 3)
 
 ## Cleanup Tracked In
 

@@ -80,7 +80,7 @@ export function PhotoGallery({ photos, profilePhotoUrl, displayName, editable, f
             src={allPhotos[current]}
             alt={displayName}
             fill
-            className="object-cover"
+            className="object-cover object-top"
             priority={current === 0}
           />
         </motion.div>

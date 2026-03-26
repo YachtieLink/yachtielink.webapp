@@ -91,8 +91,43 @@ import { StepReview } from '@/components/cv/steps/StepReview'
 import type {
   ParsedCvData, ParsedPersonal, ParsedLanguage,
   ConfirmedYacht, ConfirmedCert, ConfirmedEducation,
-  ConfirmedImportData, SaveStats, ParsedSocialMedia,
+  ConfirmedImportData, ConfirmedPersonal, SaveStats, ParsedSocialMedia,
 } from '@/lib/cv/types'
+
+const EMPTY_PERSONAL: ConfirmedPersonal = {
+  full_name: null, primary_role: null, bio: null, phone: null, email: null,
+  location_country: null, location_city: null, dob: null, home_country: null,
+  smoke_pref: null, appearance_note: null, travel_docs: null, license_info: null,
+}
+
+/** Single factory for ConfirmedImportData — eliminates duplicate construction */
+function buildImportData(opts: {
+  confirmedPersonal: ParsedPersonal | null
+  confirmedLanguages: ParsedLanguage[]
+  confirmedYachts: ConfirmedYacht[]
+  confirmedCerts: ConfirmedCert[]
+  confirmedEducation: ConfirmedEducation[]
+  skills: string[]
+  hobbies: string[]
+  existingSkills: string[]
+  existingHobbies: string[]
+  socialMedia: ParsedSocialMedia | undefined
+}): ConfirmedImportData {
+  const existingSkillsLower = new Set(opts.existingSkills.map(s => s.toLowerCase()))
+  const existingHobbiesLower = new Set(opts.existingHobbies.map(h => h.toLowerCase()))
+
+  return {
+    personal: opts.confirmedPersonal ?? EMPTY_PERSONAL,
+    languages: opts.confirmedLanguages,
+    yachts: opts.confirmedYachts,
+    certifications: opts.confirmedCerts,
+    education: opts.confirmedEducation,
+    skills: opts.skills.filter(s => !existingSkillsLower.has(s.toLowerCase())),
+    hobbies: opts.hobbies.filter(h => !existingHobbiesLower.has(h.toLowerCase())),
+    endorsementRequests: [],
+    socialMedia: opts.socialMedia ?? { instagram: null, website: null },
+  }
+}
 
 interface CvImportWizardProps {
   userId: string
@@ -116,6 +151,8 @@ export function CvImportWizard({
   const supabase = createClient()
 
   const [step, setStep] = useState(1)
+  // Track if we're editing from the review screen so onConfirm returns to step 5
+  const returnToReviewRef = useRef(false)
   const [parseLoading, setParseLoading] = useState(true)
   const [parseStartedAt] = useState(() => Date.now())
   const [parsePersonalLoading, setParsePersonalLoading] = useState(true)
@@ -263,30 +300,23 @@ export function CvImportWizard({
     }))
   }, [parsed, parsedPersonal, parsedLanguages, step, confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, parsePersonalLoading, parseLoading, storagePath])
 
+  const getImportData = useCallback((): ConfirmedImportData => {
+    return buildImportData({
+      confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts,
+      confirmedEducation, skills, hobbies, existingSkills, existingHobbies,
+      socialMedia: parsed?.social_media,
+    })
+  }, [confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, existingSkills, existingHobbies, parsed])
+
   const handleSave = useCallback(async (): Promise<SaveStats | null> => {
-    const existingSkillsLower = existingSkills.map(s => s.toLowerCase())
-    const existingHobbiesLower = existingHobbies.map(h => h.toLowerCase())
-
-    const importData: ConfirmedImportData = {
-      personal: confirmedPersonal ?? { full_name: null, primary_role: null, bio: null, phone: null, email: null, location_country: null, location_city: null, dob: null, home_country: null, smoke_pref: null, appearance_note: null, travel_docs: null, license_info: null },
-      languages: confirmedLanguages,
-      yachts: confirmedYachts,
-      certifications: confirmedCerts,
-      education: confirmedEducation,
-      skills: skills.filter(s => !existingSkillsLower.includes(s.toLowerCase())),
-      hobbies: hobbies.filter(h => !existingHobbiesLower.includes(h.toLowerCase())),
-      endorsementRequests: [],
-      socialMedia: parsed?.social_media ?? { instagram: null, website: null },
-    }
-
     try {
-      const stats = await saveConfirmedImport(supabase, userId, importData)
+      const stats = await saveConfirmedImport(supabase, userId, getImportData())
       sessionStorage.removeItem(`cv-wizard-${storagePath}`)
       return stats
     } catch {
       return null
     }
-  }, [confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, existingSkills, existingHobbies, parsed, supabase, userId, storagePath])
+  }, [getImportData, supabase, userId, storagePath])
 
   // Parse error screen — only show if we have no data at all AND both parses are done
   // Don't show while fast parse is still in flight (it might succeed)
@@ -367,13 +397,16 @@ export function CvImportWizard({
           {step === 1 && (
             <StepPersonal
               parsed={parsedPersonal}
-              languages={parsedLanguages}
-              existing={existingProfile}
+              languages={confirmedLanguages.length > 0 ? confirmedLanguages : parsedLanguages}
+              existing={confirmedPersonal
+                ? { ...existingProfile, ...Object.fromEntries(Object.entries(confirmedPersonal).filter(([, v]) => v != null)) }
+                : existingProfile}
               parsePersonalLoading={parsePersonalLoading}
               onConfirm={(personal, langs) => {
                 setConfirmedPersonal(personal)
                 setConfirmedLanguages(langs)
-                setStep(2)
+                if (returnToReviewRef.current) { returnToReviewRef.current = false; setStep(5) }
+                else setStep(2)
               }}
             />
           )}
@@ -387,9 +420,11 @@ export function CvImportWizard({
               yachts={parsed?.employment_yacht ?? []}
               landJobs={parsed?.employment_land ?? []}
               parseLoading={false}
+              initialConfirmed={confirmedYachts.length > 0 ? confirmedYachts : undefined}
               onConfirm={(yachts) => {
                 setConfirmedYachts(yachts)
-                setStep(3)
+                if (returnToReviewRef.current) { returnToReviewRef.current = false; setStep(5) }
+                else setStep(3)
               }}
             />
           )}
@@ -399,10 +434,13 @@ export function CvImportWizard({
               certifications={parsed?.certifications ?? []}
               education={parsed?.education ?? []}
               parseLoading={false}
+              initialCerts={confirmedCerts.length > 0 ? confirmedCerts : undefined}
+              initialEducation={confirmedEducation.length > 0 ? confirmedEducation : undefined}
               onConfirm={(certs, edu) => {
                 setConfirmedCerts(certs)
                 setConfirmedEducation(edu)
-                setStep(4)
+                if (returnToReviewRef.current) { returnToReviewRef.current = false; setStep(5) }
+                else setStep(4)
               }}
             />
           )}
@@ -423,18 +461,9 @@ export function CvImportWizard({
 
           {step === 5 && (
             <StepReview
-              importData={{
-                personal: confirmedPersonal ?? { full_name: null, primary_role: null, bio: null, phone: null, email: null, location_country: null, location_city: null, dob: null, home_country: null, smoke_pref: null, appearance_note: null, travel_docs: null, license_info: null },
-                languages: confirmedLanguages,
-                yachts: confirmedYachts,
-                certifications: confirmedCerts,
-                education: confirmedEducation,
-                skills: skills.filter(s => !existingSkills.some(e => e.toLowerCase() === s.toLowerCase())),
-                hobbies: hobbies.filter(h => !existingHobbies.some(e => e.toLowerCase() === h.toLowerCase())),
-                endorsementRequests: [],
-                socialMedia: parsed?.social_media ?? { instagram: null, website: null },
-              }}
+              importData={getImportData()}
               onSave={handleSave}
+              onEditStep={(s) => { returnToReviewRef.current = true; setStep(s) }}
             />
           )}
         </motion.div>
