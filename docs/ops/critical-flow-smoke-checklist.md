@@ -2,6 +2,8 @@
 
 Use this when a branch touches any launch-critical surface or when closing a sprint that changed shared profile/CV/network/media behavior.
 
+> **Also check `docs/ops/test-backlog.md`** — it tracks specific untested changes from recent PRs. This checklist catches regressions; the test backlog catches whether new work actually works.
+
 ## Always Run First
 
 1. `npm run build`

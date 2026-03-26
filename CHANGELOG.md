@@ -27,7 +27,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 ### Done
 
 - **Profile photo framing fix:** Added `object-top` to `PhotoGallery.tsx` — profile photos now start from the head instead of centering (which cut off faces). Default is sensible; user-adjustable repositioning captured to backlog.
-- **Experience summary bug fix:** Added `yacht_id` to the attachments select query in `app/(public)/u/[handle]/page.tsx`. `computeSeaTime()` reads `a.yacht_id` but the Supabase foreign-key join (`yachts(id, ...)`) doesn't include the raw FK column unless explicitly selected. Was showing "No experience added yet" despite having 2 yachts.
+- **Experience summary bug fix:** Added `yacht_id` to `getPublicProfileSections()` in `lib/queries/profile.ts`. `computeSeaTime()` reads `a.yacht_id` but the Supabase foreign-key join (`yachts(id, ...)`) doesn't include the raw FK column unless explicitly selected. Was showing "No experience added yet" despite having 2 yachts.
 - **Name text shadow strengthened:** Replaced `drop-shadow-lg` (15% opacity) with explicit `textShadow` (60%/40% opacity) on hero name and role in both `HeroSection.tsx` and `PublicProfileContent.tsx`. Ensures readability on light-coloured profile photos.
 - **CV save robustness:** Skip yacht inserts missing `started_at` (NOT NULL constraint), added `console.error` logging to all 6 save sections for debugging partial failures.
 - **Gallery seed script:** Created `scripts/seed/seed-gallery-only.mjs` — uploads 29 gallery photos across 7 test users (Charlotte gets 12 for "Show more" threshold testing).
@@ -89,6 +89,54 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 - ⚠️ Phone formatting gracefully degrades for local numbers without country prefix (returns raw string). Could add country code picker later.
 - ⚠️ `formatDateDisplay` returns raw string for out-of-range months (month 0 or 13 from AI). Display-only, no data mutation.
+
+---
+
+## 2026-03-25 — Claude Code (Opus 4.6) — Phase 1 Closeout Waves 1 + 2
+
+### Done
+
+**Wave 1: Data Integrity + CV Consolidation (PR #89)**
+- Consolidated dual CV save path: collapsed `saveParsedCvData()` into canonical `saveConfirmedImport()` (net −301 LOC)
+- Added cert/attachment dedup (D1: maritime alias map + Levenshtein fuzzy match; D8: upsert on user+yacht+role)
+- Added date overlap validation (D2: 1mo tolerance, warn but save)
+- Deleted `CvReviewClient.tsx` (301 LOC dead code), legacy `ParsedCvData` type, unused `CvImportWizard` props
+- Routed onboarding CV persistence through canonical pipeline
+
+**Wave 2: Public Profile + Shared Read Models**
+- Created `lib/queries/types.ts` — typed interfaces replacing `any[]` across all profile surfaces
+- Created `getPublicProfileSections()`, `getCvSections()`, `getViewerRelationship()` in `lib/queries/profile.ts`
+- Extracted 80 lines of inline viewer-relationship logic from `page.tsx` to shared helper
+- Split `PublicProfileContent.tsx` (646 → ~420 LOC) into 5 section components in `components/public/sections/`
+- Fixed hero: added age (server-computed, respects dob REVOKE from anon) + sea time display
+- Fixed `available_for_work` missing from `getUserByHandle` — availability badge now renders on public profiles
+- Fixed CV 404 bug: `cv_public` null now treated as public across page, download route, and profile card (was incorrectly 404ing legacy users)
+- Public CV page now uses shared `getCvSections()` instead of inline 6-query pattern
+- Updated `profile-summaries.ts` to handle null `started_at` and array/object FK yacht references
+
+**Process**
+- Created `docs/ops/test-backlog.md` — canonical pre-commit requirement for untested changes
+- Wired test backlog into AGENTS.md pre-commit requirements, code-review discipline, smoke checklist
+- Three-phase review: Sonnet (8 findings), Opus (3 P1 + 4 P2 findings), YachtieLink drift (PASS)
+- Critical catch: Opus found `dob` column REVOKE from anon would have 404'd all public profiles for logged-out visitors (exact pattern from lessons-learned.md). Fixed by computing age server-side via authenticated query.
+
+### Context
+
+- Two closeout waves executed back-to-back. Wave 1 was committed as PR #89 and pushed. Wave 2 is on the same branch, ready to commit.
+- `lib/queries/profile.ts` grew to 446 LOC (justified — consolidated scattered inline queries; split candidate when Wave 5 touches it)
+- Responsive layout fixes (D6 transform:scale) deferred — not in this wave's scope
+
+### Next
+
+1. **Wave 3: Import wizard UX** — languages, bio, phone formatting (D4: libphonenumber-js), date consistency, editable cards
+3. **Wave 4: Profile page + skills** — personal details card, editability, skills chip UX
+4. **Wave 5: Network tab** — yacht graph (D7: list-based), endorsement/colleague grouping
+
+### Flags
+
+- ⚠️ Age only displays for logged-in viewers (dob is REVOKE'd from anon). If age should show for all visitors, need an RPC that returns computed age without exposing raw DOB.
+- ⚠️ `lib/queries/profile.ts` at 446 LOC — split into `profile.ts` + `public-profile.ts` when Wave 5 adds network queries.
+- ⚠️ Founder has not tested any Wave 1 or Wave 2 changes yet — all items tracked in `docs/ops/test-backlog.md`.
 
 ---
 

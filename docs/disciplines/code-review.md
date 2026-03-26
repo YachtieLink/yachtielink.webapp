@@ -226,3 +226,4 @@ Before merging a feature branch to main:
 8. Test dark mode on all new/changed components
 9. Test at 375px width (mobile) and 1280px (desktop)
 10. Update `CHANGELOG.md` before committing
+11. Update `docs/ops/test-backlog.md` with test items for any user-facing changes

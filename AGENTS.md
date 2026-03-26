@@ -201,6 +201,7 @@ A real Supabase account exists for automated testing. No code bypasses — it go
 | `docs/yl_features.md` | Feature definitions, phase assignments, rationale |
 | `docs/yl_decisions.json` | Product decisions and their reasoning |
 | `docs/yl_moderation.md` | Trust, integrity, and moderation mechanics |
+| `docs/ops/test-backlog.md` | Untested changes awaiting founder verification — update before every commit that changes user-facing behavior |
 | `CHANGELOG.md` | Running project log — update throughout the session, not just at the end |
 
 If docs conflict, follow `yl_system_state.json`, `yl_phase1_execution.md`, and the active sprint's `build_plan.md` for current scope. `docs/canonical/` is a historical baseline from 2026-02-11 — don't overwrite root docs with it without founder review. `notes/` is scratchpad, not instruction.
@@ -222,7 +223,7 @@ If docs conflict, follow `yl_system_state.json`, `yl_phase1_execution.md`, and t
 **Keep the design system current.** If you add a new page, update the route map in `docs/design-system/flows/app-navigation.md`. If you create a new component pattern, add it to the relevant `patterns/` file. If you make or reject a design choice, log it in `decisions/`. If you take screenshots during a UI session, drop them in `reference/screenshots/`.
 
 **CRITICAL — before every `git commit`:**
-You MUST update `CHANGELOG.md` and `STATUS.md` to reflect all work being committed BEFORE running `git commit`. This is a blocking pre-commit requirement. If the changelog does not cover the changes in the commit, stop and update it first. No exceptions — this has been missed repeatedly.
+You MUST update `CHANGELOG.md`, `STATUS.md`, and `docs/ops/test-backlog.md` to reflect all work being committed BEFORE running `git commit`. This is a blocking pre-commit requirement. If the changelog does not cover the changes in the commit, stop and update it first. No exceptions — this has been missed repeatedly. For the test backlog: add concrete test items for any user-facing behavior changes. If the commit is purely internal (docs, tooling, drift baseline), note that no test items are needed but don't skip the check.
 
 **CRITICAL — before every `git commit`:**
 You MUST also update module state files (`docs/modules/`) for any modules you touched. CHANGELOG.md, STATUS.md, AND relevant module state files must be current before committing.

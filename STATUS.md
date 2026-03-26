@@ -30,8 +30,11 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 | CV parse full build (Waves 1-7) | 2026-03-23 | 5-step import wizard, AI prompt, save function, PDF templates, CV preview, public CV view |
 | StrictMode double-fire fix | 2026-03-24 | Was burning 2x OpenAI cost per upload — guarded with `hasFiredRef` |
 | Rate limit 429 banner | 2026-03-24 | Friendly "3 free CV reads per day" instead of error screen |
+| Phase 1 Wave 1: CV consolidation | 2026-03-25 | Collapsed dual save path, cert/attachment dedup, date overlap validation, deleted 301 LOC dead code (PR #89) |
+| Phase 1 Wave 2: Public profile refactor | 2026-03-25 | Shared query helpers, typed props (eliminated any[]), 5 section components, hero age+sea time, CV 404 fix |
 | Wave 3: Import wizard UX + onboarding | 2026-03-25 | Phone formatting (libphonenumber-js), bio editing, date display consistency, add-language inline, editable review cards with edit-from-review navigation, ConfirmedImportData factory extraction |
 | Drift guardrails + smoke discipline | 2026-03-25 | Added `npm run drift-check`, canonical-owner docs, critical-flow smoke checklist, and workflow/review updates to stop more SRP/DRY drift landing unnoticed |
+| Test backlog process | 2026-03-25 | `docs/ops/test-backlog.md` — canonical pre-commit requirement for tracking untested changes |
 | Profile + CV save fixes | 2026-03-26 | Photo `object-top` framing, experience summary `yacht_id` bug, name text-shadow for light photos, CV save robustness logging, gallery seed script (29 photos across 7 test users) |
 
 ---
@@ -62,13 +65,12 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Pending Decisions
 
-D1-D8 all resolved 2026-03-25 — see `sprints/PHASE1-CLOSEOUT.md` Blockers section for details. D5 (ensign flags) deferred to post-launch.
+All D1-D8 resolved 2026-03-25. See `sprints/PHASE1-CLOSEOUT.md` Blockers section for final answers. D1 (cert dedup), D2 (date overlap), D8 (attachment dedup) implemented in Wave 1. D4 (libphonenumber-js) shipped in Wave 3. D5 (ensign flags) deferred post-launch. D6 (transform:scale) deferred from Wave 2. D7 (list-based yacht graph) queued for Wave 5.
 
 ---
 
 ## Uncommitted Code
 
-- **Wave 3 branch** (`fix/phase1-wave3-wizard-onboarding`): 2 new commits (profile fixes + backlog proposals) — ready to push
 - **Wave 5 branch** (`fix/phase1-wave5-network-endorsement`): stashed CTA fix for duplicate mobile CTAs on logged-out public profile — needs unstashing + commit
 
 ---
