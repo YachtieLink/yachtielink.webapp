@@ -49,3 +49,7 @@ Any context, constraints, or open questions.
 | [Ghost Profiles & Claimable Accounts](./ghost-profiles-claimable-accounts.md) | design complete | P1 |
 | [Endorsement Writing Assist](./endorsement-writing-assist.md) | design complete | P2 |
 | [CV Actions Card Redesign](./cv-actions-card-redesign.md) | idea | P2 |
+| [CV Review — Yacht Matching UX](./cv-review-existing-yacht-badge.md) | fleshed-out | P2 |
+| [CV Review — Cert Fuzzy Matching](./cv-review-cert-matching.md) | fleshed-out | P2 |
+| [CV Review — Education Autocomplete](./cv-review-education-autocomplete.md) | idea | P3 |
+| [CV Review — Social Links Step](./cv-review-socials-step.md) | idea | P2 |
