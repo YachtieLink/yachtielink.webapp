@@ -1,6 +1,6 @@
 ---
 module: public-profile
-updated: 2026-03-25
+updated: 2026-03-26
 status: shipped
 phase: 1A
 ---
@@ -15,10 +15,11 @@ One-line: Server-rendered public profile page at `/u/{handle}` with SEO metadata
 - SEO metadata: working — dynamic `<title>`, `<meta description>`, OpenGraph tags, Twitter card tags
 - OG image generation: working — edge API route at `/api/og?handle=...`
 - Profile view tracking: working — fire-and-forget call to `record_profile_event` RPC
-- Photo gallery hero: working — uses `getExtendedProfileSections().photos` (eliminated redundant separate query)
+- Photo gallery hero: working — uses `getExtendedProfileSections().photos` (eliminated redundant separate query). Uses `object-cover object-top` for sensible default framing (faces at top of frame).
+- Hero name overlay: uses explicit `textShadow` (60%/40% opacity black) for readability against light photos, plus gradient overlay
 - Hero stats: age (server-computed, respects dob REVOKE from anon — only shown to logged-in viewers) + sea time
 - Section visibility: working — respects `section_visibility` JSONB; hidden sections not rendered
-- Data fetched in parallel via shared helpers: `getPublicProfileSections()` (att/cert/end), `getExtendedProfileSections()` (hobbies/edu/skills/photos/gallery), auth, sea time RPC
+- Data fetched in parallel via shared helpers: `getPublicProfileSections()` (att/cert/end — includes raw `yacht_id` for sea time calculation), `getExtendedProfileSections()` (hobbies/edu/skills/photos/gallery), auth, sea time RPC
 - Viewer relationship: extracted to `getViewerRelationship()` in `lib/queries/profile.ts`:
   - Shared yachts, mutual colleagues, saved status — all computed via shared helper
 - Contact info visibility: PII stripped server-side (`phone`, `whatsapp`, `email`, `dob`)

@@ -22,6 +22,76 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-26 — Claude Code (Opus 4.6) — QA Testing, Profile Fixes, CV Import Backlog Vision
+
+### Done
+
+- **Profile photo framing fix:** Added `object-top` to `PhotoGallery.tsx` — profile photos now start from the head instead of centering (which cut off faces). Default is sensible; user-adjustable repositioning captured to backlog.
+- **Experience summary bug fix:** Added `yacht_id` to `getPublicProfileSections()` in `lib/queries/profile.ts`. `computeSeaTime()` reads `a.yacht_id` but the Supabase foreign-key join (`yachts(id, ...)`) doesn't include the raw FK column unless explicitly selected. Was showing "No experience added yet" despite having 2 yachts.
+- **Name text shadow strengthened:** Replaced `drop-shadow-lg` (15% opacity) with explicit `textShadow` (60%/40% opacity) on hero name and role in both `HeroSection.tsx` and `PublicProfileContent.tsx`. Ensures readability on light-coloured profile photos.
+- **CV save robustness:** Skip yacht inserts missing `started_at` (NOT NULL constraint), added `console.error` logging to all 6 save sections for debugging partial failures.
+- **Gallery seed script:** Created `scripts/seed/seed-gallery-only.mjs` — uploads 29 gallery photos across 7 test users (Charlotte gets 12 for "Show more" threshold testing).
+- **10 backlog proposals captured** from founder QA walkthrough of CV import flow — see Backlog section below.
+- **2 commits shipped** on `fix/phase1-wave3-wizard-onboarding`: bug fixes + backlog/seed.
+
+### Context
+
+- Branch: `fix/phase1-wave3-wizard-onboarding` — now 2 commits ahead of origin
+- Founder tested CV import for Charlotte end-to-end (2 yachts enriched, 6 certs, 7 skills, 3 education entries saved correctly)
+- Founder's CV import vision: every review step should be a graph-building engine — match against DB, show social proof, let user override, crowdsource gaps. Consistently across yachts, certs, skills, hobbies, education, and socials.
+- Wave 5 branch has a stashed CTA fix (`PublicProfileContent.tsx` duplicate CTA on mobile) — needs unstashing and committing separately
+
+### Next
+
+1. **Push wave3 branch** and update PR #91
+2. **Unstash + commit CTA fix** on wave5 branch
+3. **Wave 4: Profile page + skills** — personal details card, editability, skills chip UX
+4. **Wave 5: Network tab** — yacht graph, endorsement/colleague grouping
+5. **CV import re-import test** — upload a second CV to verify old data replaced without duplicates (PR #89 item #3, not yet tested)
+
+### Flags
+
+- ⚠️ Supabase foreign-key joins don't include the raw FK column unless explicitly selected. Any code reading `row.yacht_id` after a `.select('yachts(id, ...)')` query will get `undefined`. Logged as lesson #69.
+- ⚠️ Wave 5 branch has stashed changes that need reconciling with wave3 backlog additions.
+
+---
+
+## 2026-03-25 — Claude Code (Opus 4.6) — Wave 3: Import Wizard UX + Onboarding Handoff
+
+### Done
+
+- **Phone formatting (D4):** Installed `libphonenumber-js/min`, added auto-format on blur in StepPersonal, format parsed phone numbers on import. International format by default.
+- **Bio field handling:** Added bio textarea to StepPersonal edit mode (was missing), added bio to display summary with truncation at 80 chars.
+- **Date consistency:** Added `formatDateDisplay()` to `lib/cv/types.ts` — converts YYYY/YYYY-MM/YYYY-MM-DD to readable "Mar 2024" format. Applied across StepExperience, StepQualifications, and StepReview.
+- **Languages support:** Added inline "Add language" component in StepPersonal edit mode with proficiency dropdown and duplicate detection.
+- **Editable review cards:** Rewrote StepReview from count-only summary to section-by-section cards showing actual data (personal, languages, yachts, certs, education, skills/hobbies). Each section has an "Edit" button that navigates back to the appropriate wizard step.
+- **Review-to-edit navigation:** Added `returnToReviewRef` flag so editing from review returns to step 5 (not the next sequential step). Passes confirmed data back to steps on remount to prevent data loss.
+- **Cleanup: Duplicate ConfirmedImportData construction removed.** Extracted `buildImportData()` factory function in CvImportWizard.tsx — eliminates two inconsistent inline constructions with slightly different dedup logic. Uses `Set` instead of `Array.includes` for dedup.
+- **Cleanup: Canonical owners doc updated** — marked `ConfirmedImportData` duplicate construction as fixed.
+- **Onboarding canonical pipeline verified** — `Wizard.tsx` already routes through `saveConfirmedImport()` via `parsedToConfirmedImport()` (confirmed, no changes needed).
+- **Two-phase review passed:** Sonnet + Opus review caught dead `AsYouType` import, falsy step guard, and P1 review-edit navigation bug — all fixed before commit.
+- **Drift check:** PASS (0 new warnings).
+
+### Context
+
+- Branch: `fix/phase1-wave3-wizard-onboarding` off main
+- 8 files changed: CvImportWizard.tsx, StepPersonal.tsx, StepExperience.tsx, StepQualifications.tsx, StepReview.tsx, lib/cv/types.ts, package.json/lock
+- Onboarding `Wizard.tsx` was NOT modified — it was already on the canonical pipeline from Wave 1
+- Steps 2/3 now accept optional `initialConfirmed`/`initialCerts`/`initialEducation` props for data preservation when returning from review
+
+### Next
+
+1. **Wave 4: Profile Page + Skills** — personal details card, editability improvements, skills chip UX, section counts, extract settings load/save logic from ProfileSettingsPage
+2. **Wave 5: Network Tab + Endorsement Cleanup** — yacht graph (list-based), endorsement/colleague grouping, extract shared colleague assembly, slim RequestEndorsementClient.tsx
+3. **Session 8: Media/CRUD Standardization** — consolidate photo/gallery routes, shared Pro gating
+
+### Flags
+
+- ⚠️ Phone formatting gracefully degrades for local numbers without country prefix (returns raw string). Could add country code picker later.
+- ⚠️ `formatDateDisplay` returns raw string for out-of-range months (month 0 or 13 from AI). Display-only, no data mutation.
+
+---
+
 ## 2026-03-25 — Claude Code (Opus 4.6) — Phase 1 Closeout Waves 1 + 2
 
 ### Done

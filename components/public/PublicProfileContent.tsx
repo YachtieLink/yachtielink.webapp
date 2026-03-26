@@ -211,10 +211,11 @@ export function PublicProfileContent({
             </span>
           )}
 
-          <h1 className="text-white font-serif text-4xl md:text-5xl leading-[1.1] drop-shadow-lg tracking-tight">{displayName}</h1>
+          {/* Name — large, confident */}
+          <h1 className="text-white font-serif text-4xl md:text-5xl leading-[1.1] tracking-tight" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>{displayName}</h1>
 
           {(user.primary_role || (user.departments && user.departments.length > 0)) && (
-            <p className="text-white/90 text-base font-medium drop-shadow-sm">
+            <p className="text-white/90 text-base font-medium" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
               {user.primary_role}
               {user.primary_role && user.departments && user.departments.length > 0 && (
                 <span className="text-white/50 mx-2">·</span>

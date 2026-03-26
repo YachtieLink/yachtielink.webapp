@@ -126,11 +126,11 @@ export function HeroSection({
         )}
 
         {/* Name — large, confident, serif */}
-        <h1 className="text-white font-serif text-4xl leading-[1.1] drop-shadow-lg tracking-tight">{displayName}</h1>
+        <h1 className="text-white font-serif text-4xl leading-[1.1] tracking-tight" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>{displayName}</h1>
 
         {/* Role + Department — unified line */}
         {(primaryRole || (departments && departments.length > 0)) && (
-          <p className="text-white/90 text-base font-medium drop-shadow-sm">
+          <p className="text-white/90 text-base font-medium" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
             {primaryRole}
             {primaryRole && departments && departments.length > 0 && (
               <span className="text-white/50 mx-2">·</span>

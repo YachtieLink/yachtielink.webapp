@@ -63,15 +63,15 @@
 
 ## Week 2: Wizard, Profile, Network + Media Cleanup
 
-### Session 5 — Wave 3: Import Wizard UX + Onboarding Handoff
-- [ ] Languages support
-- [ ] Bio field handling
-- [ ] Phone formatting (D4: `libphonenumber-js`)
-- [ ] Date consistency
-- [ ] Editable cards in review flow
-- [ ] **Cleanup:** Remove duplicate `ConfirmedImportData` construction
-- [ ] **Cleanup:** Ensure onboarding completion uses canonical import pipeline
-- [ ] Run `/review`, update drift baseline
+### Session 5 — Wave 3: Import Wizard UX + Onboarding Handoff ✅
+- [x] Languages support
+- [x] Bio field handling
+- [x] Phone formatting (D4: `libphonenumber-js`)
+- [x] Date consistency
+- [x] Editable cards in review flow
+- [x] **Cleanup:** Remove duplicate `ConfirmedImportData` construction
+- [x] **Cleanup:** Ensure onboarding completion uses canonical import pipeline
+- [x] Run `/review`, update drift baseline
 
 ### Session 6 — Wave 4: Profile Page + Skills
 - [ ] Personal details card
