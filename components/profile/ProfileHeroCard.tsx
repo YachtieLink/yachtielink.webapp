@@ -51,7 +51,7 @@ export function ProfileHeroCard({
     if (!handle) return
     await navigator.clipboard.writeText(`https://${handle}.yachtie.link`)
     setCopiedPro(true)
-    toast('Pro link copied!', 'success')
+    toast(isPro ? 'Pro link copied!' : 'Link copied — upgrade to Pro to activate', isPro ? 'success' : 'info')
     setTimeout(() => setCopiedPro(false), 2000)
   }
 

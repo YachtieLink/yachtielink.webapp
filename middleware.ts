@@ -26,6 +26,7 @@ export async function middleware(request: NextRequest) {
   // {handle}.yachtie.link → rewrite to /subdomain/{handle}
   if (isSubdomain) {
     const subdomain = host.split('.yachtie.link')[0]
+    if (!subdomain) return response // guard against malformed host like ".yachtie.link"
     const url = request.nextUrl.clone()
     url.pathname = `/subdomain/${subdomain}`
     const rewrite = NextResponse.rewrite(url, { request })

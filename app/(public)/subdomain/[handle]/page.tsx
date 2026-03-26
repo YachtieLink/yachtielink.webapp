@@ -13,17 +13,10 @@ import {
   getExtendedProfileSections,
   getViewerRelationship,
 } from '@/lib/queries/profile'
+import { isProFromRecord } from '@/lib/stripe/pro'
 import type { ProfilePhoto, Hobby, Education, Skill, GalleryItem, MutualColleague } from '@/lib/queries/types'
 import { PublicProfileContent } from '@/components/public/PublicProfileContent'
 import { ReservedPage } from './reserved'
-
-/** Check Pro status with expiry (mirrors getProStatus logic without a second query) */
-function isActivePro(user: { subscription_status: string | null; subscription_ends_at: string | null }) {
-  return (
-    user.subscription_status === 'pro' &&
-    (!user.subscription_ends_at || new Date(user.subscription_ends_at) > new Date())
-  )
-}
 
 interface Props {
   params: Promise<{ handle: string }>
@@ -36,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Always point canonical to the /u/ path
   const canonical = `https://yachtie.link/u/${handle}`
 
-  if (!user || !isActivePro(user) || user.subdomain_suspended) {
+  if (!user || !isProFromRecord(user) || user.subdomain_suspended) {
     return {
       title: `${handle}.yachtie.link — Reserved`,
       robots: { index: false, follow: false },
@@ -73,7 +66,7 @@ export default async function SubdomainPage({ params }: Props) {
   const user = await getUserByHandle(handle)
 
   // Unknown handle, non-Pro, or suspended → reserved page
-  if (!user || !isActivePro(user) || user.subdomain_suspended) {
+  if (!user || !isProFromRecord(user) || user.subdomain_suspended) {
     return <ReservedPage handle={handle} hasUser={!!user} />
   }
 

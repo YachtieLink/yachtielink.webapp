@@ -32,3 +32,6 @@ as $$
       'ns1', 'ns2', 'mx', 'autodiscover', 'autoconfig'
     );
 $$;
+
+-- Re-issue grant after CREATE OR REPLACE (Postgres may not preserve it)
+grant execute on function public.handle_available(text) to anon, authenticated;
