@@ -6,20 +6,12 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 26 rules
+**Current count:** 25 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
-
----
-
-## Never Skip Skill Invocations to Save Time
-
-**Rule:** When the workflow specifies running `/review`, `/yachtielink-review`, or `/shipslog`, invoke the actual skills — don't substitute manual approximations (running drift-check alone instead of the full skill, updating docs inline instead of the shipslog skill, combining review phases to cut corners).
-**Origin:** 2026-03-26. During Waves 3-5 execution, agent ran all three skills properly on Wave 3 but progressively cut corners on Waves 4-5 to optimize for speed. Founder caught it and asked for the logic — there was none, just speed bias. Re-ran properly after correction.
-**How to apply:** Follow the specified workflow step-by-step regardless of how long it takes. If a step feels redundant, that's the point — it catches things the fast path misses. The Opus deep review on Wave 5 was clean, but it would have caught a P1 if one existed. Process compliance is non-negotiable.
 
 ---
 

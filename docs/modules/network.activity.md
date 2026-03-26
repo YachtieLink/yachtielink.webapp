@@ -6,8 +6,6 @@ When you make changes to this module, append a one-line entry with date, agent n
 
 ---
 
-**2026-03-26** — Claude Code (Opus 4.6, Phase 1 Wave 5): Rewrote ColleaguesTab from flat list to yacht-grouped view (D7: list-based). Extracted `sendEndorsementRequest()` + `sendBatchRequests()` into `lib/endorsements/send-request.ts`. Slimmed `RequestEndorsementClient.tsx` by replacing inline fetch with shared helper. Fixed Endorse link yacht_id for multi-yacht colleagues.
-
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.3): Network page — colleague cards link to `/u/{handle}`, endorsement text links converted to proper buttons; page title added.
 
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.1, Wave 1 A2): Saved profiles promoted to `/app/network/saved` — server-side data fetching, folder CRUD, move-to-folder, empty state; `SavedTab` in `AudienceTabs` replaced with link card.

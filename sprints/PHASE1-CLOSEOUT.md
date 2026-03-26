@@ -73,21 +73,21 @@
 - [x] **Cleanup:** Ensure onboarding completion uses canonical import pipeline
 - [x] Run `/review`, update drift baseline
 
-### Session 6 — Wave 4: Profile Page + Skills ✅
-- [x] Personal details card
-- [x] Editability improvements
-- [x] Skills chip UX
-- [x] Section counts
-- [x] **Cleanup:** Extract settings load/save logic from `ProfileSettingsPage` (445 LOC)
-- [x] Run `/review`, update drift baseline
+### Session 6 — Wave 4: Profile Page + Skills
+- [ ] Personal details card
+- [ ] Editability improvements
+- [ ] Skills chip UX
+- [ ] Section counts
+- [ ] **Cleanup:** Extract settings load/save logic from `ProfileSettingsPage` (445 LOC)
+- [ ] Run `/review`, update drift baseline
 
-### Session 7 — Wave 5: Network Tab + Endorsement Cleanup ✅
-- [x] Yacht graph (list-based, D7 decision applied)
-- [x] Endorsement/colleague grouping by yacht
-- [x] **Cleanup:** Extract shared colleague/network assembly
-- [x] **Cleanup:** Slim `RequestEndorsementClient.tsx` (546 LOC) — extract send/share logic to helpers
-- [x] **Cleanup:** Remove duplicate request-posting behavior
-- [x] Run `/review`, update drift baseline
+### Session 7 — Wave 5: Network Tab + Endorsement Cleanup
+- [ ] Yacht graph (list-based, D7 decision applied)
+- [ ] Endorsement/colleague grouping by yacht
+- [ ] **Cleanup:** Extract shared colleague/network assembly
+- [ ] **Cleanup:** Slim `RequestEndorsementClient.tsx` (546 LOC) — extract send/share logic to helpers
+- [ ] **Cleanup:** Remove duplicate request-posting behavior
+- [ ] Run `/review`, update drift baseline
 
 ### Session 8 — Media/CRUD Standardization (Junior Sprint)
 - [ ] Consolidate `app/api/user-photos/route.ts` + `app/api/user-gallery/route.ts` (duplicate auth, limits, reorder)
