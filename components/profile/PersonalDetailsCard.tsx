@@ -64,7 +64,7 @@ export function PersonalDetailsCard({ dob, homeCountry, smokePref, appearanceNot
         <Link href="/app/profile/settings" className="block">
           <div className="rounded-xl bg-amber-50 border border-amber-200 px-3 py-2">
             <p className="text-xs font-medium text-amber-900">
-              {missingCount} field{missingCount === 1 ? '' : 's'} captains look for {missingCount === 1 ? 'is' : 'are'} missing
+              {missingCount} field{missingCount === 1 ? '' : 's'} that hirers look for {missingCount === 1 ? 'is' : 'are'} missing
             </p>
             <p className="text-xs text-amber-700 mt-0.5">
               Complete your CV details
