@@ -1,6 +1,6 @@
 ---
 module: network
-updated: 2026-03-21
+updated: 2026-03-26
 status: shipped
 phase: 1A
 ---
@@ -13,6 +13,8 @@ One-line: The Network tab — colleague graph from shared yacht attachments, end
 
 - Network page with tabbed interface (Endorsements / Colleagues / Saved): working
 - Colleague graph via `get_colleagues` RPC: working — computes colleagues from overlapping yacht attachments
+- Colleagues tab: yacht-grouped view (D7: list-based) — colleagues sorted by yacht with link headers, dedup guard, per-group Endorse button with correct yacht_id
+- Endorsement request sending: shared `sendEndorsementRequest()` helper in `lib/endorsements/send-request.ts` — used by both colleague-direct and contact-batch flows in `RequestEndorsementClient.tsx`
 - Colleague list with shared yacht names, profile photos, role, and "Endorse" CTA: working
 - Endorsements received list with excerpt, endorser name, yacht, date: working
 - Endorsement requests received (with "Write endorsement" and "Decline" actions): working
