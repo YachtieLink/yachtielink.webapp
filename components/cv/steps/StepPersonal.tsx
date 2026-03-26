@@ -5,7 +5,15 @@ import { Input, Select, Button, DatePicker } from '@/components/ui'
 import { SearchableSelect } from '@/components/ui/SearchableSelect'
 import { ALL_COUNTRIES, PINNED_COUNTRIES } from '@/lib/constants/countries'
 import { Skeleton } from '@/components/ui/skeleton'
+import { parsePhoneNumberFromString } from 'libphonenumber-js/min'
 import type { ParsedPersonal, ParsedLanguage } from '@/lib/cv/types'
+
+/** Format a phone string to international format, or return as-is if unparseable */
+function formatPhone(raw: string): string {
+  if (!raw) return raw
+  const parsed = parsePhoneNumberFromString(raw.startsWith('+') ? raw : `+${raw}`)
+  return parsed?.formatInternational() ?? raw
+}
 
 interface StepPersonalProps {
   parsed: ParsedPersonal | null
@@ -41,6 +49,58 @@ function merge(existing: unknown, parsed: unknown): string {
   return (existing as string) || (parsed as string) || ''
 }
 
+function AddLanguageInline({ onAdd, existing }: {
+  onAdd: (lang: ParsedLanguage) => void
+  existing: string[]
+}) {
+  const [adding, setAdding] = useState(false)
+  const [name, setName] = useState('')
+  const [proficiency, setProficiency] = useState<ParsedLanguage['proficiency']>('fluent')
+
+  if (!adding) {
+    return (
+      <button
+        type="button"
+        onClick={() => setAdding(true)}
+        className="text-xs text-[var(--color-interactive)] self-start"
+      >
+        + Add language
+      </button>
+    )
+  }
+
+  function handleAdd() {
+    const trimmed = name.trim()
+    if (!trimmed || existing.includes(trimmed.toLowerCase())) return
+    onAdd({ language: trimmed, proficiency })
+    setName('')
+    setProficiency('fluent')
+    setAdding(false)
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Language name"
+        autoFocus
+        onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+        className="flex-1 h-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm"
+      />
+      <select
+        value={proficiency}
+        onChange={(e) => setProficiency(e.target.value as ParsedLanguage['proficiency'])}
+        className="h-10 rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm"
+      >
+        {PROFICIENCY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+      </select>
+      <button type="button" onClick={handleAdd} className="text-sm text-[var(--color-interactive)]">Add</button>
+      <button type="button" onClick={() => setAdding(false)} className="text-sm text-[var(--color-text-tertiary)]">×</button>
+    </div>
+  )
+}
+
 export function StepPersonal({ parsed, languages: parsedLangs, existing, parsePersonalLoading, onConfirm }: StepPersonalProps) {
   const [editing, setEditing] = useState(false)
 
@@ -48,7 +108,7 @@ export function StepPersonal({ parsed, languages: parsedLangs, existing, parsePe
   const [fullName, setFullName] = useState(merge(existing.full_name, parsed?.full_name))
   const [primaryRole, setPrimaryRole] = useState(merge(existing.primary_role, parsed?.primary_role))
   const [bio, setBio] = useState(merge(existing.bio, parsed?.bio))
-  const [phone, setPhone] = useState(merge(existing.phone, parsed?.phone))
+  const [phone, setPhone] = useState(() => formatPhone(merge(existing.phone, parsed?.phone)))
   const [locationCountry, setLocationCountry] = useState(merge(existing.location_country, parsed?.location_country))
   const [locationCity, setLocationCity] = useState(merge(existing.location_city, parsed?.location_city))
   const [dob, setDob] = useState(merge(existing.dob, parsed?.dob))
@@ -68,7 +128,7 @@ export function StepPersonal({ parsed, languages: parsedLangs, existing, parsePe
     if (!existing.full_name && parsed.full_name) setFullName(parsed.full_name)
     if (!existing.primary_role && parsed.primary_role) setPrimaryRole(parsed.primary_role)
     if (!existing.bio && parsed.bio) setBio(parsed.bio)
-    if (!existing.phone && parsed.phone) setPhone(parsed.phone)
+    if (!existing.phone && parsed.phone) setPhone(formatPhone(parsed.phone))
     if (!existing.location_country && parsed.location_country) setLocationCountry(parsed.location_country)
     if (!existing.location_city && parsed.location_city) setLocationCity(parsed.location_city)
     if (!existing.dob && parsed.dob) setDob(parsed.dob)
@@ -102,6 +162,7 @@ export function StepPersonal({ parsed, languages: parsedLangs, existing, parsePe
   const displayFields: { label: string; value: string }[] = []
   if (fullName) displayFields.push({ label: 'Name', value: fullName })
   if (primaryRole) displayFields.push({ label: 'Role', value: primaryRole })
+  if (bio) displayFields.push({ label: 'Bio', value: bio.length > 80 ? `${bio.slice(0, 80)}…` : bio })
   if (homeCountry) displayFields.push({ label: 'Nationality', value: homeCountry })
   if (locationCountry || locationCity) displayFields.push({ label: 'Location', value: [locationCity, locationCountry].filter(Boolean).join(', ') })
   if (phone) displayFields.push({ label: 'Phone', value: phone })
@@ -120,6 +181,18 @@ export function StepPersonal({ parsed, languages: parsedLangs, existing, parsePe
         <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Your Details</h2>
         <Input label="Full Name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
         <Input label="Primary Role" value={primaryRole} onChange={(e) => setPrimaryRole(e.target.value)} />
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-[var(--color-text-primary)]">Bio</label>
+          <textarea
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="Short summary about yourself..."
+            className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20 focus:border-[var(--color-interactive)] resize-none"
+          />
+          {bio && <p className="text-xs text-[var(--color-text-tertiary)] text-right">{bio.length}/500</p>}
+        </div>
         <SearchableSelect
           label="Nationality"
           value={homeCountry}
@@ -140,7 +213,13 @@ export function StepPersonal({ parsed, languages: parsedLangs, existing, parsePe
           clearable
         />
         <Input label="City" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} />
-        <Input label="Phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <Input
+          label="Phone"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          onBlur={() => { if (phone) setPhone(formatPhone(phone)) }}
+          placeholder="+44 7891 234567"
+        />
         <Select label="Smoking" value={smokePref} onChange={(e) => setSmokePref(e.target.value)}>
           {SMOKE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
         </Select>
@@ -165,6 +244,10 @@ export function StepPersonal({ parsed, languages: parsedLangs, existing, parsePe
               <button type="button" onClick={() => setLanguages(languages.filter((_, j) => j !== i))} className="text-[var(--color-text-tertiary)] hover:text-[var(--color-error)]">×</button>
             </div>
           ))}
+          <AddLanguageInline
+            onAdd={(lang) => setLanguages([...languages, lang])}
+            existing={languages.map(l => l.language.toLowerCase())}
+          />
         </div>
 
         <Button onClick={() => { setEditing(false); handleConfirm() }} className="w-full">Done</Button>

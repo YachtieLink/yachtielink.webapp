@@ -1,3 +1,19 @@
+// ── Date display helper ──────────────────────────────────
+
+const SHORT_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+/** Format a date string (YYYY, YYYY-MM, or YYYY-MM-DD) into a readable display format.
+ *  YYYY → "2024", YYYY-MM → "Mar 2024", YYYY-MM-DD → "15 Mar 2024" */
+export function formatDateDisplay(dateStr: string | null | undefined): string {
+  if (!dateStr) return ''
+  if (dateStr === 'Current' || dateStr === 'Present') return 'Present'
+  const parts = dateStr.split('-')
+  if (parts.length === 1) return parts[0] // YYYY
+  const month = SHORT_MONTHS[parseInt(parts[1], 10) - 1] ?? parts[1]
+  if (parts.length === 2) return `${month} ${parts[0]}` // YYYY-MM → "Mar 2024"
+  return `${parseInt(parts[2], 10)} ${month} ${parts[0]}` // YYYY-MM-DD → "15 Mar 2024"
+}
+
 // ── Parsed CV types (AI output) ──────────────────────────
 
 export interface ParsedPersonal {

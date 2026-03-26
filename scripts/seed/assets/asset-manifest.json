@@ -1,0 +1,2070 @@
+{
+  "generatedAt": "2026-03-26T09:24:57.741Z",
+  "asOfDate": "2026-03-26",
+  "counts": {
+    "profiles": 31,
+    "gallery": 20,
+    "yachts": 10,
+    "cvs": 25
+  },
+  "yachts": [
+    {
+      "name": "TS Artemis",
+      "slug": "artemis",
+      "yachtType": "Motor Yacht",
+      "lengthMeters": 65,
+      "builder": "L\u00fcrssen",
+      "flagState": "Cayman Islands",
+      "coverPalette": [
+        "#f4c787",
+        "#8cc0da",
+        "#2b5f6f"
+      ],
+      "photo": "yachts/artemis.jpg"
+    },
+    {
+      "name": "TS Blue Horizon",
+      "slug": "blue-horizon",
+      "yachtType": "Motor Yacht",
+      "lengthMeters": 52,
+      "builder": "Benetti",
+      "flagState": "Marshall Islands",
+      "coverPalette": [
+        "#9fd5f2",
+        "#dceef7",
+        "#35687a"
+      ],
+      "photo": "yachts/blue-horizon.jpg"
+    },
+    {
+      "name": "TS Celestia",
+      "slug": "celestia",
+      "yachtType": "Sailing Yacht",
+      "lengthMeters": 43,
+      "builder": "Oyster",
+      "flagState": "Malta",
+      "coverPalette": [
+        "#f6d8aa",
+        "#8fc7cf",
+        "#2f4f73"
+      ],
+      "photo": "yachts/celestia.jpg"
+    },
+    {
+      "name": "TS Driftwood",
+      "slug": "driftwood",
+      "yachtType": "Motor Yacht",
+      "lengthMeters": 78,
+      "builder": "Feadship",
+      "flagState": "Bermuda",
+      "coverPalette": [
+        "#efb58a",
+        "#90b8d4",
+        "#36516c"
+      ],
+      "photo": "yachts/driftwood.jpg"
+    },
+    {
+      "name": "TS Eclipse Star",
+      "slug": "eclipse-star",
+      "yachtType": "Motor Yacht",
+      "lengthMeters": 90,
+      "builder": "Oceanco",
+      "flagState": "Cayman Islands",
+      "coverPalette": [
+        "#f8d4a2",
+        "#a4c5dc",
+        "#263f58"
+      ],
+      "photo": "yachts/eclipse-star.jpg"
+    },
+    {
+      "name": "TS Falcon III",
+      "slug": "falcon-iii",
+      "yachtType": "Sailing Yacht",
+      "lengthMeters": 38,
+      "builder": "Baltic Yachts",
+      "flagState": "UK",
+      "coverPalette": [
+        "#f4d9bb",
+        "#9cc9dd",
+        "#34516c"
+      ],
+      "photo": "yachts/falcon-iii.jpg"
+    },
+    {
+      "name": "TS Golden Reef",
+      "slug": "golden-reef",
+      "yachtType": "Motor Yacht",
+      "lengthMeters": 55,
+      "builder": "Amels",
+      "flagState": "Marshall Islands",
+      "coverPalette": [
+        "#f7c96d",
+        "#88c1d1",
+        "#2f6772"
+      ],
+      "photo": "yachts/golden-reef.jpg"
+    },
+    {
+      "name": "TS Harbour Light",
+      "slug": "harbour-light",
+      "yachtType": "Motor Yacht",
+      "lengthMeters": 48,
+      "builder": "Sanlorenzo",
+      "flagState": "Malta",
+      "coverPalette": [
+        "#f7d0a5",
+        "#8dbbc8",
+        "#35556f"
+      ],
+      "photo": "yachts/harbour-light.jpg"
+    },
+    {
+      "name": "TS Iris",
+      "slug": "iris",
+      "yachtType": "Motor Yacht",
+      "lengthMeters": 70,
+      "builder": "Heesen",
+      "flagState": "Cayman Islands",
+      "coverPalette": [
+        "#f3cfb7",
+        "#97bfd7",
+        "#30526a"
+      ],
+      "photo": "yachts/iris.jpg"
+    },
+    {
+      "name": "TS Jade Wave",
+      "slug": "jade-wave",
+      "yachtType": "Sailing Yacht",
+      "lengthMeters": 34,
+      "builder": "Perini Navi",
+      "flagState": "Netherlands",
+      "coverPalette": [
+        "#eecfa3",
+        "#8ec1bf",
+        "#35546b"
+      ],
+      "photo": "yachts/jade-wave.jpg"
+    }
+  ],
+  "gallery": [
+    {
+      "slug": "deck-teak-work",
+      "label": "Deck teak maintenance",
+      "photo": "gallery/deck-teak-work.jpg"
+    },
+    {
+      "slug": "deck-rail-cleaning",
+      "label": "Deck rail cleaning",
+      "photo": "gallery/deck-rail-cleaning.jpg"
+    },
+    {
+      "slug": "silver-service",
+      "label": "Silver service setup",
+      "photo": "gallery/silver-service.jpg"
+    },
+    {
+      "slug": "sunset-stern",
+      "label": "Sunset stern view",
+      "photo": "gallery/sunset-stern.jpg"
+    },
+    {
+      "slug": "tender-driving",
+      "label": "Tender driving",
+      "photo": "gallery/tender-driving.jpg"
+    },
+    {
+      "slug": "galley-plating",
+      "label": "Galley plating",
+      "photo": "gallery/galley-plating.jpg"
+    },
+    {
+      "slug": "engine-room-rounds",
+      "label": "Engine room rounds",
+      "photo": "gallery/engine-room-rounds.jpg"
+    },
+    {
+      "slug": "water-sports-launch",
+      "label": "Water sports launch",
+      "photo": "gallery/water-sports-launch.jpg"
+    },
+    {
+      "slug": "guest-table-setting",
+      "label": "Guest table setting",
+      "photo": "gallery/guest-table-setting.jpg"
+    },
+    {
+      "slug": "bridge-watch",
+      "label": "Bridge watch",
+      "photo": "gallery/bridge-watch.jpg"
+    },
+    {
+      "slug": "beach-club-setup",
+      "label": "Beach club setup",
+      "photo": "gallery/beach-club-setup.jpg"
+    },
+    {
+      "slug": "provisioning-day",
+      "label": "Provisioning day",
+      "photo": "gallery/provisioning-day.jpg"
+    },
+    {
+      "slug": "dockside-prep",
+      "label": "Dockside prep",
+      "photo": "gallery/dockside-prep.jpg"
+    },
+    {
+      "slug": "dive-platform-kit",
+      "label": "Dive platform kit",
+      "photo": "gallery/dive-platform-kit.jpg"
+    },
+    {
+      "slug": "sunrise-anchor-watch",
+      "label": "Sunrise anchor watch",
+      "photo": "gallery/sunrise-anchor-watch.jpg"
+    },
+    {
+      "slug": "sailing-bow-watch",
+      "label": "Sailing bow watch",
+      "photo": "gallery/sailing-bow-watch.jpg"
+    },
+    {
+      "slug": "wine-service",
+      "label": "Wine service",
+      "photo": "gallery/wine-service.jpg"
+    },
+    {
+      "slug": "crew-mess-lunch",
+      "label": "Crew mess lunch",
+      "photo": "gallery/crew-mess-lunch.jpg"
+    },
+    {
+      "slug": "crew-life-collage",
+      "label": "Crew life collage",
+      "photo": "gallery/crew-life-collage.jpg"
+    },
+    {
+      "slug": "night-bridge",
+      "label": "Night bridge watch",
+      "photo": "gallery/night-bridge.jpg"
+    }
+  ],
+  "users": [
+    {
+      "first": "James",
+      "last": "Whitfield",
+      "role": "Captain",
+      "department": "Deck",
+      "nationality": "United Kingdom",
+      "dob": "1982-06-14",
+      "handle": "test-seed-james",
+      "email": "test-seed-james-whitfield@yachtie.link",
+      "phone": "+44 213 879 842",
+      "profilePhoto": "profiles/james.jpg",
+      "profilePhotos": [
+        "profiles/james.jpg",
+        "profiles/james-2.jpg"
+      ],
+      "cv": "cvs/test-seed-james-whitfield-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Native"
+        ],
+        [
+          "Spanish",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Bridge watchkeeping",
+        "Tender driving",
+        "Line handling",
+        "Teak care",
+        "Water sports setup"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Advanced Fire Fighting",
+        "PSCRB",
+        "Ship Security Officer",
+        "GMDSS GOC",
+        "VHF/SRC"
+      ],
+      "education": [
+        [
+          "Warsash Maritime Academy",
+          "Master (Yachts) 3000 GT",
+          "Navigation and command"
+        ],
+        [
+          "Southampton Solent University",
+          "Bridge Resource Management",
+          "Maritime operations"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Artemis",
+          "role": "Captain",
+          "start": "2020-03-01",
+          "end": "2023-06-30",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 65,
+          "builder": "L\u00fcrssen",
+          "flagState": "Cayman Islands"
+        },
+        {
+          "yacht": "TS Driftwood",
+          "role": "Captain",
+          "start": "2023-09-01",
+          "end": null,
+          "area": "Caribbean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 78,
+          "builder": "Feadship",
+          "flagState": "Bermuda"
+        }
+      ]
+    },
+    {
+      "first": "Sofia",
+      "last": "Marinova",
+      "role": "First Officer",
+      "department": "Deck",
+      "nationality": "Bulgaria",
+      "dob": "1990-03-22",
+      "handle": "test-seed-sofia",
+      "email": "test-seed-sofia-marinova@yachtie.link",
+      "phone": "+359 121 787 923",
+      "profilePhoto": "profiles/sofia.jpg",
+      "cv": "cvs/test-seed-sofia-marinova-cv.pdf",
+      "languages": [
+        [
+          "Bulgarian",
+          "Native"
+        ],
+        [
+          "English",
+          "Fluent"
+        ],
+        [
+          "Russian",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Bridge watchkeeping",
+        "Tender driving",
+        "Line handling",
+        "Teak care",
+        "Water sports setup"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Advanced Fire Fighting",
+        "PSCRB",
+        "Powerboat Level 2",
+        "VHF/SRC",
+        "GMDSS GOC"
+      ],
+      "education": [
+        [
+          "Maritime Professional Training, Fort Lauderdale",
+          "OOW 3000 GT",
+          "Deck operations"
+        ],
+        [
+          "Blackrock Further Education Institute",
+          "Bridge Team Management",
+          "Navigation systems"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Artemis",
+          "role": "First Officer",
+          "start": "2021-01-01",
+          "end": "2023-06-30",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 65,
+          "builder": "L\u00fcrssen",
+          "flagState": "Cayman Islands"
+        },
+        {
+          "yacht": "TS Driftwood",
+          "role": "First Officer",
+          "start": "2023-09-01",
+          "end": null,
+          "area": "Caribbean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 78,
+          "builder": "Feadship",
+          "flagState": "Bermuda"
+        }
+      ]
+    },
+    {
+      "first": "Marcus",
+      "last": "Du Plessis",
+      "role": "Bosun",
+      "department": "Deck",
+      "nationality": "South Africa",
+      "dob": "1993-11-05",
+      "handle": "test-seed-marcus",
+      "email": "test-seed-marcus-du-plessis@yachtie.link",
+      "phone": "+27 825 435 252",
+      "profilePhoto": "profiles/marcus.jpg",
+      "cv": "cvs/test-seed-marcus-du-plessis-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Native"
+        ],
+        [
+          "Afrikaans",
+          "Fluent"
+        ]
+      ],
+      "skills": [
+        "Bridge watchkeeping",
+        "Tender driving",
+        "Line handling",
+        "Teak care",
+        "Water sports setup"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Advanced Fire Fighting",
+        "Yacht Rating",
+        "Powerboat Level 2",
+        "Personal Watercraft"
+      ],
+      "education": [
+        [
+          "UKSA",
+          "Deck Operations Programme",
+          "Deck and tender operations"
+        ],
+        [
+          "Superyacht Crew Academy",
+          "Bosun Leadership Workshop",
+          "Crew management"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Artemis",
+          "role": "Bosun",
+          "start": "2020-03-01",
+          "end": "2022-12-31",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 65,
+          "builder": "L\u00fcrssen",
+          "flagState": "Cayman Islands"
+        },
+        {
+          "yacht": "TS Blue Horizon",
+          "role": "Bosun",
+          "start": "2023-03-01",
+          "end": null,
+          "area": "Caribbean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 52,
+          "builder": "Benetti",
+          "flagState": "Marshall Islands"
+        }
+      ]
+    },
+    {
+      "first": "Liam",
+      "last": "O'Connor",
+      "role": "Lead Deckhand",
+      "department": "Deck",
+      "nationality": "Ireland",
+      "dob": "1996-08-17",
+      "handle": "test-seed-liam",
+      "email": "test-seed-liam-o-connor@yachtie.link",
+      "phone": "+353 306 341 853",
+      "profilePhoto": "profiles/liam.jpg",
+      "cv": "cvs/test-seed-liam-o-connor-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Native"
+        ],
+        [
+          "French",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Bridge watchkeeping",
+        "Tender driving",
+        "Line handling",
+        "Teak care",
+        "Water sports setup"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Yacht Rating",
+        "Powerboat Level 2",
+        "VHF/SRC",
+        "Personal Watercraft"
+      ],
+      "education": [
+        [
+          "Bluewater Training",
+          "Deckhand Course",
+          "Tender and deck operations"
+        ],
+        [
+          "RYA Training Centre Antibes",
+          "Yachtmaster Offshore Theory",
+          "Navigation"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Artemis",
+          "role": "Lead Deckhand",
+          "start": "2021-04-01",
+          "end": "2022-10-31",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 65,
+          "builder": "L\u00fcrssen",
+          "flagState": "Cayman Islands"
+        },
+        {
+          "yacht": "TS Blue Horizon",
+          "role": "Lead Deckhand",
+          "start": "2023-03-01",
+          "end": "2024-10-31",
+          "area": "Caribbean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 52,
+          "builder": "Benetti",
+          "flagState": "Marshall Islands"
+        },
+        {
+          "yacht": "TS Celestia",
+          "role": "Lead Deckhand",
+          "start": "2025-01-01",
+          "end": null,
+          "area": "Pacific",
+          "yachtType": "Sailing Yacht",
+          "lengthMeters": 43,
+          "builder": "Oyster",
+          "flagState": "Malta"
+        }
+      ]
+    },
+    {
+      "first": "Tyler",
+      "last": "Jensen",
+      "role": "Deckhand",
+      "department": "Deck",
+      "nationality": "Australia",
+      "dob": "1999-02-28",
+      "handle": "test-seed-tyler",
+      "email": "test-seed-tyler-jensen@yachtie.link",
+      "phone": "+61 250 703 626",
+      "profilePhoto": "profiles/tyler.jpg",
+      "cv": "cvs/test-seed-tyler-jensen-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Native"
+        ],
+        [
+          "French",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Bridge watchkeeping",
+        "Tender driving",
+        "Line handling",
+        "Teak care",
+        "Water sports setup"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Yacht Rating",
+        "Powerboat Level 2",
+        "Personal Watercraft"
+      ],
+      "education": [
+        [
+          "Bluewater Training",
+          "Superyacht Deck Crew",
+          "Deck foundations"
+        ],
+        [
+          "RYA Training Centre",
+          "Powerboat & seamanship",
+          "Tender handling"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Blue Horizon",
+          "role": "Deckhand",
+          "start": "2024-04-01",
+          "end": "2024-10-31",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 52,
+          "builder": "Benetti",
+          "flagState": "Marshall Islands"
+        },
+        {
+          "yacht": "TS Golden Reef",
+          "role": "Deckhand",
+          "start": "2025-03-01",
+          "end": null,
+          "area": "Caribbean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 55,
+          "builder": "Amels",
+          "flagState": "Marshall Islands"
+        }
+      ]
+    },
+    {
+      "first": "Charlotte",
+      "last": "Beaumont",
+      "role": "Chief Stewardess",
+      "department": "Interior",
+      "nationality": "France",
+      "dob": "1988-12-03",
+      "handle": "test-seed-charlotte",
+      "email": "test-seed-charlotte-beaumont@yachtie.link",
+      "phone": "+33 828 611 425",
+      "profilePhoto": "profiles/charlotte.jpg",
+      "cv": "cvs/test-seed-charlotte-beaumont-cv.pdf",
+      "languages": [
+        [
+          "French",
+          "Native"
+        ],
+        [
+          "English",
+          "Fluent"
+        ],
+        [
+          "Italian",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Silver service",
+        "Housekeeping detail",
+        "Laundry management",
+        "Table styling",
+        "Guest care"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Food Safety Level 2",
+        "First Aid at Work",
+        "Powerboat Level 2"
+      ],
+      "education": [
+        [
+          "The International Butler Academy",
+          "Silver Service & Housekeeping",
+          "Luxury service"
+        ],
+        [
+          "WSET",
+          "Level 2 Award in Wines",
+          "Wine service"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Driftwood",
+          "role": "Chief Stewardess",
+          "start": "2019-06-01",
+          "end": "2022-12-31",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 78,
+          "builder": "Feadship",
+          "flagState": "Bermuda"
+        },
+        {
+          "yacht": "TS Eclipse Star",
+          "role": "Chief Stewardess",
+          "start": "2023-03-01",
+          "end": null,
+          "area": "Worldwide",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 90,
+          "builder": "Oceanco",
+          "flagState": "Cayman Islands"
+        }
+      ],
+      "profilePhotos": [
+        "profiles/charlotte.jpg",
+        "profiles/charlotte-2.jpg",
+        "profiles/charlotte-3.jpg"
+      ]
+    },
+    {
+      "first": "Elena",
+      "last": "Rossi",
+      "role": "Second Stewardess",
+      "department": "Interior",
+      "nationality": "Italy",
+      "dob": "1994-07-19",
+      "handle": "test-seed-elena",
+      "email": "test-seed-elena-rossi@yachtie.link",
+      "phone": "+39 553 231 414",
+      "profilePhoto": "profiles/elena.jpg",
+      "cv": "cvs/test-seed-elena-rossi-cv.pdf",
+      "languages": [
+        [
+          "Italian",
+          "Native"
+        ],
+        [
+          "English",
+          "Fluent"
+        ],
+        [
+          "Spanish",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Silver service",
+        "Housekeeping detail",
+        "Laundry management",
+        "Table styling",
+        "Guest care"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Food Safety Level 2",
+        "First Aid at Work"
+      ],
+      "education": [
+        [
+          "The Crew Academy",
+          "Advanced Interior Service",
+          "Guest service and laundry"
+        ],
+        [
+          "Cayman Crew Academy",
+          "Hospitality and housekeeping",
+          "Interior operations"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Driftwood",
+          "role": "Second Stewardess",
+          "start": "2021-04-01",
+          "end": "2023-06-30",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 78,
+          "builder": "Feadship",
+          "flagState": "Bermuda"
+        },
+        {
+          "yacht": "TS Artemis",
+          "role": "Second Stewardess",
+          "start": "2023-09-01",
+          "end": null,
+          "area": "Caribbean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 65,
+          "builder": "L\u00fcrssen",
+          "flagState": "Cayman Islands"
+        }
+      ]
+    },
+    {
+      "first": "Mia",
+      "last": "Van der Berg",
+      "role": "Stewardess",
+      "department": "Interior",
+      "nationality": "Netherlands",
+      "dob": "1997-01-11",
+      "handle": "test-seed-mia",
+      "email": "test-seed-mia-van-der-berg@yachtie.link",
+      "phone": "+31 573 590 983",
+      "profilePhoto": "profiles/mia.jpg",
+      "cv": "cvs/test-seed-mia-van-der-berg-cv.pdf",
+      "languages": [
+        [
+          "Dutch",
+          "Native"
+        ],
+        [
+          "English",
+          "Fluent"
+        ],
+        [
+          "German",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Silver service",
+        "Housekeeping detail",
+        "Laundry management",
+        "Table styling",
+        "Guest care"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Food Safety Level 2",
+        "First Aid at Work"
+      ],
+      "education": [
+        [
+          "The Crew Academy",
+          "Interior Introduction",
+          "Service and housekeeping"
+        ],
+        [
+          "Luxury Hospitality Institute",
+          "Guest service certificate",
+          "Service standards"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Blue Horizon",
+          "role": "Stewardess",
+          "start": "2023-03-01",
+          "end": "2024-10-31",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 52,
+          "builder": "Benetti",
+          "flagState": "Marshall Islands"
+        },
+        {
+          "yacht": "TS Harbour Light",
+          "role": "Stewardess",
+          "start": "2025-01-01",
+          "end": null,
+          "area": "Southeast Asia",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 48,
+          "builder": "Sanlorenzo",
+          "flagState": "Malta"
+        }
+      ]
+    },
+    {
+      "first": "Zara",
+      "last": "Okafor",
+      "role": "Stewardess",
+      "department": "Interior",
+      "nationality": "Nigeria",
+      "dob": "1998-05-30",
+      "handle": "test-seed-zara",
+      "email": "test-seed-zara-okafor@yachtie.link",
+      "phone": "+234 336 510 770",
+      "profilePhoto": "profiles/zara.jpg",
+      "cv": "cvs/test-seed-zara-okafor-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Native"
+        ],
+        [
+          "French",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Silver service",
+        "Housekeeping detail",
+        "Laundry management",
+        "Table styling",
+        "Guest care"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Food Safety Level 2",
+        "First Aid at Work"
+      ],
+      "education": [
+        [
+          "The Crew Academy",
+          "Interior Introduction",
+          "Service and housekeeping"
+        ],
+        [
+          "Luxury Hospitality Institute",
+          "Guest service certificate",
+          "Service standards"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Golden Reef",
+          "role": "Stewardess",
+          "start": "2025-01-01",
+          "end": null,
+          "area": "Caribbean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 55,
+          "builder": "Amels",
+          "flagState": "Marshall Islands"
+        }
+      ]
+    },
+    {
+      "first": "Hannah",
+      "last": "Fischer",
+      "role": "Junior Stewardess",
+      "department": "Interior",
+      "nationality": "Germany",
+      "dob": "2000-09-14",
+      "handle": "test-seed-hannah",
+      "email": "test-seed-hannah-fischer@yachtie.link",
+      "phone": "+49 973 816 854",
+      "profilePhoto": "profiles/hannah.jpg",
+      "cv": "cvs/test-seed-hannah-fischer-cv.pdf",
+      "languages": [
+        [
+          "German",
+          "Native"
+        ],
+        [
+          "English",
+          "Fluent"
+        ]
+      ],
+      "skills": [
+        "Silver service",
+        "Housekeeping detail",
+        "Laundry management",
+        "Table styling",
+        "Guest care"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Food Safety Level 2",
+        "First Aid at Work"
+      ],
+      "education": [
+        [
+          "The Crew Academy",
+          "Entry-Level Interior Course",
+          "Housekeeping and service"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Harbour Light",
+          "role": "Junior Stewardess",
+          "start": "2025-03-01",
+          "end": null,
+          "area": "Southeast Asia",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 48,
+          "builder": "Sanlorenzo",
+          "flagState": "Malta"
+        }
+      ]
+    },
+    {
+      "first": "David",
+      "last": "Kowalski",
+      "role": "Chief Engineer",
+      "department": "Engineering",
+      "nationality": "Poland",
+      "dob": "1979-04-08",
+      "handle": "test-seed-david",
+      "email": "test-seed-david-kowalski@yachtie.link",
+      "phone": "+48 845 963 437",
+      "profilePhoto": "profiles/david.jpg",
+      "cv": "cvs/test-seed-david-kowalski-cv.pdf",
+      "languages": [
+        [
+          "Polish",
+          "Native"
+        ],
+        [
+          "English",
+          "Fluent"
+        ]
+      ],
+      "skills": [
+        "Planned maintenance",
+        "Electrical systems",
+        "HVAC",
+        "Watermakers",
+        "Engine troubleshooting"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Advanced Fire Fighting",
+        "PSCRB",
+        "Ship Security Officer",
+        "GMDSS GOC"
+      ],
+      "education": [
+        [
+          "South Shields Marine School",
+          "Y4 Chief Engineer",
+          "Marine engineering"
+        ],
+        [
+          "MAN PrimeServ Academy",
+          "Engine systems familiarisation",
+          "Propulsion systems"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Eclipse Star",
+          "role": "Chief Engineer",
+          "start": "2018-01-01",
+          "end": "2022-12-31",
+          "area": "Worldwide",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 90,
+          "builder": "Oceanco",
+          "flagState": "Cayman Islands"
+        },
+        {
+          "yacht": "TS Artemis",
+          "role": "Chief Engineer",
+          "start": "2023-03-01",
+          "end": null,
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 65,
+          "builder": "L\u00fcrssen",
+          "flagState": "Cayman Islands"
+        }
+      ]
+    },
+    {
+      "first": "Ryan",
+      "last": "Campbell",
+      "role": "Second Engineer",
+      "department": "Engineering",
+      "nationality": "New Zealand",
+      "dob": "1991-10-22",
+      "handle": "test-seed-ryan",
+      "email": "test-seed-ryan-campbell@yachtie.link",
+      "phone": "+64 898 600 193",
+      "profilePhoto": "profiles/ryan.jpg",
+      "cv": "cvs/test-seed-ryan-campbell-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Native"
+        ],
+        [
+          "Spanish",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Planned maintenance",
+        "Electrical systems",
+        "HVAC",
+        "Watermakers",
+        "Engine troubleshooting"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Advanced Fire Fighting",
+        "PSCRB",
+        "VHF/SRC"
+      ],
+      "education": [
+        [
+          "Maritime Professional Training",
+          "AEC 1 & 2",
+          "Auxiliary engineering"
+        ],
+        [
+          "MTU Academy",
+          "Marine engine systems",
+          "Diagnostics"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Eclipse Star",
+          "role": "Second Engineer",
+          "start": "2020-06-01",
+          "end": "2023-02-28",
+          "area": "Worldwide",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 90,
+          "builder": "Oceanco",
+          "flagState": "Cayman Islands"
+        },
+        {
+          "yacht": "TS Driftwood",
+          "role": "Second Engineer",
+          "start": "2023-09-01",
+          "end": null,
+          "area": "Caribbean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 78,
+          "builder": "Feadship",
+          "flagState": "Bermuda"
+        }
+      ]
+    },
+    {
+      "first": "Kai",
+      "last": "Nakamura",
+      "role": "ETO",
+      "department": "Engineering",
+      "nationality": "Japan",
+      "dob": "1993-06-01",
+      "handle": "test-seed-kai",
+      "email": "test-seed-kai-nakamura@yachtie.link",
+      "phone": "+81 886 142 820",
+      "profilePhoto": "profiles/kai.jpg",
+      "cv": "cvs/test-seed-kai-nakamura-cv.pdf",
+      "languages": [
+        [
+          "Japanese",
+          "Native"
+        ],
+        [
+          "English",
+          "Fluent"
+        ]
+      ],
+      "skills": [
+        "Planned maintenance",
+        "Electrical systems",
+        "HVAC",
+        "Watermakers",
+        "Engine troubleshooting"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Advanced Fire Fighting",
+        "PSCRB",
+        "GMDSS GOC"
+      ],
+      "education": [
+        [
+          "Maritime Professional Training",
+          "Electro-Technical Officer Course",
+          "Marine electronics"
+        ],
+        [
+          "Yokohama Institute of Technology",
+          "Electrical Engineering",
+          "Systems and controls"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Eclipse Star",
+          "role": "ETO",
+          "start": "2021-01-01",
+          "end": "2024-06-30",
+          "area": "Worldwide",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 90,
+          "builder": "Oceanco",
+          "flagState": "Cayman Islands"
+        },
+        {
+          "yacht": "TS Iris",
+          "role": "ETO",
+          "start": "2024-09-01",
+          "end": null,
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 70,
+          "builder": "Heesen",
+          "flagState": "Cayman Islands"
+        }
+      ]
+    },
+    {
+      "first": "Pierre",
+      "last": "Laurent",
+      "role": "Head Chef",
+      "department": "Galley",
+      "nationality": "France",
+      "dob": "1985-08-25",
+      "handle": "test-seed-pierre",
+      "email": "test-seed-pierre-laurent@yachtie.link",
+      "phone": "+33 225 326 226",
+      "profilePhoto": "profiles/pierre.jpg",
+      "cv": "cvs/test-seed-pierre-laurent-cv.pdf",
+      "languages": [
+        [
+          "French",
+          "Native"
+        ],
+        [
+          "English",
+          "Fluent"
+        ],
+        [
+          "Italian",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Menu planning",
+        "Provisioning",
+        "Dietary requests",
+        "Food presentation",
+        "Crew meal planning"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Food Safety Level 2",
+        "First Aid at Work",
+        "Advanced Fire Fighting"
+      ],
+      "education": [
+        [
+          "Le Cordon Bleu Paris",
+          "Diplome de Cuisine",
+          "Classical culinary arts"
+        ],
+        [
+          "Galley Gang",
+          "Superyacht Chef Business Course",
+          "Provisioning and galley systems"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Driftwood",
+          "role": "Head Chef",
+          "start": "2019-06-01",
+          "end": "2022-12-31",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 78,
+          "builder": "Feadship",
+          "flagState": "Bermuda"
+        },
+        {
+          "yacht": "TS Eclipse Star",
+          "role": "Head Chef",
+          "start": "2023-03-01",
+          "end": null,
+          "area": "Worldwide",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 90,
+          "builder": "Oceanco",
+          "flagState": "Cayman Islands"
+        }
+      ]
+    },
+    {
+      "first": "Anna",
+      "last": "Svensson",
+      "role": "Sous Chef",
+      "department": "Galley",
+      "nationality": "Sweden",
+      "dob": "1992-03-17",
+      "handle": "test-seed-anna",
+      "email": "test-seed-anna-svensson@yachtie.link",
+      "phone": "+46 651 648 843",
+      "profilePhoto": "profiles/anna.jpg",
+      "cv": "cvs/test-seed-anna-svensson-cv.pdf",
+      "languages": [
+        [
+          "Swedish",
+          "Native"
+        ],
+        [
+          "English",
+          "Fluent"
+        ]
+      ],
+      "skills": [
+        "Menu planning",
+        "Provisioning",
+        "Dietary requests",
+        "Food presentation",
+        "Crew meal planning"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Food Safety Level 2",
+        "First Aid at Work"
+      ],
+      "education": [
+        [
+          "Stockholm Culinary Institute",
+          "Professional Cookery Diploma",
+          "Nordic cuisine"
+        ],
+        [
+          "Galley Gang",
+          "Superyacht Chef Intro",
+          "Galley workflow"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Golden Reef",
+          "role": "Sous Chef",
+          "start": "2023-04-01",
+          "end": "2024-10-31",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 55,
+          "builder": "Amels",
+          "flagState": "Marshall Islands"
+        },
+        {
+          "yacht": "TS Iris",
+          "role": "Sous Chef",
+          "start": "2025-01-01",
+          "end": null,
+          "area": "Caribbean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 70,
+          "builder": "Heesen",
+          "flagState": "Cayman Islands"
+        }
+      ]
+    },
+    {
+      "first": "Jake",
+      "last": "Thompson",
+      "role": "Crew Cook",
+      "department": "Galley",
+      "nationality": "United Kingdom",
+      "dob": "1995-12-09",
+      "handle": "test-seed-jake",
+      "email": "test-seed-jake-thompson@yachtie.link",
+      "phone": "+44 255 101 525",
+      "profilePhoto": "profiles/jake.jpg",
+      "cv": "cvs/test-seed-jake-thompson-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Native"
+        ],
+        [
+          "Spanish",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Menu planning",
+        "Provisioning",
+        "Dietary requests",
+        "Food presentation",
+        "Crew meal planning"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Food Safety Level 2",
+        "First Aid at Work"
+      ],
+      "education": [
+        [
+          "Ashburton Chefs Academy",
+          "Diploma in Culinary Arts",
+          "Professional cookery"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Blue Horizon",
+          "role": "Crew Cook",
+          "start": "2023-03-01",
+          "end": "2024-10-31",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 52,
+          "builder": "Benetti",
+          "flagState": "Marshall Islands"
+        },
+        {
+          "yacht": "TS Celestia",
+          "role": "Crew Cook",
+          "start": "2025-01-01",
+          "end": null,
+          "area": "Pacific",
+          "yachtType": "Sailing Yacht",
+          "lengthMeters": 43,
+          "builder": "Oyster",
+          "flagState": "Malta"
+        }
+      ]
+    },
+    {
+      "first": "Sarah",
+      "last": "Adams",
+      "role": "Nurse",
+      "department": "Medical",
+      "nationality": "United States",
+      "dob": "1987-11-20",
+      "handle": "test-seed-sarah",
+      "email": "test-seed-sarah-adams@yachtie.link",
+      "phone": "+1 375 324 659",
+      "profilePhoto": "profiles/sarah.jpg",
+      "cv": "cvs/test-seed-sarah-adams-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Native"
+        ],
+        [
+          "Spanish",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Primary care",
+        "Medication control",
+        "Emergency response",
+        "Discretion",
+        "Guest support"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Advanced Fire Fighting",
+        "PSCRB",
+        "First Aid at Work"
+      ],
+      "education": [
+        [
+          "University of Colorado",
+          "BSc Nursing",
+          "Adult nursing"
+        ],
+        [
+          "Remote Emergency Care",
+          "Maritime & remote medicine",
+          "Emergency response"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Eclipse Star",
+          "role": "Nurse",
+          "start": "2022-06-01",
+          "end": null,
+          "area": "Worldwide",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 90,
+          "builder": "Oceanco",
+          "flagState": "Cayman Islands"
+        }
+      ]
+    },
+    {
+      "first": "Lucy",
+      "last": "Zhao",
+      "role": "Nanny",
+      "department": "Other",
+      "nationality": "Australia",
+      "dob": "1994-04-15",
+      "handle": "test-seed-lucy",
+      "email": "test-seed-lucy-zhao@yachtie.link",
+      "phone": "+61 936 428 198",
+      "profilePhoto": "profiles/lucy.jpg",
+      "cv": "cvs/test-seed-lucy-zhao-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Native"
+        ],
+        [
+          "French",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Childcare routines",
+        "Water sports instruction",
+        "Activity planning",
+        "Guest engagement",
+        "Safety awareness"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "First Aid at Work",
+        "Food Safety Level 2"
+      ],
+      "education": [
+        [
+          "Melbourne Montessori Institute",
+          "Montessori Early Childhood",
+          "Child development"
+        ],
+        [
+          "Norland Online",
+          "Private household childcare",
+          "High-standard childcare"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Driftwood",
+          "role": "Nanny",
+          "start": "2023-09-01",
+          "end": null,
+          "area": "Caribbean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 78,
+          "builder": "Feadship",
+          "flagState": "Bermuda"
+        }
+      ]
+    },
+    {
+      "first": "Tom",
+      "last": "Rivera",
+      "role": "Dive Instructor",
+      "department": "Other",
+      "nationality": "Spain",
+      "dob": "1991-07-04",
+      "handle": "test-seed-tom",
+      "email": "test-seed-tom-rivera@yachtie.link",
+      "phone": "+34 510 752 437",
+      "profilePhoto": "profiles/tom.jpg",
+      "cv": "cvs/test-seed-tom-rivera-cv.pdf",
+      "languages": [
+        [
+          "Spanish",
+          "Native"
+        ],
+        [
+          "English",
+          "Fluent"
+        ]
+      ],
+      "skills": [
+        "Childcare routines",
+        "Water sports instruction",
+        "Activity planning",
+        "Guest engagement",
+        "Safety awareness"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "First Aid at Work",
+        "Powerboat Level 2",
+        "Personal Watercraft"
+      ],
+      "education": [
+        [
+          "PADI",
+          "Master Instructor",
+          "Dive education"
+        ],
+        [
+          "RYA Training Centre",
+          "Powerboat Level 2 Theory",
+          "Small craft handling"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Blue Horizon",
+          "role": "Dive Instructor",
+          "start": "2023-04-01",
+          "end": "2024-04-30",
+          "area": "Caribbean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 52,
+          "builder": "Benetti",
+          "flagState": "Marshall Islands"
+        },
+        {
+          "yacht": "TS Celestia",
+          "role": "Water Sports Lead",
+          "start": "2024-06-01",
+          "end": "2025-03-31",
+          "area": "Pacific",
+          "yachtType": "Sailing Yacht",
+          "lengthMeters": 43,
+          "builder": "Oyster",
+          "flagState": "Malta"
+        },
+        {
+          "yacht": "TS Jade Wave",
+          "role": "Dive Instructor",
+          "start": "2025-04-01",
+          "end": null,
+          "area": "Maldives",
+          "yachtType": "Sailing Yacht",
+          "lengthMeters": 34,
+          "builder": "Perini Navi",
+          "flagState": "Netherlands"
+        }
+      ]
+    },
+    {
+      "first": "Olivia",
+      "last": "Chen",
+      "role": "Purser",
+      "department": "Admin",
+      "nationality": "Singapore",
+      "dob": "1989-02-14",
+      "handle": "test-seed-olivia",
+      "email": "test-seed-olivia-chen@yachtie.link",
+      "phone": "+65 413 567 513",
+      "profilePhoto": "profiles/olivia.jpg",
+      "cv": "cvs/test-seed-olivia-chen-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Fluent"
+        ],
+        [
+          "Mandarin",
+          "Native"
+        ]
+      ],
+      "skills": [
+        "Crew administration",
+        "Port logistics",
+        "Budget tracking",
+        "Clearance paperwork",
+        "Confidential coordination"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Ship Security Officer",
+        "First Aid at Work",
+        "VHF/SRC"
+      ],
+      "education": [
+        [
+          "Purser Trainer",
+          "Superyacht Purser Diploma",
+          "Admin and financial management"
+        ],
+        [
+          "Singapore Management Institute",
+          "Business Administration",
+          "Operations"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Eclipse Star",
+          "role": "Purser",
+          "start": "2020-01-01",
+          "end": "2024-06-30",
+          "area": "Worldwide",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 90,
+          "builder": "Oceanco",
+          "flagState": "Cayman Islands"
+        },
+        {
+          "yacht": "TS Iris",
+          "role": "Purser",
+          "start": "2024-09-01",
+          "end": null,
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 70,
+          "builder": "Heesen",
+          "flagState": "Cayman Islands"
+        }
+      ],
+      "profilePhotos": [
+        "profiles/olivia.jpg",
+        "profiles/olivia-2.jpg",
+        "profiles/olivia-3.jpg",
+        "profiles/olivia-4.jpg"
+      ]
+    },
+    {
+      "first": "Ben",
+      "last": "Harris",
+      "role": "Deckhand",
+      "department": "Deck",
+      "nationality": "United Kingdom",
+      "dob": "1997-06-22",
+      "handle": "test-seed-ben",
+      "email": "test-seed-ben-harris@yachtie.link",
+      "phone": "+44 993 744 882",
+      "profilePhoto": "profiles/ben.jpg",
+      "cv": "cvs/test-seed-ben-harris-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Native"
+        ],
+        [
+          "Spanish",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Bridge watchkeeping",
+        "Tender driving",
+        "Line handling",
+        "Teak care",
+        "Water sports setup"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Yacht Rating",
+        "Powerboat Level 2",
+        "Personal Watercraft"
+      ],
+      "education": [
+        [
+          "Bluewater Training",
+          "Superyacht Deck Crew",
+          "Deck foundations"
+        ],
+        [
+          "RYA Training Centre",
+          "Powerboat & seamanship",
+          "Tender handling"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Golden Reef",
+          "role": "Deckhand",
+          "start": "2024-04-01",
+          "end": "2024-10-31",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 55,
+          "builder": "Amels",
+          "flagState": "Marshall Islands"
+        },
+        {
+          "yacht": "TS Falcon III",
+          "role": "Deckhand",
+          "start": "2025-01-01",
+          "end": null,
+          "area": "Caribbean",
+          "yachtType": "Sailing Yacht",
+          "lengthMeters": 38,
+          "builder": "Baltic Yachts",
+          "flagState": "UK"
+        }
+      ]
+    },
+    {
+      "first": "Chloe",
+      "last": "Martin",
+      "role": "Third Stewardess",
+      "department": "Interior",
+      "nationality": "South Africa",
+      "dob": "1998-10-08",
+      "handle": "test-seed-chloe",
+      "email": "test-seed-chloe-martin@yachtie.link",
+      "phone": "+27 569 179 745",
+      "profilePhoto": "profiles/chloe.jpg",
+      "cv": "cvs/test-seed-chloe-martin-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Native"
+        ],
+        [
+          "Afrikaans",
+          "Fluent"
+        ]
+      ],
+      "skills": [
+        "Silver service",
+        "Housekeeping detail",
+        "Laundry management",
+        "Table styling",
+        "Guest care"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Food Safety Level 2",
+        "First Aid at Work"
+      ],
+      "education": [
+        [
+          "The Crew Academy",
+          "Interior Crew Foundations",
+          "Housekeeping and laundry"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Golden Reef",
+          "role": "Third Stewardess",
+          "start": "2024-04-01",
+          "end": "2024-10-31",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 55,
+          "builder": "Amels",
+          "flagState": "Marshall Islands"
+        },
+        {
+          "yacht": "TS Harbour Light",
+          "role": "Third Stewardess",
+          "start": "2025-01-01",
+          "end": null,
+          "area": "Southeast Asia",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 48,
+          "builder": "Sanlorenzo",
+          "flagState": "Malta"
+        }
+      ]
+    },
+    {
+      "first": "Finn",
+      "last": "Murphy",
+      "role": "Second Officer",
+      "department": "Deck",
+      "nationality": "Ireland",
+      "dob": "1994-01-30",
+      "handle": "test-seed-finn",
+      "email": "test-seed-finn-murphy@yachtie.link",
+      "phone": "+353 344 388 933",
+      "profilePhoto": "profiles/finn.jpg",
+      "cv": "cvs/test-seed-finn-murphy-cv.pdf",
+      "languages": [
+        [
+          "English",
+          "Native"
+        ],
+        [
+          "French",
+          "Conversational"
+        ]
+      ],
+      "skills": [
+        "Bridge watchkeeping",
+        "Tender driving",
+        "Line handling",
+        "Teak care",
+        "Water sports setup"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "First Aid at Work",
+        "Powerboat Level 2"
+      ],
+      "education": [
+        [
+          "Bluewater Training",
+          "Superyacht Introduction",
+          "Crew foundations"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Iris",
+          "role": "Second Officer",
+          "start": "2023-06-01",
+          "end": "2024-12-31",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 70,
+          "builder": "Heesen",
+          "flagState": "Cayman Islands"
+        },
+        {
+          "yacht": "TS Falcon III",
+          "role": "Second Officer",
+          "start": "2025-03-01",
+          "end": null,
+          "area": "Caribbean",
+          "yachtType": "Sailing Yacht",
+          "lengthMeters": 38,
+          "builder": "Baltic Yachts",
+          "flagState": "UK"
+        }
+      ]
+    },
+    {
+      "first": "Grace",
+      "last": "Kim",
+      "role": "Stewardess",
+      "department": "Interior",
+      "nationality": "South Korea",
+      "dob": "1995-05-19",
+      "handle": "test-seed-grace",
+      "email": "test-seed-grace-kim@yachtie.link",
+      "phone": "+82 710 235 992",
+      "profilePhoto": "profiles/grace.jpg",
+      "cv": "cvs/test-seed-grace-kim-cv.pdf",
+      "languages": [
+        [
+          "Korean",
+          "Native"
+        ],
+        [
+          "English",
+          "Fluent"
+        ]
+      ],
+      "skills": [
+        "Silver service",
+        "Housekeeping detail",
+        "Laundry management",
+        "Table styling",
+        "Guest care"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Food Safety Level 2",
+        "First Aid at Work"
+      ],
+      "education": [
+        [
+          "The Crew Academy",
+          "Interior Introduction",
+          "Service and housekeeping"
+        ],
+        [
+          "Luxury Hospitality Institute",
+          "Guest service certificate",
+          "Service standards"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Iris",
+          "role": "Stewardess",
+          "start": "2024-01-01",
+          "end": "2024-12-31",
+          "area": "Mediterranean",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 70,
+          "builder": "Heesen",
+          "flagState": "Cayman Islands"
+        },
+        {
+          "yacht": "TS Jade Wave",
+          "role": "Stewardess",
+          "start": "2025-04-01",
+          "end": null,
+          "area": "Maldives",
+          "yachtType": "Sailing Yacht",
+          "lengthMeters": 34,
+          "builder": "Perini Navi",
+          "flagState": "Netherlands"
+        }
+      ]
+    },
+    {
+      "first": "Hugo",
+      "last": "Bergstr\u00f6m",
+      "role": "Engineer",
+      "department": "Engineering",
+      "nationality": "Sweden",
+      "dob": "1998-08-11",
+      "handle": "test-seed-hugo",
+      "email": "test-seed-hugo-bergstrom@yachtie.link",
+      "phone": "+46 910 775 775",
+      "profilePhoto": "profiles/hugo.jpg",
+      "cv": "cvs/test-seed-hugo-bergstrom-cv.pdf",
+      "languages": [
+        [
+          "Swedish",
+          "Native"
+        ],
+        [
+          "English",
+          "Fluent"
+        ]
+      ],
+      "skills": [
+        "Planned maintenance",
+        "Electrical systems",
+        "HVAC",
+        "Watermakers",
+        "Engine troubleshooting"
+      ],
+      "certifications": [
+        "STCW BST",
+        "ENG1",
+        "Advanced Fire Fighting",
+        "PSCRB"
+      ],
+      "education": [
+        [
+          "Chalmers University of Technology",
+          "BSc Mechanical Engineering",
+          "Mechanical systems"
+        ],
+        [
+          "Maritime Professional Training",
+          "AEC",
+          "Marine auxiliary systems"
+        ]
+      ],
+      "assignments": [
+        {
+          "yacht": "TS Falcon III",
+          "role": "Engineer",
+          "start": "2024-04-01",
+          "end": "2024-12-31",
+          "area": "Mediterranean",
+          "yachtType": "Sailing Yacht",
+          "lengthMeters": 38,
+          "builder": "Baltic Yachts",
+          "flagState": "UK"
+        },
+        {
+          "yacht": "TS Harbour Light",
+          "role": "Engineer",
+          "start": "2025-01-01",
+          "end": null,
+          "area": "Southeast Asia",
+          "yachtType": "Motor Yacht",
+          "lengthMeters": 48,
+          "builder": "Sanlorenzo",
+          "flagState": "Malta"
+        }
+      ]
+    }
+  ]
+}

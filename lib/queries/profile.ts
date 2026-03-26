@@ -246,7 +246,7 @@ export async function getPublicProfileSections(userId: string) {
     supabase
       .from('attachments')
       .select(`
-        id, role_label, started_at, ended_at,
+        id, yacht_id, role_label, started_at, ended_at,
         yachts ( id, name, yacht_type, length_meters, flag_state )
       `)
       .eq('user_id', userId)

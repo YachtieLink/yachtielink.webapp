@@ -18,7 +18,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 |--------|-------|--------|-------|
 | [CV Parse Bugfix](./sprints/major/phase-1b/sprint-cv-parse-bugfix/README.md) | 1B | Planning | 37 QA bugs across 5 waves — data integrity, public profile, wizard UX, profile page, network tab |
 
-**Next action:** Waves 1-5 complete. Next: Session 8 (Media/CRUD standardization).
+**Next action:** Waves 1-5 complete. Next: Media/CRUD standardization or CTA fix.
 
 ---
 
@@ -32,22 +32,26 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 | Rate limit 429 banner | 2026-03-24 | Friendly "3 free CV reads per day" instead of error screen |
 | Phase 1 Wave 1: CV consolidation | 2026-03-25 | Collapsed dual save path, cert/attachment dedup, date overlap validation, deleted 301 LOC dead code (PR #89) |
 | Phase 1 Wave 2: Public profile refactor | 2026-03-25 | Shared query helpers, typed props (eliminated any[]), 5 section components, hero age+sea time, CV 404 fix |
+| Wave 3: Import wizard UX + onboarding | 2026-03-25 | Phone formatting (libphonenumber-js), bio editing, date display consistency, add-language inline, editable review cards with edit-from-review navigation, ConfirmedImportData factory extraction |
+| Drift guardrails + smoke discipline | 2026-03-25 | Added `npm run drift-check`, canonical-owner docs, critical-flow smoke checklist, and workflow/review updates to stop more SRP/DRY drift landing unnoticed |
 | Test backlog process | 2026-03-25 | `docs/ops/test-backlog.md` — canonical pre-commit requirement for tracking untested changes |
-| Drift guardrails + smoke discipline | 2026-03-25 | Added `npm run drift-check`, canonical-owner docs, critical-flow smoke checklist |
+| Profile + CV save fixes | 2026-03-26 | Photo `object-top` framing, experience summary `yacht_id` bug, name text-shadow for light photos, CV save robustness logging, gallery seed script (29 photos across 7 test users) |
+| Wave 4: Profile page + skills | 2026-03-26 | PersonalDetailsCard, skills/hobbies chip previews in grid, useProfileSettings hook extraction |
 | Wave 5: Network tab + endorsements | 2026-03-26 | Yacht-grouped colleagues, sendEndorsementRequest helper, RequestEndorsementClient slimmed |
 
 ---
 
 ## Up Next (ordered)
 
-1. ~~Wave 1: Data integrity~~ — complete, PR #89
-2. ~~Wave 2: Public profile + shared read models~~ — complete, ready to commit
-3. ~~Wave 3: Import wizard UX~~ — complete (separate branch, pending merge)
-4. ~~Wave 4: Profile page + skills~~ — complete (separate branch, pending merge)
-5. ~~Wave 5: Network tab~~ — complete (separate branch, pending merge)
-6. **Media/CRUD standardization** (follow-up junior sprint after bugfix waves — photo/gallery dedup, shared Pro gating)
-7. **Promote Ghost Profiles to sprint** (major sprint, ~2-3 days, when bugfixes are done)
-8. **Endorsement Writing Assist** (quick junior sprint, no schema changes)
+1. ~~Answer D1-D8 design decisions~~ — resolved 2026-03-25
+2. ~~**Wave 1: Data integrity**~~ — shipped 2026-03-25
+3. ~~**Wave 2: Public profile + CV view**~~ — shipped 2026-03-25
+4. ~~**Wave 3: Import wizard UX**~~ — shipped 2026-03-25
+5. ~~**Wave 4: Profile page + skills**~~ — shipped 2026-03-26
+6. ~~**Wave 5: Network tab + endorsements**~~ — shipped 2026-03-26
+7. **Media/CRUD standardization** (follow-up junior sprint after bugfix waves — photo/gallery dedup, shared Pro gating)
+8. **Promote Ghost Profiles to sprint** (major sprint, ~2-3 days, when bugfixes are done)
+9. **Endorsement Writing Assist** (quick junior sprint, no schema changes)
 
 ---
 
@@ -63,13 +67,13 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Pending Decisions
 
-All D1-D8 resolved 2026-03-25. See `sprints/PHASE1-CLOSEOUT.md` Blockers section for final answers. D1 (cert dedup), D2 (date overlap), D8 (attachment dedup) implemented in Wave 1. D4 (libphonenumber-js) queued for Wave 3. D5 (ensign flags) deferred post-launch. D6 (transform:scale) deferred from Wave 2. D7 (list-based yacht graph) queued for Wave 5.
+All D1-D8 resolved 2026-03-25. See `sprints/PHASE1-CLOSEOUT.md` Blockers section for final answers. D1 (cert dedup), D2 (date overlap), D8 (attachment dedup) implemented in Wave 1. D4 (libphonenumber-js) shipped in Wave 3. D5 (ensign flags) deferred post-launch. D6 (transform:scale) deferred from Wave 2. D7 (list-based yacht graph) queued for Wave 5.
 
 ---
 
 ## Uncommitted Code
 
-None — Wave 2 committed and pushed on `fix/phase1-wave1-cv-consolidation`.
+- **Wave 5 branch** (`fix/phase1-wave5-network-endorsement`): stashed CTA fix for duplicate mobile CTAs on logged-out public profile — needs unstashing + commit
 
 ---
 
@@ -103,3 +107,5 @@ None — Wave 2 committed and pushed on `fix/phase1-wave1-cv-consolidation`.
 - **Ghost Profiles & Claimable Accounts** — full design spec done (24 decisions), ready for sprint promotion
 - **Endorsement Writing Assist** — full design spec done (12 decisions), no schema changes
 - **CV Actions Card Redesign** — unified card layout, relative timestamps, multi-page viewer
+- **CV Import Graph-Building Vision** — 5 new proposals: yacht matching UX, cert fuzzy matching, skill/hobby autocomplete + chip redesign, education autocomplete, social links step
+- **Profile Photo Reposition** — crop/zoom/reposition for hero framing (idea)
