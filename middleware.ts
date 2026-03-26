@@ -37,9 +37,21 @@ export async function middleware(request: NextRequest) {
   if (isSubdomain) {
     const subdomain = host.split('.yachtie.link')[0]
     if (!subdomain) return auth.response // guard against malformed host
-    const url = request.nextUrl.clone()
-    url.pathname = `/subdomain/${subdomain}`
-    return withCookies(NextResponse.rewrite(url, { request }), auth.response)
+
+    const { pathname } = request.nextUrl
+
+    // Only rewrite the root path to the subdomain profile page.
+    // All other paths (e.g. /app/profile, /signup, /u/someone) redirect
+    // to the main domain so links from the profile page work correctly.
+    if (pathname === '/' || pathname === '') {
+      const url = request.nextUrl.clone()
+      url.pathname = `/subdomain/${subdomain}`
+      return withCookies(NextResponse.rewrite(url, { request }), auth.response)
+    }
+
+    // Non-root paths on subdomain: redirect to main domain
+    const mainUrl = new URL(pathname + request.nextUrl.search, 'https://yachtie.link')
+    return withCookies(NextResponse.redirect(mainUrl), auth.response)
   }
 
   // ── Invite-only gate ─────────────────────────────────────────────────

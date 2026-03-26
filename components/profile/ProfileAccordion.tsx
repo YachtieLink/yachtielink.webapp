@@ -41,7 +41,7 @@ export function ProfileAccordion({
       style={tokens ? { borderLeftWidth: 3, borderLeftColor: tokens.accent500 } : undefined}
     >
       <button
-        className="w-full text-left p-4 flex items-start gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-interactive)] active:scale-[0.99] transition-transform"
+        className="w-full text-left p-4 flex items-start gap-3 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-interactive)] active:scale-[0.99] transition-transform"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
       >
