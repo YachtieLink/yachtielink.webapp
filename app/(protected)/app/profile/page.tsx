@@ -4,7 +4,6 @@ import Image from 'next/image'
 import { Heart, Wrench, Camera } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getUserById, getProfileSections, getExtendedProfileSections } from '@/lib/queries/profile'
-import { getProStatus } from '@/lib/stripe/pro'
 import { ProfileHeroCard } from '@/components/profile/ProfileHeroCard'
 import { ProfileStrength } from '@/components/profile/ProfileStrength'
 import { ProfileSectionGrid, type SectionItem } from '@/components/profile/ProfileSectionGrid'
@@ -31,7 +30,7 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/welcome')
 
-  const [profile, { attachments, certifications: certs, endorsements }, extended, { data: profilePhotos }, seaTimeRes, proStatus] =
+  const [profile, { attachments, certifications: certs, endorsements }, extended, { data: profilePhotos }, seaTimeRes] =
     await Promise.all([
       getUserById(user.id),
       getProfileSections(user.id),
@@ -42,7 +41,6 @@ export default async function ProfilePage() {
         .eq('user_id', user.id)
         .order('sort_order'),
       supabase.rpc('get_sea_time', { p_user_id: user.id }),
-      getProStatus(user.id),
     ])
 
   const seaTime = seaTimeRes.data as { total_days: number; yacht_count: number }[] | null
@@ -231,7 +229,6 @@ export default async function ProfilePage() {
         home_country={profile.show_home_country !== false ? profile.home_country : null}
         seaTimeTotalDays={seaTimeTotalDays}
         seaTimeYachtCount={seaTimeYachtCount}
-        isPro={proStatus.isPro}
       />
 
       {/* Social links */}
