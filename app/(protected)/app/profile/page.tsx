@@ -8,7 +8,6 @@ import { ProfileHeroCard } from '@/components/profile/ProfileHeroCard'
 import { ProfileStrength } from '@/components/profile/ProfileStrength'
 import { ProfileSectionGrid, type SectionItem } from '@/components/profile/ProfileSectionGrid'
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
-import { PersonalDetailsCard } from '@/components/profile/PersonalDetailsCard'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageTransition } from '@/components/ui/PageTransition'
 import {
@@ -131,7 +130,6 @@ export default async function ProfilePage() {
       count: extended.hobbies.length,
       visible: sectionVisibility.hobbies ?? true,
       editHref: '/app/hobbies/edit',
-      chips: extended.hobbies.map((h: { name: string; emoji?: string }) => h.emoji ? `${h.emoji} ${h.name}` : h.name),
     },
     {
       key: 'skills',
@@ -140,7 +138,6 @@ export default async function ProfilePage() {
       count: extended.skills.length,
       visible: sectionVisibility.skills ?? true,
       editHref: '/app/skills/edit',
-      chips: extended.skills.map((s: { name: string }) => s.name),
     },
     {
       key: 'photos',
@@ -249,15 +246,23 @@ export default async function ProfilePage() {
         </Link>
       )}
 
-      {/* Personal Details Card */}
-      <PersonalDetailsCard
-        dob={profile.dob}
-        homeCountry={profile.home_country}
-        smokePref={profile.smoke_pref}
-        appearanceNote={profile.appearance_note}
-        licenseInfo={profile.license_info}
-        travelDocs={(profile.travel_docs as string[]) ?? []}
-      />
+      {/* CV Completeness Prompt */}
+      {(() => {
+        const missing = [profile.dob, profile.home_country, profile.smoke_pref].filter((v) => !v).length
+        if (missing === 0) return null
+        return (
+          <Link href="/app/profile/settings">
+            <div className="bg-[var(--color-surface)] rounded-2xl px-4 py-3 border border-amber-200">
+              <p className="text-sm font-medium text-[var(--color-text-primary)]">
+                Your generated CV is missing {missing} field{missing === 1 ? '' : 's'} captains look for.
+              </p>
+              <p className="text-xs text-[var(--color-interactive)] mt-1">
+                Complete your CV details
+              </p>
+            </div>
+          </Link>
+        )
+      })()}
 
       {/* Profile Strength */}
       <ProfileStrength
