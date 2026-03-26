@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 const PRO_BENEFITS = [
   { label: 'Custom subdomain', detail: 'yourname.yachtie.link' },
   { label: 'Profile analytics', detail: 'See who viewed your profile' },
@@ -60,19 +58,19 @@ export function ReservedPage({ handle, hasUser }: ReservedPageProps) {
 
         {/* CTAs */}
         <div className="w-full flex flex-col gap-3">
-          <Link
-            href="/signup?returnTo=/app/billing"
+          <a
+            href="https://yachtie.link/signup?returnTo=/app/billing"
             className="w-full py-3 rounded-xl bg-[var(--color-interactive)] text-white text-sm font-semibold text-center hover:bg-[var(--color-interactive-hover)] transition-colors"
           >
             Activate with Pro
-          </Link>
+          </a>
           {hasUser && (
-            <Link
-              href={`/u/${handle}`}
+            <a
+              href={`https://yachtie.link/u/${handle}`}
               className="w-full py-3 rounded-xl bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] text-sm font-medium text-center hover:bg-[var(--color-text-secondary)]/10 transition-colors"
             >
               View their profile
-            </Link>
+            </a>
           )}
         </div>
       </div>
