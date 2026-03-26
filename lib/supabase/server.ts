@@ -1,6 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+/** Share auth cookies across *.yachtie.link subdomains in production */
+const COOKIE_DOMAIN = process.env.NODE_ENV === 'production' ? '.yachtie.link' : undefined;
+
 /**
  * Cookie-aware Supabase client for Server Components and Route Handlers.
  *
@@ -24,7 +27,10 @@ export async function createClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, {
+                ...options,
+                ...(COOKIE_DOMAIN ? { domain: COOKIE_DOMAIN } : {}),
+              })
             );
           } catch {
             // Server Components cannot set cookies — session refresh is
