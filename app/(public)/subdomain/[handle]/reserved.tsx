@@ -2,10 +2,10 @@ import Link from 'next/link'
 
 const PRO_BENEFITS = [
   { label: 'Custom subdomain', detail: 'yourname.yachtie.link' },
-  { label: 'Priority in crew search', detail: 'Get found first' },
-  { label: 'Unlimited photos & gallery', detail: 'Show your work' },
+  { label: 'Profile analytics', detail: 'See who viewed your profile' },
+  { label: 'Cert expiry reminders', detail: 'Never miss a renewal' },
   { label: 'Pro CV templates', detail: 'Stand out on paper' },
-  { label: 'Advanced analytics', detail: 'See who viewed your profile' },
+  { label: 'Extended photo & gallery limits', detail: 'Show your work' },
 ]
 
 interface ReservedPageProps {
