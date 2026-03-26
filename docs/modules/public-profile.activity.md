@@ -4,6 +4,10 @@ Append-only. Never edit existing entries. Newest at top.
 
 When you make changes to this module, append a one-line entry with date, agent name, and what changed.
 
+**2026-03-26** — Claude Code (Opus 4.6) (QA session): Fixed profile photo framing (`object-top` in PhotoGallery.tsx), experience summary bug (missing `yacht_id` in page.tsx select), name text-shadow strengthened for light photos (HeroSection + PublicProfileContent). Captured profile-photo-reposition backlog item.
+
+---
+
 **2026-03-24** — Claude Code (Opus 4.6) (QA Rally): Documented 8 bugs on public profile — missing age/sea time/flag in hero, CV view 404/blank/horizontal scroll, yacht names not clickable, no ensign flags. Bugfix sprint Wave 2 covers all.
 
 ---

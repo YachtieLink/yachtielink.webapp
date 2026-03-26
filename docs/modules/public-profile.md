@@ -1,6 +1,6 @@
 ---
 module: public-profile
-updated: 2026-03-21
+updated: 2026-03-26
 status: shipped
 phase: 1A
 ---
@@ -15,9 +15,10 @@ One-line: Server-rendered public profile page at `/u/{handle}` with SEO metadata
 - SEO metadata: working — dynamic `<title>`, `<meta description>`, OpenGraph tags (title, description, image, type=profile, URL), Twitter card tags
 - OG image generation: working — edge API route at `/api/og?handle=...` using `next/og` `ImageResponse`; fetches user data directly from Supabase REST API (no cached query in edge runtime); renders gradient background with profile photo, name, role, and handle
 - Profile view tracking: working — fire-and-forget call to `record_profile_event` RPC on page load
-- Photo gallery hero: working — fetches `user_photos` ordered by sort_order and passes to `PublicProfileContent`
+- Photo gallery hero: working — fetches `user_photos` ordered by sort_order and passes to `PublicProfileContent`. Uses `object-cover object-top` for sensible default framing (faces at top of frame).
+- Hero name overlay: uses explicit `textShadow` (60%/40% opacity black) for readability against light photos, plus gradient overlay (85% black at bottom)
 - Section visibility: working — respects `section_visibility` JSONB from user record; hidden sections are not rendered
-- Data fetched in parallel: attachments, certifications, endorsements, extended sections (hobbies, education, skills, gallery), and current viewer auth — all via `Promise.all`
+- Data fetched in parallel: attachments (including raw `yacht_id` for sea time calculation), certifications, endorsements, extended sections (hobbies, education, skills, gallery), and current viewer auth — all via `Promise.all`
 - Viewer relationship context: working — when viewer is authenticated and not viewing own profile:
   - Shared yachts: computed from overlapping attachment yacht_ids
   - Mutual colleagues: computed via 3-step query (profile's coworkers -> filter by viewer's yachts -> fetch user details)

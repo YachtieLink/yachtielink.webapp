@@ -32,6 +32,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 | Rate limit 429 banner | 2026-03-24 | Friendly "3 free CV reads per day" instead of error screen |
 | Wave 3: Import wizard UX + onboarding | 2026-03-25 | Phone formatting (libphonenumber-js), bio editing, date display consistency, add-language inline, editable review cards with edit-from-review navigation, ConfirmedImportData factory extraction |
 | Drift guardrails + smoke discipline | 2026-03-25 | Added `npm run drift-check`, canonical-owner docs, critical-flow smoke checklist, and workflow/review updates to stop more SRP/DRY drift landing unnoticed |
+| Profile + CV save fixes | 2026-03-26 | Photo `object-top` framing, experience summary `yacht_id` bug, name text-shadow for light photos, CV save robustness logging, gallery seed script (29 photos across 7 test users) |
 
 ---
 
@@ -67,7 +68,8 @@ D1-D8 all resolved 2026-03-25 — see `sprints/PHASE1-CLOSEOUT.md` Blockers sect
 
 ## Uncommitted Code
 
-- **Wave 3 branch** (`fix/phase1-wave3-wizard-onboarding`): phone formatting, bio editing, date display, add-language, editable review cards, buildImportData factory — ready for commit + push
+- **Wave 3 branch** (`fix/phase1-wave3-wizard-onboarding`): 2 new commits (profile fixes + backlog proposals) — ready to push
+- **Wave 5 branch** (`fix/phase1-wave5-network-endorsement`): stashed CTA fix for duplicate mobile CTAs on logged-out public profile — needs unstashing + commit
 
 ---
 
@@ -101,3 +103,5 @@ D1-D8 all resolved 2026-03-25 — see `sprints/PHASE1-CLOSEOUT.md` Blockers sect
 - **Ghost Profiles & Claimable Accounts** — full design spec done (24 decisions), ready for sprint promotion
 - **Endorsement Writing Assist** — full design spec done (12 decisions), no schema changes
 - **CV Actions Card Redesign** — unified card layout, relative timestamps, multi-page viewer
+- **CV Import Graph-Building Vision** — 5 new proposals: yacht matching UX, cert fuzzy matching, skill/hobby autocomplete + chip redesign, education autocomplete, social links step
+- **Profile Photo Reposition** — crop/zoom/reposition for hero framing (idea)

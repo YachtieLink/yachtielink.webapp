@@ -22,6 +22,40 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-26 — Claude Code (Opus 4.6) — QA Testing, Profile Fixes, CV Import Backlog Vision
+
+### Done
+
+- **Profile photo framing fix:** Added `object-top` to `PhotoGallery.tsx` — profile photos now start from the head instead of centering (which cut off faces). Default is sensible; user-adjustable repositioning captured to backlog.
+- **Experience summary bug fix:** Added `yacht_id` to the attachments select query in `app/(public)/u/[handle]/page.tsx`. `computeSeaTime()` reads `a.yacht_id` but the Supabase foreign-key join (`yachts(id, ...)`) doesn't include the raw FK column unless explicitly selected. Was showing "No experience added yet" despite having 2 yachts.
+- **Name text shadow strengthened:** Replaced `drop-shadow-lg` (15% opacity) with explicit `textShadow` (60%/40% opacity) on hero name and role in both `HeroSection.tsx` and `PublicProfileContent.tsx`. Ensures readability on light-coloured profile photos.
+- **CV save robustness:** Skip yacht inserts missing `started_at` (NOT NULL constraint), added `console.error` logging to all 6 save sections for debugging partial failures.
+- **Gallery seed script:** Created `scripts/seed/seed-gallery-only.mjs` — uploads 29 gallery photos across 7 test users (Charlotte gets 12 for "Show more" threshold testing).
+- **10 backlog proposals captured** from founder QA walkthrough of CV import flow — see Backlog section below.
+- **2 commits shipped** on `fix/phase1-wave3-wizard-onboarding`: bug fixes + backlog/seed.
+
+### Context
+
+- Branch: `fix/phase1-wave3-wizard-onboarding` — now 2 commits ahead of origin
+- Founder tested CV import for Charlotte end-to-end (2 yachts enriched, 6 certs, 7 skills, 3 education entries saved correctly)
+- Founder's CV import vision: every review step should be a graph-building engine — match against DB, show social proof, let user override, crowdsource gaps. Consistently across yachts, certs, skills, hobbies, education, and socials.
+- Wave 5 branch has a stashed CTA fix (`PublicProfileContent.tsx` duplicate CTA on mobile) — needs unstashing and committing separately
+
+### Next
+
+1. **Push wave3 branch** and update PR #91
+2. **Unstash + commit CTA fix** on wave5 branch
+3. **Wave 4: Profile page + skills** — personal details card, editability, skills chip UX
+4. **Wave 5: Network tab** — yacht graph, endorsement/colleague grouping
+5. **CV import re-import test** — upload a second CV to verify old data replaced without duplicates (PR #89 item #3, not yet tested)
+
+### Flags
+
+- ⚠️ Supabase foreign-key joins don't include the raw FK column unless explicitly selected. Any code reading `row.yacht_id` after a `.select('yachts(id, ...)')` query will get `undefined`. Logged as lesson #69.
+- ⚠️ Wave 5 branch has stashed changes that need reconciling with wave3 backlog additions.
+
+---
+
 ## 2026-03-25 — Claude Code (Opus 4.6) — Wave 3: Import Wizard UX + Onboarding Handoff
 
 ### Done
