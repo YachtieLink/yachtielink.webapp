@@ -18,6 +18,7 @@ interface ProfileHeroCardProps {
   home_country?: string | null
   seaTimeTotalDays?: number
   seaTimeYachtCount?: number
+  isPro?: boolean
 }
 
 export function ProfileHeroCard({
@@ -29,11 +30,14 @@ export function ProfileHeroCard({
   home_country,
   seaTimeTotalDays,
   seaTimeYachtCount,
+  isPro = false,
 }: ProfileHeroCardProps) {
   const { toast } = useToast()
   const [copied, setCopied] = useState(false)
+  const [copiedPro, setCopiedPro] = useState(false)
 
   const profileUrl = handle ? `yachtie.link/u/${handle}` : null
+  const proUrl = handle ? `${handle}.yachtie.link` : null
 
   async function copyUrl() {
     if (!handle) return
@@ -41,6 +45,14 @@ export function ProfileHeroCard({
     setCopied(true)
     toast('Profile link copied!', 'success')
     setTimeout(() => setCopied(false), 2000)
+  }
+
+  async function copyProUrl() {
+    if (!handle) return
+    await navigator.clipboard.writeText(`https://${handle}.yachtie.link`)
+    setCopiedPro(true)
+    toast('Pro link copied!', 'success')
+    setTimeout(() => setCopiedPro(false), 2000)
   }
 
   async function shareProfile() {
@@ -102,14 +114,50 @@ export function ProfileHeroCard({
       </div>
 
       {profileUrl && (
-        <div className="flex items-center gap-2">
-          <p className="text-sm text-[var(--color-interactive)] truncate">{profileUrl}</p>
-          <button
-            onClick={copyUrl}
-            className="shrink-0 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors p-1"
-          >
-            {copied ? <Check size={14} /> : <Copy size={14} />}
-          </button>
+        <div className="flex flex-col gap-1.5">
+          {/* Free link */}
+          <div className="flex items-center gap-2">
+            <span className="shrink-0 w-8" />
+            <p className="text-sm text-[var(--color-interactive)] truncate flex-1">{profileUrl}</p>
+            <button
+              onClick={copyUrl}
+              className="shrink-0 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors p-1"
+            >
+              {copied ? <Check size={14} /> : <Copy size={14} />}
+            </button>
+          </div>
+          {/* Pro subdomain link */}
+          {proUrl && (
+            <div className="flex items-center gap-2">
+              <Link href="/app/billing" className="shrink-0 w-8 flex items-center justify-center">
+                <span className="text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded bg-[var(--color-teal-100)] text-[var(--color-teal-700)] hover:bg-[var(--color-teal-200)] transition-colors cursor-pointer">
+                  Pro
+                </span>
+              </Link>
+              <a
+                href={`https://${proUrl}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`text-sm truncate flex-1 ${isPro ? 'text-[var(--color-interactive)] hover:underline' : 'text-[var(--color-text-tertiary)]'}`}
+              >
+                {proUrl}
+              </a>
+              <button
+                onClick={copyProUrl}
+                className="shrink-0 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors p-1"
+              >
+                {copiedPro ? <Check size={14} /> : <Copy size={14} />}
+              </button>
+              {!isPro && (
+                <Link
+                  href="/app/billing"
+                  className="shrink-0 text-[10px] font-medium text-[var(--color-interactive)] hover:underline"
+                >
+                  Upgrade
+                </Link>
+              )}
+            </div>
+          )}
         </div>
       )}
 

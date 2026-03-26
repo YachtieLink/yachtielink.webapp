@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { uploadCV } from "@/lib/storage/upload";
 import { saveConfirmedImport, parsedToConfirmedImport } from "@/lib/cv/save-parsed-cv-data";
 import type { ParsedCvData, SaveStats } from "@/lib/cv/types";
+import { RESERVED_HANDLES } from "@/lib/constants/reserved-handles";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -441,6 +442,12 @@ function StepHandle({
         setFormatError(
           "3–30 characters: lowercase letters, numbers, and hyphens only (must start and end with a letter or number)"
         );
+        return;
+      }
+
+      if (RESERVED_HANDLES.has(value)) {
+        setAvailable(false);
+        setChecking(false);
         return;
       }
 
