@@ -48,8 +48,8 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 2. ~~**Wave 1: Data integrity**~~ — shipped 2026-03-25
 3. ~~**Wave 2: Public profile + CV view**~~ — shipped 2026-03-25
 4. ~~**Wave 3: Import wizard UX**~~ — shipped 2026-03-25
-5. ~~**Wave 4: Profile page + skills**~~ — shipped 2026-03-26
-6. ~~**Wave 5: Network tab + endorsements**~~ — shipped 2026-03-26
+5. ~~**Wave 4: Profile page + skills**~~ — QA passed, PR #96
+6. ~~**Wave 5: Network tab + Pro subdomain**~~ — QA passed, PR #97
 7. **Media/CRUD standardization** (follow-up junior sprint after bugfix waves — photo/gallery dedup, shared Pro gating)
 8. **Promote Ghost Profiles to sprint** (major sprint, ~2-3 days, when bugfixes are done)
 9. **Endorsement Writing Assist** (quick junior sprint, no schema changes)

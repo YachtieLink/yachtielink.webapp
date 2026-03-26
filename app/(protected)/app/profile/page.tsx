@@ -100,7 +100,7 @@ export default async function ProfilePage() {
       summary: experienceSummary(attachments ?? []),
       count: attachments?.length ?? 0,
       visible: sectionVisibility.experience ?? true,
-      editHref: '/app/attachment/new',
+      editHref: '/app/attachment',
     },
     {
       key: 'endorsements',

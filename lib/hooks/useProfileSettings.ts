@@ -45,7 +45,7 @@ export function useProfileSettings() {
   useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) { setLoaded(true); return }
       const { data } = await supabase
         .from('users')
         .select(SETTINGS_COLUMNS)
@@ -58,10 +58,10 @@ export function useProfileSettings() {
           contact_email:     data.email              ?? '',
           location_country:  data.location_country   ?? '',
           location_city:     data.location_city      ?? '',
-          show_phone:        data.show_phone,
-          show_whatsapp:     data.show_whatsapp,
-          show_email:        data.show_email,
-          show_location:     data.show_location,
+          show_phone:        data.show_phone        ?? false,
+          show_whatsapp:     data.show_whatsapp     ?? false,
+          show_email:        data.show_email        ?? false,
+          show_location:     data.show_location     ?? false,
           dob:               data.dob                ?? '',
           home_country:      data.home_country       ?? '',
           smoke_pref:        data.smoke_pref         ?? '',

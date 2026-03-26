@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/Button'
 import { BackButton } from '@/components/ui/BackButton'
 import { Input } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
-import { sendEndorsementRequest, sendBatchRequests } from '@/lib/endorsements/send-request'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -158,19 +157,29 @@ export function RequestEndorsementClient({
       return
     }
     setColleagueStates((prev) => ({ ...prev, [colleague.id]: 'sending' }))
-    const result = await sendEndorsementRequest({
-      yacht_id: yacht.id,
-      yacht_name: yacht.name,
-      recipient_user_id: colleague.id,
-      recipient_email: colleague.email ?? undefined,
-    })
-    if (result.ok) {
-      setColleagueStates((prev) => ({ ...prev, [colleague.id]: 'sent' }))
-      setRemaining((r) => Math.max(0, r - 1))
-      toast(`Request sent to ${colleague.name}`, 'success')
-    } else {
+    try {
+      const res = await fetch('/api/endorsement-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          yacht_id: yacht.id,
+          yacht_name: yacht.name,
+          recipient_user_id: colleague.id,
+          recipient_email: colleague.email,
+        }),
+      })
+      const data = await res.json()
+      if (res.ok && (data.ok || data.skipped)) {
+        setColleagueStates((prev) => ({ ...prev, [colleague.id]: 'sent' }))
+        setRemaining((r) => Math.max(0, r - 1))
+        toast(`Request sent to ${colleague.name}`, 'success')
+      } else {
+        setColleagueStates((prev) => ({ ...prev, [colleague.id]: 'error' }))
+        toast('Failed to send request.', 'error')
+      }
+    } catch {
       setColleagueStates((prev) => ({ ...prev, [colleague.id]: 'error' }))
-      toast(result.error ?? 'Failed to send request.', 'error')
+      toast('Failed to send request.', 'error')
     }
   }
 
@@ -184,9 +193,33 @@ export function RequestEndorsementClient({
     }
 
     setSending(true)
-    const { successCount, failCount } = await sendBatchRequests(yacht.id, yacht.name, contacts)
-    setSending(false)
+    let successCount = 0
+    let failCount = 0
 
+    for (const contact of contacts) {
+      try {
+        const res = await fetch('/api/endorsement-requests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            yacht_id: yacht.id,
+            yacht_name: yacht.name,
+            recipient_email: contact.type === 'email' ? contact.value : undefined,
+            recipient_phone: contact.type === 'phone' ? contact.value : undefined,
+          }),
+        })
+        const data = await res.json()
+        if (res.ok && (data.ok || data.skipped)) {
+          successCount++
+        } else {
+          failCount++
+        }
+      } catch {
+        failCount++
+      }
+    }
+
+    setSending(false)
     if (successCount > 0) {
       toast(`Sent to ${successCount} contact${successCount === 1 ? '' : 's'}.`, 'success')
       setContacts([])
