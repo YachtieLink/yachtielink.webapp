@@ -1,6 +1,6 @@
 ---
 module: profile
-updated: 2026-03-25
+updated: 2026-03-26
 status: shipped
 phase: 1A
 ---
@@ -11,7 +11,7 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 
 ## Current State
 
-- Profile page: working — server-rendered dashboard at `/app/profile` showing hero card, photo strip, strength meter, section grid, and empty-state prompts
+- Profile page: working — server-rendered dashboard at `/app/profile` showing hero card, photo strip, personal details card (age/nationality/smoking/tattoos/license/travel docs), strength meter, section grid with chip previews for skills/hobbies, and empty-state prompts
 - Profile photo: working — upload with client-side crop (react-image-crop), 800px square output, JPEG/PNG/WebP, 5 MB max
 - Multi-photo gallery: working — `user_photos` table, ordered strip with "Main" badge on first, up to 9 photos (reorder via API)
 - Work gallery: working — `user_gallery` table with optional caption and yacht association, up to 30 items
