@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-26 (Waves 1-5 complete)
+**Last updated:** 2026-03-26 (Waves 1-5 QA'd, PRs #96 + #97 ready for merge)
 
 ---
 
@@ -18,7 +18,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 |--------|-------|--------|-------|
 | [CV Parse Bugfix](./sprints/major/phase-1b/sprint-cv-parse-bugfix/README.md) | 1B | Planning | 37 QA bugs across 5 waves — data integrity, public profile, wizard UX, profile page, network tab |
 
-**Next action:** Waves 1-5 complete. Next: Media/CRUD standardization or CTA fix.
+**Next action:** Merge PRs #96 (wave4) and #97 (wave5). Then: consolidate subdomain/public profile read model, custom 404, media/CRUD standardization.
 
 ---
 
@@ -38,6 +38,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 | Profile + CV save fixes | 2026-03-26 | Photo `object-top` framing, experience summary `yacht_id` bug, name text-shadow for light photos, CV save robustness logging, gallery seed script (29 photos across 7 test users) |
 | Wave 4: Profile page + skills | 2026-03-26 | PersonalDetailsCard, skills/hobbies chip previews in grid, useProfileSettings hook extraction |
 | Wave 5: Network tab + endorsements | 2026-03-26 | Yacht-grouped colleagues, sendEndorsementRequest helper, RequestEndorsementClient slimmed |
+| Pro subdomain routing | 2026-03-26 | Middleware rewrite for `*.yachtie.link`, reserved landing page, handle blocklist, Pro link in hero card, cookie refresh fix, billing placeholder |
 
 ---
 

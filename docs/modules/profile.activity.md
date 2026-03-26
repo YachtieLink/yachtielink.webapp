@@ -4,6 +4,8 @@ Append-only. Never edit existing entries. Newest at top.
 
 When you make changes to this module, append a one-line entry with date, agent name, and what changed.
 
+**2026-03-26** — Claude Code (Opus 4.6) (Wave 5 QA): Wired `isPro` prop to ProfileHeroCard via `getProStatus`. Fixed `isProFromRecord` extraction into `lib/stripe/pro.ts` (canonical pure check). Fixed non-Pro copy toast UX. Created `/app/billing` placeholder page. Corrected Pro benefits list on reserved page (removed false "Priority in crew search", "Unlimited photos" → "Extended limits", added "Cert expiry reminders").
+
 **2026-03-26** — Claude Code (Opus 4.6) (Phase 1 Wave 4): Added `PersonalDetailsCard` component to profile page (replaces CV completeness warning). Added chip preview in `ProfileSectionGrid` for skills/hobbies sections. Extracted `useProfileSettings` hook from `ProfileSettingsPage` (445 → 185 LOC page + 115 LOC hook).
 
 **2026-03-25** — Claude Code (Opus 4.6) (Phase 1 Wave 2): Extended `lib/queries/profile.ts` with shared query helpers (`getPublicProfileSections`, `getCvSections`, `getViewerRelationship`); added `lib/queries/types.ts` with 12 typed interfaces; updated `lib/profile-summaries.ts` to handle null `started_at` and array/object FK yacht references with `resolveYachtId` helper.
