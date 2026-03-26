@@ -1,6 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
+/**
+ * Returns a container where `response` is always the latest value.
+ * Supabase's `setAll` reassigns `response` internally when refreshing cookies.
+ * Using a getter ensures callers always read the post-refresh response,
+ * not the stale initial one captured at destructure time.
+ */
 export function createMiddlewareClient(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -25,5 +31,8 @@ export function createMiddlewareClient(request: NextRequest) {
     }
   );
 
-  return { supabase, response };
+  return {
+    supabase,
+    get response() { return response; },
+  };
 }

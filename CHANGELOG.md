@@ -22,6 +22,73 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-26 — Claude Code (Opus 4.6) — Wave 5 QA + Pro Subdomain Review
+
+### Done
+
+- **Two-phase code review (Wave 5):** Phase 1 (Sonnet) found 3 HIGH + 4 MEDIUM. Phase 2 (Opus) found 1 P1 (middleware cookie refresh broken) + 2 P2s. All fixed.
+- **P1 fix: Middleware cookie refresh:** `createMiddlewareClient` returned response by value — callers got stale reference after Supabase `setAll`. Fixed with getter pattern. All redirect responses now carry auth cookies via `withCookies` helper.
+- **Canonical Pro gate:** Extracted `isProFromRecord()` into `lib/stripe/pro.ts`. Subdomain route and `getProStatus` both use it. Removed inline `isActivePro`.
+- **ProfileHeroCard isPro:** Wired `getProStatus` into profile page, passes `isPro` to hero card. Pro users see active subdomain link, free users see greyed-out with "Upgrade".
+- **Pro benefits accuracy:** Removed false "Priority in crew search" claim. Changed "Unlimited photos" to "Extended photo & gallery limits". Added "Cert expiry reminders" per D-023.
+- **Billing placeholder:** Created `/app/billing` coming-soon page so Pro badge link doesn't 404.
+- **Copy fixes:** "captains" → "that hirers" on wave5 branch. Non-Pro copy toast: "Link copied — upgrade to Pro to activate".
+- **Migration fix:** Re-issued GRANT EXECUTE after CREATE OR REPLACE on `handle_available`.
+- **Middleware guard:** Empty subdomain string guard for malformed `.yachtie.link` host.
+- **YachtieLink drift review:** WARNING — subdomain page duplicates public profile read model. Noted for consolidation in next cleanup sprint. No canonical owner bypasses.
+- **Subdomain DNS verified:** `dev-qa.yachtie.link` rendering full profile in production via Vercel.
+
+### Context
+
+- Branch: `fix/phase1-wave5-network-endorsement` — PR #97, ready for merge
+- 6 commits: subdomain feature, proxy.ts removal, review fixes, P1 cookie fix, QA fixes
+- `proxy.ts` replaced by `middleware.ts` (subdomain routing requires root middleware)
+- Vercel DNS configured and operational for `*.yachtie.link`
+
+### Next
+
+1. **Merge Wave 4 (PR #96) then Wave 5 (PR #97)** — both QA'd
+2. **Consolidate subdomain/public-profile read model** — extract shared loader to eliminate duplication
+3. **Custom 404 page** — branded page with nautical copy
+4. **Media/CRUD standardization** — consolidate photo/gallery routes
+
+### Flags
+
+- ⚠️ Subdomain route duplicates public profile read model (known, tracked for cleanup)
+- ⚠️ `subdomain_suspended` column writable by user via own-update RLS — needs admin-only restriction before abuse flag is used in production
+- ⚠️ Client/DB reserved handle lists maintained separately — drift risk
+
+---
+
+## 2026-03-26 — Claude Code (Opus 4.6) — Wave 4 QA + Reverts + Pro Subdomain Commit
+
+### Done
+
+- **Wave 4+5 revert:** Reverted premature merges of PRs #92 and #93. Created revert PR #95, merged by founder. Recreated wave4 branch via cherry-pick onto clean main.
+- **Two-phase code review (Wave 4):** Phase 1 (Sonnet) found 1 MEDIUM + 4 LOW. Phase 2 (Opus) found 0 new bugs. Drift check PASS. All fixes applied.
+- **Wave 4 QA walkthrough with founder:** Full interactive checklist — all items passed.
+- **Copy fix:** "captains look for" → "that hirers look for" in PersonalDetailsCard warning.
+- **Experience list page (new):** Built `/app/attachment/page.tsx`. Fixed `editHref` for experience section.
+- **Review bug fixes:** `useProfileSettings` — `setLoaded(true)` on `!user`, `?? false` null-coalescing.
+
+### Context
+
+- Branch: `fix/phase1-wave4-profile-skills` — PR #96, QA passed
+
+### Next
+
+1. Wave 5 QA
+
+### Flags
+
+- ⚠️ Founder feedback: Claude must NEVER merge PRs. (Added to feedback.md as rule #27)
+
+---
+
+## 2026-03-26 — Claude Code (Opus 4.6) — Wave 5: Network Tab + Endorsement Cleanup
+
+---
+
 ## 2026-03-26 — Claude Code (Opus 4.6) — Wave 4: Profile Page + Skills
 
 ### Done

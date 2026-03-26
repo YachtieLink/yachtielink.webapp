@@ -7,6 +7,21 @@ export interface ProStatus {
 }
 
 /**
+ * Pure check for Pro status from an already-fetched user record.
+ * Use this when you already have the user row and don't want a second DB query.
+ * Canonical logic — matches getProStatus().
+ */
+export function isProFromRecord(user: {
+  subscription_status: string | null;
+  subscription_ends_at: string | null;
+}): boolean {
+  return (
+    user.subscription_status === 'pro' &&
+    (!user.subscription_ends_at || new Date(user.subscription_ends_at) > new Date())
+  );
+}
+
+/**
  * Returns Pro subscription status for a user.
  * Checks both the status flag AND expiry date (belt + suspenders).
  * Server-side only.
@@ -29,12 +44,8 @@ export async function getProStatus(userId?: string): Promise<ProStatus> {
 
   if (!data) return { isPro: false, plan: null, endsAt: null };
 
-  const isPro =
-    data.subscription_status === 'pro' &&
-    (!data.subscription_ends_at || new Date(data.subscription_ends_at) > new Date());
-
   return {
-    isPro,
+    isPro: isProFromRecord(data),
     plan: data.subscription_plan as 'monthly' | 'annual' | null,
     endsAt: data.subscription_ends_at,
   };

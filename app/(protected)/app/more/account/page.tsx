@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button, Input, Select } from '@/components/ui'
 import { BackButton } from '@/components/ui/BackButton'
 import { useToast } from '@/components/ui/Toast'
+import { RESERVED_HANDLES } from '@/lib/constants/reserved-handles'
 
 const DEPARTMENTS = [
   'Deck', 'Interior', 'Engineering', 'Galley',
@@ -86,6 +87,7 @@ export default function AccountPage() {
     if (handle === originalHandle) { setHandleStatus('idle'); return }
     if (!handle) { setHandleStatus('idle'); return }
     if (!HANDLE_RE.test(handle)) { setHandleStatus('invalid'); return }
+    if (RESERVED_HANDLES.has(handle)) { setHandleStatus('taken'); return }
 
     setHandleStatus('checking')
     const timeout = setTimeout(async () => {
