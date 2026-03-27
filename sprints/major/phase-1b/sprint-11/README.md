@@ -33,10 +33,11 @@ This sprint rebuilds onboarding around this fork. New users either get an instan
 - Delete `/app/onboarding/role`, `/app/onboarding/yachts`, `/app/onboarding/endorsements` steps
 - Onboarding steps: `["cv-upload", "name", "handle", "done"]` (CV path skips name+handle)
 
-**B. CvReviewClient Refactor**
-- Standalone `/app/cv/upload` + `/app/cv/review` unchanged (still work)
-- `CvReviewClient` now uses shared `lib/cv/save-parsed-cv-data.ts` (instead of own save logic)
-- Reduces duplication between onboarding and standalone flows
+**B. Standalone CV Flow** (No Refactor Needed)
+- Standalone `/app/cv/upload` + `/app/cv/review` already exist and work correctly
+- `CvReviewClient` component does not exist (verified absent from codebase)
+- No refactor needed; onboarding and standalone flows are independent
+- Update standalone flow documentation to reflect current state
 
 **C. Section Colours on Public Profile** (visual polish)
 - `accentColor` prop on ProfileAccordion (About, Experience, Yachts, Certs, Languages, etc.)
@@ -106,11 +107,11 @@ Onboarding Start
 - ⬜ Delete `/app/onboarding/role`, `/app/onboarding/yachts`, `/app/onboarding/endorsements` directories
 - ⬜ Update nav/routing to omit deleted steps
 
-### B. CvReviewClient Refactor
+### B. Standalone CV Flow
 
-- ⬜ Import and use `lib/cv/save-parsed-cv-data.ts` instead of own save logic
-- ⬜ Consolidate duplicate save paths (onboarding, standalone CV, settings CV update)
-- ⬜ Testing: verify standalone `/app/cv/upload` + `/app/cv/review` still work identically
+- ✅ Standalone `/app/cv/upload` + `/app/cv/review` already exist and work
+- ⬜ Verify standalone flow continues to work after onboarding rewrite
+- ⬜ Update documentation if needed
 
 ### C. Section Colours on Public Profile
 

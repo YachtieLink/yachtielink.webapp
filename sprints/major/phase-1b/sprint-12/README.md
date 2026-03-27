@@ -105,6 +105,9 @@ This sprint doesn't build search or visualization. It builds **navigation:** yac
 
 ### A. Yacht Detail Page (`/app/yacht/[id]`)
 
+**Note:** Directory exists at `/app/(protected)/app/yacht/[id]/` but `page.tsx` is missing. This sprint will CREATE the page (not enhance existing).
+
+- ⬜ Create `page.tsx` for yacht detail page (new file)
 - ⬜ Query: fetch yacht + current crew (ended_at IS NULL) + alumni (ended_at IS NOT NULL)
 - ⬜ Current/alumni tabs or accordion split
 - ⬜ Crew cards: photo, name, role, years on yacht, endorsement status badge
