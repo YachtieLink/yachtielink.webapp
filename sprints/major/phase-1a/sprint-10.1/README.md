@@ -1,306 +1,177 @@
-# Sprint 10.1 — Close & Polish Phase 1A
+# Sprint 10.1 — Phase 1A Closeout
 
-**Phase:** 1A
-**Status:** 📋 Planned
-**Started:** —
-**Completed:** —
+**Phase:** 1A (Final)
+**Status:** 📋 Ready for execution
+**Priority:** P0 — must complete before Phase 1B work
+**Estimated effort:** 4–5 days (revised down from 5-7, API routes pre-exist)
+**Runs after:** PRs #96 + #97 merge (Waves 4–5)
+**Runs before:** Sprint CV-Parse-Bugfix (Phase 1B)
 
-## Goal
+---
 
-Full polish pass on everything Sprint 10 built. Fix every bug, inconsistency, and gap found in the 2026-03-21 audit so Phase 1A can merge to `main` as a clean, tight foundation for Phase 1B.
+## Why This Sprint Exists
+
+Waves 1–5 shipped the core Phase 1A features (CV import, profile, entities, endorsements, public profile, PDF). The 2026-03-21 audit found gaps: incomplete dark mode, unused animation presets, unpolished typography, and missing public layout infrastructure. This sprint closes those gaps so Phase 1A merges to main as a solid, complete foundation for Phase 1B work.
+
+**Without this sprint:** Phase 1B bugfixes land on a wobbly foundation. Dark mode incomplete, animations inconsistent, public pages have no layout wrapper.
+
+**With this sprint:** Phase 1A is production-ready. Phase 1B can focus on bugs and features without foundation churn.
+
+---
 
 ## Scope
 
-In:
-- Missing pages (education edit, saved profiles promotion)
-- Dark mode implementation (not just QA — 5 of 6 new components have zero `dark:` classes)
-- Animation pass (wire `lib/motion.ts` presets — currently 100% unused)
-- Typography pass (wire DM Serif Display — currently loaded but never applied)
-- Route cleanup (deduplicate `/app/audience` → `/app/network`)
-- Layout bug fixes (`pb-8` → `pb-24` on edit pages, hardcoded hex colours)
-- API hardening (missing try/catch, missing Zod validation, missing GET-by-ID route)
-- DB migration fix (storage buckets not created in SQL)
-- Storage abstraction completion (all `supabase.storage` calls through `lib/storage/`)
-- Shared component consolidation (EmptyState with inline variant)
-- Merge `feat/ui-refresh-phase1` → `main`
+### In — Core Completeness
 
-Out:
+**A. Missing Pages** (Phase 1A surfaces all CRUD)
+- Education edit page (`/app/education/[id]/edit`) — **page.tsx already exists and is fully implemented** (Mar 22). Verify it matches expected UX pattern.
+- Saved profiles dedicated page (`/app/network/saved`) — extract from inline tab, server-side fetching, folder management
+- Supporting API routes: **GET /api/user-education/[id] and PATCH /api/saved-profiles/[id] already exist**. Verify they work correctly.
+
+**B. Dark Mode Implementation** (5 of 6 components with zero `dark:` classes)
+- `ProfileAccordion.tsx`, `PhotoGallery.tsx`, `ProfileStrength.tsx`, `SaveProfileButton.tsx`, `SectionManager.tsx` — add `dark:` variants
+- Page-level dark: `insights/page.tsx` (chart colours), `AudienceTabs.tsx` (status pills), `SidebarNav.tsx` (badges)
+- Full visual verification at 375px width
+
+**C. Animation Consistency** (12 presets defined, zero used)
+- Presets already exist in `lib/motion.ts` (springSnappy, springGentle, easeFast, fadeUp, fadeIn, staggerContainer, cardHover, buttonTap, scrollReveal, easeGentle, scrollRevealViewport, popIn)
+- Wire presets into: `ProfileAccordion`, `IdentityCard`, `Toast`, `BottomSheet` (replace inline values)
+- Add entrance animations to Sprint 10 components
+
+**D. Typography Consistency** (DM Serif Display loaded but unused)
+- Apply `font-serif` to: profile names (hero), section headings, page titles
+- Remove synthetic bold from serif headings
+- Verify rendering at all viewport sizes
+
+**E. Route & Layout Cleanup**
+- Delete `/app/audience` directory (deduplicate with `/app/network`)
+- Fix bottom padding on edit pages (`pb-8` → `pb-24`)
+- Delete empty macOS iCloud ghost directories under `app/api/`
+
+**F. API & Database Hardening**
+- Add error handling: `POST /api/stripe/portal`, `GET/PUT /api/endorsement-requests/[id]`, `GET /api/cron/*`
+- Add Zod validation: `DELETE /api/saved-profiles`, `POST /api/profile/ai-summary`
+- Fix health endpoint: query `users` table instead of non-existent `profiles`
+- Storage buckets created in migration (not manual dashboard step)
+
+**G. Storage Abstraction** (all `supabase.storage` calls → `lib/storage/`)
+- `lib/storage/upload.ts` already has comprehensive functions: `uploadUserPhoto()`, `deleteUserPhoto()`, `uploadGalleryItem()`, `deleteGalleryItem()`, and more
+- Refactor `profile/photos`, `profile/gallery`, and `DELETE /api/user-photos`, `DELETE /api/user-gallery` to use existing abstraction
+- Add storage cleanup to `POST /api/account/delete` and `POST /api/cv/generate-pdf`
+- Client-side image compression on photo/gallery uploads (max 1200px, WebP 0.85)
+
+**H. Shared Component: EmptyState** (consolidate 3 patterns)
+- Create `components/ui/EmptyState.tsx` with `variant: 'card' | 'inline'`
+- Replace ad-hoc empty states in: `AboutSection`, `YachtsSection`, `CertsSection`, `EndorsementsSection`, `AudienceTabs`
+- Dark mode support built in; becomes mounting point for Salty illustrations in Sprint 11
+
+**I. Public Layout Infrastructure** (needed for Sprint 13, add here to unblock)
+- Create `app/(public)/layout.tsx` — wrapper for public pages
+- Create `components/public/PublicHeader.tsx` — logo, sign up/login, responsive menu
+- Create `components/public/PublicFooter.tsx` — links (terms, privacy, roadmap), copyright
+- Apply to: marketing page (`/`), legal pages (`/privacy`, `/terms`), roadmap page
+- This is a blocker for Sprint 13; build it here to close Phase 1A infrastructure
+
+**J. Minor Fixes**
+- `CookieBanner.tsx` (note: file is named `CookieBanner`, not `CookieConsent` as previously referenced) — component exists, may need text updates
+- Badge colours — use `var(--color-error)` instead of `bg-red-500`
+- "N more endorsements/photos" text — remove clickable styling or make it a button
+- `admin.ts` — add `import 'server-only'` guard
+
+### Out — Deferred
+
 - Salty mascot (Sprint 11)
-- Section colours / accentColor prop (Sprint 11)
-- QR code on public profile (Sprint 11 — branded treatment)
-- "Endorse [Name]" CTA on public profiles (Sprint 11)
-- New features, new data models
-- Marketing page
+- Section colours / `accentColor` prop (Sprint 11)
+- QR code on public profile (Sprint 11)
+- "Endorse [Name]" CTA (Sprint 11)
+- Any new features or data models
+- Marketing page content (Sprint 13)
+
+---
 
 ## Dependencies
 
-- Sprint 10 code complete (it is)
-- One new migration required (storage bucket creation — NO policy duplication)
-
----
-
-## Key Deliverables
-
-### A. Missing Pages
-
-#### A1. `/app/education/[id]/edit`
-- ⬜ Create `page.tsx` in the existing (empty) `education/[id]/edit/` directory
-- ⬜ Add `GET /api/user-education/[id]` route — currently only GET-all exists, no GET-by-ID. Needed for pre-populating the edit form. (See F3)
-- ⬜ Edit form matching `/app/education/new` pattern
-- ⬜ Pre-populated from existing record via new `GET /api/user-education/[id]`
-- ⬜ Zod validation with `userEducationSchema`
-- ⬜ Optimistic update on save
-- ⬜ Delete button with confirmation
-- ⬜ Inline loading skeleton (match other edit pages)
-- ⬜ Not-found handling if ID doesn't exist or doesn't belong to user
-
-#### A2. Saved Profiles — Promote to Dedicated Page
-> **Audit finding:** `AudienceTabs.tsx` already has a fully functional `SavedTab` (lines 393–522). Rather than building a duplicate, we promote the existing tab into its own route and replace the tab with a link.
-
-- ⬜ Create `/app/network/saved/page.tsx` — extract and enhance the existing `SavedTab` logic from `AudienceTabs.tsx`
-- ⬜ Server-side data fetching (current SavedTab is client-only with `useEffect` + silent error swallowing — fix this)
-- ⬜ Group by folder (ungrouped first, then folders)
-- ⬜ Folder CRUD: create, rename, delete via `/api/profile-folders`
-- ⬜ Move profile to folder (use `moveToFolderSchema` via new `PATCH /api/saved-profiles/[id]` — see F3)
-- ⬜ Each saved profile card: photo, name, role, "View profile" link
-- ⬜ Unsave action (heart toggle)
-- ⬜ Use `EmptyState` component (depends on H)
-- ⬜ Loading skeleton (match `/app/network` pattern)
-- ⬜ In `AudienceTabs.tsx`: replace the inline SavedTab with a link card pointing to `/app/network/saved` ("View saved profiles →")
-- ⬜ Add `loading.tsx` for the new route
-
----
-
-### B. Dark Mode Implementation
-
-The audit found 5 of 6 Sprint 10 components have **zero** `dark:` classes. This is implementation work, not QA.
-
-#### B1. Component dark mode
-- ⬜ `ProfileAccordion.tsx` — add `dark:` variants for backgrounds, borders, text
-- ⬜ `PhotoGallery.tsx` — add `dark:` variants
-- ⬜ `ProfileStrength.tsx` — replace hardcoded hex arc colours (`#E5A832`, `#0D7377`, `#22c55e`). Use existing `--chart-*` variables where possible; create `--color-strength-low`, `--color-strength-mid`, `--color-strength-high` semantic tokens in `globals.css` with `.dark` overrides if needed
-- ⬜ `SaveProfileButton.tsx` — add `dark:` variants
-- ⬜ `SectionManager.tsx` — add `dark:` variants
-- ⬜ `SocialLinksRow.tsx` — already has 2 `dark:` classes, verify complete
-
-#### B2. Page-level dark mode
-- ⬜ `insights/page.tsx` — replace hardcoded chart colours (`#0D7377`, `#0D9488`, `#14B8A6`) with `var(--chart-1)` through `var(--chart-3)` (already defined in `.dark` block of `globals.css`)
-- ⬜ `AudienceTabs.tsx` — verify status pills (`bg-blue-500/10 text-blue-400`, `bg-emerald-500/10 text-emerald-400`) render acceptably on dark backgrounds; if not, add explicit `dark:` overrides
-- ⬜ `SidebarNav.tsx` — notification badge uses `bg-red-500`, should use `bg-[var(--color-error)]` to match `BottomTabBar.tsx`
-
-#### B3. Dark mode verification
-- ⬜ Toggle dark mode and visually check every Sprint 10 page/component
-- ⬜ Verify no white flashes, no invisible text, no missing borders
-
----
-
-### C. Animation Pass
-
-`lib/motion.ts` exports 7 presets. Zero are imported anywhere. All current Framer Motion usage is inline/ad-hoc with inconsistent spring values.
-
-> **Audit finding:** Replacing `{duration: 0.2, ease: 'easeOut'}` with `springGentle` changes animation character — springs overshoot, eases don't. This is a **deliberate UX upgrade**, not a mechanical swap. Add `easeGentle` preset to `lib/motion.ts` as an alternative for height-expanding elements (accordions) where overshoot looks wrong.
-
-#### C1. Extend `lib/motion.ts` presets
-- ⬜ Add `easeGentle: { duration: 0.25, ease: 'easeOut' }` — for accordion/expand animations where spring overshoot is undesirable
-- ⬜ Add `scrollReveal` viewport config: `{ whileInView: true, viewport: { once: true, margin: '-50px' } }` — currently only a variant, not a complete recipe
-
-#### C2. Wire shared presets into existing components
-- ⬜ `ProfileAccordion.tsx` — replace inline ease with `easeGentle` (not `springGentle` — accordion height expansion should not overshoot)
-- ⬜ `IdentityCard.tsx` — replace inline ease with `easeGentle` (QR panel expand)
-- ⬜ `Toast.tsx` — replace inline `{type: "spring", damping: 20, stiffness: 300}` with `springSnappy` (damping 20→24, slightly less bounce — acceptable)
-- ⬜ `BottomSheet.tsx` — replace inline `{type: "spring", damping: 25, stiffness: 300}` with `springSnappy` (damping 25→24, near-identical)
-
-#### C3. Add entrance animations to Sprint 10 components
-- ⬜ `fadeUp` on page-level content wrappers (profile, network, insights, cv, more)
-- ⬜ `staggerContainer` on card lists (endorsement cards, saved profiles, cert cards)
-- ⬜ `cardHover` on interactive cards (yacht cards, endorsement cards, saved profile cards)
-- ⬜ `popIn` on badges and counts (profile strength score, badge count, endorsement count)
-- ⬜ `scrollReveal` on public profile sections (each accordion reveals on scroll using `whileInView`)
-
----
-
-### D. Typography Pass
-
-DM Serif Display is loaded (~15KB) but applied nowhere. Wire it in for visual hierarchy.
-
-> **Audit finding:** DM Serif Display is loaded at weight 400 only. Applying `font-serif` + `font-semibold` triggers ugly synthetic bold. **Drop `font-semibold`/`font-bold` from any heading that receives `font-serif`** — the serif face provides its own visual weight at 400.
-
-- ⬜ Public profile: apply `font-serif` to profile name in hero section (remove any `font-semibold`/`font-bold`)
-- ⬜ Public profile: apply `font-serif` to section headings (About, Experience, etc.)
-- ⬜ Page titles: apply `font-serif` to main `<h1>` on authenticated pages (Profile, Network, Insights, CV, More) — remove weight utilities
-- ⬜ Auth pages: apply `font-serif` to `<h1>` (Welcome, Login, Signup) — remove weight utilities
-- ⬜ Verify rendering at all viewport sizes — DM Serif can get tight at small sizes
-
----
-
-### E. Route & Layout Cleanup
-
-#### E1. Deduplicate audience/network
-- ⬜ Delete `/app/(protected)/app/audience/` directory entirely
-- ⬜ In `/app/network/page.tsx`: rename the exported function from `AudiencePage` to `NetworkPage`
-- ⬜ Verify no internal links point to `/app/audience` (search codebase, update any references)
-- ⬜ Both nav components already point to `/app/network` — confirm, no change needed
-
-#### E2. Fix edit page bottom padding
-- ⬜ Change `pb-8` → `pb-24` on: `about/edit`, `certification/[id]/edit`, `certification/new`, `more/account`, `profile/settings`, `profile/photo`
-- ⬜ Verify content is not obscured by BottomTabBar on mobile (375px)
-
-#### E3. Clean up ghost directories
-- ⬜ Delete all empty macOS iCloud " 2" duplicate directories under `app/api/` (10 directories)
-- ⬜ Do NOT delete `education/[id]/edit/` — A1 creates a page there
-
----
-
-### F. API Hardening
-
-#### F1. Missing error handling
-- ⬜ `POST /api/stripe/portal` — wrap in try/catch + `handleApiError()`
-- ⬜ `GET /api/endorsement-requests/[id]` — add `handleApiError()` wrapper
-- ⬜ `PUT /api/endorsement-requests/[id]` — add `handleApiError()` wrapper
-- ⬜ `GET /api/cron/analytics-nudge` — add try/catch
-- ⬜ `GET /api/cron/cert-expiry` — add try/catch
-
-#### F2. Missing validation
-- ⬜ `DELETE /api/saved-profiles` — add Zod validation for `saved_user_id` (schema: `z.object({ saved_user_id: z.string().uuid() })`)
-- ⬜ `POST /api/profile/ai-summary` — add minimal Zod schema for `{ force?: boolean }`
-
-#### F3. New routes
-- ⬜ `GET /api/user-education/[id]` — return single education record by ID. Auth + ownership check. Needed by A1.
-- ⬜ `PATCH /api/saved-profiles/[id]` — move a saved profile to a different folder. Uses `moveToFolderSchema` (already defined in schemas.ts). Auth + ownership check. Needed by A2.
-
-#### F4. Health endpoint fix
-- ⬜ `GET /api/health/supabase` — fix query from `profiles` table (doesn't exist) to `users` table
-- ⬜ Sanitise error messages (don't leak Supabase internals)
-
----
-
-### G. Database Migration + Storage Fixes
-
-One migration to fix deployment risks + storage hardening. See `docs/yl_storage_plan.md` (v2.0) for full context.
-
-> **Audit finding:** Migration 021 already created RLS policies for `user-photos` and `user-gallery`. The new migration must ONLY add `INSERT INTO storage.buckets` rows — do NOT duplicate `CREATE POLICY` statements or they will conflict.
-
-#### G1. Storage bucket creation
-- ⬜ Create migration `20260321000001_fix_storage_buckets.sql`
-- ⬜ Add `INSERT INTO storage.buckets` for `user-photos` (public, 5 MB limit, `image/jpeg`, `image/png`, `image/webp`) — policies already exist from migration 021
-- ⬜ Add `INSERT INTO storage.buckets` for `user-gallery` (public, 5 MB limit, `image/jpeg`, `image/png`, `image/webp`) — policies already exist from migration 021
-- ⬜ Fix `yacht-photos` RLS: add `AND deleted_at IS NULL` to attachment check (ex-crew can currently still write)
-
-#### G2. Function consistency
-- ⬜ Update `get_sea_time()` to add `SECURITY DEFINER`, `SET search_path = public`, and `public.` schema prefix (currently inconsistent with all other functions)
-
-#### G3. Storage abstraction completion
-- ⬜ Add `uploadUserPhoto()`, `deleteUserPhoto()` to `lib/storage/upload.ts`
-- ⬜ Add `uploadGalleryItem()`, `deleteGalleryItem()` to `lib/storage/upload.ts`
-- ⬜ Refactor `profile/photos/page.tsx` to use `uploadUserPhoto()` instead of direct `supabase.storage` call
-- ⬜ Refactor `profile/gallery/page.tsx` to use `uploadGalleryItem()` instead of direct `supabase.storage` call
-- ⬜ Refactor `DELETE /api/user-photos/[id]` to use `deleteUserPhoto()`
-- ⬜ Refactor `DELETE /api/user-gallery/[id]` to use `deleteGalleryItem()`
-- ⬜ All `supabase.storage` calls now routed through `lib/storage/` (provider-swappable)
-
-#### G4. Storage cleanup gaps
-- ⬜ Add `user-photos/{user_id}/` and `user-gallery/{user_id}/` to `POST /api/account/delete` cleanup
-- ⬜ In `POST /api/cv/generate-pdf`: delete previous PDF (from `users.latest_pdf_path`) before writing new one
-- ⬜ Add client-side image compression to `user-photos` and `user-gallery` uploads (Canvas resize max 1200px, WebP 0.85 — same pattern as avatar)
-
----
-
-### H. Shared Component: EmptyState
-
-Three different empty state patterns exist. Consolidate before Sprint 11 adds Salty illustrations.
-
-> **Audit finding:** Three profile sections (About, Yachts, Certs) render empty states inline inside existing cards. A standalone card wrapper would create double-borders. The component needs a `variant` prop.
-
-- ⬜ Create `components/ui/EmptyState.tsx` — props: `icon?` (emoji or component), `title`, `description?`, `actionLabel?`, `actionHref?`, `variant: 'card' | 'inline'`
-- ⬜ `variant='card'`: renders its own `p-6 text-center` card wrapper (for standalone use in AudienceTabs, saved profiles page)
-- ⬜ `variant='inline'`: renders just the text content without a card shell (for use inside AboutSection, YachtsSection, CertsSection which already have a card wrapper)
-- ⬜ Replace ad-hoc empty states in: `AboutSection` (inline), `YachtsSection` (inline), `CertsSection` (inline), `EndorsementsSection` (inline), `AudienceTabs` endorsements (card), `AudienceTabs` colleagues (card)
-- ⬜ Dark mode support built in from day one
-- ⬜ This component becomes the mounting point for Salty illustrations in Sprint 11
-
----
-
-### I. Minor Fixes
-
-- ⬜ `AudienceTabs.tsx` saved tab — replace raw `animate-pulse` div with `<Skeleton>` component
-- ⬜ `SidebarNav.tsx` — change `bg-red-500` badge to `bg-[var(--color-error)]`
-- ⬜ `PublicProfileContent.tsx` — "N more endorsements" text: make it a button that expands to show all, or remove the `text-[var(--color-interactive)]` styling so it doesn't look clickable
-- ⬜ `PublicProfileContent.tsx` — "N more photos" text: same fix
-- ⬜ Privacy page — add TODO comment to CHANGELOG as a pre-launch blocker (business address needed)
-- ⬜ `admin.ts` — add `import 'server-only'` guard at top of file (will cause deliberate build error if accidentally imported in a Client Component)
-- ⬜ Commit the 4 uncommitted sprint doc files before starting work (clean baseline)
-
----
-
-### J. Git
-
-- ⬜ Merge `feat/ui-refresh-phase1` → `main`
-- ⬜ Tag `v1.0-phase-1a`
-- ⬜ Update CHANGELOG.md
+- **Prerequisite:** PRs #96 + #97 merged to main (Waves 4–5)
+- **Blocker none:** All required tables, RPCs, and components exist
+- **Foundation for:** Sprint CV-Parse-Bugfix, Sprint 11+
+- **Blocks Sprint 13:** Public layout infrastructure (add to this sprint to unblock)
 
 ---
 
 ## Build Order (Dependency-Validated)
 
-```
-Wave 0 — Unblock everything (~2 hours):
-  H   EmptyState component (with inline/card variants)
-  F3  New API routes: GET /api/user-education/[id] + PATCH /api/saved-profiles/[id]
-  G1  Migration SQL (bucket creation ONLY, no policy duplication)
+### Wave 0 — Public Infrastructure + Unblock Everything (~1.5 days)
 
-Wave 1 — Parallel workstreams:
-  Agent A: A1 (education edit page) + A2 (saved profiles promotion)
-  Agent B: B (dark mode) + D (typography)
-  Agent C: C (animation pass — extend presets first, then wire)
-  Agent D: E (route cleanup) + F1/F2/F4 (API hardening) + I (minor fixes)
-  Agent E: G2 + G3 + G4 (storage chain)
+These pieces enable parallel work on Waves 1–5 AND unblock Sprint 13.
 
-Wave 2:
-  J   Merge + tag (blocks on ALL above)
-```
+- **I** — Create public layout, header, footer (infrastructure for Sprint 13)
+- **H** — Create EmptyState component (card/inline variants, dark mode)
+- **F (migration)** — Storage bucket creation, health endpoint fix
 
-## Exit Criteria
+### Wave 1 — Parallel Workstreams (3–4 days)
 
-- Education edit page works end-to-end (load → edit → save → delete → verify)
-- Saved profiles promoted to own page with server-side data fetching and folder support
-- All Sprint 10 components use `lib/motion.ts` presets (zero inline spring/ease values)
-- DM Serif Display visible on profile names and page headings (at weight 400, no synthetic bold)
-- No dark mode regressions — every page checked with toggle
-- No layout breaks at 375px — edit pages have correct bottom padding
-- `/app/audience` removed, `/app/network` is sole route (function renamed)
-- All API routes have try/catch + handleApiError
-- Health endpoint queries the correct table
-- Storage buckets created in migration (not manual dashboard step)
-- All `supabase.storage` calls routed through `lib/storage/` abstraction
-- EmptyState component (card + inline variants) used in all empty-state locations
-- Branch merged to `main`, clean git state, tagged
+After Wave 0:
 
-## Estimated Effort
+- **Agent A:** A (verify education edit page works correctly) + J (minor fixes, CookieBanner text)
+- **Agent B:** B (dark mode on all components) + D (typography)
+- **Agent C:** C (animation presets + wire into components)
+- **Agent D:** E (route cleanup) + F (API hardening) + G (storage abstraction)
 
-5–7 days with parallel agents (Wave 0 + 4-5 concurrent workstreams)
-8–11 days sequential (single developer)
+### Wave 2 — Merge & Close
+
+- Verify all changes work at 375px (mobile)
+- Merge `feat/ui-refresh-phase1` → `main`
+- Tag `v1.0-phase-1a`
+- Update CHANGELOG.md
+
+---
+
+## Exit Criteria — All Required
+
+- [ ] Education edit page verified functional (load → edit → save → delete)
+- [ ] Saved profiles promoted to own page, server-side fetching, folder support
+- [ ] All Sprint 10 components use `lib/motion.ts` presets (zero inline spring/ease)
+- [ ] DM Serif Display visible on profile names and headings (weight 400, no synthetic bold)
+- [ ] Dark mode: every page checked with toggle, no regressions
+- [ ] No layout breaks at 375px — edit pages have `pb-24`
+- [ ] `/app/audience` deleted, `/app/network` is canonical
+- [ ] All API routes have try/catch + error handling
+- [ ] Health endpoint queries correct table
+- [ ] Storage buckets created in migration
+- [ ] All `supabase.storage` calls routed through `lib/storage/` abstraction
+- [ ] EmptyState component used in all empty-state locations
+- [ ] Public layout, header, footer exist and applied to public routes
+- [ ] Public header/footer responsive at 375px
+- [ ] Branch merged to main, tagged `v1.0-phase-1a`
+
+---
+
+## Estimated Effort (Revised)
+
+- **Wave 0:** 1.5 days (public infrastructure + EmptyState + migration)
+- **Wave 1:** 2.5–3 days (parallel agents on 4 workstreams; education edit already exists, verification only)
+- **Wave 2:** 0.5 day (merge + tag)
+- **Total:** 4–5 days (revised down from 5–7; API routes + education page pre-exist)
+
+---
 
 ## Notes
 
-**Audit source:** Full 6-agent audit conducted 2026-03-21 covering routes, UI consistency, API validation, database schema, Sprint 10 completion, and public profile experience. Followed by 3-agent verification audit that found 8 additional issues, all folded in.
+**Phase 1A is done after this sprint.** The gap between "features built" and "ready to hand off to Phase 1B" is exactly this work: complete the missing pieces (public layout), fix dark mode, wire animations, polish typography. Nothing new is added; everything is consolidated and hardened.
 
-**Key decisions:**
-- `/app/network` is canonical (audience deleted, function renamed)
-- DM Serif Display wired in now at weight 400 (drop font-semibold from serif headings)
-- QR code left for Sprint 11 branded treatment
-- "Endorse [Name]" CTA deferred to Sprint 11
-- EmptyState component built with card/inline variants as Salty mounting point
-- Animation: `easeGentle` added for accordion/expand (no spring overshoot), `springGentle`/`springSnappy` for entrances/transitions
-- Saved profiles: promote existing SavedTab to own route, don't build duplicate
-- Storage migration: bucket INSERT only, no policy duplication (021 already has them)
+**Public layout is critical for Sprint 13.** Don't defer it — build it here in Wave 0 so Sprint 13 can focus on marketing content and ops, not infrastructure.
+
+**Education edit page already exists.** The sprint scope is to verify it's correct, not build it from scratch. Same for API routes — just verify they work.
+
+**Key decisions reflected:**
+- `/app/network` is canonical (audience deleted entirely)
+- DM Serif Display at weight 400 only (no synthetic bold)
+- EmptyState component with card/inline variants (mounting point for Salty later)
+- Animation presets used consistently (no inline spring/ease)
+- Storage abstraction complete (provider-swappable)
+- Public layout built here to unblock Sprint 13
 
 **Risks:**
-- Dark mode is deeper than expected — 5 components need full implementation. Budget 1-2 days.
-- Animation pass touches many files — risk of visual regressions. Test on mobile Safari.
-- C3 (`scrollReveal` with `whileInView`) is scope creep risk — keep it simple, no intersection observers.
-- DM Serif Display at 400 weight renders differently per OS — test on Windows/Android if possible.
-- B and C touch the same .tsx files — coordinate agent file ownership to avoid git conflicts.
-
-**Key Files:**
-- [build_plan.md](./build_plan.md) — full implementation spec (Part 1–8)
-- `docs/yl_storage_plan.md` (v2.0) — storage architecture and migration strategy
+- Dark mode is deeper than expected — 5 components, 2 pages. Budget 1–2 days.
+- Animation pass touches many files — visual regressions risk on mobile Safari.
+- B and C touch same files — coordinate agent file ownership to avoid conflicts.

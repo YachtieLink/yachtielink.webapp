@@ -15,11 +15,8 @@ They are first-class work — they get their own folder, their own README, and t
 | debug | debug-cv-parse-extraction | 🐛 In Progress | CV upload text extraction fails on all file types |
 | debug | debug-photo-upload-limit | 🐛 In Progress | Photo page uses Pro limit for free users — wrong add button + count |
 | debug | debug-cv-regenerate-date | 🐛 In Progress | Regenerate PDF date doesn't update after generation |
-| feature | feature-pro-subdomain-link | ⚡ Planned | Pro custom subdomain (`{handle}.yachtie.link`) with reserved upsell page |
 | feature | feature-cv-sharing-rework | ⚡ Planned | Full CV & Sharing page rework — always-on QR, share modal, CV toggle |
 | feature | feature-saved-profiles-rework | ⚡ Planned | Saved profiles — notes, availability watch, relationship context, folders |
-
-
 | ui-ux | ui-public-profile-button-margin | 🎨 In Progress | Top bar buttons on public profile sit flush against screen edge |
 
 ---
@@ -57,4 +54,5 @@ Layout, styling, responsive fixes, animation, visual polish. Not new features �
 
 | Type | Slug | Completed | Summary |
 |------|------|-----------|---------|
+| feature | feature-pro-subdomain-link | 2026-03-27 | Pro custom subdomain (`{handle}.yachtie.link`) — middleware, reserved page, handle blocklist, DNS migration |
 | feature | feature-two-pass-cv-parse | 2026-03-23 | Split CV parse into fast personal + background full parse for better UX |

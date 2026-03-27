@@ -6,12 +6,32 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 69 lessons
+**Current count:** 71 lessons
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## Vercel Wildcard Domains Require Vercel-Managed Nameservers
+
+**What happened:** Tried to configure `*.yachtie.link` on Vercel with Cloudflare as external DNS. Added A record (`216.150.1.1`) and CNAME (`cname.vercel-dns.com`) with proxy off. Vercel showed "Invalid Configuration" and insisted on nameserver change regardless of DNS record type.
+**Root cause:** Vercel needs to auto-create `_acme-challenge` TXT records for Let's Encrypt wildcard certificate validation. This requires Vercel to control DNS via its own nameservers (`ns1.vercel-dns.com` / `ns2.vercel-dns.com`). External DNS providers can't grant Vercel the ability to create arbitrary TXT records on the fly.
+**Fix applied:** Switched nameservers from Cloudflare to Vercel at the registrar level. Migrated all email records (MX, SPF, DKIM, site verification) to Vercel DNS via `npx vercel dns add`. Wildcard SSL provisioned automatically.
+**Lesson:** For wildcard domains on Vercel, you must use Vercel nameservers — no workaround with external DNS. Budget time to migrate MX/TXT records when planning wildcard features. Non-wildcard domains work fine with external DNS.
+**Sprint:** Pro Subdomain | **Caught by:** Claude Code (Opus 4.6) | **Date:** 2026-03-27
+
+---
+
+## Next.js Middleware: Early Returns Skip Auth Cookie Refresh
+
+**What happened:** Subdomain rewrite in `middleware.ts` returned `NextResponse.rewrite()` before `createMiddlewareClient()` ran. Logged-in users visiting `{handle}.yachtie.link` with expired auth cookies appeared as unauthenticated.
+**Root cause:** Supabase SSR uses the middleware `getUser()` call to refresh expired JWTs via cookie `setAll()`. An early return before this call means cookies never refresh, and the downstream page's `getUser()` returns null.
+**Fix applied:** Moved `createMiddlewareClient()` and `getUser()` before the subdomain detection block. Carried refreshed cookies through to the rewrite response.
+**Lesson:** Any middleware early return (rewrite, redirect) must run AFTER Supabase auth refresh, and must copy the response cookies to the returned response object.
+**Sprint:** Pro Subdomain | **Caught by:** Opus Phase 2 Review | **Date:** 2026-03-26
 
 ---
 

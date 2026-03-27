@@ -2,7 +2,7 @@
 date: 2026-03-26
 agent: Claude Code (Opus 4.6)
 sprint: junior/feature-pro-subdomain-link
-modules_touched: [profile, onboarding]
+modules_touched: [profile, onboarding, middleware, subdomain, billing, stripe]
 ---
 
 ## Summary
@@ -34,4 +34,12 @@ Built the full Pro subdomain feature: wildcard subdomain routing, reserved landi
 
 **Cleanup** — Deleted dead `proxy.ts`. Synced client blocklist with DB. Removed invalid underscore entries from sprint README.
 
-**Session end** — Feature code-complete. 3 migrations deployed to prod. DNS setup instructions provided to founder.
+**Session end (code)** — Feature code-complete. 3 migrations deployed to prod. DNS setup instructions provided to founder.
+
+**DNS migration (late session)** — Attempted to configure wildcard on Cloudflare DNS with A/CNAME records pointing to Vercel. Vercel refused to validate `*.yachtie.link` without its own nameservers (required for wildcard SSL cert provisioning via ACME challenge). Tried A record (`216.150.1.1`), CNAME (`cname.vercel-dns.com`), both with proxy off — all showed "Invalid Configuration" with nameserver requirement.
+
+**Resolution** — Switched `yachtie.link` nameservers from Cloudflare to Vercel (`ns1.vercel-dns.com` / `ns2.vercel-dns.com`). Vercel auto-created ALIAS records. Migrated all email/DNS records (2 MX, 4 TXT) to Vercel DNS via `npx vercel dns add`. Wildcard SSL provisioned automatically. Confirmed `aristeele.yachtie.link` returning 200, `yachtie.link` returning 200.
+
+**Key learning** — Vercel wildcard domains require Vercel-managed nameservers. External DNS (Cloudflare, etc.) with A/CNAME records is not sufficient — Vercel needs to auto-create `_acme-challenge` TXT records for Let's Encrypt wildcard cert validation.
+
+**Session end (DNS)** — Wildcard live. `aristeele.yachtie.link` returning 200, `yachtie.link` returning 200, SSL valid. Feature is end-to-end operational. DNS managed in Vercel going forward.

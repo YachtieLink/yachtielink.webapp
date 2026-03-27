@@ -12,16 +12,19 @@ This is the canonical home for all execution work — building (sprints) and aud
 
 ---
 
-## Active Right Now
+## Execution Sequence (Locked)
 
-| Type | Sprint | Status | Focus |
-|------|--------|--------|-------|
-| Major | [Phase 1B — CV Parse Bugfix](./major/phase-1b/sprint-cv-parse-bugfix/README.md) | 📋 Planning | 37 QA bugs in 5 waves — data integrity, public profile, wizard UX, profile page, network |
-| Major | [Phase 1A — Sprint 10](./major/phase-1a/sprint-10/README.md) | ✅ Complete | Profile robustness, photo-forward UX |
-| Major | [Phase 1A — Sprint 10.1](./major/phase-1a/sprint-10.1/README.md) | 📋 Draft | Close Phase 1A — education edit, saved profiles, animation, QA |
-| Major | [Phase 1B — Sprint 11](./major/phase-1b/sprint-11/README.md) | 📋 Draft | Crew landing pages, Salty, section colours, OG images |
-| Major | [Phase 1B — Sprint 12](./major/phase-1b/sprint-12/README.md) | 📋 Draft | Yacht graph, colleague network, sea time |
-| Major | [Phase 1B — Sprint 13](./major/phase-1b/sprint-13/README.md) | 📋 Draft | Launch polish, marketing page, production env, QA |
+Phase 1B execution runs sequentially through these 4 sprints. See [PHASE1-CLOSEOUT.md](./PHASE1-CLOSEOUT.md) for the complete checklist.
+
+| Order | Sprint | Phase | Status | Focus |
+|-------|--------|-------|--------|-------|
+| 1 | [Sprint 10.1](./major/phase-1a/sprint-10.1/README.md) | 1A | 📋 Ready | Phase 1A closeout — dark mode, animations, public layout, missing pages |
+| 2 | [CV Parse Bugfix](./major/phase-1b/sprint-cv-parse-bugfix/README.md) | 1B | 📋 Ready | Fix 37 QA bugs in 5 waves — data integrity, public profile, wizard, profile page, network |
+| 3 | [Sprint 11](./major/phase-1b/sprint-11/README.md) | 1B | 📋 Ready | CV onboarding rebuild — one-drop path + manual path fork, section colours, OG/QR polish |
+| 4 | [Sprint 12](./major/phase-1b/sprint-12/README.md) | 1B | 📋 Ready | Yacht graph foundation — yacht detail, colleagues, sea time, transfer flow |
+| 5 | [Sprint 13](./major/phase-1b/sprint-13/README.md) | 1B | 📋 Ready | Launch polish — public layout, marketing page, production ops, legal sign-off |
+
+**Next action:** Merge PRs #96 + #97 to main, then begin Sprint 10.1
 
 > Junior sprints in flight → see [junior/README.md](./junior/README.md)
 
