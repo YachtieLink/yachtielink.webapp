@@ -55,7 +55,8 @@ Any context, constraints, or open questions.
 | [CV Review — Education Autocomplete](./cv-review-education-autocomplete.md) | idea | P3 |
 | [CV Review — Social Links Step](./cv-review-socials-step.md) | idea | P2 |
 | [Skill & Hobby Autocomplete](./skill-autocomplete-normalization.md) | idea | P2 |
-| [Profile Photo Reposition](./profile-photo-reposition.md) | idea | P2 |
+| [Profile Photo Reposition](./profile-photo-reposition.md) | promoted (Sprint 11) | P2 |
 | [Colleague Display Names](./colleague-display-names.md) | idea | P2 |
-| [Endorsement Context Display](./endorsement-context-display.md) | idea | P2 |
+| [Endorsement Context Display](./endorsement-context-display.md) | promoted (Sprint 11) | P2 |
 | [Onboarding Name from Email](./onboarding-name-from-email.md) | idea | P3 |
+| [Pro Upsell Consistency](./pro-upsell-consistency.md) | idea | P2 |

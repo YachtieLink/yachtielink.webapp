@@ -22,6 +22,42 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-28 — Claude Code (Opus 4.6) — Sprint 11 Design Interview + Sprint Kickoff Prep
+
+### Done
+
+- **Public Profile Rewrite design interview (34 questions):** Comprehensive /grill-me session with founder. Walked the current public profile in Chrome, identified 9+ issues. Designed three view modes (Profile, Portfolio, Rich Portfolio), bento grid layout system, photo management, endorsement display, sub-page architecture, and Pro upsell strategy. All 48 decisions locked.
+- **Design spec written:** `sprints/major/phase-1b/sprint-11/public-profile-rewrite-spec.md` — complete spec covering view modes, hero, content sections, bento grid, photo system, sub-pages, presentation controls.
+- **Build plan 11a written:** `sprints/major/phase-1b/sprint-11/build_plan_11a.md` — 11-part plan for Profile mode fixes + foundation (migration, layout, typography, contact row, endorsements, CV on-demand, display settings, sub-page routes).
+- **Sprint 11 README updated:** Repurposed from CV Onboarding Rebuild to Public Profile Rewrite.
+- **Mobile bento research:** Subagent produced comprehensive report on CSS Grid vs masonry, responsive tile ratios at 375px, focal point implementation, template-based bento system, performance (CLS, Next.js Image sizes), accessibility. Conclusion: pure CSS Grid with `grid-template-areas`, no JS library needed.
+- **Backlog triage:** Founder resolved safari-public-profile-links (subdomain issue, not a bug), nationality-flag (already done). Identified CV regeneration as a design flaw (should be on-demand). Pulled endorsement context, inner page header, button margins, avatar framing into Sprint 11. Visibility toggle kept as separate junior sprint.
+- **New backlog item:** `pro-upsell-consistency.md` — app-wide Pro upsell standardisation needed (currently looks different everywhere).
+- **Memory updated:** Sprint 11 project memory expanded with all 48 locked decisions. New feedback memory: "Profile is user's presentation layer" (no dark mode on profiles).
+
+### Context
+
+- Branch: `main` — no code written this session, design only
+- Sprint 11 split into 11a (Profile mode fixes + foundation), 11b (Portfolio mode), 11c (Rich Portfolio bento)
+- Build plan 11a ready for `/sprint-start-yl` validation against codebase
+- Design references: Cosmos.so (bento), Glass.photo (framed photos), Kinfolk (editorial tone)
+
+### Next
+
+1. **Run `/sprint-start-yl 11a`** — validate build plan against current codebase (founder will run overnight)
+2. **Execute Sprint 11a** — Profile mode fixes + schema foundation (~3-4 days)
+3. **Sprint 11b** — Portfolio mode (free layout + mini bento)
+4. **Sprint 11c** — Rich Portfolio bento grid (Pro, template-based)
+
+### Flags
+
+- ⚠️ Sprint 11 scope significantly expanded from original (was CV onboarding rebuild, now full public profile rewrite across 3 sub-sprints)
+- ⚠️ Backlog items `safari-public-profile-links-broken.md` and `nationality-flag-public-profile.md` are resolved — should be archived
+- ⚠️ `debug-cv-regenerate-date` junior sprint may be obsolete — CV regeneration replaced by on-demand generation in Sprint 11a
+- ⚠️ Pro upsell consistency backlog item filed — needs app-wide design pass
+
+---
+
 ## 2026-03-27 — Claude Code (Opus 4.6) — Sprint CV-Parse-Bugfix + Skills Ecosystem
 
 ### Done

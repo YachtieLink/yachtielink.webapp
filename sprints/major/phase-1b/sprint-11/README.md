@@ -1,12 +1,14 @@
-# Sprint 11 — CV Onboarding Rebuild + Public Polish
+# Sprint 11 — Public Profile Rewrite
 
 **Phase:** 1B
-**Priority:** P0 — core user journey, direct path to profile population
-**Status:** 📋 Ready for execution
+**Priority:** P0 — the profile IS the product
+**Status:** 📋 Design approved, build plan needed
 **Runs after:** Sprint 10.1 complete, Sprint CV-Parse-Bugfix complete
 **Runs before:** Sprint 12 (Yacht graph)
-**Estimated effort:** 5–7 days
-**Type:** Feature sprint — redesign onboarding to be one-file-drop or two-input minimal
+**Estimated effort:** TBD (significantly larger than original scope)
+**Type:** Feature sprint — rewrite public profile as a portfolio-quality presentation
+
+> **Note:** CV onboarding rebuild (original Sprint 11 scope) is ~85% complete from prior sprints. This sprint has been repurposed for the public profile rewrite based on founder walkthrough 2026-03-28.
 
 ---
 
