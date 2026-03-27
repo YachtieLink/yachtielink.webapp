@@ -58,6 +58,41 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ---
 
+## 2026-03-27 — Claude Code (Haiku 4.5) — Validation Pass + Documentation Alignment
+
+### Done
+
+- **Comprehensive validation pass:** Checked all files referenced in 5 sprint READMEs against actual codebase state. Found 5 scope mismatches that were corrected.
+- **Sprint 10.1 revised:** API routes (GET /api/user-education/[id], PATCH /api/saved-profiles/[id]) pre-exist (no build needed, just verify). Education edit page fully implemented (Mar 22). Effort revised 5-7d → 4-5d. Added public layout infrastructure to Wave 0 (unblocks Sprint 13).
+- **Sprint 11 cleaned:** CvReviewClient component doesn't exist in codebase. Removed refactor scope (no component to refactor). Standalone CV flow verified working.
+- **Sprint 12 clarified:** Yacht detail page (`/app/yacht/[id]/page.tsx`) missing. Changed scope from "enhance existing" to "create new" (larger than originally assumed).
+- **Sprint 13 critical update:** `app/(public)/layout.tsx` does not exist (BLOCKER). Added to Wave 0 as critical prerequisite. Must create public layout before building public pages. Effort revised 5-7d → 6-7d. Marketing page verified fully implemented (just needs verification). Legal sign-off marked as blocker.
+- **Validation matrix created:** 20 RPC functions verified exist, all dark mode components validated (zero dark: classes), motion presets exceed expectations (12 vs 7), storage abstraction comprehensive, colleagues page already complete (pre-sprint work).
+- **PHASE1-CLOSEOUT.md rewritten:** Completely restructured from Wave 1-5 terminology to Sprint 10.1 → Bugfix → 11 → 12 → 13 structure. Added clear dependencies, blockers, and decisions. Session start checklist now points to canonical execution plan.
+- **sprints/README.md updated:** "Active Right Now" section changed to "Execution Sequence (Locked)" with all 5 sprints in order, all marked Ready. Removed "Draft" and "Planning" statuses.
+- **All changes committed:** 2 commits (validation pass fixes + documentation alignment). Branch `refactor/sprint-restructure-2026-03-27` ready for merge.
+
+### Context
+
+- Prior session locked sprint sequence: 10.1 → Bugfix → 11 → 12 → 13 (based on logical ordering and dependencies)
+- Validation pass discovered that assumptions about pre-existing code didn't match reality (API routes exist but weren't marked; yacht page doesn't exist but was assumed)
+- Public layout was assumed to exist but is missing entirely — this is now a critical blocker for Sprint 13
+- Documentation alignment ensures next agent won't be confused by Wave 1-5 terminology in old PHASE1-CLOSEOUT.md
+
+### Next
+
+1. **Merge branch `refactor/sprint-restructure-2026-03-27` to main** — all sprint docs validated and aligned
+2. **Merge PRs #96 + #97** (Wave 4-5 code)
+3. **Begin Sprint 10.1** (Phase 1A closeout)
+
+### Flags
+
+- ⚠️ Public layout (`app/(public)/layout.tsx`) is now a hard blocker for Sprint 13. Must be built in Sprint 13 Wave 0 before any public pages can be constructed.
+- ⚠️ Sprint 12 yacht detail page scope larger than originally written (page missing, not just needing enhancement). Team should budget accordingly.
+- ✅ Sprint effort estimates revised: 10.1 (5-7d → 4-5d), 13 (5-7d → 6-7d). All other sprints verified accurate.
+
+---
+
 ## 2026-03-27 — Claude Code (Opus 4.6) — DNS Migration + Wildcard Go-Live
 
 ### Done
