@@ -126,7 +126,7 @@ export default function MorePage() {
   return (
     <PageTransition className="flex flex-col pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-sand-100)]">
       {/* Page title */}
-      <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)] px-1 pt-2 pb-2">Settings</h1>
+      <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)] px-1 pt-2 pb-2">Settings</h1>
 
       {/* ── Appearance ─────────────────────────────── */}
       <SectionHeader title="Appearance" />

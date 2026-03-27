@@ -3,7 +3,9 @@
 import { useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
 import { useNetworkBadge } from '@/lib/hooks/useNetworkBadge'
+import { popIn } from '@/lib/motion'
 import {
   ProfileIcon,
   ProfileIconFilled,
@@ -73,7 +75,13 @@ export function SidebarNav() {
             <span className="relative h-5 w-5">
               {isActive ? icons?.activeIcon : icons?.icon}
               {showBadge && (
-                <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[var(--color-error)]" />
+                <motion.span
+                  key="network-badge"
+                  variants={popIn}
+                  initial="hidden"
+                  animate="visible"
+                  className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[var(--color-error)]"
+                />
               )}
             </span>
             <span>{tab.label}</span>

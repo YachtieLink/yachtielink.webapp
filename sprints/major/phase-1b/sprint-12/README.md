@@ -267,4 +267,6 @@ Wave 5 — Testing + Polish (~1 day)
 
 **Database foundation first.** All queries are shared across yacht detail, colleague explorer, sea time, search. Building RPCs once and testing them thoroughly prevents bugs and performance issues later.
 
+**Save yachts:** Once yacht detail pages exist, users should be able to save/bookmark yachts the same way they save profiles (heart button, notes, watching, folders). This could live on the yacht detail page and appear in a "Yachts" sub-section of `/app/network/saved`. See `sprints/backlog/save-yachts.md` for full spec.
+
 **Post-launch:** After launch, Ghost Profiles + Claimable Accounts unblocks crew who've never created a profile (received endorsements, appeared on yachts). That's the next major feature after this sprint.

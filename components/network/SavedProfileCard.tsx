@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import { Eye, EyeOff, StickyNote, Trash2, FolderInput, ExternalLink } from 'lucide-react'
+import { cardHover } from '@/lib/motion'
 import { SavedProfileNoteEditor } from './SavedProfileNoteEditor'
 
 interface SavedProfileCardProps {
@@ -46,7 +48,10 @@ export function SavedProfileCard({
   const subtitle = [user.primary_role, user.departments?.join(' · ')].filter(Boolean).join(' · ')
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 flex flex-col gap-3">
+    <motion.div
+      {...cardHover}
+      className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 flex flex-col gap-3"
+    >
       {/* Top row: photo + info */}
       <div className="flex gap-3">
         <Link href={`/u/${user.handle}`} className="shrink-0">
@@ -171,6 +176,6 @@ export function SavedProfileCard({
           onSave={(note) => onUpdate(saved.id, { notes: note || null })}
         />
       )}
-    </div>
+    </motion.div>
   )
 }

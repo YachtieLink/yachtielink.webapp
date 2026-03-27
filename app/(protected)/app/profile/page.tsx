@@ -125,6 +125,10 @@ export default async function ProfilePage() {
       count: extended.education.length,
       visible: sectionVisibility.education ?? true,
       editHref: '/app/education/new',
+      itemLinks: extended.education.map((edu: { id: string; institution: string }) => ({
+        label: edu.institution,
+        href: `/app/education/${edu.id}/edit`,
+      })),
     },
     {
       key: 'hobbies',
@@ -167,7 +171,7 @@ export default async function ProfilePage() {
 
       {/* Page title */}
       <div className="flex items-center justify-between px-1 pt-4">
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">My Profile</h1>
+        <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">My Profile</h1>
       </div>
 
       {/* Photo strip — compact editing view */}
