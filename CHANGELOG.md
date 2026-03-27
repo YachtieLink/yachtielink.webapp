@@ -22,6 +22,42 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-27 — Claude Code (Haiku 4.5) — Sprint Restructure + Execution Plan Locked
+
+### Done
+
+- **Rewrote all 5 upcoming sprints** (10.1, CV-Parse-Bugfix, 11, 12, 13) to reflect Wave 1-5 evolution and clarify dependencies
+- **Sprint 10.1:** Phase 1A closeout, 5-7 days, Wave 0 unblocks everything (EmptyState, API routes, migration), 4 parallel agents in Wave 1
+- **Sprint CV-Parse-Bugfix:** 37 QA bugs in 5 waves, sequential minimum 5 days, parallelizable after Wave 1 completes. Data integrity (P0) foundational.
+- **Sprint 11:** CV onboarding rebuild, one-drop CV path vs two-input manual fork, CvReviewClient refactored to use shared save utility, 5-7 days
+- **Sprint 12:** Yacht graph foundation (yacht detail, colleague explorer, sea time), database layer first (5 RPCs), UI in waves 2-5, 6-8 days
+- **Sprint 13:** Launch polish (marketing page, production ops, QA, legal), most infrastructure already production-ready, 5-7 days
+- **STATUS.md updated:** Major Sprints table now shows execution order (1-5), dependencies explicit, no circular deps
+- **Execution sequence locked:** 10.1 → Bugfix → 11 → 12 → 13 (sequential, foundation-first, each sprint unblocks next)
+- **Scope ruthlessly cut:** All deferred items (Salty, full graph viz, dark mode, endorsement prompts) tracked in each sprint's Out section
+- **Exit criteria measurable:** All 5 sprints have testable, specific exit criteria (not aspirational)
+
+### Context
+
+- Branch: `refactor/sprint-restructure-2026-03-27` — All changes doc-only (sprint READMEs + STATUS.md)
+- No code changes, no module touches, no risk
+- Recent context: Waves 1-5 shipped (CV parse, public profile, import wizard, profile page, network tab + Pro subdomain). Phase 1A → 1B transition in motion. PRs #96 + #97 ready to merge.
+- Ordering rationale: 10.1 closes Phase 1A (foundation), bugfix waves fix Phase 1B bugs on clean foundation, 11-13 build Phase 1B features and go-live
+- Each sprint README follows consistent template: Why, Scope, Dependencies, Deliverables, Build Order (sequential or parallel-capable), Exit Criteria, Notes
+
+### Next
+
+1. **Merge PRs #96 + #97** to main (Wave 4 + 5)
+2. **Quick follow-ups** (junior sprints): subdomain consolidation, custom 404, media/CRUD standardization
+3. **Begin Sprint 10.1** (Phase 1A closeout)
+
+### Flags
+
+- ⚠️ `/loop 60m` was started but /review skill didn't return output on multiple invocations (appears to be stalled). Work proceeded anyway (doc-only changes, low risk). Commit message documents approach. Monitor in next session.
+- ⚠️ Execution plan is now sequential (no parallelization). Sprints noted parallelization opportunities (e.g., 10.1 Wave 0 unblocks, 11-13 can parallelize bugs) but kept as sequential in write-ups for clarity.
+
+---
+
 ## 2026-03-27 — Claude Code (Opus 4.6) — DNS Migration + Wildcard Go-Live
 
 ### Done
