@@ -79,6 +79,7 @@ interface AudienceTabsProps {
   requestsSent: RequestSent[]
   colleagues: ColleagueEntry[]
   mostRecentYachtId: string | null
+  savedCount: number
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -114,6 +115,7 @@ export function AudienceTabs({
   requestsSent,
   colleagues,
   mostRecentYachtId,
+  savedCount,
 }: AudienceTabsProps) {
   const [activeTab, setActiveTab] = useState<'endorsements' | 'colleagues' | 'saved'>('endorsements')
 
@@ -162,16 +164,24 @@ export function AudienceTabs({
                 : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
             }`}
           >
-            {tab === 'endorsements' ? 'Endorsements' : tab === 'colleagues' ? (
-              <span className="flex items-center justify-center gap-1.5">
-                Colleagues
-                {colleagues.length > 0 && (
-                  <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[var(--color-navy-100)] text-[var(--color-navy-700)]">
-                    {colleagues.length}
-                  </span>
-                )}
-              </span>
-            ) : 'Saved'}
+            {(() => {
+              const count = tab === 'endorsements' ? endorsementsReceived.length
+                : tab === 'colleagues' ? colleagues.length
+                : savedCount
+              const label = tab === 'endorsements' ? 'Endorsements'
+                : tab === 'colleagues' ? 'Colleagues'
+                : 'Saved'
+              return (
+                <span className="flex items-center justify-center gap-1.5">
+                  {label}
+                  {count > 0 && (
+                    <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-[var(--color-navy-100)] text-[var(--color-navy-700)]">
+                      {count}
+                    </span>
+                  )}
+                </span>
+              )
+            })()}
           </button>
         ))}
       </div>

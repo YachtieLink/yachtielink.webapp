@@ -36,6 +36,7 @@ export default async function NetworkPage() {
     requestsReceivedRes,
     requestsSentRes,
     endorsementsGivenRes,
+    savedCountRes,
   ] = await Promise.all([
     supabase.rpc('get_colleagues', { p_user_id: user.id }),
     supabase
@@ -64,6 +65,10 @@ export default async function NetworkPage() {
       .select('recipient_id, yacht_id')
       .eq('endorser_id', user.id)
       .is('deleted_at', null),
+    supabase
+      .from('saved_profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id),
   ])
 
   const colleagueRows = (colleaguesRes.data as ColleagueRow[]) ?? []
@@ -140,13 +145,14 @@ export default async function NetworkPage() {
 
   return (
     <PageTransition className="flex flex-col gap-4">
-      <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Network</h1>
+      <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">Network</h1>
     <AudienceTabs
       endorsementsReceived={endorsementsReceived}
       requestsReceived={requestsReceived}
       requestsSent={requestsSent}
       colleagues={colleagues}
       mostRecentYachtId={mostRecentYachtId}
+      savedCount={savedCountRes.count ?? 0}
     />
     </PageTransition>
   )

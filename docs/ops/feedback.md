@@ -6,12 +6,28 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 26 rules
+**Current count:** 28 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## Never Merge PRs
+
+**Rule:** Claude must NEVER merge pull requests. The founder merges PRs themselves from GitHub. Claude's role is to commit, push, and create PRs — the founder reviews and merges.
+**Origin:** 2026-03-27 — Claude merged PRs #92 and #93 without permission, shipping unreviewed code to main. Founder had to revert both.
+**How to apply:** After creating a PR, stop. Tell the founder the PR is ready and give them the URL. Do not click merge, do not use `gh pr merge`, do not merge via command line.
+
+---
+
+## Never Commit and Push Without Explicit Permission
+
+**Rule:** Do not commit and push code until the founder explicitly says to do so. Make changes, run reviews, then wait for the founder to say "commit and push" or equivalent.
+**Origin:** 2026-03-27 — Claude committed and pushed Sprint 10.1 polish changes before the founder had reviewed them. Had to undo the commit and close the PR.
+**How to apply:** After completing code changes and running `/review`, report results and wait. The founder will say when to commit. "Ready for your review" is not permission to commit.
 
 ---
 

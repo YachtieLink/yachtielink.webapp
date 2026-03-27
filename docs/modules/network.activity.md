@@ -6,6 +6,8 @@ When you make changes to this module, append a one-line entry with date, agent n
 
 ---
 
+**2026-03-27** — Claude Code (Opus 4.6) (Sprint 10.1): `font-serif` on network page h1. `cardHover` animation on SavedProfileCard (lift on hover, scale on tap). `popIn` on nav notification badges (BottomTabBar + SidebarNav).
+
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.3): Network page — colleague cards link to `/u/{handle}`, endorsement text links converted to proper buttons; page title added.
 
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.1, Wave 1 A2): Saved profiles promoted to `/app/network/saved` — server-side data fetching, folder CRUD, move-to-folder, empty state; `SavedTab` in `AudienceTabs` replaced with link card.

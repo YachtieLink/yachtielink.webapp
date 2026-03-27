@@ -108,7 +108,7 @@ export default async function InsightsPage({ searchParams }: Props) {
       {upgraded && <InsightsUpgradedToast isPro={proStatus.isPro} />}
 
       <div className="flex items-center justify-between">
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Insights</h1>
+        <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">Insights</h1>
         {proStatus.isPro && (
           <span className="text-xs font-semibold bg-[var(--color-sand-100)] text-[var(--color-sand-400)] px-2.5 py-1 rounded-full">
             Pro ✓

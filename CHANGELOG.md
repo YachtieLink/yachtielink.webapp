@@ -22,101 +22,61 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
-## 2026-03-27 — Claude Code (Haiku 4.5) — Sprint Restructure + Execution Plan Locked
+## 2026-03-27 — Claude Code (Opus 4.6) — Sprint 10.1 Remaining Polish + Wave 4/5 QA
 
 ### Done
 
-- **Rewrote all 5 upcoming sprints** (10.1, CV-Parse-Bugfix, 11, 12, 13) to reflect Wave 1-5 evolution and clarify dependencies
-- **Sprint 10.1:** Phase 1A closeout, 5-7 days, Wave 0 unblocks everything (EmptyState, API routes, migration), 4 parallel agents in Wave 1
-- **Sprint CV-Parse-Bugfix:** 37 QA bugs in 5 waves, sequential minimum 5 days, parallelizable after Wave 1 completes. Data integrity (P0) foundational.
-- **Sprint 11:** CV onboarding rebuild, one-drop CV path vs two-input manual fork, CvReviewClient refactored to use shared save utility, 5-7 days
-- **Sprint 12:** Yacht graph foundation (yacht detail, colleague explorer, sea time), database layer first (5 RPCs), UI in waves 2-5, 6-8 days
-- **Sprint 13:** Launch polish (marketing page, production ops, QA, legal), most infrastructure already production-ready, 5-7 days
-- **STATUS.md updated:** Major Sprints table now shows execution order (1-5), dependencies explicit, no circular deps
-- **Execution sequence locked:** 10.1 → Bugfix → 11 → 12 → 13 (sequential, foundation-first, each sprint unblocks next)
-- **Scope ruthlessly cut:** All deferred items (Salty, full graph viz, dark mode, endorsement prompts) tracked in each sprint's Out section
-- **Exit criteria measurable:** All 5 sprints have testable, specific exit criteria (not aspirational)
+- **Wave 4 QA + review (PR #96):** Two-phase code review, interactive walkthrough with founder. Fixed: "captains" → "that hirers" copy, experience list page, editHref, useProfileSettings session-loss bug, boolean null-coalescing. Founder merged.
+- **Wave 5 QA + review (PR #97):** Two-phase code review, interactive walkthrough. Fixed: Pro benefits accuracy, billing placeholder, GRANT EXECUTE, middleware empty-subdomain guard, canonical Pro gate, middleware cookie refresh P1. Founder merged.
+- **Pro subdomain DNS verified:** `dev-qa.yachtie.link` live in production via Vercel.
+- **Subdomain cookie audit:** Deep investigation confirmed code is correct (`domain: '.yachtie.link'` on all 3 Supabase clients). Root cause was stale cookies from pre-fix logins. Founder confirmed fresh login works.
+- **Sprint 10.1 validation:** Spec was 90% already done from overnight session. Identified 5 remaining items.
+- **Sprint 10.1 remaining polish (staged, not committed):** 4 parallel Sonnet subagents executed typography (font-serif on 5 headings), education per-item edit links (new `itemLinks` prop on ProfileSectionGrid), nav badge `popIn` animation, saved profile `cardHover`. Two-phase review caught 3 issues (badge replay, willChange bloat, itemLinks overflow) — all fixed.
+- **Feedback rules #27-28 captured:** Never merge PRs. Never commit/push without permission.
 
 ### Context
 
-- Branch: `refactor/sprint-restructure-2026-03-27` — All changes doc-only (sprint READMEs + STATUS.md)
-- No code changes, no module touches, no risk
-- Recent context: Waves 1-5 shipped (CV parse, public profile, import wizard, profile page, network tab + Pro subdomain). Phase 1A → 1B transition in motion. PRs #96 + #97 ready to merge.
-- Ordering rationale: 10.1 closes Phase 1A (foundation), bugfix waves fix Phase 1B bugs on clean foundation, 11-13 build Phase 1B features and go-live
-- Each sprint README follows consistent template: Why, Scope, Dependencies, Deliverables, Build Order (sequential or parallel-capable), Exit Criteria, Notes
+- Branch: `sprint-10.1/remaining-polish` off main — changes staged, awaiting founder permission to commit
+- 9 code files changed: 4 page h1s, ProfileAccordion, ProfileSectionGrid, BottomTabBar, SidebarNav, SavedProfileCard
+- Sprint 10.1 spec is now fully complete pending this commit + merge of `feat/ui-refresh-phase1` + tag
+- Subdomain cookie issue resolved — no migration needed (no real users yet, fresh login picks up correct cookie domain)
 
 ### Next
 
-1. **Merge PRs #96 + #97** to main (Wave 4 + 5)
-2. **Quick follow-ups** (junior sprints): subdomain consolidation, custom 404, media/CRUD standardization
-3. **Begin Sprint 10.1** (Phase 1A closeout)
+1. **Founder reviews staged changes** — then commit and push
+2. **Merge `feat/ui-refresh-phase1` → main** — final Sprint 10.1 deliverable
+3. **Tag `v1.0-phase-1a`** — clean baseline for Phase 1B
+4. **Sprint CV-Parse-Bugfix** — 37 QA bugs across 5 waves
 
 ### Flags
 
-- ⚠️ `/loop 60m` was started but /review skill didn't return output on multiple invocations (appears to be stalled). Work proceeded anyway (doc-only changes, low risk). Commit message documents approach. Monitor in next session.
-- ⚠️ Execution plan is now sequential (no parallelization). Sprints noted parallelization opportunities (e.g., 10.1 Wave 0 unblocks, 11-13 can parallelize bugs) but kept as sequential in write-ups for clarity.
+- ⚠️ Founder feedback: Claude must never merge PRs (rule #27) and never commit/push without permission (rule #28). Both captured in feedback.md.
+- ⚠️ Subdomain route duplicates public profile read model — tracked for consolidation.
+- ⚠️ `feat/ui-refresh-phase1` branch still needs merging to main (Sprint 10.1 final step).
 
 ---
 
-## 2026-03-27 — Claude Code (Haiku 4.5) — Validation Pass + Documentation Alignment
+## 2026-03-27 — Claude Code (Haiku 4.5) — Sprint Restructure PR Merge + Backlog Audit
 
 ### Done
 
-- **Comprehensive validation pass:** Checked all files referenced in 5 sprint READMEs against actual codebase state. Found 5 scope mismatches that were corrected.
-- **Sprint 10.1 revised:** API routes (GET /api/user-education/[id], PATCH /api/saved-profiles/[id]) pre-exist (no build needed, just verify). Education edit page fully implemented (Mar 22). Effort revised 5-7d → 4-5d. Added public layout infrastructure to Wave 0 (unblocks Sprint 13).
-- **Sprint 11 cleaned:** CvReviewClient component doesn't exist in codebase. Removed refactor scope (no component to refactor). Standalone CV flow verified working.
-- **Sprint 12 clarified:** Yacht detail page (`/app/yacht/[id]/page.tsx`) missing. Changed scope from "enhance existing" to "create new" (larger than originally assumed).
-- **Sprint 13 critical update:** `app/(public)/layout.tsx` does not exist (BLOCKER). Added to Wave 0 as critical prerequisite. Must create public layout before building public pages. Effort revised 5-7d → 6-7d. Marketing page verified fully implemented (just needs verification). Legal sign-off marked as blocker.
-- **Validation matrix created:** 20 RPC functions verified exist, all dark mode components validated (zero dark: classes), motion presets exceed expectations (12 vs 7), storage abstraction comprehensive, colleagues page already complete (pre-sprint work).
-- **PHASE1-CLOSEOUT.md rewritten:** Completely restructured from Wave 1-5 terminology to Sprint 10.1 → Bugfix → 11 → 12 → 13 structure. Added clear dependencies, blockers, and decisions. Session start checklist now points to canonical execution plan.
-- **sprints/README.md updated:** "Active Right Now" section changed to "Execution Sequence (Locked)" with all 5 sprints in order, all marked Ready. Removed "Draft" and "Planning" statuses.
-- **All changes committed:** 2 commits (validation pass fixes + documentation alignment). Branch `refactor/sprint-restructure-2026-03-27` ready for merge.
+- **PR #100 merged:** Sprint restructure (sprint 10.1, CV-Parse-Bugfix, 11, 12, 13) now on main. All scope mismatches validated and corrected, dependencies explicit, effort revised where needed.
+- **Backlog proposal merged:** Wave 5 branch had 1 unpushed commit (subdomain cookie & auth audit — 3eb1753). Cherry-picked to main and merged directly.
+- **Documentation alignment verified:** PHASE1-CLOSEOUT.md + sprints/README now use new sprint terminology (no longer Wave 1-5 references). Next agent has clear execution roadmap.
 
 ### Context
 
-- Prior session locked sprint sequence: 10.1 → Bugfix → 11 → 12 → 13 (based on logical ordering and dependencies)
-- Validation pass discovered that assumptions about pre-existing code didn't match reality (API routes exist but weren't marked; yacht page doesn't exist but was assumed)
-- Public layout was assumed to exist but is missing entirely — this is now a critical blocker for Sprint 13
-- Documentation alignment ensures next agent won't be confused by Wave 1-5 terminology in old PHASE1-CLOSEOUT.md
+- Main is now fully updated with Waves 1-5 code (PRs #96-#99 merged earlier) + sprint restructure (PR #100 now merged)
+- Stale wave5 branch identified with 1 unpushed commit — recovered and merged to main
+- Project ready to begin Sprint 10.1 (Phase 1A closeout)
 
 ### Next
 
-1. **Merge branch `refactor/sprint-restructure-2026-03-27` to main** — all sprint docs validated and aligned
-2. **Merge PRs #96 + #97** (Wave 4-5 code)
-3. **Begin Sprint 10.1** (Phase 1A closeout)
+1. **Begin Sprint 10.1** — Phase 1A closeout (dark mode, animations, public layout infrastructure, missing pages)
 
 ### Flags
 
-- ⚠️ Public layout (`app/(public)/layout.tsx`) is now a hard blocker for Sprint 13. Must be built in Sprint 13 Wave 0 before any public pages can be constructed.
-- ⚠️ Sprint 12 yacht detail page scope larger than originally written (page missing, not just needing enhancement). Team should budget accordingly.
-- ✅ Sprint effort estimates revised: 10.1 (5-7d → 4-5d), 13 (5-7d → 6-7d). All other sprints verified accurate.
-
----
-
-## 2026-03-27 — Claude Code (Opus 4.6) — DNS Migration + Wildcard Go-Live
-
-### Done
-
-- **DNS migration from Cloudflare to Vercel:** Vercel requires its own nameservers for wildcard SSL cert provisioning. Switched `yachtie.link` nameservers from Cloudflare to `ns1.vercel-dns.com` / `ns2.vercel-dns.com`. Vercel auto-created ALIAS records for root and wildcard.
-- **Email/DNS records migrated:** Added all MX and TXT records to Vercel DNS via CLI (`npx vercel dns add`): Google SMTP MX (priority 1), Resend/Amazon SES MX (priority 10, `send.mail` subdomain), Resend DKIM TXT (`resend._domainkey.mail`), Amazon SES SPF TXT (`send.mail`), Google site verification TXT, root SPF TXT.
-- **Wildcard SSL live:** `*.yachtie.link` validated, SSL cert provisioned. Subdomain routing confirmed working — `aristeele.yachtie.link` returning 200.
-- **Root domain verified:** `yachtie.link` returning 200, `yachtielink.com` redirect working.
-
-### Context
-
-- DNS now managed in Vercel dashboard (not Cloudflare). Cloudflare DNS records are stale — do not use Cloudflare for DNS changes going forward.
-- All code was committed and pushed by parallel session. Branch `fix/phase1-wave5-network-endorsement` is up to date with PR #97.
-
-### Next
-
-1. **Merge PRs #96 + #97** — both reviewed and QA'd
-2. **Smoke test subdomain after merge to main** — verify middleware routing works on production deployment
-3. **Wave 5: Network Tab + Endorsement Cleanup**
-
-### Flags
-
-- ⚠️ DNS is now on Vercel, not Cloudflare. Any future DNS changes (new email providers, verification records) must be done in Vercel dashboard or via `npx vercel dns add`.
-- ⚠️ Cloudflare still has the domain registered but nameservers point away. If Cloudflare subscription lapses, no impact — DNS is on Vercel.
+- ⚠️ **Public layout is a blocker for Sprint 13:** app/(public)/layout.tsx does not exist. Added to Sprint 13 Wave 0 but flagged for early review in Sprint 10.1 planning if possible.
 
 ---
 

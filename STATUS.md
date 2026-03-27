@@ -2,23 +2,23 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-27 (Sprint restructure complete — ordering clarified, all rewrites done)
+**Last updated:** 2026-03-27 (Sprint 10.1 polish staged, awaiting commit)
 
 ---
 
 ## Current Phase
 
-**Phase 1A → 1B transition: Execution sequence locked.** Phase 1A core features are built. Next: close Phase 1A cleanly (Sprint 10.1), fix Phase 1B bugs (CV Parse Bugfix), rebuild onboarding (Sprint 11), build yacht graph (Sprint 12), ship to production (Sprint 13).
+**Phase 1A → 1B transition.** Phase 1A core features are built (profile, CV import, employment, yacht entities, endorsements, public profile, PDF). Remaining 1A cleanup is in Sprint 10.1 (draft). Active work has shifted to Phase 1B bugfixes and polish.
 
 ---
 
-## Active Sprint (Next to Execute)
+## Active Sprint
 
-| Sprint | Phase | Status | Est. | Focus |
-|--------|-------|--------|------|-------|
-| [Sprint 10.1](./sprints/major/phase-1a/sprint-10.1/README.md) | 1A | Ready | 5-7d | Close Phase 1A — dark mode, animations, missing pages, API hardening |
+| Sprint | Phase | Status | Focus |
+|--------|-------|--------|-------|
+| [Sprint 10.1](./sprints/major/phase-1a/sprint-10.1/README.md) | 1A | 🔧 In Progress | Phase 1A closeout — remaining polish staged, pending commit + branch merge + tag |
 
-**Immediate next action:** Merge PRs #96 (wave4) and #97 (wave5) to main. Then begin Sprint 10.1.
+**Next action:** Founder reviews staged changes → commit → merge `feat/ui-refresh-phase1` → tag `v1.0-phase-1a`.
 
 ---
 
@@ -39,25 +39,21 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 | Wave 4: Profile page + skills | 2026-03-26 | PersonalDetailsCard, skills/hobbies chip previews in grid, useProfileSettings hook extraction |
 | Wave 5: Network tab + endorsements | 2026-03-26 | Yacht-grouped colleagues, sendEndorsementRequest helper, RequestEndorsementClient slimmed |
 | Pro subdomain routing | 2026-03-26 | Middleware rewrite for `*.yachtie.link`, reserved landing page, handle blocklist, Pro link in hero card, cookie refresh fix, billing placeholder |
+| Sprint restructure + validation pass | 2026-03-27 | Rewrote all upcoming sprints (10.1, bugfix, 11, 12, 13) to reflect Wave 1-5 evolution. Validation pass found & corrected 5 scope mismatches. |
 
 ---
 
-## Up Next (ordered execution plan)
+## Up Next (ordered)
 
-**Immediate (next 1-2 sessions):**
-1. Merge PRs #96 (Wave 4) + #97 (Wave 5) to main
-2. Quick follow-ups: subdomain consolidation, custom 404, media/CRUD standardization (junior sprints)
-
-**Major sprint sequence (3-4 weeks):**
-3. **Sprint 10.1** (5-7 days) — Phase 1A closeout: dark mode, animations, missing pages, API hardening
-4. **Sprint CV-Parse-Bugfix** (5-7 days) — Fix 37 QA bugs: data integrity (Wave 1), public profile (Wave 2), wizard UX (Wave 3), profile page (Wave 4), network tab (Wave 5)
-5. **Sprint 11** (5-7 days) — CV onboarding rebuild: CV drop path + manual path fork, section colours, OG/QR polish
-6. **Sprint 12** (6-8 days) — Yacht graph foundation: yacht detail, colleague explorer, sea time, transfer flow
-7. **Sprint 13** (5-7 days) — Launch polish: marketing page, production ops, manual QA, go-live
-
-**Post-launch (after Sprint 13 soft-launch):**
-8. Ghost Profiles + Claimable Accounts (design spec ready, ~2-3 days)
-9. Endorsement Writing Assist (quick junior sprint, ~1-2 days)
+1. ✅ Waves 1-5 shipped and merged to main
+2. ✅ Sprint restructure completed and merged (PR #100)
+3. **Sprint 10.1 — Phase 1A Closeout** — remaining polish staged, pending commit + merge + tag
+4. **Sprint CV-Parse-Bugfix** (5–7 days) — fix 37 QA bugs across 5 waves
+5. **Sprint 11 — CV Onboarding Rebuild** (5–7 days) — one-drop vs manual fork, motion polish, OG/QR
+6. **Sprint 12 — Yacht Graph Foundation** (6–8 days) — yacht detail pages, colleagues explorer, sea time display
+7. **Sprint 13 — Launch Polish** (6–7 days) — public layout, marketing page, ops config, legal sign-off, go-live
+8. **Media/CRUD standardization** (junior sprint after Phase 1B — photo/gallery dedup, shared Pro gating)
+9. **Ghost Profiles & Claimable Accounts** (phase 2, 24 decisions)
 
 ---
 
@@ -79,19 +75,17 @@ All D1-D8 resolved 2026-03-25. See `sprints/PHASE1-CLOSEOUT.md` Blockers section
 
 ## Uncommitted Code
 
-- **Stashed CTA fix** (stash@{2} on `fix/phase1-wave5-network-endorsement`): duplicate mobile CTAs on logged-out public profile — needs unstashing + commit after PR merge
+9 files staged on branch `sprint-10.1/remaining-polish` — awaiting founder permission to commit and push. Files: 4 page h1s (font-serif), ProfileAccordion, ProfileSectionGrid (itemLinks), BottomTabBar, SidebarNav (popIn badges), SavedProfileCard (cardHover).
 
 ---
 
-## Major Sprints (rewritten 2026-03-27, execution order locked)
+## Draft Sprints (queued but not started)
 
-| Order | Sprint | Phase | Status | Est. | Focus |
-|-------|--------|-------|--------|------|-------|
-| 1 | [Sprint 10.1](./sprints/major/phase-1a/sprint-10.1/README.md) | 1A | Ready | 5-7d | Phase 1A closeout: dark mode, animations, API hardening, missing pages (education edit, saved profiles page) |
-| 2 | [CV Parse Bugfix](./sprints/major/phase-1b/sprint-cv-parse-bugfix/README.md) | 1B | Ready | 5-7d | Fix 37 QA bugs across 5 waves: data integrity, public profile hero, CV view, import wizard UX, profile page, network grouping |
-| 3 | [Sprint 11](./sprints/major/phase-1b/sprint-11/README.md) | 1B | Ready | 5-7d | CV onboarding rebuild: one-drop CV path + manual path, section colours, motion polish, OG/QR enhancement |
-| 4 | [Sprint 12](./sprints/major/phase-1b/sprint-12/README.md) | 1B | Ready | 6-8d | Yacht graph foundation: yacht detail, colleague explorer, sea time, attachment transfer, yacht search UX |
-| 5 | [Sprint 13](./sprints/major/phase-1b/sprint-13/README.md) | 1B | Ready | 5-7d | Launch polish: marketing page, production setup, manual QA, legal sign-off, soft-launch |
+| Sprint | Phase | Focus |
+|--------|-------|-------|
+| [Sprint 11](./sprints/major/phase-1b/sprint-11/README.md) | 1B | Crew landing pages, Salty, section colours, OG images |
+| [Sprint 12](./sprints/major/phase-1b/sprint-12/README.md) | 1B | Yacht graph, colleague network, sea time |
+| [Sprint 13](./sprints/major/phase-1b/sprint-13/README.md) | 1B | Launch polish, marketing page, production env, QA |
 
 ---
 
@@ -103,7 +97,7 @@ All D1-D8 resolved 2026-03-25. See `sprints/PHASE1-CLOSEOUT.md` Blockers section
 | debug | debug-photo-upload-limit | In Progress |
 | debug | debug-cv-regenerate-date | In Progress |
 | ui-ux | ui-public-profile-button-margin | In Progress |
-| feature | feature-pro-subdomain-link | Live (DNS + code deployed) |
+| feature | feature-pro-subdomain-link | Planned |
 | feature | feature-cv-sharing-rework | Planned |
 | feature | feature-saved-profiles-rework | Planned |
 

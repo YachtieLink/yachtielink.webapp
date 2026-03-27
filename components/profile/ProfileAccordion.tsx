@@ -47,7 +47,7 @@ export function ProfileAccordion({
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-base font-semibold text-[var(--color-text-primary)]">{title}</span>
+            <span className="text-base font-serif text-[var(--color-text-primary)]">{title}</span>
             {editHref && (
               <Link
                 href={editHref}
