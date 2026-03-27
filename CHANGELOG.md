@@ -22,6 +22,40 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-27 — Claude Code (Opus 4.6) — Sprint CV-Parse-Bugfix + Skills Ecosystem
+
+### Done
+
+- **Sprint CV-Parse-Bugfix executed (PR #104):** Validated original 37-bug spec — 22 already fixed, 7 deferred to Sprint 12. Rewrote spec for 8 remaining bugs. 4 parallel Sonnet subagents across 2 waves. Two-phase review caught P1 (cv_public_source override) + P2 (stale editing index). All fixed. QA verified with test accounts.
+- **8 bugs fixed:** CV view 404 (cv_public_source), country flag in hero (countryToFlag), CV mobile scroll (overflow-x-hidden), CV share/download buttons, cert/education inline editing in wizard, visibility settings link on PersonalDetailsCard, ParseProgress jump (initial={false}).
+- **3 new skills built:** `/test-yl` (interactive QA with test accounts), `/sprint-start-yl` (spec validation + execution planning), `/sprint-build-yl` (spec writing with codebase research).
+- **Skill chain audit:** Added auto-chains: `/yachtielink-review` → `/test-yl` → `/shipslog`. Added overnight mode to `/test-yl` (auto-proceed vs wait for founder). Added sprint tracking file updates to both sprint skills.
+- **Sprint 10.1 polish (PR #103):** Typography (font-serif on 6 page h1s + accordion), education per-item links, nav badge popIn, saved profile cardHover, network tab count badges. Review fixes: willChange removal, itemLinks overflow, badge stable key.
+- **9 backlog items created:** nationality flag, avatar framing, saved card detail line, watch notifications, save yachts, inner page header, endorsement request yacht grouping, visibility toggle clarity, subdomain cookie audit.
+- **Charlotte made Pro** (test account for QA).
+- **Feedback rules #27-29:** Never merge, never commit/push without permission, always run /shipslog before commit.
+- **Sprint procedure hardwired in CLAUDE.md** — mandatory chain enforced across sessions.
+
+### Context
+
+- Branch: `fix/cv-parse-bugfix` merged to main (PR #104)
+- Sprint CV-Parse-Bugfix complete. Sprint 10.1 complete (PR #103 merged earlier).
+- Full skill ecosystem operational: sprint-build → sprint-start → build → review → yachtielink-review → test-yl → shipslog → commit
+- `feat/ui-refresh-phase1` branch confirmed fully merged (zero commits ahead of main)
+
+### Next
+
+1. **Sprint 11 — CV Onboarding Rebuild** (5-7 days)
+2. **Sprint 12 — Yacht Graph Foundation** (6-8 days) — includes 7 deferred bugfix items
+3. **Sprint 13 — Launch Polish** (6-7 days)
+
+### Flags
+
+- ⚠️ Feedback rule #29: Always run `/shipslog` before commit — was skipped this session, now hardwired in CLAUDE.md
+- ⚠️ 9 new backlog items captured — review `sprints/backlog/` for prioritisation
+
+---
+
 ## 2026-03-27 — Claude Code (Opus 4.6) — Sprint 10.1 Remaining Polish + Wave 4/5 QA
 
 ### Done

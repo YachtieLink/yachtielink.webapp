@@ -10,6 +10,20 @@ Read `AGENTS.md` first. That file contains all primary instructions, workflow, b
 - `notes/` is for ideation and strategy. Sprint work lives in `sprints/`. If something in `notes/` becomes a real decision, promote it into the appropriate `docs/` file and log it in `CHANGELOG.md`.
 - When creating or closing a junior sprint, update both the sprint's own README and the parent index (`sprints/junior/README.md`).
 
+## Sprint Procedure — Mandatory Chain
+
+After building code, follow this chain exactly. Do NOT skip steps. Do NOT commit without completing the chain.
+
+```
+BUILD → type-check → drift-check → /review → /yachtielink-review → /test-yl → /shipslog → WAIT FOR FOUNDER → commit + push → PR
+```
+
+**Hard rules:**
+- NEVER merge PRs — founder merges
+- NEVER commit/push without founder's explicit permission
+- ALWAYS run `/shipslog` before commit (even if QA was done manually)
+- If the founder says "commit and push", run `/shipslog` first, then commit
+
 ## Idea Capture — Feature Conversations
 
 When the founder talks about features, improvements, or things to build — **do not start coding**. These are ideas to capture, not tasks to execute immediately.
