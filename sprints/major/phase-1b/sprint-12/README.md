@@ -269,4 +269,14 @@ Wave 5 — Testing + Polish (~1 day)
 
 **Save yachts:** Once yacht detail pages exist, users should be able to save/bookmark yachts the same way they save profiles (heart button, notes, watching, folders). This could live on the yacht detail page and appear in a "Yachts" sub-section of `/app/network/saved`. See `sprints/backlog/save-yachts.md` for full spec.
 
+**Deferred bugs from CV-Parse-Bugfix sprint (pick up here):**
+These were originally filed as QA bugs (2026-03-24) but belong in this sprint's scope:
+- Bug 34: Network tab missing yacht graph/exploration → Sprint 12 Section A+B
+- Bug 37: Colleagues not grouped by yacht → Sprint 12 Section B (colleague explorer)
+- Bug 10: Yacht matching unclear ("new" badge on everything) → Sprint 12 Section D (match quality indicator)
+- Bug 31: Yacht names not clickable on profile/CV → wire links to `/app/yacht/[id]` in ExperienceSection
+- Bug 32: Yacht ensign flags show plain text → render flag in yacht stats/experience cards
+- Bug 36: Endorsements not grouped by yacht → Sprint 12 Section A (endorsement cross-refs on yacht detail)
+- Bug 35: Can't save/bookmark yachts → already noted above, backlog spec at `sprints/backlog/save-yachts.md`
+
 **Post-launch:** After launch, Ghost Profiles + Claimable Accounts unblocks crew who've never created a profile (received endorsements, appeared on yachts). That's the next major feature after this sprint.

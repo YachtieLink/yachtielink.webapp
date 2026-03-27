@@ -60,6 +60,13 @@ export function PersonalDetailsCard({ dob, homeCountry, smokePref, appearanceNot
         </div>
       ) : null}
 
+      <div className="flex flex-col gap-0.5">
+        <Link href="/app/profile/settings" className="text-xs font-medium text-[var(--color-interactive)] hover:underline">
+          Visibility settings
+        </Link>
+        <p className="text-xs text-[var(--color-text-tertiary)]">Control what&apos;s visible on your public profile</p>
+      </div>
+
       {missingCount > 0 && (
         <Link href="/app/profile/settings" className="block">
           <div className="rounded-xl bg-amber-50 border border-amber-200 px-3 py-2">

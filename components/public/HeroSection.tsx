@@ -29,6 +29,7 @@ interface HeroSectionProps {
   savedUserId: string
   savedStatus?: { id: string; folder_id: string | null } | null
   heroStats?: string[]
+  homeCountryFlag?: string
 }
 
 export function HeroSection({
@@ -52,6 +53,7 @@ export function HeroSection({
   savedUserId,
   savedStatus,
   heroStats = [],
+  homeCountryFlag,
 }: HeroSectionProps) {
   const { scrollY } = useScroll()
   const heroHeight = useTransform(scrollY, [0, 200], ['70vh', '40vh'])
@@ -126,7 +128,9 @@ export function HeroSection({
         )}
 
         {/* Name — large, confident, serif */}
-        <h1 className="text-white font-serif text-4xl leading-[1.1] tracking-tight" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>{displayName}</h1>
+        <h1 className="text-white font-serif text-4xl leading-[1.1] tracking-tight" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
+          {displayName}{homeCountryFlag ? <span className="ml-2 text-3xl align-middle">{homeCountryFlag}</span> : null}
+        </h1>
 
         {/* Role + Department — unified line */}
         {(primaryRole || (departments && departments.length > 0)) && (

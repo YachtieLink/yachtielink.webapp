@@ -40,7 +40,7 @@ function ParseProgress({ startedAt }: { startedAt: number }) {
         <div className="w-full h-1.5 bg-[var(--color-surface-raised)] rounded-full overflow-hidden mb-6">
           <motion.div
             className="h-full bg-[var(--color-interactive)] rounded-full"
-            initial={{ width: '5%' }}
+            initial={false}
             animate={{ width: `${Math.min(((activeStep + 1) / PARSE_STEPS.length) * 100, 95)}%` }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
           />
@@ -51,7 +51,7 @@ function ParseProgress({ startedAt }: { startedAt: number }) {
           {PARSE_STEPS.map((s, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 8 }}
+              initial={i < activeStep ? false : { opacity: 0, y: 8 }}
               animate={{
                 opacity: i <= activeStep ? 1 : 0.3,
                 y: 0,

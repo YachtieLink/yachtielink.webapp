@@ -49,7 +49,7 @@ export function CvPreview({ mode, user, attachments, certifications, endorsement
   const languages = user.languages as Array<{ language: string; proficiency: string }> | null
 
   return (
-    <div className="max-w-[700px] mx-auto bg-white border border-[var(--color-border)] rounded-xl shadow-sm overflow-hidden">
+    <div className="max-w-[700px] mx-auto bg-white border border-[var(--color-border)] rounded-xl shadow-sm overflow-hidden min-w-0">
       {/* Header */}
       <div className="p-6 pb-4">
         <h1 className="text-2xl font-bold text-gray-900">{displayName}</h1>
@@ -75,7 +75,7 @@ export function CvPreview({ mode, user, attachments, certifications, endorsement
       {/* About */}
       {user.bio ? (
         <Section title="About" editHref={isOwner ? '/app/about/edit' : undefined}>
-          <p className="text-sm text-gray-700 leading-relaxed">{user.bio}</p>
+          <p className="text-sm text-gray-700 leading-relaxed break-words">{user.bio}</p>
         </Section>
       ) : isOwner ? (
         <MissingField label="Add your bio" href="/app/about/edit" />
@@ -102,7 +102,7 @@ export function CvPreview({ mode, user, attachments, certifications, endorsement
                     {att.role_label} · {formatDate(att.started_at)} — {att.ended_at ? formatDate(att.ended_at) : 'Present'}
                   </p>
                   {att.cruising_area && <p className="text-xs text-gray-400">{att.cruising_area}</p>}
-                  {att.description && <p className="text-xs text-gray-500 mt-1">{att.description.slice(0, 500)}</p>}
+                  {att.description && <p className="text-xs text-gray-500 mt-1 break-words">{att.description.slice(0, 500)}</p>}
                 </div>
               )
             })}
@@ -158,7 +158,7 @@ export function CvPreview({ mode, user, attachments, certifications, endorsement
           <div className="flex flex-col gap-3">
             {endorsements.slice(0, 3).map((end: any) => (
               <div key={end.id} className="border-l-2 border-gray-200 pl-3">
-                <p className="text-sm text-gray-600 italic">&ldquo;{end.content.slice(0, 200)}&rdquo;</p>
+                <p className="text-sm text-gray-600 italic break-words">&ldquo;{end.content.slice(0, 200)}&rdquo;</p>
                 <p className="text-xs text-gray-400 mt-0.5">— {end.endorser?.display_name ?? end.endorser?.full_name ?? 'Anonymous'}</p>
               </div>
             ))}
@@ -178,9 +178,21 @@ export function CvPreview({ mode, user, attachments, certifications, endorsement
             </Link>
           </>
         ) : (
-          <Link href={`/u/${user.handle}`} className="flex-1 text-center py-2.5 rounded-xl text-sm font-medium border border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]">
-            Back to profile
-          </Link>
+          <>
+            <Link href={`/u/${user.handle}`} className="flex-1 text-center py-2.5 rounded-xl text-sm font-medium border border-[var(--color-border)] text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)]">
+              Back to profile
+            </Link>
+            {user.cv_public !== false && (user.latest_pdf_path || user.cv_storage_path) && (
+              <a
+                href={`/api/cv/public-download/${user.handle}`}
+                target="_blank"
+                rel="noopener"
+                className="flex-1 text-center py-2.5 rounded-xl text-sm font-medium bg-[var(--color-interactive)] text-white hover:opacity-90"
+              >
+                Download CV
+              </a>
+            )}
+          </>
         )}
       </div>
     </div>

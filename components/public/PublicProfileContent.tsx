@@ -13,6 +13,7 @@ import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { PhotoGallery } from '@/components/profile/PhotoGallery'
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { formatSeaTime } from '@/lib/sea-time'
+import { countryToFlag } from '@/lib/constants/country-iso'
 import { SaveProfileButton } from '@/components/profile/SaveProfileButton'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { aboutSummary, hobbiesSummary, educationSummary } from '@/lib/profile-summaries'
@@ -48,6 +49,8 @@ interface UserProfile {
   show_whatsapp?: boolean
   show_email?: boolean
   show_location?: boolean
+  home_country?: string | null
+  show_home_country?: boolean
   available_for_work?: boolean
   founding_member?: boolean
   social_links?: Array<{ platform: string; url: string }> | null
@@ -126,6 +129,9 @@ export function PublicProfileContent({
   if (age) heroStats.push(`${age} years old`)
   if (seaTimeTotalDays > 0) heroStats.push(`${formatSeaTime(seaTimeTotalDays).displayLong} at sea`)
 
+  const flag = user.home_country ? countryToFlag(user.home_country) : ''
+  const homeCountryFlag = user.show_home_country !== false && flag ? flag : undefined
+
   return (
     // ── Outer: stacked on mobile, side-by-side on desktop ────────────────────
     <div className="flex flex-col md:flex-row md:min-h-screen">
@@ -152,6 +158,7 @@ export function PublicProfileContent({
         savedUserId={user.id}
         savedStatus={savedStatus}
         heroStats={heroStats}
+        homeCountryFlag={homeCountryFlag}
       />
 
       {/* ── LEFT: Desktop hero photo panel (hidden on mobile) ─────────────── */}
@@ -212,7 +219,9 @@ export function PublicProfileContent({
           )}
 
           {/* Name — large, confident */}
-          <h1 className="text-white font-serif text-4xl md:text-5xl leading-[1.1] tracking-tight" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>{displayName}</h1>
+          <h1 className="text-white font-serif text-4xl md:text-5xl leading-[1.1] tracking-tight" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
+            {displayName}{homeCountryFlag ? <span className="ml-2 text-3xl align-middle">{homeCountryFlag}</span> : null}
+          </h1>
 
           {(user.primary_role || (user.departments && user.departments.length > 0)) && (
             <p className="text-white/90 text-base font-medium" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
