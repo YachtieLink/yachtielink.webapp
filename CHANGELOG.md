@@ -22,6 +22,33 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-27 — Claude Code (Opus 4.6) — DNS Migration + Wildcard Go-Live
+
+### Done
+
+- **DNS migration from Cloudflare to Vercel:** Vercel requires its own nameservers for wildcard SSL cert provisioning. Switched `yachtie.link` nameservers from Cloudflare to `ns1.vercel-dns.com` / `ns2.vercel-dns.com`. Vercel auto-created ALIAS records for root and wildcard.
+- **Email/DNS records migrated:** Added all MX and TXT records to Vercel DNS via CLI (`npx vercel dns add`): Google SMTP MX (priority 1), Resend/Amazon SES MX (priority 10, `send.mail` subdomain), Resend DKIM TXT (`resend._domainkey.mail`), Amazon SES SPF TXT (`send.mail`), Google site verification TXT, root SPF TXT.
+- **Wildcard SSL live:** `*.yachtie.link` validated, SSL cert provisioned. Subdomain routing confirmed working — `aristeele.yachtie.link` returning 200.
+- **Root domain verified:** `yachtie.link` returning 200, `yachtielink.com` redirect working.
+
+### Context
+
+- DNS now managed in Vercel dashboard (not Cloudflare). Cloudflare DNS records are stale — do not use Cloudflare for DNS changes going forward.
+- All code was committed and pushed by parallel session. Branch `fix/phase1-wave5-network-endorsement` is up to date with PR #97.
+
+### Next
+
+1. **Merge PRs #96 + #97** — both reviewed and QA'd
+2. **Smoke test subdomain after merge to main** — verify middleware routing works on production deployment
+3. **Wave 5: Network Tab + Endorsement Cleanup**
+
+### Flags
+
+- ⚠️ DNS is now on Vercel, not Cloudflare. Any future DNS changes (new email providers, verification records) must be done in Vercel dashboard or via `npx vercel dns add`.
+- ⚠️ Cloudflare still has the domain registered but nameservers point away. If Cloudflare subscription lapses, no impact — DNS is on Vercel.
+
+---
+
 ## 2026-03-26 — Claude Code (Opus 4.6) — Wave 5 QA + Pro Subdomain Review
 
 ### Done
