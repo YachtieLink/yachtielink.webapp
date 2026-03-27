@@ -2,13 +2,13 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-27 (Sprint 10.1 ✅ + CV-Parse-Bugfix ✅, ready for Sprint 11)
+**Last updated:** 2026-03-28 (Sprint 11 design complete, build plan 11a ready, awaiting `/sprint-start-yl` validation)
 
 ---
 
 ## Current Phase
 
-**Phase 1A → 1B transition.** Phase 1A core features are built (profile, CV import, employment, yacht entities, endorsements, public profile, PDF). Remaining 1A cleanup is in Sprint 10.1 (draft). Active work has shifted to Phase 1B bugfixes and polish.
+**Phase 1B active.** Phase 1A complete (Sprint 10.1 ✅). Sprint 11 (Public Profile Rewrite) design locked, build plan 11a ready for validation. This is the largest sprint yet — full public profile rewrite across 3 sub-sprints (11a/b/c).
 
 ---
 
@@ -16,9 +16,9 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Sprint | Phase | Status | Focus |
 |--------|-------|--------|-------|
-| [Sprint 11](./sprints/major/phase-1b/sprint-11/README.md) | 1B | 📋 Ready | CV onboarding rebuild — one-drop vs manual fork, section colours, OG/QR polish |
+| [Sprint 11a](./sprints/major/phase-1b/sprint-11/build_plan_11a.md) | 1B | 📋 Design complete, awaiting validation | Public Profile Rewrite — Profile mode fixes + schema foundation |
 
-**Next action:** Begin Sprint 11. Sprint 10.1 and CV-Parse-Bugfix both complete.
+**Next action:** Run `/sprint-start-yl 11a` to validate build plan against codebase, then execute.
 
 ---
 
@@ -41,11 +41,13 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 2. ✅ Sprint restructure completed and merged (PR #100)
 3. ✅ **Sprint 10.1 — Phase 1A Closeout** — complete (PR #103)
 4. ✅ **Sprint CV-Parse-Bugfix** — complete (PR #104, 8 bugs fixed, 7 deferred to Sprint 12)
-5. **Sprint 11 — CV Onboarding Rebuild** (5–7 days) — one-drop vs manual fork, motion polish, OG/QR
-6. **Sprint 12 — Yacht Graph Foundation** (6–8 days) — yacht detail pages, colleagues explorer, sea time display
-7. **Sprint 13 — Launch Polish** (6–7 days) — public layout, marketing page, ops config, legal sign-off, go-live
-8. **Media/CRUD standardization** (junior sprint after Phase 1B — photo/gallery dedup, shared Pro gating)
-9. **Ghost Profiles & Claimable Accounts** (phase 2, 24 decisions)
+5. **Sprint 11a — Public Profile Rewrite: Profile mode + foundation** (~3-4 days) — layout, typography, contact row, endorsements, CV on-demand, display settings, sub-page routes
+6. **Sprint 11b — Public Profile Rewrite: Portfolio mode** — free layout, mini bento gallery, section polish
+7. **Sprint 11c — Public Profile Rewrite: Rich Portfolio bento** — Pro bento grid, templates, density variants, photo management
+8. **Sprint 12 — Yacht Graph Foundation** (6–8 days) — yacht detail pages, colleagues explorer, sea time display
+9. **Sprint 13 — Launch Polish** (6–7 days) — public layout, marketing page, ops config, legal sign-off, go-live
+10. **Media/CRUD standardization** (junior sprint after Phase 1B — photo/gallery dedup, shared Pro gating)
+11. **Ghost Profiles & Claimable Accounts** (phase 2, 24 decisions)
 
 ---
 
@@ -67,7 +69,7 @@ All D1-D8 resolved 2026-03-25. See `sprints/PHASE1-CLOSEOUT.md` Blockers section
 
 ## Uncommitted Code
 
-Shipslog updates from CV-Parse-Bugfix session (CHANGELOG, STATUS, feedback, session log, module activity, backlog items). Will be committed as follow-up.
+Shipslog updates from design interview session (CHANGELOG, STATUS, session log, memory). Sprint 11 spec + build plan 11a (untracked). Backlog items (untracked).
 
 ---
 
@@ -75,7 +77,7 @@ Shipslog updates from CV-Parse-Bugfix session (CHANGELOG, STATUS, feedback, sess
 
 | Sprint | Phase | Focus |
 |--------|-------|-------|
-| [Sprint 11](./sprints/major/phase-1b/sprint-11/README.md) | 1B | Crew landing pages, Salty, section colours, OG images |
+| [Sprint 11](./sprints/major/phase-1b/sprint-11/README.md) | 1B | Public Profile Rewrite — 3 view modes, bento grid, photo system (split into 11a/b/c) |
 | [Sprint 12](./sprints/major/phase-1b/sprint-12/README.md) | 1B | Yacht graph, colleague network, sea time |
 | [Sprint 13](./sprints/major/phase-1b/sprint-13/README.md) | 1B | Launch polish, marketing page, production env, QA |
 
@@ -87,9 +89,9 @@ Shipslog updates from CV-Parse-Bugfix session (CHANGELOG, STATUS, feedback, sess
 |------|------|--------|
 | debug | debug-cv-parse-extraction | In Progress |
 | debug | debug-photo-upload-limit | In Progress |
-| debug | debug-cv-regenerate-date | In Progress |
+| debug | debug-cv-regenerate-date | ⚠️ Likely obsolete — CV moving to on-demand generation in Sprint 11a |
 | ui-ux | ui-public-profile-button-margin | In Progress |
-| feature | feature-pro-subdomain-link | Planned |
+| feature | feature-pro-subdomain-link | ✅ Complete (2026-03-27) |
 | feature | feature-cv-sharing-rework | Planned |
 | feature | feature-saved-profiles-rework | Planned |
 
@@ -97,8 +99,11 @@ Shipslog updates from CV-Parse-Bugfix session (CHANGELOG, STATUS, feedback, sess
 
 ## Backlog Highlights
 
+- **Pro Upsell Consistency** — app-wide standardisation needed (filed 2026-03-28)
 - **Ghost Profiles & Claimable Accounts** — full design spec done (24 decisions), ready for sprint promotion
 - **Endorsement Writing Assist** — full design spec done (12 decisions), no schema changes
 - **CV Actions Card Redesign** — unified card layout, relative timestamps, multi-page viewer
 - **CV Import Graph-Building Vision** — 5 new proposals: yacht matching UX, cert fuzzy matching, skill/hobby autocomplete + chip redesign, education autocomplete, social links step
-- **Profile Photo Reposition** — crop/zoom/reposition for hero framing (idea)
+- **Profile Photo Reposition** — promoted to Sprint 11 (focal point + crop adjustment)
+- ~~Safari Public Profile Links~~ — resolved (was subdomain link issue)
+- ~~Nationality Flag~~ — resolved (already implemented)
