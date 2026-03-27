@@ -24,6 +24,8 @@ export interface SectionItem {
   editHref: string
   /** Optional chip-style preview items (e.g. skills, hobbies) */
   chips?: string[]
+  /** Optional per-item edit links. When present and non-empty, replaces the single Edit/Add link. */
+  itemLinks?: Array<{ label: string; href: string }>
 }
 
 interface ProfileSectionGridProps {
@@ -123,13 +125,33 @@ export function ProfileSectionGrid({ sections }: ProfileSectionGridProps) {
                 </p>
               )}
 
-              {/* Edit / Add button */}
-              <Link
-                href={section.editHref}
-                className="text-xs font-medium text-[var(--color-interactive)] hover:underline self-start"
-              >
-                {section.count > 0 ? 'Edit' : 'Add'}
-              </Link>
+              {/* Edit / Add button(s) */}
+              {section.itemLinks && section.itemLinks.length > 0 ? (
+                <div className="flex flex-col gap-0.5">
+                  {section.itemLinks.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="text-xs font-medium text-[var(--color-interactive)] hover:underline truncate"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                  <Link
+                    href={section.editHref}
+                    className="text-xs text-[var(--color-text-tertiary)] hover:underline self-start mt-0.5"
+                  >
+                    + Add new
+                  </Link>
+                </div>
+              ) : (
+                <Link
+                  href={section.editHref}
+                  className="text-xs font-medium text-[var(--color-interactive)] hover:underline self-start"
+                >
+                  {section.count > 0 ? 'Edit' : 'Add'}
+                </Link>
+              )}
             </div>
           )
         })}

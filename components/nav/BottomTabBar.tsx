@@ -3,7 +3,9 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { useNetworkBadge } from "@/lib/hooks/useNetworkBadge";
+import { popIn } from "@/lib/motion";
 import {
   ProfileIcon,
   ProfileIconFilled,
@@ -66,7 +68,12 @@ export function BottomTabBar() {
                 <span className="relative h-6 w-6">
                   {isActive ? icons?.activeIcon : icons?.icon}
                   {tab.href === '/app/network' && networkBadge > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[var(--color-error)]" />
+                    <motion.span
+                      variants={popIn}
+                      initial="hidden"
+                      animate="visible"
+                      className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-[var(--color-error)]"
+                    />
                   )}
                 </span>
                 <span>{tab.label}</span>

@@ -140,7 +140,7 @@ export default async function NetworkPage() {
 
   return (
     <PageTransition className="flex flex-col gap-4">
-      <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Network</h1>
+      <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">Network</h1>
     <AudienceTabs
       endorsementsReceived={endorsementsReceived}
       requestsReceived={requestsReceived}
