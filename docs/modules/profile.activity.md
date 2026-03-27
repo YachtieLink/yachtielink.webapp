@@ -4,6 +4,8 @@ Append-only. Never edit existing entries. Newest at top.
 
 When you make changes to this module, append a one-line entry with date, agent name, and what changed.
 
+**2026-03-27** — Claude Code (Opus 4.6) (CV-Parse-Bugfix): Country flag in public profile hero via `countryToFlag()` (HeroSection + PublicProfileContent). Visibility settings link on PersonalDetailsCard. ParseProgress `initial={false}` fix in CvImportWizard. CV view: share/download buttons, overflow-x-hidden, cv_public guard on download. Cert/education inline editing in StepQualifications with stale-index decrement fix.
+
 **2026-03-27** — Claude Code (Opus 4.6) (Sprint 10.1): Typography pass — `font-serif` on ProfileAccordion section titles and profile/network/cv/more page h1s (replacing `font-bold` to avoid synthetic bold with DM Serif Display 400). Added `itemLinks` prop to ProfileSectionGrid for per-item education edit links with `.slice(0,3)` overflow. Added `popIn` animation to nav notification badges (BottomTabBar + SidebarNav) with stable key. Added `cardHover` to SavedProfileCard (without willChange).
 
 **2026-03-26** — Claude Code (Opus 4.6) (Wave 5 QA): Wired `isPro` prop to ProfileHeroCard via `getProStatus`. Fixed `isProFromRecord` extraction into `lib/stripe/pro.ts` (canonical pure check). Fixed non-Pro copy toast UX. Created `/app/billing` placeholder page. Corrected Pro benefits list on reserved page (removed false "Priority in crew search", "Unlimited photos" → "Extended limits", added "Cert expiry reminders").

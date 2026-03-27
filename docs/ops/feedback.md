@@ -6,12 +6,20 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 28 rules
+**Current count:** 29 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## Always Run /shipslog Before Commit
+
+**Rule:** After QA (whether via `/test-yl` skill or manual interactive testing), always run `/shipslog` before committing. The sprint procedure chain is: build → `/review` → `/yachtielink-review` → `/test-yl` → `/shipslog` → commit. Skipping `/shipslog` means the commit ships without documentation updates.
+**Origin:** 2026-03-27 — Claude completed the full CV-Parse-Bugfix sprint, ran review + QA, but skipped `/shipslog` and went straight to commit when the founder said go.
+**How to apply:** After QA is done and the founder approves, run `/shipslog` BEFORE `git commit`. If QA was done manually (not via `/test-yl` skill), the auto-chain won't fire — you must invoke `/shipslog` explicitly.
 
 ---
 
