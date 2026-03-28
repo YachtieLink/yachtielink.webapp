@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { X, Mail, Phone, Copy, Share2, ExternalLink, FileText, User } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
@@ -60,6 +61,8 @@ interface RichPortfolioLayoutProps {
   handle: string
   displayName: string
   templateId?: string
+  isLoggedIn?: boolean
+  isOwnProfile?: boolean
 }
 
 export function RichPortfolioLayout({
@@ -77,6 +80,8 @@ export function RichPortfolioLayout({
   handle,
   displayName,
   templateId = 'classic',
+  isLoggedIn,
+  isOwnProfile,
 }: RichPortfolioLayoutProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [showGalleryModal, setShowGalleryModal] = useState(false)
@@ -383,6 +388,39 @@ export function RichPortfolioLayout({
           <div className="absolute inset-0 -z-10" onClick={() => setShowGalleryModal(false)} />
         </div>
       )}
+
+      {/* Bottom CTAs */}
+      <div className="flex flex-col gap-3 mt-6 max-w-[680px] mx-auto w-full">
+        {!isLoggedIn ? (
+          <>
+            <Link
+              href="/signup"
+              className="w-full flex items-center justify-center text-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-medium text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
+            >
+              Build your crew profile — it&apos;s free
+            </Link>
+            <Link
+              href="/login"
+              className="w-full flex items-center justify-center text-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+            >
+              Sign in to see how you know {displayName}
+            </Link>
+          </>
+        ) : isOwnProfile ? (
+          <Link
+            href="/app/profile"
+            className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+          >
+            Back to My Profile
+          </Link>
+        ) : null}
+      </div>
+
+      <footer className="text-center py-6 mt-4">
+        <p className="text-xs text-[var(--color-text-secondary)]">
+          <Link href="/welcome" className="hover:underline">YachtieLink</Link> — Professional profiles for yacht crew
+        </p>
+      </footer>
 
       {/* Section modals — full content overlays */}
       <SectionModal

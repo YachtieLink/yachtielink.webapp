@@ -234,6 +234,8 @@ export function PublicProfileContent({
             handle={user.handle}
             displayName={displayName}
             templateId={user.profile_template ?? 'classic'}
+            isLoggedIn={isLoggedIn}
+            isOwnProfile={isOwnProfile}
           />
         </div>
       ) : activeMode === 'portfolio' ? (
