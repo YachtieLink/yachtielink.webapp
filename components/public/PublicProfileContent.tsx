@@ -581,34 +581,34 @@ function ProfileModeContent({
             </a>
           )}
           {user.show_phone !== false && user.phone && (
-            <div className="flex flex-col gap-1">
-              <a href={`tel:${user.phone}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
+            <div className="rounded-xl border border-[var(--color-border-subtle)] overflow-hidden">
+              <div className="flex items-center gap-3 p-3">
                 <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><Phone size={18} className="text-[var(--color-text-secondary)]" /></span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[var(--color-text-primary)]">Call</p>
+                  <p className="text-sm font-medium text-[var(--color-text-primary)]">Phone</p>
                   <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.phone}</p>
                 </div>
-                <ExternalLink size={14} className="text-[var(--color-text-tertiary)]" />
-              </a>
-              <div className="flex gap-2 pl-[52px]">
-                <a href={`sms:${user.phone}`} className="text-xs text-[var(--accent-500,#14b8a6)] hover:underline">Message</a>
-                <button onClick={() => { navigator.clipboard.writeText(user.phone!) }} className="text-xs text-[var(--color-text-tertiary)] hover:underline">Copy</button>
+              </div>
+              <div className="flex border-t border-[var(--color-border-subtle)] divide-x divide-[var(--color-border-subtle)]">
+                <a href={`tel:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--color-surface-raised)] transition-colors">Call</a>
+                <a href={`sms:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--color-surface-raised)] transition-colors">Message</a>
+                <button onClick={() => { navigator.clipboard.writeText(user.phone!) }} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] transition-colors">Copy</button>
               </div>
             </div>
           )}
           {user.show_whatsapp !== false && user.whatsapp && (
-            <div className="flex flex-col gap-1">
-              <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
-                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><WhatsAppIcon size={18} className="text-[var(--color-text-secondary)]" /></span>
+            <div className="rounded-xl border border-[var(--color-border-subtle)] overflow-hidden">
+              <div className="flex items-center gap-3 p-3">
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><WhatsAppIcon size={18} className="text-green-600" /></span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[var(--color-text-primary)]">WhatsApp</p>
                   <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.whatsapp}</p>
                 </div>
-                <ExternalLink size={14} className="text-[var(--color-text-tertiary)]" />
-              </a>
-              <div className="flex gap-2 pl-[52px]">
-                <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-xs text-[var(--accent-500,#14b8a6)] hover:underline">Message</a>
-                <button onClick={() => { navigator.clipboard.writeText(user.whatsapp!) }} className="text-xs text-[var(--color-text-tertiary)] hover:underline">Copy</button>
+              </div>
+              <div className="flex border-t border-[var(--color-border-subtle)] divide-x divide-[var(--color-border-subtle)]">
+                <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-2.5 text-center text-xs font-medium text-green-600 hover:bg-[var(--color-surface-raised)] transition-colors">Call</a>
+                <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-2.5 text-center text-xs font-medium text-green-600 hover:bg-[var(--color-surface-raised)] transition-colors">Message</a>
+                <button onClick={() => { navigator.clipboard.writeText(user.whatsapp!) }} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] transition-colors">Copy</button>
               </div>
             </div>
           )}
