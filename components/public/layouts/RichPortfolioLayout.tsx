@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { X, Mail, Phone, MessageCircle, Copy, Share2, ExternalLink, FileText } from 'lucide-react'
+import { X, Mail, Phone, MessageSquare, Copy, Share2, ExternalLink, FileText } from 'lucide-react'
 import { BentoGrid } from '../bento/BentoGrid'
 import { SectionModal } from '../SectionModal'
 import { PhotoTile } from '../bento/tiles/PhotoTile'
@@ -258,7 +258,7 @@ export function RichPortfolioLayout({
     <div className="px-4 pt-4 pb-24 max-w-[960px] mx-auto w-full">
       {/* Contact + CV row */}
       {(hasContact || hasCv) && (
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 ml-1 mr-1">
           {hasContact && (
             <button onClick={() => setActiveModal('contact')} className="flex gap-3">
               {user.show_email !== false && user.email && (
@@ -273,7 +273,7 @@ export function RichPortfolioLayout({
               )}
               {user.show_whatsapp !== false && user.whatsapp && (
                 <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">
-                  <MessageCircle size={18} />
+                  <MessageSquare size={18} />
                 </span>
               )}
             </button>
@@ -452,7 +452,7 @@ export function RichPortfolioLayout({
           )}
           {user.show_whatsapp !== false && user.whatsapp && (
             <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
-              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><MessageCircle size={18} className="text-[var(--color-text-secondary)]" /></span>
+              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><MessageSquare size={18} className="text-[var(--color-text-secondary)]" /></span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-[var(--color-text-primary)]">WhatsApp</p>
                 <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.whatsapp}</p>
