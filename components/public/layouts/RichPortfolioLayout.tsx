@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
+import { X } from 'lucide-react'
 import { BentoGrid } from '../bento/BentoGrid'
 import { PhotoTile } from '../bento/tiles/PhotoTile'
 import { AboutTile } from '../bento/tiles/AboutTile'
@@ -70,6 +71,7 @@ export function RichPortfolioLayout({
   templateId = 'classic',
 }: RichPortfolioLayoutProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [showGalleryModal, setShowGalleryModal] = useState(false)
 
   // Gallery photos from user_gallery (work portfolio, not profile headshots)
   const galleryPhotos = gallery.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
@@ -255,16 +257,59 @@ export function RichPortfolioLayout({
                 />
               </button>
             ))}
-            <a
-              href={`/u/${handle}/gallery`}
-              className="shrink-0 snap-start rounded-2xl overflow-hidden flex items-center justify-center bg-[var(--color-surface-raised)] hover:bg-[var(--color-border)] transition-colors"
+            <button
+              onClick={() => setShowGalleryModal(true)}
+              className="shrink-0 snap-start rounded-2xl overflow-hidden flex items-center justify-center bg-[var(--color-surface-raised)] hover:bg-[var(--color-border)] transition-colors cursor-pointer"
               style={{ width: 160, height: 200 }}
             >
               <span className="text-sm font-medium text-[var(--accent-500,#14b8a6)]">
                 See all &rarr;
               </span>
-            </a>
+            </button>
           </div>
+        </div>
+      )}
+
+      {/* Gallery modal — full photo grid overlay */}
+      {showGalleryModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center overflow-y-auto">
+          <div className="relative w-full max-w-[960px] mx-4 my-8 bg-[var(--color-surface)] rounded-2xl overflow-hidden">
+            {/* Header */}
+            <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-[var(--color-surface)] border-b border-[var(--color-border-subtle)]">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-text-primary)]">
+                Gallery · {galleryPhotos.length} photos
+              </h2>
+              <button
+                onClick={() => setShowGalleryModal(false)}
+                className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-[var(--color-surface-raised)] transition-colors"
+                aria-label="Close gallery"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            {/* Photo grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-4">
+              {galleryPhotos.map((photo, i) => (
+                <button
+                  key={photo.id}
+                  onClick={() => {
+                    setShowGalleryModal(false)
+                    setLightboxIndex(i)
+                  }}
+                  className="aspect-square rounded-xl overflow-hidden group cursor-pointer"
+                >
+                  <img
+                    src={photo.image_url}
+                    alt={photo.caption || ''}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    loading="lazy"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+          {/* Click outside to close */}
+          <div className="absolute inset-0 -z-10" onClick={() => setShowGalleryModal(false)} />
         </div>
       )}
 
