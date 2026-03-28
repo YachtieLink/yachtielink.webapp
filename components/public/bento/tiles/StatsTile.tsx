@@ -24,8 +24,8 @@ export function StatsTile({ displayName, seaTime, yachtCount, certCount, endorse
   }
 
   return (
-    <div className="h-full rounded-xl bg-gradient-to-br from-[var(--accent-100,#ccfbf1)]/40 to-white/60 p-6 flex items-center justify-center">
-      <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed tracking-wide italic text-center">
+    <div className="h-full rounded-xl bg-gradient-to-br from-[var(--accent-100,#ccfbf1)]/40 to-white/60 px-4 py-4 flex items-center justify-center">
+      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed italic text-center w-full">
         I&apos;ve spent <Tap section="experience">{seaTime}</Tap> working at sea
         {yachtCount > 0 && <> across <Tap section="experience">{yachtCount} {yachtCount === 1 ? 'yacht' : 'yachts'}</Tap></>}
         {certCount > 0 && <>, hold <Tap section="certifications">{certCount} {certCount === 1 ? 'certification' : 'certifications'}</Tap></>}
