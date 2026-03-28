@@ -19,21 +19,36 @@ function extractAreaNames(areas: string): Set<string> {
   return names
 }
 
+/**
+ * Filter out rows from grid-template-areas where ALL area names in that row
+ * have no corresponding tile. This collapses empty rows (e.g. contact+cv row
+ * when user has neither).
+ */
+function filterEmptyRows(areasStr: string, tileAreas: Set<string>): string {
+  const rows = areasStr.split('\n')
+  const filtered = rows.filter((row) => {
+    const names = [...row.matchAll(/[a-zA-Z]\w*/g)].map((m) => m[0])
+    // Keep the row if at least one area name has a tile
+    return names.some((name) => tileAreas.has(name))
+  })
+  // If all rows were filtered out (shouldn't happen), return original
+  return filtered.length > 0 ? filtered.join('\n') : areasStr
+}
+
 export function BentoGrid({ variant, tiles, gap = 12, accentColor }: BentoGridProps) {
   const scopeId = useId().replace(/:/g, '')
   const scopeClass = `bento-${scopeId}`
 
-  // Find all area names defined in the template that have no corresponding tile
   const tileAreas = useMemo(() => new Set(tiles.map((t) => t.areaName)), [tiles])
-  const allAreas = useMemo(() => {
-    const desktop = extractAreaNames(variant.areas.desktop)
-    const mobile = extractAreaNames(variant.areas.mobile)
-    return new Set([...desktop, ...mobile])
-  }, [variant])
 
-  const emptyAreas = useMemo(
-    () => [...allAreas].filter((a) => !tileAreas.has(a)),
-    [allAreas, tileAreas],
+  // Filter out rows where all tiles are empty
+  const desktopAreas = useMemo(
+    () => filterEmptyRows(variant.areas.desktop, tileAreas),
+    [variant.areas.desktop, tileAreas],
+  )
+  const mobileAreas = useMemo(
+    () => filterEmptyRows(variant.areas.mobile, tileAreas),
+    [variant.areas.mobile, tileAreas],
   )
 
   return (
@@ -41,7 +56,7 @@ export function BentoGrid({ variant, tiles, gap = 12, accentColor }: BentoGridPr
       <style>{`
         .${scopeClass} {
           display: grid;
-          grid-template-areas: ${variant.areas.desktop.split('\n').join(' ')};
+          grid-template-areas: ${desktopAreas.split('\n').join(' ')};
           grid-template-columns: repeat(4, 1fr);
           grid-auto-rows: 160px;
           gap: ${gap}px;
@@ -49,7 +64,7 @@ export function BentoGrid({ variant, tiles, gap = 12, accentColor }: BentoGridPr
         }
         @media (max-width: 767px) {
           .${scopeClass} {
-            grid-template-areas: ${variant.areas.mobile.split('\n').join(' ')};
+            grid-template-areas: ${mobileAreas.split('\n').join(' ')};
             grid-template-columns: repeat(2, 1fr);
             grid-auto-rows: 140px;
           }
@@ -71,10 +86,6 @@ export function BentoGrid({ variant, tiles, gap = 12, accentColor }: BentoGridPr
           >
             {tile.content}
           </div>
-        ))}
-        {/* Spacer divs for unused grid areas — prevents CSS grid layout holes */}
-        {emptyAreas.map((area) => (
-          <div key={area} style={{ gridArea: area }} className="min-w-0 min-h-0" />
         ))}
       </div>
     </>
