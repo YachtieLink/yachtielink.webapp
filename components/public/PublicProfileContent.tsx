@@ -9,9 +9,11 @@
  */
 import { useState } from 'react'
 import Link from 'next/link'
-import { FileText, User, GraduationCap, Heart } from 'lucide-react'
+import { FileText, User, GraduationCap, Heart, Mail, Phone, ExternalLink, Copy, Share2 } from 'lucide-react'
+import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { HeroSection } from './HeroSection'
 import { ContactRow } from './ContactRow'
+import { SectionModal } from './SectionModal'
 import { ViewModeToggle } from './ViewModeToggle'
 import { PortfolioLayout } from './layouts/PortfolioLayout'
 import { RichPortfolioLayout } from './layouts/RichPortfolioLayout'
@@ -251,10 +253,81 @@ export function PublicProfileContent({
           />
         </div>
       ) : (
+      <ProfileModeContent
+        user={user}
+        attachments={attachments}
+        certifications={certifications}
+        endorsements={endorsements}
+        hobbies={hobbies}
+        education={education}
+        skills={skills}
+        gallery={gallery}
+        sectionVisibility={sectionVisibility}
+        isLoggedIn={isLoggedIn}
+        isOwnProfile={isOwnProfile}
+        displayName={displayName}
+        firstName={firstName}
+        sharedYachtIdSet={sharedYachtIdSet}
+        mutualEndorserCount={mutualEndorserCount}
+        seaTimeTotalDays={seaTimeTotalDays}
+        seaTimeYachtCount={seaTimeYachtCount}
+        colleagueCount={colleagueCount}
+        profileUrl={profileUrl}
+      />
+      )}
+
+      {/* ── Sticky bottom CTA for non-logged-in viewers (mobile only) ───────── */}
+      {!isLoggedIn && (
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-t border-[var(--color-border-subtle)] z-40 md:hidden">
+          <Link
+            href="/welcome"
+            className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
+          >
+            Build your crew profile
+          </Link>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Profile Mode (extracted for modal state) ──────────────────────────────────
+
+function ProfileModeContent({
+  user, attachments, certifications, endorsements, hobbies, education, skills, gallery,
+  sectionVisibility, isLoggedIn, isOwnProfile, displayName, firstName,
+  sharedYachtIdSet, mutualEndorserCount, seaTimeTotalDays, seaTimeYachtCount,
+  colleagueCount, profileUrl,
+}: {
+  user: PublicProfileContentProps['user']
+  attachments: PublicAttachment[]
+  certifications: PublicCertification[]
+  endorsements: PublicEndorsement[]
+  hobbies: Hobby[]
+  education: Education[]
+  skills: Skill[]
+  gallery: GalleryItem[]
+  sectionVisibility: Record<string, boolean>
+  isLoggedIn?: boolean
+  isOwnProfile: boolean
+  displayName: string
+  firstName: string
+  sharedYachtIdSet: Set<string>
+  mutualEndorserCount: number
+  seaTimeTotalDays: number
+  seaTimeYachtCount: number
+  colleagueCount: number
+  profileUrl: string
+}) {
+  const [profileModal, setProfileModal] = useState<string | null>(null)
+  const handle = user.handle
+
+  return (
+    <>
       <div className="flex-1">
         <div className="flex flex-col gap-4 px-4 pt-4 pb-24 max-w-[680px] mx-auto w-full">
 
-          {/* Contact + CV row */}
+          {/* Contact + CV row — tappable to open modals */}
           <div className="flex items-center justify-between">
             <ContactRow
               email={user.email}
@@ -264,17 +337,18 @@ export function PublicProfileContent({
               showPhone={user.show_phone}
               showWhatsapp={user.show_whatsapp}
               firstName={firstName}
+              onTap={() => setProfileModal('contact')}
             />
             {user.cv_public !== false && (
               (user.cv_public_source === 'uploaded' ? user.cv_storage_path : user.latest_pdf_path)
             ) && (
-              <Link
-                href={`/u/${user.handle}/cv`}
+              <button
+                onClick={() => setProfileModal('cv')}
                 className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
               >
                 <FileText size={16} className="text-[var(--color-text-secondary)]" />
                 View CV
-              </Link>
+              </button>
             )}
           </div>
 
@@ -470,19 +544,105 @@ export function PublicProfileContent({
           </p>
         </footer>
       </div>
-      )}
 
-      {/* ── Sticky bottom CTA for non-logged-in viewers (mobile only) ───────── */}
-      {!isLoggedIn && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-t border-[var(--color-border-subtle)] z-40 md:hidden">
-          <Link
-            href="/welcome"
-            className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
-          >
-            Build your crew profile
-          </Link>
+      {/* ── Contact modal ──────────────────────────────────────────── */}
+      <SectionModal
+        title="Contact"
+        open={profileModal === 'contact'}
+        onClose={() => setProfileModal(null)}
+        footer={
+          <div className="flex gap-3">
+            <button
+              onClick={() => { navigator.clipboard.writeText(profileUrl); }}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              <Share2 size={14} />
+              Share Profile
+            </button>
+            <button
+              onClick={() => { navigator.clipboard.writeText(profileUrl); }}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+            >
+              <Copy size={14} />
+              Copy Link
+            </button>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-3">
+          {user.show_email !== false && user.email && (
+            <a href={`mailto:${user.email}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
+              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><Mail size={18} className="text-[var(--color-text-secondary)]" /></span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-[var(--color-text-primary)]">Email</p>
+                <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.email}</p>
+              </div>
+              <ExternalLink size={14} className="text-[var(--color-text-tertiary)]" />
+            </a>
+          )}
+          {user.show_phone !== false && user.phone && (
+            <div className="flex flex-col gap-1">
+              <a href={`tel:${user.phone}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><Phone size={18} className="text-[var(--color-text-secondary)]" /></span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[var(--color-text-primary)]">Call</p>
+                  <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.phone}</p>
+                </div>
+                <ExternalLink size={14} className="text-[var(--color-text-tertiary)]" />
+              </a>
+              <div className="flex gap-2 pl-[52px]">
+                <a href={`sms:${user.phone}`} className="text-xs text-[var(--accent-500,#14b8a6)] hover:underline">Message</a>
+                <button onClick={() => { navigator.clipboard.writeText(user.phone!) }} className="text-xs text-[var(--color-text-tertiary)] hover:underline">Copy</button>
+              </div>
+            </div>
+          )}
+          {user.show_whatsapp !== false && user.whatsapp && (
+            <div className="flex flex-col gap-1">
+              <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><WhatsAppIcon size={18} className="text-[var(--color-text-secondary)]" /></span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[var(--color-text-primary)]">WhatsApp</p>
+                  <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.whatsapp}</p>
+                </div>
+                <ExternalLink size={14} className="text-[var(--color-text-tertiary)]" />
+              </a>
+              <div className="flex gap-2 pl-[52px]">
+                <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-xs text-[var(--accent-500,#14b8a6)] hover:underline">Message</a>
+                <button onClick={() => { navigator.clipboard.writeText(user.whatsapp!) }} className="text-xs text-[var(--color-text-tertiary)] hover:underline">Copy</button>
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </SectionModal>
+
+      {/* ── CV preview modal ──────────────────────────────────────── */}
+      <SectionModal
+        title="CV Preview"
+        open={profileModal === 'cv'}
+        onClose={() => setProfileModal(null)}
+        footer={
+          <div className="flex gap-3">
+            <a
+              href={`/api/cv/public-download/${handle}`}
+              download
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              Download CV
+            </a>
+            <button
+              onClick={() => { navigator.clipboard.writeText(`https://yachtie.link/u/${handle}/cv`); }}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+            >
+              <Share2 size={14} />
+              Share
+            </button>
+          </div>
+        }
+      >
+        <div className="h-[60vh] rounded-xl overflow-hidden bg-gray-100">
+          <iframe src={`/api/cv/public-download/${handle}`} className="w-full h-full border-0" title="CV Preview" />
+        </div>
+      </SectionModal>
+    </>
   )
 }
