@@ -42,6 +42,7 @@ interface RichPortfolioLayoutProps {
     cv_public_source?: string
     latest_pdf_path?: string | null
     cv_storage_path?: string | null
+    available_for_work?: boolean
   }
   attachments: PublicAttachment[]
   certifications: PublicCertification[]
@@ -178,6 +179,7 @@ export function RichPortfolioLayout({
               showEmail={user.show_email}
               showPhone={user.show_phone}
               showWhatsapp={user.show_whatsapp}
+              availableForWork={user.available_for_work}
             />
           ),
         }

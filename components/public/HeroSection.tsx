@@ -132,16 +132,8 @@ export function HeroSection({
         </div>
       </div>
 
-      {/* Identity — overlaid at bottom of photo */}
-      <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 z-10 flex flex-col gap-3">
-        {/* Availability badge — top of identity block */}
-        {availableForWork && (
-          <span className={`self-start flex items-center gap-1.5 ${scrim.badgeBg} backdrop-blur-md border border-green-400/40 rounded-full px-3 py-1 text-xs font-semibold text-green-300 tracking-wide uppercase`}>
-            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-            Available for work
-          </span>
-        )}
-
+      {/* Identity — overlaid at bottom of photo, minimal */}
+      <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 z-10 flex flex-col gap-1.5">
         {/* Name — large, confident, serif */}
         <h1 className={`${scrim.textColor} font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
           <span className="inline-flex items-baseline gap-2 flex-wrap">
@@ -152,10 +144,10 @@ export function HeroSection({
 
         {/* Role + Department — unified line */}
         {(primaryRole || (departments && departments.length > 0)) && (
-          <p className={`${scrim.subtextColor} text-base font-medium`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 6px rgba(0,0,0,0.5)' }}>
+          <p className={`${scrim.subtextColor} text-sm font-medium`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 6px rgba(0,0,0,0.5)' }}>
             {primaryRole}
             {primaryRole && departments && departments.length > 0 && (
-              <span className="opacity-50 mx-2">·</span>
+              <span className="opacity-50 mx-1.5">·</span>
             )}
             {departments && departments.length > 0 && (
               <span className="opacity-70">{departments.join(', ')}</span>
@@ -163,47 +155,45 @@ export function HeroSection({
           </p>
         )}
 
-        {/* Hero stats: age, sea time */}
-        {heroStats.length > 0 && (
-          <p className={`${scrim.subtextColor} ${scrim.variant === 'dark' ? 'opacity-70' : ''} text-sm font-medium`}>
-            {heroStats.join(' · ')}
-          </p>
-        )}
+        {/* Compact info line: age, sea time, location */}
+        <p className={`${scrim.subtextColor} ${scrim.variant === 'dark' ? 'opacity-60' : ''} text-xs font-medium`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 4px rgba(0,0,0,0.4)' }}>
+          {[
+            ...heroStats,
+            showLocation && location ? location : null,
+          ].filter(Boolean).join(' · ')}
+        </p>
+      </div>
 
-        {/* Location */}
-        {showLocation && location && (
-          <p className={`${scrim.subtextColor} ${scrim.variant === 'dark' ? 'opacity-60' : ''} text-sm flex items-center gap-1.5 font-medium`}>
-            <MapPin size={13} className={scrim.variant === 'dark' ? 'opacity-50' : ''} />{location}
-          </p>
-        )}
-
-        {/* View Mode Toggle */}
-        {viewModeToggle}
-
-        {/* Social links row (white variant on dark bg) */}
+      {/* Bottom-right: view mode toggle + social links (subtle) */}
+      <div className="absolute bottom-3 right-4 z-10 flex items-center gap-2">
+        {/* Social links */}
         {socialLinks && socialLinks.length > 0 && (
           <SocialLinksRow links={socialLinks as any} variant="light" />
         )}
+        {/* View mode toggle — compact */}
+        {viewModeToggle}
+      </div>
 
-        {/* Badges */}
-        <div className="flex flex-wrap gap-2">
+      {/* Badges — founding member, colleague, mutual (top-left below back button) */}
+      {(isFoundingMember || isColleague || (showMutual && firstMutualName)) && (
+        <div className="absolute top-16 left-4 z-10 flex flex-col gap-1.5">
           {isFoundingMember && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 backdrop-blur-sm border border-amber-400/30 px-2.5 py-0.5 text-xs font-semibold text-amber-300">
-              ⚓ Founding Member
+            <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 backdrop-blur-sm border border-amber-400/30 px-2.5 py-0.5 text-[10px] font-semibold text-amber-300">
+              ⚓ Founding
             </span>
           )}
           {isColleague && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-400/20 backdrop-blur-sm border border-teal-400/30 px-2.5 py-0.5 text-xs font-medium text-teal-300">
-              🤝 Colleague{sharedYachtCount > 1 ? ` · ${sharedYachtCount} yachts` : ''}
+            <span className="inline-flex items-center gap-1 rounded-full bg-teal-400/20 backdrop-blur-sm border border-teal-400/30 px-2.5 py-0.5 text-[10px] font-medium text-teal-300">
+              🤝 Colleague
             </span>
           )}
           {showMutual && firstMutualName && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 px-2.5 py-0.5 text-xs font-medium text-white/70">
-              2nd connection · via {firstMutualName}
+            <span className="inline-flex items-center gap-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 px-2.5 py-0.5 text-[10px] font-medium text-white/70">
+              via {firstMutualName}
             </span>
           )}
         </div>
-      </div>
+      )}
     </motion.div>
   )
 }
