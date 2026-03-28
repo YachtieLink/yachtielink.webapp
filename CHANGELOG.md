@@ -43,25 +43,32 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - **Colleague context**: "including you" in stats + "You've worked together on M/Y Artemis" line.
 - **Sprint 11d build plan created**: 18 remaining items from design interview.
 - **6 backlog items created**: share-button-qr-code, stock-gallery-placeholders, cv-sharing-page-rework, social-links-add-prompt, skill-hobby-notes, colleague-graph-explorer.
+- **Crew Pass** added to backlog (background check for yachties).
+- **Architecture review — all findings fixed:**
+  - HIGH: Extracted `ContactModal`, `CvPreviewModal`, `generateVCard` (lib/vcard.ts) — 3 copies each → 1 shared component.
+  - MEDIUM: Extracted `BottomCTA`, `formatDate` (lib/format-date.ts, 9 copies → 1). RichPortfolioLayout uses `ContactRow` (was inline). `isFoundingMember` dead code removed. `pendingNav` confirmation added to Profile + Portfolio.
+  - LOW: Dead props (`available_for_work`), unused imports cleaned.
+  - Net: -134 lines of duplication, 5 new shared files.
+- **PR #107 created** — 114 commits, 94 files, ready to merge.
 
 ### Context
 
-- Branch: `sprint-11c/rich-portfolio` — 112 commits ahead of main, 93 files changed, 6321 insertions.
-- Type-check clean, build clean. Drift check: 1 false positive (pro-shared.ts), 2 hotspot warnings (PortfolioLayout 545 LOC, RichPortfolioLayout 766 LOC).
+- Branch: `sprint-11c/rich-portfolio` — 114 commits ahead of main, 94 files changed.
+- Type-check clean, build clean. All architecture review findings resolved.
 - Charlotte test account: Pro, 4 endorsements, contact info, generated CV, 12 gallery photos.
 - James test account: logged in for cross-user QA — colleague badge, save heart, shared yacht context verified.
 - All test accounts: `onboarding_complete` fixed to `true`.
 
 ### Next
 
-1. **Merge sprint-11c/rich-portfolio to main** — create PR, founder merges
+1. **Founder merges PR #107** — sprint-11c/rich-portfolio → main
 2. **Sprint 11d** — 18 remaining items: settings UI, sub-pages, endorsement pinning, CV rework, stock photos
 3. **CV parser dedup fix** — education zero dedup, certs weak fuzzy match (separate concern)
 
 ### Flags
 
-- ⚠️ Drift check `pro-shared.ts` false positive — file is the canonical pure Pro check, intentionally extracted. Suppress in baseline.
-- ⚠️ RichPortfolioLayout at 766 LOC — could split modals into separate file. Works for now.
+- ⚠️ Drift check `pro-shared.ts` false positive — suppress in baseline after merge.
+- ⚠️ Layout files still large (PortfolioLayout ~420 LOC, RichPortfolioLayout ~650 LOC after extraction) — manageable, monitor.
 - ⚠️ `colleagueCount` query is N+1-ish (fetches all attachment rows). Fine at current scale, should become an RPC later.
 - ⚠️ CV preview iframe blocked in preview tool (Supabase external URL). Works in real browser.
 - ⚠️ `viewerIsPro` hardcoded to `false` in PublicProfileContent — needs viewer's subscription status for Pro badge click gating.
