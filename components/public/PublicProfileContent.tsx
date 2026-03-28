@@ -384,7 +384,8 @@ function ProfileModeContent({
                   parts.push(<span key="cert">, hold <button type="button" onClick={() => scrollToSection('section-certifications')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">{certifications.length} {certifications.length === 1 ? 'certification' : 'certifications'}</button></span>)
                 }
                 if (colleagueCount > 0) {
-                  parts.push(<span key="col"> and have worked with <strong className="font-semibold text-[var(--color-text-primary)]">{colleagueCount} {colleagueCount === 1 ? 'colleague' : 'colleagues'}</strong></span>)
+                  const includingYou = sharedYachtIdSet.size > 0 ? ' including you' : ''
+                  parts.push(<span key="col"> and have worked with <strong className="font-semibold text-[var(--color-text-primary)]">{colleagueCount} {colleagueCount === 1 ? 'colleague' : 'colleagues'}{includingYou}</strong></span>)
                 }
                 if (endorsements.length > 0) {
                   parts.push(<span key="end">, of which <button type="button" onClick={() => scrollToSection('section-endorsements')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">{endorsements.length} endorsed</button></span>)
@@ -393,6 +394,21 @@ function ProfileModeContent({
               })()}
             </div>
           )}
+
+          {/* Shared yacht context — only for colleagues */}
+          {sharedYachtIdSet.size > 0 && (() => {
+            const sharedYachtNames = attachments
+              .filter(a => a.yachts?.id && sharedYachtIdSet.has(a.yachts.id))
+              .map(a => a.yachts?.name)
+              .filter(Boolean) as string[]
+            const unique = [...new Set(sharedYachtNames)]
+            if (unique.length === 0) return null
+            return (
+              <p className="text-center text-xs text-[var(--color-text-tertiary)]">
+                You&apos;ve worked together on {unique.join(', ')}
+              </p>
+            )
+          })()}
 
           {/* About Me */}
           {sectionVisible(sectionVisibility, 'about', !!(user.ai_summary || user.bio)) && (
