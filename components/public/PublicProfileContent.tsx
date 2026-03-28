@@ -237,6 +237,7 @@ export function PublicProfileContent({
             templateId={user.profile_template ?? 'classic'}
             isLoggedIn={isLoggedIn}
             isOwnProfile={isOwnProfile}
+            savedStatus={savedStatus}
           />
         </div>
       ) : activeMode === 'portfolio' ? (

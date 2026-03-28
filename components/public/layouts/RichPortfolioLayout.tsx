@@ -5,6 +5,7 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { X, Mail, Phone, Copy, Share2, ExternalLink, FileText, User } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
+import { SaveProfileButton } from '@/components/profile/SaveProfileButton'
 import { BentoGrid } from '../bento/BentoGrid'
 import { SectionModal } from '../SectionModal'
 import { PhotoTile } from '../bento/tiles/PhotoTile'
@@ -63,6 +64,7 @@ interface RichPortfolioLayoutProps {
   templateId?: string
   isLoggedIn?: boolean
   isOwnProfile?: boolean
+  savedStatus?: { id: string; folder_id: string | null } | null
 }
 
 export function RichPortfolioLayout({
@@ -82,6 +84,7 @@ export function RichPortfolioLayout({
   templateId = 'classic',
   isLoggedIn,
   isOwnProfile,
+  savedStatus,
 }: RichPortfolioLayoutProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [showGalleryModal, setShowGalleryModal] = useState(false)
@@ -458,6 +461,13 @@ export function RichPortfolioLayout({
         onClose={() => setActiveModal(null)}
         footer={
           <div className="flex gap-3">
+            {isLoggedIn && !isOwnProfile && (
+              <SaveProfileButton
+                savedUserId={user.id}
+                initialSaved={!!savedStatus}
+                initialFolderId={savedStatus?.folder_id}
+              />
+            )}
             <button
               onClick={() => {
                 const url = `https://yachtie.link/u/${handle}`
