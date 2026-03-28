@@ -55,6 +55,7 @@ interface RichPortfolioLayoutProps {
   hobbies: Hobby[]
   gallery: GalleryItem[]
   seaTimeTotalDays: number
+  colleagueCount: number
   accentColor: string
   handle: string
   templateId?: string
@@ -70,6 +71,7 @@ export function RichPortfolioLayout({
   hobbies,
   gallery,
   seaTimeTotalDays,
+  colleagueCount,
   accentColor,
   handle,
   templateId = 'classic',
@@ -214,7 +216,7 @@ export function RichPortfolioLayout({
               yachtCount={attachments.length}
               certCount={certifications.length}
               endorsementCount={endorsements.length}
-              colleagueCount={0}
+              colleagueCount={colleagueCount}
             />
           ),
         }

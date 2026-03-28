@@ -89,6 +89,7 @@ export interface PublicProfileContentProps {
   savedStatus?: { id: string; folder_id: string | null } | null
   seaTimeTotalDays?: number
   seaTimeYachtCount?: number
+  colleagueCount?: number
   age?: number | null
 }
 
@@ -117,6 +118,7 @@ export function PublicProfileContent({
   savedStatus,
   seaTimeTotalDays = 0,
   seaTimeYachtCount = 0,
+  colleagueCount = 0,
   age,
 }: PublicProfileContentProps) {
   // Pro fallback: rich_portfolio requires Pro subscription
@@ -224,6 +226,7 @@ export function PublicProfileContent({
             hobbies={hobbies}
             gallery={gallery}
             seaTimeTotalDays={seaTimeTotalDays}
+            colleagueCount={colleagueCount}
             accentColor={resolvedAccent[500]}
             handle={user.handle}
             templateId={user.profile_template ?? 'classic'}
