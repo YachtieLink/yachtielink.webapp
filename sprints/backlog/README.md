@@ -66,3 +66,4 @@ Any context, constraints, or open questions.
 | [Social Links Add Prompt](./social-links-add-prompt.md) | idea | P3 |
 | [Skill & Hobby Notes](./skill-hobby-notes.md) | idea | P3 |
 | [Colleague Graph Explorer](./colleague-graph-explorer.md) | idea | P1 |
+| [Crew Pass](./crew-pass.md) | idea | P2 |
