@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { X, Mail, Phone, Copy, Share2, ExternalLink, FileText } from 'lucide-react'
+import { X, Mail, Phone, Copy, Share2, ExternalLink, FileText, User } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { BentoGrid } from '../bento/BentoGrid'
 import { SectionModal } from '../SectionModal'
@@ -421,18 +421,43 @@ export function RichPortfolioLayout({
         footer={
           <div className="flex gap-3">
             <button
-              onClick={() => { navigator.clipboard.writeText(`https://yachtie.link/u/${handle}`); }}
+              onClick={() => {
+                const url = `https://yachtie.link/u/${handle}`
+                if (navigator.share) {
+                  navigator.share({ title: `${displayName} — YachtieLink`, url })
+                } else {
+                  navigator.clipboard.writeText(url)
+                }
+              }}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
             >
               <Share2 size={14} />
-              Share Profile
+              Share
             </button>
             <button
-              onClick={() => { navigator.clipboard.writeText(`https://yachtie.link/u/${handle}`); }}
+              onClick={() => {
+                const parts = [
+                  'BEGIN:VCARD',
+                  'VERSION:3.0',
+                  `FN:${displayName}`,
+                  user.email ? `EMAIL:${user.email}` : '',
+                  user.phone ? `TEL:${user.phone}` : '',
+                  'ORG:YachtieLink',
+                  `URL:https://yachtie.link/u/${handle}`,
+                  'END:VCARD',
+                ].filter(Boolean).join('\n')
+                const blob = new Blob([parts], { type: 'text/vcard' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = `${displayName.replace(/\s+/g, '_')}.vcf`
+                a.click()
+                URL.revokeObjectURL(url)
+              }}
               className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
             >
-              <Copy size={14} />
-              Copy Link
+              <User size={14} />
+              Add to Contacts
             </button>
           </div>
         }

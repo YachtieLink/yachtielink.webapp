@@ -563,18 +563,43 @@ function ProfileModeContent({
               />
             )}
             <button
-              onClick={() => { navigator.clipboard.writeText(profileUrl); }}
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({ title: `${displayName} — YachtieLink`, url: profileUrl })
+                } else {
+                  navigator.clipboard.writeText(profileUrl)
+                }
+              }}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
             >
               <Share2 size={14} />
               Share
             </button>
             <button
-              onClick={() => { navigator.clipboard.writeText(profileUrl); }}
+              onClick={() => {
+                const parts = [
+                  'BEGIN:VCARD',
+                  'VERSION:3.0',
+                  `FN:${displayName}`,
+                  user.email ? `EMAIL:${user.email}` : '',
+                  user.phone ? `TEL:${user.phone}` : '',
+                  user.primary_role ? `TITLE:${user.primary_role}` : '',
+                  'ORG:YachtieLink',
+                  `URL:${profileUrl}`,
+                  'END:VCARD',
+                ].filter(Boolean).join('\n')
+                const blob = new Blob([parts], { type: 'text/vcard' })
+                const url = URL.createObjectURL(blob)
+                const a = document.createElement('a')
+                a.href = url
+                a.download = `${displayName.replace(/\s+/g, '_')}.vcf`
+                a.click()
+                URL.revokeObjectURL(url)
+              }}
               className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
             >
-              <Copy size={14} />
-              Copy
+              <User size={14} />
+              Add to Contacts
             </button>
           </div>
         }
