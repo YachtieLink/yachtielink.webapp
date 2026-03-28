@@ -283,7 +283,7 @@ export function RichPortfolioLayout({
 
       {/* Gallery modal — full photo grid overlay (z-40, below lightbox z-50) */}
       {showGalleryModal && (
-        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-stretch justify-center p-4">
+        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-stretch justify-center p-4 pb-[20vh]">
           <div className="relative w-full max-w-[960px] bg-[var(--color-surface)] rounded-2xl overflow-hidden flex flex-col">
             {/* Header */}
             <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-[var(--color-surface)] border-b border-[var(--color-border-subtle)]">
