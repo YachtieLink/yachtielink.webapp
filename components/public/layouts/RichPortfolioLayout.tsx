@@ -490,33 +490,33 @@ export function RichPortfolioLayout({
       </SectionModal>
 
       <SectionModal title="Endorsements" open={activeModal === 'endorsements'} onClose={() => setActiveModal(null)}>
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-0 divide-y divide-[var(--color-border-subtle)]">
           {endorsements.map((end) => {
             const endorserName = end.endorser?.display_name || end.endorser?.full_name || 'Anonymous'
             return (
-              <div key={end.id}>
-                <p className="text-sm text-[var(--color-text-primary)] italic">&ldquo;{end.content}&rdquo;</p>
-                <div className="flex items-center gap-2 mt-2">
+              <div key={end.id} className="py-4 first:pt-0 last:pb-0">
+                <div className="flex items-center gap-2.5 mb-2.5">
                   {end.endorser?.profile_photo_url ? (
-                    <img src={end.endorser.profile_photo_url} alt="" className="w-7 h-7 rounded-full object-cover" />
+                    <img src={end.endorser.profile_photo_url} alt="" className="w-8 h-8 rounded-full object-cover" />
                   ) : (
-                    <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-500">
                       {endorserName.charAt(0)}
                     </div>
                   )}
                   <div>
                     {end.endorser?.handle ? (
-                      <button onClick={() => setPendingNav({ url: `/u/${end.endorser!.handle}`, label: endorserName })} className="text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:underline text-left">
+                      <button onClick={() => setPendingNav({ url: `/u/${end.endorser!.handle}`, label: endorserName })} className="text-sm font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#14b8a6)] text-left">
                         {endorserName}
                       </button>
                     ) : (
-                      <p className="text-xs font-medium text-[var(--color-text-primary)]">{endorserName}</p>
+                      <p className="text-sm font-semibold text-[var(--color-text-primary)]">{endorserName}</p>
                     )}
                     {(end.endorser_role_label || end.yacht?.name) && (
-                      <p className="text-[10px] text-[var(--color-text-secondary)]">{end.endorser_role_label}{end.endorser_role_label && end.yacht?.name ? ' · ' : ''}{end.yacht?.name}</p>
+                      <p className="text-xs text-[var(--color-text-secondary)]">{end.endorser_role_label}{end.endorser_role_label && end.yacht?.name ? ' · ' : ''}{end.yacht?.name}</p>
                     )}
                   </div>
                 </div>
+                <p className="text-sm text-[var(--color-text-primary)] italic leading-relaxed">&ldquo;{end.content}&rdquo;</p>
               </div>
             )
           })}

@@ -62,32 +62,23 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
           </div>
         )}
       </div>
-      <div className="flex-1">
-        <p className="text-sm text-[var(--color-text-primary)] italic line-clamp-3">
-          &ldquo;{current.content}&rdquo;
-        </p>
-        <div className="flex items-center gap-2 mt-3">
+      <div className="flex-1 flex flex-col">
+        <div className="flex items-center gap-2 mb-2">
           {endorserAvatar ? (
             <Image
               src={endorserAvatar}
               alt={endorserName}
               width={24}
               height={24}
-              className="rounded-full object-cover"
+              className="rounded-full object-cover shrink-0"
             />
           ) : (
-            <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">
+            <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500 shrink-0">
               {endorserName.charAt(0)}
             </div>
           )}
           <div className="min-w-0">
-            {endorserHandle ? (
-              <Link href={`/u/${endorserHandle}`} onClick={(e) => e.stopPropagation()} className="text-xs font-medium text-[var(--color-text-primary)] hover:underline truncate block">
-                {endorserName}
-              </Link>
-            ) : (
-              <span className="text-xs font-medium text-[var(--color-text-primary)] truncate block">{endorserName}</span>
-            )}
+            <p className="text-xs font-semibold text-[var(--color-text-primary)] truncate">{endorserName}</p>
             {(current.endorser_role_label || yachtName) && (
               <p className="text-[10px] text-[var(--color-text-secondary)] truncate">
                 {current.endorser_role_label}{current.endorser_role_label && yachtName ? ' · ' : ''}{yachtName}
@@ -95,6 +86,9 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
             )}
           </div>
         </div>
+        <p className="text-sm text-[var(--color-text-primary)] italic line-clamp-3 flex-1">
+          &ldquo;{current.content}&rdquo;
+        </p>
       </div>
       <span className="mt-2 text-xs font-medium text-[var(--accent-500,#14b8a6)]">
         See all &rarr;
