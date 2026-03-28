@@ -166,7 +166,6 @@ export function PublicProfileContent({
 
   // Hero stat parts: age (server-computed) + sea time
   const heroStats: string[] = []
-  if (age) heroStats.push(`${age} years old`)
   if (seaTimeTotalDays > 0) heroStats.push(`${formatSeaTime(seaTimeTotalDays).displayLong} at sea`)
 
   const flag = user.home_country ? countryToFlag(user.home_country) : ''

@@ -132,14 +132,24 @@ export function HeroSection({
         </div>
       </div>
 
-      {/* Identity — overlaid at bottom of photo. Just name + role. */}
-      <div className="absolute bottom-0 left-0 right-0 pl-5 pr-20 pb-5 z-10 flex flex-col gap-1">
-        <h1 className={`${scrim.textColor} font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight whitespace-nowrap`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
+      {/* Identity — overlaid at bottom-left, stacked vertically */}
+      <div className="absolute bottom-14 left-0 right-0 px-5 z-10 flex flex-col gap-1.5">
+        <h1 className={`${scrim.textColor} font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
           {displayName}{homeCountryFlag ? <span className="ml-2 text-2xl sm:text-3xl align-middle">{homeCountryFlag}</span> : null}
         </h1>
         {primaryRole && (
           <p className={`${scrim.subtextColor} text-sm font-medium`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 6px rgba(0,0,0,0.5)' }}>
             {primaryRole}
+          </p>
+        )}
+        {heroStats.length > 0 && (
+          <p className={`${scrim.subtextColor} ${scrim.variant === 'dark' ? 'opacity-70' : ''} text-xs font-medium`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 4px rgba(0,0,0,0.4)' }}>
+            {heroStats.join(' · ')}
+          </p>
+        )}
+        {showLocation && location && (
+          <p className={`${scrim.subtextColor} ${scrim.variant === 'dark' ? 'opacity-60' : ''} text-xs font-medium flex items-center gap-1.5`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 4px rgba(0,0,0,0.4)' }}>
+            <MapPin size={12} />{location}
           </p>
         )}
       </div>
