@@ -166,8 +166,13 @@ export function HeroSection({
 
       {/* Bottom bar: Pro badge left, toggle + social links right */}
       <div className="absolute bottom-3 left-5 right-4 z-10 flex items-center justify-between">
-        {/* Pro badge — left */}
-        <div>
+        {/* Badges — left */}
+        <div className="flex items-center gap-1.5">
+          {isColleague && (
+            <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-medium text-white/90" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+              Colleague
+            </span>
+          )}
           {isPro && (
             <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/90" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
               Pro
@@ -183,19 +188,12 @@ export function HeroSection({
         </div>
       </div>
 
-      {/* Badges — Pro, colleague, mutual (top-left below back button) */}
-      {(isColleague || (showMutual && firstMutualName)) && (
-        <div className="absolute top-16 left-4 z-10 flex flex-col gap-1.5">
-          {isColleague && (
-            <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-medium text-white/90" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-              Colleague
-            </span>
-          )}
-          {showMutual && firstMutualName && (
-            <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-medium text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-              via {firstMutualName}
-            </span>
-          )}
+      {/* Mutual badge — top-left below back button (colleague moved to bottom bar) */}
+      {showMutual && firstMutualName && (
+        <div className="absolute top-16 left-4 z-10">
+          <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-medium text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+            via {firstMutualName}
+          </span>
         </div>
       )}
     </motion.div>
