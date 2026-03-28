@@ -317,6 +317,14 @@ export function PortfolioLayout({
               </div>
             ))}
           </div>
+          {education.length > 3 && (
+            <Link
+              href={`/u/${handle}/education`}
+              className="mt-3 block text-xs font-medium text-[var(--accent-500,var(--color-interactive))] hover:underline"
+            >
+              See all {education.length} entries &rarr;
+            </Link>
+          )}
         </SectionCard>
       )}
 
