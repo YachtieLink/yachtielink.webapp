@@ -19,7 +19,7 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
     if (shown.length <= 1) return
     const timer = setInterval(() => {
       setActiveIndex((i) => (i + 1) % shown.length)
-    }, 8000)
+    }, 9000)
     return () => clearInterval(timer)
   }, [shown.length])
 
@@ -61,30 +61,30 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
         )}
       </div>
 
-      {/* Quote */}
-      <p className="text-sm text-[var(--color-text-primary)] italic leading-relaxed flex-1">
+      {/* Quote — centred, truncates */}
+      <p className="text-sm text-[var(--color-text-primary)] italic leading-relaxed flex-1 text-center line-clamp-5">
         &ldquo;{current.content}&rdquo;
       </p>
 
-      {/* Endorser — pinned to bottom */}
-      <div className="flex items-center gap-2.5 mt-3 pt-3 border-t border-[var(--color-border-subtle)]">
+      {/* Endorser — centred, pinned to bottom */}
+      <div className="flex flex-col items-center gap-1.5 mt-3 pt-3 border-t border-[var(--color-border-subtle)]">
         {endorserAvatar ? (
           <Image
             src={endorserAvatar}
             alt={endorserName}
-            width={28}
-            height={28}
-            className="rounded-full object-cover shrink-0"
+            width={32}
+            height={32}
+            className="rounded-full object-cover"
           />
         ) : (
-          <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-500 shrink-0">
+          <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-500">
             {endorserName.charAt(0)}
           </div>
         )}
-        <div className="min-w-0">
-          <p className="text-xs font-semibold text-[var(--color-text-primary)] truncate">{endorserName}</p>
+        <div className="text-center">
+          <p className="text-xs font-semibold text-[var(--color-text-primary)]">{endorserName}</p>
           {(current.endorser_role_label || yachtName) && (
-            <p className="text-[10px] text-[var(--color-text-secondary)] truncate">
+            <p className="text-[10px] text-[var(--color-text-secondary)]">
               {current.endorser_role_label}{current.endorser_role_label && yachtName ? ' · ' : ''}{yachtName}
             </p>
           )}
