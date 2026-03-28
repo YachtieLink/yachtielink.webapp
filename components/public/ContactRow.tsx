@@ -1,4 +1,5 @@
-import { Mail, Phone, MessageCircle } from 'lucide-react'
+import { Mail, Phone } from 'lucide-react'
+import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 
 interface ContactRowProps {
   email?: string | null
@@ -52,7 +53,7 @@ export function ContactRow({
           className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:text-green-600 hover:border-green-500 transition-colors"
           aria-label="WhatsApp"
         >
-          <MessageCircle size={18} />
+          <WhatsAppIcon size={18} />
         </a>
       )}
     </div>

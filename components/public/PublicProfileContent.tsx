@@ -278,28 +278,38 @@ export function PublicProfileContent({
             )}
           </div>
 
-          {/* Stats — conversational introduction */}
+          {/* Stats — conversational introduction with clickable stats */}
           {(seaTimeTotalDays > 0 || seaTimeYachtCount > 0) && (
             <div className="text-center italic text-sm text-[var(--color-text-secondary)] leading-relaxed px-2">
               {(() => {
+                const scrollToSection = (id: string) => {
+                  const el = document.getElementById(id)
+                  if (!el) return
+                  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                  // Open the accordion by clicking its header button
+                  setTimeout(() => {
+                    const btn = el.querySelector('button[aria-expanded]') as HTMLButtonElement | null
+                    if (btn && btn.getAttribute('aria-expanded') === 'false') btn.click()
+                  }, 400)
+                }
+
                 const parts: React.ReactNode[] = []
-                const fname = firstName
 
                 if (seaTimeTotalDays > 0) {
                   const seaTimeStr = formatSeaTime(seaTimeTotalDays).displayLong
-                  parts.push(<span key="sea">I&apos;ve spent <strong className="font-semibold text-[var(--color-text-primary)]">{seaTimeStr}</strong> working at sea</span>)
+                  parts.push(<span key="sea">I&apos;ve spent <button type="button" onClick={() => scrollToSection('section-experience')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">{seaTimeStr}</button> working at sea</span>)
                 }
                 if (seaTimeYachtCount > 0) {
-                  parts.push(<span key="yacht"> across <strong className="font-semibold text-[var(--color-text-primary)]">{seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}</strong></span>)
+                  parts.push(<span key="yacht"> across <button type="button" onClick={() => scrollToSection('section-experience')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">{seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}</button></span>)
                 }
                 if (certifications.length > 0) {
-                  parts.push(<span key="cert">, hold <strong className="font-semibold text-[var(--color-text-primary)]">{certifications.length} {certifications.length === 1 ? 'certification' : 'certifications'}</strong></span>)
+                  parts.push(<span key="cert">, hold <button type="button" onClick={() => scrollToSection('section-certifications')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">{certifications.length} {certifications.length === 1 ? 'certification' : 'certifications'}</button></span>)
                 }
                 if (colleagueCount > 0) {
                   parts.push(<span key="col"> and have worked with <strong className="font-semibold text-[var(--color-text-primary)]">{colleagueCount} {colleagueCount === 1 ? 'colleague' : 'colleagues'}</strong></span>)
                 }
                 if (endorsements.length > 0) {
-                  parts.push(<span key="end">, of which <strong className="font-semibold text-[var(--color-text-primary)]">{endorsements.length} endorsed</strong></span>)
+                  parts.push(<span key="end">, of which <button type="button" onClick={() => scrollToSection('section-endorsements')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">{endorsements.length} endorsed</button></span>)
                 }
                 return <>{parts}.</>
               })()}
@@ -324,17 +334,23 @@ export function PublicProfileContent({
 
           {/* My Experience */}
           {sectionVisible(sectionVisibility, 'experience', attachments.length > 0) && (
-            <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} seaTimeTotalDays={seaTimeTotalDays} seaTimeYachtCount={seaTimeYachtCount} />
+            <div id="section-experience">
+              <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} seaTimeTotalDays={seaTimeTotalDays} seaTimeYachtCount={seaTimeYachtCount} />
+            </div>
           )}
 
           {/* My Endorsements */}
           {sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) && (
-            <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} />
+            <div id="section-endorsements">
+              <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} />
+            </div>
           )}
 
           {/* My Certifications */}
           {sectionVisible(sectionVisibility, 'certifications', certifications.length > 0) && (
-            <CertificationsSection certifications={certifications} />
+            <div id="section-certifications">
+              <CertificationsSection certifications={certifications} />
+            </div>
           )}
 
           {/* My Education */}
