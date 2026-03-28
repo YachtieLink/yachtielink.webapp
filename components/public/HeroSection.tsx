@@ -141,11 +141,6 @@ export function HeroSection({
 
       {/* Identity — overlaid at bottom-left, stacked vertically */}
       <div className="absolute bottom-14 left-0 right-0 px-5 z-10 flex flex-col gap-1.5">
-        {isPro && (
-          <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/90 self-start" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-            Pro
-          </span>
-        )}
         <h1 className={`${scrim.textColor} font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
           {displayName}{homeCountryFlag ? <span className="ml-2 text-2xl sm:text-3xl align-middle">{homeCountryFlag}</span> : null}
         </h1>
@@ -166,6 +161,11 @@ export function HeroSection({
           <p className={`${scrim.subtextColor} ${scrim.variant === 'dark' ? 'opacity-60' : ''} text-xs font-medium flex items-center gap-1.5`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 4px rgba(0,0,0,0.4)' }}>
             <MapPin size={12} />{location}
           </p>
+        )}
+        {isPro && (
+          <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/90 self-start" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+            Pro
+          </span>
         )}
       </div>
 
