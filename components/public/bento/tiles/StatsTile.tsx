@@ -19,11 +19,11 @@ export function StatsTile({ seaTime, yachtCount, certCount, endorsementCount, co
 
   return (
     <div className="h-full rounded-xl bg-white/80 p-5 flex items-center justify-center">
-      <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
+      <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
         {stats.map((s) => (
-          <div key={s.label} className="text-center">
-            <p className="text-xl font-bold text-[var(--color-text-primary)] leading-tight">{s.value}</p>
-            <p className="text-[10px] font-medium uppercase tracking-wide text-[var(--color-text-tertiary)]">{s.label}</p>
+          <div key={s.label} className="flex items-baseline gap-1.5">
+            <span className="text-base font-semibold text-[var(--color-text-primary)]">{s.value}</span>
+            <span className="text-[10px] font-medium uppercase tracking-wide text-[var(--color-text-tertiary)]">{s.label}</span>
           </div>
         ))}
       </div>
