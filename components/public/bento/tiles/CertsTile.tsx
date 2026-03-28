@@ -18,7 +18,7 @@ export function CertsTile({ certifications, handle }: CertsTileProps) {
     <div className="h-full rounded-xl bg-[var(--color-teal-50)]/50 p-5 flex flex-col">
       <div className="flex items-center gap-2 mb-3">
         <Shield size={14} className="text-amber-500" />
-        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">Certifications</span>
+        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">My Certifications</span>
       </div>
       <div className="flex flex-wrap gap-1.5 flex-1">
         {shown.map((cert) => {

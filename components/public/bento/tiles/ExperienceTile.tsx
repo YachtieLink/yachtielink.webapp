@@ -23,7 +23,7 @@ export function ExperienceTile({ attachments, handle, maxShow = 3 }: ExperienceT
     <div className="h-full rounded-xl bg-[var(--color-teal-50)]/50 p-5 flex flex-col">
       <div className="flex items-center gap-2 mb-3">
         <Anchor size={14} className="text-blue-500" />
-        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">Experience</span>
+        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">My Experience</span>
       </div>
       <div className="flex flex-col gap-2.5 flex-1">
         {shown.map((att) => (

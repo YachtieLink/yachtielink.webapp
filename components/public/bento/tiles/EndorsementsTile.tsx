@@ -47,7 +47,7 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <MessageSquareQuote size={14} className="text-[#F08080]" />
-        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">Endorsements</span>
+        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">My Endorsements</span>
         {shown.length > 1 && (
           <div className="flex gap-1 ml-auto">
             {shown.map((_, i) => (

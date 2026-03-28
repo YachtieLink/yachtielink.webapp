@@ -17,7 +17,7 @@ export function EducationTile({ education, handle }: EducationTileProps) {
     <div className="h-full rounded-xl bg-[var(--color-sand-100)]/50 p-5 flex flex-col">
       <div className="flex items-center gap-2 mb-3">
         <GraduationCap size={14} className="text-[var(--color-text-tertiary)]" />
-        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">Education</span>
+        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">My Education</span>
       </div>
       <div className="flex flex-col gap-2 flex-1">
         {shown.map((edu) => (

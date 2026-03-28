@@ -311,7 +311,7 @@ export function RichPortfolioLayout({
             onClick={() => setShowGalleryModal(true)}
             className="flex items-center gap-2 mb-3 px-1 w-full text-left cursor-pointer"
           >
-            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">Gallery</span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">My Gallery</span>
             <span className="text-xs text-[var(--color-text-tertiary)]">· {galleryPhotos.length} photos</span>
             <span className="text-xs font-medium text-[var(--accent-500,#14b8a6)] ml-auto">View all &rarr;</span>
           </button>
