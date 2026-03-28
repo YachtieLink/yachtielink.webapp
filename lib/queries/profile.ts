@@ -71,7 +71,8 @@ export const getUserByHandle = cache(async (handle: string) => {
       cv_public, cv_public_source, latest_pdf_path, cv_storage_path,
       home_country, languages, available_for_work,
       smoke_pref, appearance_note, travel_docs, license_info, show_dob, show_home_country,
-      subscription_status, subscription_ends_at, subdomain_suspended
+      subscription_status, subscription_ends_at, subdomain_suspended,
+      profile_view_mode, scrim_preset, accent_color, profile_template
     `)
     .eq('handle', handle.toLowerCase())
     .single()
@@ -144,7 +145,7 @@ export async function getExtendedProfileSections(userId: string) {
       .order('sort_order'),
     supabase
       .from('user_photos')
-      .select('id, photo_url, sort_order')
+      .select('id, photo_url, sort_order, focal_x, focal_y')
       .eq('user_id', userId)
       .order('sort_order'),
     supabase
@@ -264,12 +265,13 @@ export async function getPublicProfileSections(userId: string) {
     supabase
       .from('endorsements')
       .select(`
-        id, content, created_at, endorser_role_label, recipient_role_label,
-        endorser:endorser_id ( id, display_name, full_name, profile_photo_url ),
-        yacht:yachts!yacht_id ( name )
+        id, content, created_at, endorser_role_label, recipient_role_label, is_pinned,
+        endorser:endorser_id ( id, display_name, full_name, handle, profile_photo_url ),
+        yacht:yachts!yacht_id ( id, name )
       `)
       .eq('recipient_id', userId)
       .is('deleted_at', null)
+      .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false }),
   ])
   return {
@@ -310,7 +312,7 @@ export async function getCvSections(userId: string) {
       .select(`
         id, content, created_at,
         endorser:endorser_id ( display_name, full_name ),
-        yacht:yachts!yacht_id ( name )
+        yacht:yachts!yacht_id ( id, name )
       `)
       .eq('recipient_id', userId)
       .is('deleted_at', null)

@@ -1,20 +1,26 @@
+'use client'
+
 /**
- * PublicProfileContent — Bumble-style hero photo with identity overlaid,
- * then scrollable accordion sections below.
+ * PublicProfileContent — Dual-mode layout (Profile / Portfolio).
+ * Full-width hero, then centred content (max 680px).
+ * View mode toggle switches between Profile (editorial) and Portfolio (card-based).
  *
- * Section rendering is delegated to components/public/sections/ to keep this
- * file focused on layout and the desktop hero.
+ * Section rendering is delegated to components/public/sections/.
  */
-import Link from 'next/link'
-import { MapPin, ChevronLeft, Pencil, Download } from 'lucide-react'
-import { ShareButton } from './ShareButton'
+import { useState } from 'react'
+import { FileText, User, GraduationCap, Heart } from 'lucide-react'
 import { HeroSection } from './HeroSection'
+import { ContactRow } from './ContactRow'
+import { ContactModal } from './ContactModal'
+import { CvPreviewModal } from './CvPreviewModal'
+import { BottomCTA } from './BottomCTA'
+import { ViewModeToggle } from './ViewModeToggle'
+import { PortfolioLayout } from './layouts/PortfolioLayout'
+import { RichPortfolioLayout } from './layouts/RichPortfolioLayout'
+import { isProFromRecord } from '@/lib/stripe/pro-shared'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
-import { PhotoGallery } from '@/components/profile/PhotoGallery'
-import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { formatSeaTime } from '@/lib/sea-time'
 import { countryToFlag } from '@/lib/constants/country-iso'
-import { SaveProfileButton } from '@/components/profile/SaveProfileButton'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { aboutSummary, hobbiesSummary, educationSummary } from '@/lib/profile-summaries'
 import { ExperienceSection } from './sections/ExperienceSection'
@@ -22,6 +28,8 @@ import { EndorsementsSection } from './sections/EndorsementsSection'
 import { CertificationsSection } from './sections/CertificationsSection'
 import { SkillsSection } from './sections/SkillsSection'
 import { GallerySection } from './sections/GallerySection'
+import { accentColors, type AccentColor } from '@/lib/accent-colors'
+import { scrimPresets, type ScrimPreset } from '@/lib/scrim-presets'
 import type {
   PublicAttachment, PublicCertification, PublicEndorsement,
   ProfilePhoto, Hobby, Education, Skill, GalleryItem,
@@ -58,6 +66,12 @@ interface UserProfile {
   cv_public_source?: string
   latest_pdf_path?: string | null
   cv_storage_path?: string | null
+  profile_view_mode?: 'profile' | 'portfolio' | 'rich_portfolio'
+  scrim_preset?: 'dark' | 'light' | 'teal' | 'warm'
+  accent_color?: string
+  profile_template?: string
+  subscription_status?: string | null
+  subscription_ends_at?: string | null
 }
 
 export interface PublicProfileContentProps {
@@ -70,13 +84,13 @@ export interface PublicProfileContentProps {
   education: Education[]
   skills: Skill[]
   gallery: GalleryItem[]
-  isFoundingMember?: boolean
   isLoggedIn?: boolean
   viewerRelationship?: ViewerRelationship
   sectionVisibility?: Record<string, boolean>
   savedStatus?: { id: string; folder_id: string | null } | null
   seaTimeTotalDays?: number
   seaTimeYachtCount?: number
+  colleagueCount?: number
   age?: number | null
 }
 
@@ -98,15 +112,28 @@ export function PublicProfileContent({
   education,
   skills,
   gallery,
-  isFoundingMember = false,
   isLoggedIn,
   viewerRelationship,
   sectionVisibility = {},
   savedStatus,
   seaTimeTotalDays = 0,
   seaTimeYachtCount = 0,
+  colleagueCount = 0,
   age,
 }: PublicProfileContentProps) {
+  // Pro fallback: rich_portfolio requires Pro subscription
+  const isPro = isProFromRecord({
+    subscription_status: user.subscription_status ?? null,
+    subscription_ends_at: user.subscription_ends_at ?? null,
+  })
+  const rawDefault = user.profile_view_mode ?? 'portfolio'
+  const ownerDefault = rawDefault === 'rich_portfolio' && !isPro ? 'portfolio' : rawDefault
+  const [activeMode, setActiveMode] = useState<'profile' | 'portfolio' | 'rich_portfolio'>(ownerDefault)
+
+  // Resolve accent color — fall back to teal for unknown values
+  const resolvedAccent = accentColors[(user.accent_color as AccentColor)] ?? accentColors.teal
+  const resolvedScrim = scrimPresets[(user.scrim_preset as ScrimPreset)] ?? scrimPresets.dark
+
   const displayName = user.display_name ?? user.full_name
   const firstName = displayName.split(' ')[0]
   const isOwnProfile = viewerRelationship?.isOwnProfile ?? false
@@ -124,19 +151,40 @@ export function PublicProfileContent({
 
   const location = [user.location_city, user.location_country].filter(Boolean).join(', ')
 
+  // View mode toggle — only show if owner's default is portfolio or rich_portfolio
+  const viewModeToggle = (ownerDefault === 'portfolio' || ownerDefault === 'rich_portfolio') ? (
+    <ViewModeToggle
+      ownerDefault={ownerDefault}
+      activeMode={activeMode}
+      onChange={setActiveMode}
+      scrimVariant={resolvedScrim.variant}
+    />
+  ) : null
+
+  // Hero photo focal point
+  const heroPhoto = profilePhotos.find((p) => p.sort_order === 0) ?? profilePhotos[0]
+  const heroFocalX = heroPhoto?.focal_x ?? 50
+  const heroFocalY = heroPhoto?.focal_y ?? 50
+
   // Hero stat parts: age (server-computed) + sea time
   const heroStats: string[] = []
-  if (age) heroStats.push(`${age} years old`)
   if (seaTimeTotalDays > 0) heroStats.push(`${formatSeaTime(seaTimeTotalDays).displayLong} at sea`)
 
   const flag = user.home_country ? countryToFlag(user.home_country) : ''
   const homeCountryFlag = user.show_home_country !== false && flag ? flag : undefined
 
   return (
-    // ── Outer: stacked on mobile, side-by-side on desktop ────────────────────
-    <div className="flex flex-col md:flex-row md:min-h-screen">
+    // ── Dual-mode layout with accent CSS vars ────────────────────────────
+    <div
+      className="flex flex-col"
+      style={{
+        '--accent-500': resolvedAccent[500],
+        '--accent-600': resolvedAccent[600],
+        '--accent-100': resolvedAccent[100],
+      } as React.CSSProperties}
+    >
 
-      {/* ── MOBILE: Animated hero (client component, md:hidden) ────────────── */}
+      {/* ── Hero — full-width on all breakpoints ─────────────────────────── */}
       <HeroSection
         displayName={displayName}
         primaryRole={user.primary_role}
@@ -144,7 +192,8 @@ export function PublicProfileContent({
         location={location}
         showLocation={user.show_location}
         availableForWork={user.available_for_work}
-        isFoundingMember={isFoundingMember}
+        isPro={isPro}
+        viewerIsPro={false}
         isOwnProfile={isOwnProfile}
         isLoggedIn={isLoggedIn}
         isColleague={isColleague}
@@ -159,175 +208,216 @@ export function PublicProfileContent({
         savedStatus={savedStatus}
         heroStats={heroStats}
         homeCountryFlag={homeCountryFlag}
+        viewModeToggle={viewModeToggle}
+        scrimPreset={user.scrim_preset as ScrimPreset}
+        focalX={heroFocalX}
+        focalY={heroFocalY}
       />
 
-      {/* ── LEFT: Desktop hero photo panel (hidden on mobile) ─────────────── */}
-      <div className="relative hidden md:block md:w-2/5 md:sticky md:top-0 md:h-screen shrink-0 overflow-hidden">
-
-        {/* Photo fills this panel */}
-        <div className="relative h-full w-full">
-          <PhotoGallery
-            photos={profilePhotos}
-            profilePhotoUrl={user.profile_photo_url}
+      {/* ── Content — switches based on active view mode ─────────────── */}
+      {activeMode === 'rich_portfolio' ? (
+        <div className="flex-1">
+          <RichPortfolioLayout
+            user={user}
+            attachments={attachments}
+            certifications={certifications}
+            endorsements={endorsements}
+            education={education}
+            skills={skills}
+            hobbies={hobbies}
+            gallery={gallery}
+            seaTimeTotalDays={seaTimeTotalDays}
+            colleagueCount={colleagueCount}
+            accentColor={resolvedAccent[500]}
+            handle={user.handle}
             displayName={displayName}
-            fillContainer
+            templateId={user.profile_template ?? 'classic'}
+            isLoggedIn={isLoggedIn}
+            isOwnProfile={isOwnProfile}
+            savedStatus={savedStatus}
           />
         </div>
-
-        {/* Strong gradient — dark at top (for buttons) and bottom (for identity) */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="h-28 bg-gradient-to-b from-black/50 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+      ) : activeMode === 'portfolio' ? (
+        <div className="flex-1">
+          <PortfolioLayout
+            user={user}
+            attachments={attachments}
+            certifications={certifications}
+            endorsements={endorsements}
+            education={education}
+            skills={skills}
+            hobbies={hobbies}
+            gallery={gallery}
+            accentColor={resolvedAccent[500]}
+            handle={user.handle}
+            displayName={displayName}
+            isLoggedIn={isLoggedIn}
+            isOwnProfile={isOwnProfile}
+            sectionVisibility={sectionVisibility}
+            seaTimeTotalDays={seaTimeTotalDays}
+            seaTimeYachtCount={seaTimeYachtCount}
+            colleagueCount={colleagueCount}
+            savedStatus={savedStatus}
+          />
         </div>
+      ) : (
+      <ProfileModeContent
+        user={user}
+        attachments={attachments}
+        certifications={certifications}
+        endorsements={endorsements}
+        hobbies={hobbies}
+        education={education}
+        skills={skills}
+        gallery={gallery}
+        sectionVisibility={sectionVisibility}
+        isLoggedIn={isLoggedIn}
+        isOwnProfile={isOwnProfile}
+        displayName={displayName}
+        firstName={firstName}
+        sharedYachtIdSet={sharedYachtIdSet}
+        mutualEndorserCount={mutualEndorserCount}
+        seaTimeTotalDays={seaTimeTotalDays}
+        seaTimeYachtCount={seaTimeYachtCount}
+        colleagueCount={colleagueCount}
+        profileUrl={profileUrl}
+        savedStatus={savedStatus}
+      />
+      )}
 
-        {/* Top bar — icon-only buttons over photo */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top,0px),1rem)] z-10">
-          <Link
-            href="/"
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-black/25 backdrop-blur-md text-white hover:bg-black/40 transition-colors"
-            aria-label="Go back"
-          >
-            <ChevronLeft size={20} />
-          </Link>
-          <div className="flex items-center gap-2">
-            {isOwnProfile ? (
-              <Link
-                href="/app/profile"
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-black/25 backdrop-blur-md text-white hover:bg-black/40 transition-colors"
-                aria-label="Edit profile"
+      {/* No sticky CTA on profiles — this is the user's presentation, not our ad space */}
+    </div>
+  )
+}
+
+// ── Profile Mode (extracted for modal state) ──────────────────────────────────
+
+function ProfileModeContent({
+  user, attachments, certifications, endorsements, hobbies, education, skills, gallery,
+  sectionVisibility, isLoggedIn, isOwnProfile, displayName, firstName,
+  sharedYachtIdSet, mutualEndorserCount, seaTimeTotalDays, seaTimeYachtCount,
+  colleagueCount, profileUrl, savedStatus,
+}: {
+  user: PublicProfileContentProps['user']
+  attachments: PublicAttachment[]
+  certifications: PublicCertification[]
+  endorsements: PublicEndorsement[]
+  hobbies: Hobby[]
+  education: Education[]
+  skills: Skill[]
+  gallery: GalleryItem[]
+  sectionVisibility: Record<string, boolean>
+  isLoggedIn?: boolean
+  isOwnProfile: boolean
+  displayName: string
+  firstName: string
+  sharedYachtIdSet: Set<string>
+  mutualEndorserCount: number
+  seaTimeTotalDays: number
+  seaTimeYachtCount: number
+  colleagueCount: number
+  profileUrl: string
+  savedStatus?: { id: string; folder_id: string | null } | null
+}) {
+  const [profileModal, setProfileModal] = useState<string | null>(null)
+  const [pendingNav, setPendingNav] = useState<{ url: string; label: string } | null>(null)
+  const handle = user.handle
+
+  return (
+    <>
+      <div className="flex-1">
+        <div className="flex flex-col gap-4 px-4 pt-4 pb-24 max-w-[680px] mx-auto w-full">
+
+          {/* Contact + CV row — matches Rich Portfolio exactly */}
+          <div className="flex items-center justify-between ml-1 mr-1">
+            <ContactRow
+              email={user.email}
+              phone={user.phone}
+              whatsapp={user.whatsapp}
+              showEmail={user.show_email}
+              showPhone={user.show_phone}
+              showWhatsapp={user.show_whatsapp}
+              firstName={firstName}
+              onTap={() => setProfileModal('contact')}
+            />
+            {user.cv_public !== false && (
+              (user.cv_public_source === 'uploaded' ? user.cv_storage_path : user.latest_pdf_path)
+            ) && (
+              <button
+                onClick={() => setProfileModal('cv')}
+                className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
               >
-                <Pencil size={16} />
-              </Link>
-            ) : isLoggedIn ? (
-              <SaveProfileButton
-                savedUserId={user.id}
-                initialSaved={!!savedStatus}
-                initialFolderId={savedStatus?.folder_id}
-              />
-            ) : null}
-            <ShareButton url={profileUrl} name={displayName} variant="compact" />
-          </div>
-        </div>
-
-        {/* Identity — overlaid at bottom of photo */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 z-10 flex flex-col gap-3">
-          {user.available_for_work && (
-            <span className="self-start flex items-center gap-1.5 bg-green-500/25 backdrop-blur-md border border-green-400/40 rounded-full px-3 py-1 text-xs font-semibold text-green-300 tracking-wide uppercase">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              Available for work
-            </span>
-          )}
-
-          {/* Name — large, confident */}
-          <h1 className="text-white font-serif text-4xl md:text-5xl leading-[1.1] tracking-tight" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
-            {displayName}{homeCountryFlag ? <span className="ml-2 text-3xl align-middle">{homeCountryFlag}</span> : null}
-          </h1>
-
-          {(user.primary_role || (user.departments && user.departments.length > 0)) && (
-            <p className="text-white/90 text-base font-medium" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
-              {user.primary_role}
-              {user.primary_role && user.departments && user.departments.length > 0 && (
-                <span className="text-white/50 mx-2">·</span>
-              )}
-              {user.departments && user.departments.length > 0 && (
-                <span className="text-white/70">{user.departments.join(', ')}</span>
-              )}
-            </p>
-          )}
-
-          {/* Hero stats: age, sea time */}
-          {heroStats.length > 0 && (
-            <p className="text-white/70 text-sm font-medium drop-shadow-sm">
-              {heroStats.join(' · ')}
-            </p>
-          )}
-
-          {user.show_location && location && (
-            <p className="text-white/60 text-sm flex items-center gap-1.5 font-medium">
-              <MapPin size={13} className="text-white/50" />{location}
-            </p>
-          )}
-
-          {user.social_links && user.social_links.length > 0 && (
-            <SocialLinksRow links={user.social_links as any} variant="light" />
-          )}
-
-          {/* Badges */}
-          <div className="flex flex-wrap gap-2">
-            {isFoundingMember && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 backdrop-blur-sm border border-amber-400/30 px-2.5 py-0.5 text-xs font-semibold text-amber-300">
-                Founding Member
-              </span>
-            )}
-            {isColleague && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-400/20 backdrop-blur-sm border border-teal-400/30 px-2.5 py-0.5 text-xs font-medium text-teal-300">
-                Colleague{sharedYachtIdSet.size > 1 ? ` · ${sharedYachtIdSet.size} yachts` : ''}
-              </span>
-            )}
-            {showMutual && firstMutual && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 px-2.5 py-0.5 text-xs font-medium text-white/70">
-                2nd connection · via {firstMutual.name}
-              </span>
+                <FileText size={16} className="text-[var(--color-text-secondary)]" />
+                View my CV
+              </button>
             )}
           </div>
-        </div>
-      </div>
 
-      {/* ── RIGHT / BOTTOM: Scrollable content ────────────────────────────── */}
-      <div className="flex-1 md:overflow-y-auto">
-        <div className="flex flex-col gap-4 px-4 pt-4 pb-24">
+          {/* Stats — conversational introduction with clickable stats */}
+          {(seaTimeTotalDays > 0 || seaTimeYachtCount > 0) && (
+            <div className="text-center italic text-sm text-[var(--color-text-secondary)] leading-relaxed px-2">
+              {(() => {
+                const scrollToSection = (id: string) => {
+                  const el = document.getElementById(id)
+                  if (!el) return
+                  // Position heading ~25% from top of viewport
+                  const rect = el.getBoundingClientRect()
+                  const offset = window.scrollY + rect.top - (window.innerHeight * 0.25)
+                  window.scrollTo({ top: offset, behavior: 'smooth' })
+                  // Open the accordion by clicking its header button
+                  setTimeout(() => {
+                    const btn = el.querySelector('button[aria-expanded]') as HTMLButtonElement | null
+                    if (btn && btn.getAttribute('aria-expanded') === 'false') btn.click()
+                  }, 400)
+                }
 
-          {/* Contact info — only shown when user has opted in */}
-          {(
-            (user.show_email && user.email) ||
-            (user.show_phone && user.phone) ||
-            (user.show_whatsapp && user.whatsapp)
-          ) && (
-            <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-1.5 border border-[var(--color-border-subtle)]">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-1">Contact</p>
-              {user.show_email && user.email && (
-                <a href={`mailto:${user.email}?subject=${encodeURIComponent(`Hey ${firstName}`)}&body=${encodeURIComponent(`Hey ${firstName}, I saw your profile on YachtieLink.\n\n`)}`} className="text-sm text-[var(--color-interactive)] hover:underline">{user.email}</a>
-              )}
-              {user.show_phone && user.phone && (
-                <a href={`tel:${user.phone}`} className="text-sm text-[var(--color-text-primary)]">{user.phone}</a>
-              )}
-              {user.show_whatsapp && user.whatsapp && (
-                <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hey ${firstName}, I saw your profile on YachtieLink. `)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--color-interactive)] hover:underline">
-                  WhatsApp: {user.whatsapp}
-                </a>
-              )}
+                const parts: React.ReactNode[] = []
+
+                if (seaTimeTotalDays > 0) {
+                  const seaTimeStr = formatSeaTime(seaTimeTotalDays).displayLong
+                  parts.push(<span key="sea">I&apos;ve spent <button type="button" onClick={() => scrollToSection('section-experience')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">{seaTimeStr}</button> working at sea</span>)
+                }
+                if (seaTimeYachtCount > 0) {
+                  parts.push(<span key="yacht"> across <button type="button" onClick={() => scrollToSection('section-experience')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">{seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}</button></span>)
+                }
+                if (certifications.length > 0) {
+                  parts.push(<span key="cert">, hold <button type="button" onClick={() => scrollToSection('section-certifications')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">{certifications.length} {certifications.length === 1 ? 'certification' : 'certifications'}</button></span>)
+                }
+                if (colleagueCount > 0) {
+                  const includingYou = sharedYachtIdSet.size > 0 ? ' including you' : ''
+                  parts.push(<span key="col"> and have worked with <strong className="font-semibold text-[var(--color-text-primary)]">{colleagueCount} {colleagueCount === 1 ? 'colleague' : 'colleagues'}{includingYou}</strong></span>)
+                }
+                if (endorsements.length > 0) {
+                  parts.push(<span key="end">, of which <button type="button" onClick={() => scrollToSection('section-endorsements')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">{endorsements.length} endorsed</button></span>)
+                }
+                return <>{parts}.</>
+              })()}
             </div>
           )}
 
-          {/* CV — View + Download (cv_public defaults to true when null) */}
-          {user.cv_public !== false && (
-            (user.cv_public_source === 'uploaded' ? user.cv_storage_path : user.latest_pdf_path)
-          ) && (
-            <div className="bg-[var(--color-surface)] rounded-2xl p-4 border border-[var(--color-border-subtle)] flex items-center justify-between">
-              <a
-                href={`/u/${user.handle}/cv`}
-                className="flex items-center gap-2 text-sm font-medium text-[var(--color-interactive)] hover:underline"
-              >
-                View CV
-              </a>
-              <a
-                href={`/api/cv/public-download/${user.handle}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors"
-              >
-                <Download size={16} />
-              </a>
-            </div>
-          )}
+          {/* Shared yacht context — only for colleagues */}
+          {sharedYachtIdSet.size > 0 && (() => {
+            const sharedYachtNames = attachments
+              .filter(a => a.yachts?.id && sharedYachtIdSet.has(a.yachts.id))
+              .map(a => a.yachts?.name)
+              .filter(Boolean) as string[]
+            const unique = [...new Set(sharedYachtNames)]
+            if (unique.length === 0) return null
+            return (
+              <p className="text-center text-xs text-[var(--color-text-tertiary)]">
+                You&apos;ve worked together on {unique.join(', ')}
+              </p>
+            )
+          })()}
 
-          {/* About */}
+          {/* About Me */}
           {sectionVisible(sectionVisibility, 'about', !!(user.ai_summary || user.bio)) && (
             <ScrollReveal>
             <ProfileAccordion
-              title="About"
+              title="About Me"
               summary={aboutSummary(user.ai_summary, user.bio)}
-              accentColor="teal"
+              accentColor="sand"
+              icon={<User size={16} />}
             >
               <p className="text-sm text-[var(--color-text-primary)] leading-relaxed whitespace-pre-line">
                 {user.ai_summary || user.bio}
@@ -336,37 +426,35 @@ export function PublicProfileContent({
             </ScrollReveal>
           )}
 
-          {/* Sea Time Stat Line */}
-          {seaTimeTotalDays > 0 && (
-            <div className="px-1 py-2">
-              <p className="text-sm text-[var(--color-text-secondary)]">
-                {formatSeaTime(seaTimeTotalDays).displayLong} at sea · {seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}
-              </p>
+          {/* My Experience */}
+          {sectionVisible(sectionVisibility, 'experience', attachments.length > 0) && (
+            <div id="section-experience">
+              <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} seaTimeTotalDays={seaTimeTotalDays} seaTimeYachtCount={seaTimeYachtCount} onNavigate={(url, label) => setPendingNav({ url, label })} />
             </div>
           )}
 
-          {/* Experience */}
-          {sectionVisible(sectionVisibility, 'experience', attachments.length > 0) && (
-            <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} />
-          )}
-
-          {/* Endorsements */}
+          {/* My Endorsements */}
           {sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) && (
-            <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} />
+            <div id="section-endorsements">
+              <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} onNavigate={(url, label) => setPendingNav({ url, label })} />
+            </div>
           )}
 
-          {/* Certifications */}
+          {/* My Certifications */}
           {sectionVisible(sectionVisibility, 'certifications', certifications.length > 0) && (
-            <CertificationsSection certifications={certifications} />
+            <div id="section-certifications">
+              <CertificationsSection certifications={certifications} />
+            </div>
           )}
 
-          {/* Education */}
+          {/* My Education */}
           {sectionVisible(sectionVisibility, 'education', education.length > 0) && (
             <ScrollReveal>
             <ProfileAccordion
-              title="Education"
+              title="My Education"
               summary={educationSummary(education)}
               accentColor="teal"
+              icon={<GraduationCap size={16} />}
             >
               <div className="flex flex-col gap-3">
                 {education.map((edu) => (
@@ -386,16 +474,18 @@ export function PublicProfileContent({
             </ScrollReveal>
           )}
 
-          {/* Hobbies */}
+          {/* My Interests */}
           {sectionVisible(sectionVisibility, 'hobbies', hobbies.length > 0) && (
             <ScrollReveal>
             <ProfileAccordion
-              title="Hobbies"
+              title="My Interests"
               summary={hobbiesSummary(hobbies)}
+              accentColor="sand"
+              icon={<Heart size={16} />}
             >
               <div className="flex flex-wrap gap-2">
                 {hobbies.map((h) => (
-                  <span key={h.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]">
+                  <span key={h.id} className="text-sm px-3 py-1.5 rounded-full bg-transparent border border-[var(--color-border)] text-[var(--color-text-primary)]">
                     {h.emoji ? `${h.emoji} ${h.name}` : h.name}
                   </span>
                 ))}
@@ -404,12 +494,12 @@ export function PublicProfileContent({
             </ScrollReveal>
           )}
 
-          {/* Skills */}
+          {/* My Skills */}
           {sectionVisible(sectionVisibility, 'skills', skills.length > 0) && (
             <SkillsSection skills={skills} />
           )}
 
-          {/* Gallery */}
+          {/* My Gallery */}
           {sectionVisible(sectionVisibility, 'gallery', gallery.length > 0) && (
             <GallerySection gallery={gallery} />
           )}
@@ -432,57 +522,51 @@ export function PublicProfileContent({
         )}
 
         {/* Bottom CTAs */}
-        <div className="px-4 pb-8 flex flex-col gap-3">
-          {!isLoggedIn ? (
-            <>
-              <Link
-                href="/signup"
-                className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
-              >
-                Build your crew profile — it&apos;s free
-              </Link>
-              <Link
-                href="/login"
-                className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
-              >
-                Sign in to see how you know {displayName}
-              </Link>
-            </>
-          ) : isOwnProfile ? (
-            <Link
-              href="/app/profile"
-              className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
-            >
-              Back to my profile
-            </Link>
-          ) : (
-            <Link
-              href="/app/profile"
-              className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
-            >
-              Back to dashboard
-            </Link>
-          )}
+        <div className="px-4 pb-8">
+          <BottomCTA isLoggedIn={isLoggedIn} isOwnProfile={isOwnProfile} displayName={displayName} />
         </div>
-
-        <footer className="text-center pb-6">
-          <p className="text-xs text-[var(--color-text-secondary)]">
-            <Link href="/welcome" className="hover:underline">YachtieLink</Link> — Professional profiles for yacht crew
-          </p>
-        </footer>
       </div>
 
-      {/* ── Sticky bottom CTA for non-logged-in viewers (mobile only) ───────── */}
-      {!isLoggedIn && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-t border-[var(--color-border-subtle)] z-40 md:hidden">
-          <Link
-            href="/welcome"
-            className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
-          >
-            Build your crew profile
-          </Link>
+      {/* ── Contact modal ──────────────────────────────────────────── */}
+      <ContactModal
+        open={profileModal === 'contact'}
+        onClose={() => setProfileModal(null)}
+        user={user}
+        displayName={displayName}
+        firstName={firstName}
+        profileUrl={profileUrl}
+        isLoggedIn={isLoggedIn}
+        isOwnProfile={isOwnProfile}
+        savedStatus={savedStatus}
+      />
+
+      {/* ── CV preview modal ──────────────────────────────────────── */}
+      <CvPreviewModal open={profileModal === 'cv'} onClose={() => setProfileModal(null)} handle={handle} />
+
+      {/* Navigation confirmation — "leaving this profile" */}
+      {pendingNav && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="bg-[var(--color-surface)] rounded-2xl p-6 max-w-[320px] w-full flex flex-col gap-4 text-center">
+            <p className="text-sm text-[var(--color-text-primary)]">
+              You&apos;re about to leave this profile to view <span className="font-semibold">{pendingNav.label}</span>
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPendingNav(null)}
+                className="flex-1 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+              >
+                Stay here
+              </button>
+              <a
+                href={pendingNav.url}
+                className="flex-1 py-2.5 rounded-xl bg-[var(--accent-500,#0f9b8e)] text-white text-sm font-semibold text-center hover:opacity-90 transition-opacity"
+              >
+                Continue
+              </a>
+            </div>
+          </div>
         </div>
       )}
-    </div>
+    </>
   )
 }

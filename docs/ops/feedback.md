@@ -6,12 +6,28 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 29 rules
+**Current count:** 31 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## Don't Defer Quick Fixes to Backlog
+
+**Rule:** If a fix takes less than 10 minutes, do it now. Don't create a backlog item for something that's a simple edit. Backlog is for genuinely complex work, not laziness.
+**Origin:** 2026-03-28 — founder called out deferring yacht name clickability, save heart sync, and education summary as "lazy" when each was a 5-minute fix.
+**How to apply:** Before writing "backlog item created", ask: can I fix this in under 10 minutes? If yes, fix it.
+
+---
+
+## Profile Is the User's Product — No Intrusive Platform UI
+
+**Rule:** The public profile is the user's presentation. No sticky CTAs, no persistent login bars, no platform branding that detracts from their content. A subtle CTA at the end of the scroll is fine.
+**Origin:** 2026-03-28 — founder rejected sticky bottom CTA: "this is the users product at this point we are detracting from their content."
+**How to apply:** Any fixed/sticky UI element on public profiles needs explicit founder approval. Default to no platform chrome on the user's profile.
 
 ---
 

@@ -196,6 +196,18 @@ export const cvSettingsSchema = z.object({
   'At least one field required',
 );
 
+// --- Display Settings ---
+
+export const displaySettingsSchema = z.object({
+  profile_view_mode: z.enum(['profile', 'portfolio', 'rich_portfolio']).optional(),
+  scrim_preset: z.enum(['dark', 'light', 'teal', 'warm']).optional(),
+  accent_color: z.enum(['teal', 'coral', 'navy', 'amber', 'sand']).optional(),
+  profile_template: z.enum(['classic', 'bold']).optional(),
+}).refine(
+  (d) => d.profile_view_mode !== undefined || d.scrim_preset !== undefined || d.accent_color !== undefined || d.profile_template !== undefined,
+  'At least one field required',
+);
+
 // --- AI Summary ---
 
 export const aiSummaryEditSchema = z.object({

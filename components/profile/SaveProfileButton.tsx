@@ -1,7 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { Heart } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+
+const SAVE_EVENT = 'yl:save-profile-toggle'
 
 interface SaveProfileButtonProps {
   savedUserId: string
@@ -14,11 +17,29 @@ export function SaveProfileButton({ savedUserId, initialSaved, initialFolderId }
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
+  // Listen for save toggle events from other instances on the same page
+  const handleSyncEvent = useCallback((e: Event) => {
+    const detail = (e as CustomEvent).detail
+    if (detail?.userId === savedUserId) {
+      setSaved(detail.saved)
+    }
+  }, [savedUserId])
+
+  useEffect(() => {
+    window.addEventListener(SAVE_EVENT, handleSyncEvent)
+    return () => window.removeEventListener(SAVE_EVENT, handleSyncEvent)
+  }, [handleSyncEvent])
+
   async function toggle() {
     if (loading) return
     setLoading(true)
     const wasSaved = saved
-    setSaved(!wasSaved) // optimistic
+    const newSaved = !wasSaved
+    setSaved(newSaved) // optimistic
+
+    // Broadcast to other instances
+    window.dispatchEvent(new CustomEvent(SAVE_EVENT, { detail: { userId: savedUserId, saved: newSaved } }))
+
     try {
       const res = await fetch('/api/saved-profiles', {
         method: wasSaved ? 'DELETE' : 'POST',
@@ -26,12 +47,14 @@ export function SaveProfileButton({ savedUserId, initialSaved, initialFolderId }
         body: JSON.stringify({ saved_user_id: savedUserId, folder_id: initialFolderId ?? null }),
       })
       if (!res.ok) {
-        setSaved(wasSaved) // roll back
+        setSaved(wasSaved)
+        window.dispatchEvent(new CustomEvent(SAVE_EVENT, { detail: { userId: savedUserId, saved: wasSaved } }))
       } else {
         router.refresh()
       }
     } catch {
-      setSaved(wasSaved) // roll back on network error
+      setSaved(wasSaved)
+      window.dispatchEvent(new CustomEvent(SAVE_EVENT, { detail: { userId: savedUserId, saved: wasSaved } }))
     } finally {
       setLoading(false)
     }
@@ -43,12 +66,12 @@ export function SaveProfileButton({ savedUserId, initialSaved, initialFolderId }
       disabled={loading}
       aria-pressed={saved}
       aria-label={saved ? 'Unsave profile' : 'Save profile'}
-      className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-lg bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] hover:bg-[var(--color-text-secondary)]/10 transition-colors disabled:opacity-50"
+      className="flex items-center justify-center w-10 h-10 rounded-full bg-black/25 backdrop-blur-md hover:bg-black/40 transition-colors disabled:opacity-50"
     >
-      <span className={saved ? 'text-[var(--color-interactive)]' : ''}>
-        {saved ? '♥' : '♡'}
-      </span>
-      {saved ? 'Saved' : 'Save'}
+      <Heart
+        size={18}
+        className={`transition-all duration-300 ${saved ? 'text-pink-500 fill-pink-500 scale-125' : 'text-white scale-100'}`}
+      />
     </button>
   )
 }

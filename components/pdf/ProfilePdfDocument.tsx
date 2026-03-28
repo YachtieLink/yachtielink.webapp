@@ -1,4 +1,5 @@
 import { Document, Page, Text, View, Image, StyleSheet } from '@react-pdf/renderer'
+import { formatDate } from '@/lib/format-date'
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -440,12 +441,6 @@ const minimalStyles = StyleSheet.create({
 })
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return ''
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
-}
 
 function truncate(text: string, maxLen: number): string {
   if (text.length <= maxLen) return text

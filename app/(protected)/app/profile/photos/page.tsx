@@ -24,24 +24,29 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { FocalPointPicker } from '@/components/profile/FocalPointPicker'
 
 interface Photo {
   id: string
   photo_url: string
   sort_order: number
+  focal_x?: number
+  focal_y?: number
 }
 
 const MAX_PHOTOS_FREE = 3
-const MAX_PHOTOS_PRO = 9
+const MAX_PHOTOS_PRO = 15
 
 function SortablePhoto({
   photo,
   index,
   onDelete,
+  onFocalPoint,
 }: {
   photo: Photo
   index: number
   onDelete: (photo: Photo) => void
+  onFocalPoint: (photo: Photo) => void
 }) {
   const {
     attributes,
@@ -89,6 +94,17 @@ function SortablePhoto({
       >
         ×
       </button>
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          onFocalPoint(photo)
+        }}
+        onPointerDown={(e) => e.stopPropagation()}
+        className="absolute bottom-1 right-1 bg-black/50 hover:bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded-full transition-colors"
+        aria-label="Set focal point"
+      >
+        ⊕
+      </button>
     </div>
   )
 }
@@ -100,6 +116,10 @@ export default function ProfilePhotosPage() {
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [isPro, setIsPro] = useState(true) // Default to Pro so paid users aren't penalised if plan lookup fails
+  const [focalPhoto, setFocalPhoto] = useState<Photo | null>(null)
+  const [focalX, setFocalX] = useState(50)
+  const [focalY, setFocalY] = useState(50)
+  const [savingFocal, setSavingFocal] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const maxPhotos = isPro ? MAX_PHOTOS_PRO : MAX_PHOTOS_FREE
@@ -265,6 +285,11 @@ export default function ProfilePhotosPage() {
                 photo={photo}
                 index={idx}
                 onDelete={deletePhoto}
+                onFocalPoint={(p) => {
+                  setFocalPhoto(p)
+                  setFocalX(Number(p.focal_x) || 50)
+                  setFocalY(Number(p.focal_y) || 50)
+                }}
               />
             ))}
 
@@ -290,6 +315,57 @@ export default function ProfilePhotosPage() {
         className="hidden"
         onChange={handleMultiUpload}
       />
+
+      {/* Focal Point Modal */}
+      {focalPhoto && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[var(--color-surface)] rounded-2xl p-5 max-w-sm w-full flex flex-col gap-4">
+            <h3 className="text-base font-semibold text-[var(--color-text-primary)]">Set Focal Point</h3>
+            <p className="text-xs text-[var(--color-text-secondary)]">Tap or drag to set the focal point. This determines how the photo is cropped in the hero and grid.</p>
+            <FocalPointPicker
+              imageUrl={focalPhoto.photo_url}
+              focalX={focalX}
+              focalY={focalY}
+              onChange={(x, y) => { setFocalX(x); setFocalY(y) }}
+            />
+            <div className="flex gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => setFocalPhoto(null)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                loading={savingFocal}
+                className="flex-1"
+                onClick={async () => {
+                  setSavingFocal(true)
+                  try {
+                    const res = await fetch(`/api/user-photos/${focalPhoto.id}`, {
+                      method: 'PATCH',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ focal_x: focalX, focal_y: focalY }),
+                    })
+                    if (!res.ok) throw new Error('Failed to save')
+                    setPhotos((prev) => prev.map((p) =>
+                      p.id === focalPhoto.id ? { ...p, focal_x: focalX, focal_y: focalY } : p
+                    ))
+                    toast('Focal point saved', 'success')
+                    setFocalPhoto(null)
+                  } catch {
+                    toast('Failed to save focal point', 'error')
+                  } finally {
+                    setSavingFocal(false)
+                  }
+                }}
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

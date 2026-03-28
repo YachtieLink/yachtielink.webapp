@@ -79,6 +79,20 @@ export default async function PublicProfilePage({ params }: Props) {
     .map((a) => a.yachts?.id)
     .filter(Boolean) as string[]
 
+  // Count colleagues (unique users on same yachts)
+  let colleagueCount = 0
+  if (profileYachtIds.length > 0) {
+    const { data: colleagueRows } = await supabase
+      .from('attachments')
+      .select('user_id')
+      .in('yacht_id', profileYachtIds)
+      .is('deleted_at', null)
+      .neq('user_id', user.id)
+    if (colleagueRows) {
+      colleagueCount = new Set(colleagueRows.map((r) => r.user_id)).size
+    }
+  }
+
   let viewerRelationship = { isOwnProfile: false, sharedYachtIds: [] as string[], mutualColleagues: [] as MutualColleague[] }
   let savedStatus: { id: string; folder_id: string | null } | null = null
   let age: number | null = null
@@ -125,13 +139,13 @@ export default async function PublicProfilePage({ params }: Props) {
         education={extended.education as Education[]}
         skills={extended.skills as Skill[]}
         gallery={extended.gallery as unknown as GalleryItem[]}
-        isFoundingMember={user.founding_member === true}
         isLoggedIn={!!viewer}
         viewerRelationship={viewerRelationship}
         sectionVisibility={sectionVisibility}
         savedStatus={savedStatus}
         seaTimeTotalDays={seaTimeTotalDays}
         seaTimeYachtCount={seaTimeYachtCount}
+        colleagueCount={colleagueCount}
         age={age}
       />
     </div>

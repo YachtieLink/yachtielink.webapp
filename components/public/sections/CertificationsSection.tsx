@@ -1,12 +1,9 @@
+import { Shield } from 'lucide-react'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { certificationsSummary, countExpiringCerts } from '@/lib/profile-summaries'
+import { formatDate } from '@/lib/format-date'
 import type { PublicCertification } from '@/lib/queries/types'
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
-}
 
 function certStatus(expiryDate: string | null | undefined): { label: string; color: string } {
   if (!expiryDate) return { label: '', color: '' }
@@ -28,9 +25,10 @@ export function CertificationsSection({ certifications }: CertificationsSectionP
   return (
     <ScrollReveal>
       <ProfileAccordion
-        title="Certifications"
+        title="My Certifications"
         summary={certificationsSummary(certifications.length, expiringCount)}
-        accentColor="amber"
+        accentColor="sand"
+        icon={<Shield size={16} />}
       >
         <div className="flex flex-col gap-2">
           {certifications.map((cert) => {

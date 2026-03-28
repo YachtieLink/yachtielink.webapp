@@ -16,9 +16,12 @@ export default async function OnboardingPage() {
 
   const { data: profile } = await supabase
     .from("users")
-    .select("full_name, display_name, handle, departments, primary_role")
+    .select("full_name, display_name, handle, departments, primary_role, onboarding_complete")
     .eq("id", user!.id)
     .single();
+
+  // Already completed onboarding (or has handle — functionally complete) — skip to profile
+  if (profile?.onboarding_complete || profile?.handle) redirect("/app/profile");
 
   return (
     <Wizard

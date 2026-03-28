@@ -1,8 +1,8 @@
 ---
 module: profile
-updated: 2026-03-26
+updated: 2026-03-28
 status: shipped
-phase: 1A
+phase: 1B
 ---
 
 # Profile
@@ -20,6 +20,7 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 - Bio: free-text, editable at `/app/about/edit`
 - Primary role + departments: set during onboarding, editable
 - Contact info (phone, WhatsApp, email, location): working at `/app/profile/settings` with per-field show/hide toggles
+- Display settings: working — View Mode (profile/portfolio/rich_portfolio with Pro lock), Hero Scrim presets (dark/light/teal/warm), Accent Colour swatches (teal/coral/navy/amber/sand). Settings stored in users table with CHECK constraints. `rich_portfolio` coerced to `portfolio` on save for non-Pro users.
 - Section visibility: working — PATCH endpoint toggles individual sections (about, experience, endorsements, certifications, hobbies, education, skills, photos, gallery) via `section_visibility` JSONB column
 - Social links: working — up to 7 links (Instagram, LinkedIn, TikTok, YouTube, X, Facebook, website) via PATCH API
 - AI summary: working — generated via OpenAI `gpt-4o-mini` from bio + attachments + endorsements; editable after generation; `ai_summary_edited` flag prevents accidental overwrite; rate-limited to 10/hour
@@ -61,6 +62,7 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 | Saved profiles API | `app/api/saved-profiles/route.ts` |
 | Profile folders API | `app/api/profile-folders/route.ts` |
 | Validation schemas | `lib/validation/schemas.ts` |
+| Display settings API | `app/api/profile/display-settings/route.ts` |
 | Profile summaries | `lib/profile-summaries.ts` |
 
 ## Decisions That Bind This Module
@@ -77,3 +79,4 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 - [ ] Allow changing account email from settings
 - [ ] Profile analytics (basic: view count) — gated to Pro tier
 - [ ] Cert expiry alerts (cron job exists at `app/api/cron/cert-expiry/`)
+- [ ] Bump MAX_PHOTOS_PRO 9 → 15 (Sprint 11c)

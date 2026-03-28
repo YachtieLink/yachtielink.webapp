@@ -1,8 +1,8 @@
 ---
 module: public-profile
-updated: 2026-03-26
+updated: 2026-03-28
 status: shipped
-phase: 1A
+phase: 1B
 ---
 
 # Public Profile
@@ -24,7 +24,13 @@ One-line: Server-rendered public profile page at `/u/{handle}` with SEO metadata
   - Shared yachts, mutual colleagues, saved status — all computed via shared helper
 - Contact info visibility: PII stripped server-side (`phone`, `whatsapp`, `email`, `dob`)
 - Availability badge: `available_for_work` now included in `getUserByHandle` (was previously missing)
-- Public profile components: `PublicProfileContent` (layout, ~420 LOC), `HeroSection`, section components (`ExperienceSection`, `EndorsementsSection`, `CertificationsSection`, `SkillsSection`, `GallerySection`), `EndorsementCard`, `ShareButton`, `ShowMoreButton`
+- Dual-layout system: `PublicProfileContent` (now client component) branches between Profile mode (editorial layout) and Portfolio mode (card-based `PortfolioLayout`). View mode toggle rendered in hero identity block. Default mode stored in `profile_view_mode` column.
+- Scrim preset system: 4 presets (dark/light/teal/warm) from `lib/scrim-presets.ts` control hero gradients, text colors, text shadows, badge backgrounds. Applied in `HeroSection`.
+- Accent color system: 5 palettes (teal/coral/navy/amber/sand) from `lib/accent-colors.ts`. CSS custom properties (`--accent-500`, `--accent-600`, `--accent-100`) injected on wrapper div.
+- Photo focal points: `focal_x`/`focal_y` from `user_photos` applied via `objectPosition` in hero and gallery components.
+- Mini bento gallery: `MiniBentoGallery` — 3 layout variants (1/2/3+ photos) with asymmetric grid and lazy-loaded `PhotoLightbox` (full-screen viewer with keyboard/touch navigation).
+- Endorsement pinning: recipients can pin up to 3 endorsements. Pin API at `/api/endorsements/[id]/pin`, RLS policy for recipient updates, `EndorsementsPageClient` with optimistic updates and rollback.
+- Public profile components: `PublicProfileContent` (dual-layout, ~500 LOC), `HeroSection`, `ViewModeToggle`, `PortfolioLayout`, `MiniBentoGallery`, `PhotoLightbox`, section components (`ExperienceSection`, `EndorsementsSection`, `CertificationsSection`, `SkillsSection`, `GallerySection`), `EndorsementCard` (with pin support), `ShareButton`, `ShowMoreButton`
 - CV visibility: `cv_public` null treated as public (matching CvActions default) — consistent across profile card, CV page, and download route
 - PDF export: working — POST to `/api/cv/generate-pdf` renders PDF via `@react-pdf/renderer` with profile data, attachments, certifications, endorsements (top 3), and QR code; uploads to `pdf-exports` storage bucket; returns signed URL (1-hour TTL); standard template free, premium templates gated to Pro
 - PDF download: working — GET at `/api/cv/download-pdf` (retrieves latest generated PDF)
@@ -45,6 +51,16 @@ One-line: Server-rendered public profile page at `/u/{handle}` with SEO metadata
 | Section components | `components/public/sections/{Experience,Endorsements,Certifications,Skills,Gallery}Section.tsx` |
 | Hero section | `components/public/HeroSection.tsx` |
 | Endorsement card | `components/public/EndorsementCard.tsx` |
+| View mode toggle | `components/public/ViewModeToggle.tsx` |
+| Portfolio layout | `components/public/layouts/PortfolioLayout.tsx` |
+| Mini bento gallery | `components/public/MiniBentoGallery.tsx` |
+| Photo lightbox | `components/public/PhotoLightbox.tsx` |
+| Scrim presets | `lib/scrim-presets.ts` |
+| Accent colors | `lib/accent-colors.ts` |
+| Endorsement pin API | `app/api/endorsements/[id]/pin/route.ts` |
+| Endorsements client page | `app/(public)/u/[handle]/endorsements/EndorsementsPageClient.tsx` |
+| Education sub-page | `app/(public)/u/[handle]/education/page.tsx` |
+| Endorsement pin RLS | `supabase/migrations/20260328000002_endorsement_recipient_pin_policy.sql` |
 | Share button | `components/public/ShareButton.tsx` |
 | QR code | `components/public/PublicQRCode.tsx` |
 | Shared types | `lib/queries/types.ts` |
@@ -67,6 +83,7 @@ One-line: Server-rendered public profile page at `/u/{handle}` with SEO metadata
 
 ## Next Steps
 
+- [x] Sprint 11c: Rich Portfolio mode — bento grid engine, templates, tiles, Pro gating (built, pending merge)
 - [ ] Custom domain support for Pro users (display `handle.yachtie.link` prominently)
 - [ ] PDF template polish (additional templates, layout improvements)
 - [ ] Profile analytics dashboard (view count, referrer breakdown) — Pro feature
