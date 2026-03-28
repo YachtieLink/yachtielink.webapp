@@ -14,6 +14,7 @@ import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { HeroSection } from './HeroSection'
 import { ContactRow } from './ContactRow'
 import { SectionModal } from './SectionModal'
+import { SaveProfileButton } from '@/components/profile/SaveProfileButton'
 import { ViewModeToggle } from './ViewModeToggle'
 import { PortfolioLayout } from './layouts/PortfolioLayout'
 import { RichPortfolioLayout } from './layouts/RichPortfolioLayout'
@@ -273,6 +274,7 @@ export function PublicProfileContent({
         seaTimeYachtCount={seaTimeYachtCount}
         colleagueCount={colleagueCount}
         profileUrl={profileUrl}
+        savedStatus={savedStatus}
       />
       )}
 
@@ -297,7 +299,7 @@ function ProfileModeContent({
   user, attachments, certifications, endorsements, hobbies, education, skills, gallery,
   sectionVisibility, isLoggedIn, isOwnProfile, displayName, firstName,
   sharedYachtIdSet, mutualEndorserCount, seaTimeTotalDays, seaTimeYachtCount,
-  colleagueCount, profileUrl,
+  colleagueCount, profileUrl, savedStatus,
 }: {
   user: PublicProfileContentProps['user']
   attachments: PublicAttachment[]
@@ -318,6 +320,7 @@ function ProfileModeContent({
   seaTimeYachtCount: number
   colleagueCount: number
   profileUrl: string
+  savedStatus?: { id: string; folder_id: string | null } | null
 }) {
   const [profileModal, setProfileModal] = useState<string | null>(null)
   const handle = user.handle
@@ -552,19 +555,26 @@ function ProfileModeContent({
         onClose={() => setProfileModal(null)}
         footer={
           <div className="flex gap-3">
+            {isLoggedIn && !isOwnProfile && (
+              <SaveProfileButton
+                savedUserId={user.id}
+                initialSaved={!!savedStatus}
+                initialFolderId={savedStatus?.folder_id}
+              />
+            )}
             <button
               onClick={() => { navigator.clipboard.writeText(profileUrl); }}
               className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
             >
               <Share2 size={14} />
-              Share Profile
+              Share
             </button>
             <button
               onClick={() => { navigator.clipboard.writeText(profileUrl); }}
               className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
             >
               <Copy size={14} />
-              Copy Link
+              Copy
             </button>
           </div>
         }
