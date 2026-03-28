@@ -195,7 +195,7 @@ export function PublicProfileContent({
         location={location}
         showLocation={user.show_location}
         availableForWork={user.available_for_work}
-        isFoundingMember={isFoundingMember}
+        isPro={isPro}
         isOwnProfile={isOwnProfile}
         isLoggedIn={isLoggedIn}
         isColleague={isColleague}

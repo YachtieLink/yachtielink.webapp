@@ -16,7 +16,7 @@ interface HeroSectionProps {
   location?: string
   showLocation?: boolean
   availableForWork?: boolean
-  isFoundingMember?: boolean
+  isPro?: boolean
   isOwnProfile: boolean
   isLoggedIn?: boolean
   isColleague: boolean
@@ -44,7 +44,7 @@ export function HeroSection({
   location,
   showLocation,
   availableForWork,
-  isFoundingMember,
+  isPro,
   isOwnProfile,
   isLoggedIn,
   isColleague,
@@ -141,9 +141,16 @@ export function HeroSection({
 
       {/* Identity — overlaid at bottom-left, stacked vertically */}
       <div className="absolute bottom-14 left-0 right-0 px-5 z-10 flex flex-col gap-1.5">
-        <h1 className={`${scrim.textColor} font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
-          {displayName}{homeCountryFlag ? <span className="ml-2 text-2xl sm:text-3xl align-middle">{homeCountryFlag}</span> : null}
-        </h1>
+        <div className="flex items-center gap-2">
+          <h1 className={`${scrim.textColor} font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
+            {displayName}{homeCountryFlag ? <span className="ml-2 text-2xl sm:text-3xl align-middle">{homeCountryFlag}</span> : null}
+          </h1>
+          {isPro && (
+            <span className="inline-flex items-center rounded-full bg-amber-400/20 backdrop-blur-sm border border-amber-400/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-300 shrink-0" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+              Pro
+            </span>
+          )}
+        </div>
         {primaryRole && (
           <p className={`${scrim.subtextColor} text-sm font-medium flex items-center gap-1.5`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 6px rgba(0,0,0,0.5)' }}>
             {availableForWork && (
@@ -174,14 +181,9 @@ export function HeroSection({
         {viewModeToggle}
       </div>
 
-      {/* Badges — founding member, colleague, mutual (top-left below back button) */}
-      {(isFoundingMember || isColleague || (showMutual && firstMutualName)) && (
+      {/* Badges — Pro, colleague, mutual (top-left below back button) */}
+      {(isColleague || (showMutual && firstMutualName)) && (
         <div className="absolute top-16 left-4 z-10 flex flex-col gap-1.5">
-          {isFoundingMember && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 backdrop-blur-sm border border-amber-400/30 px-2.5 py-0.5 text-[10px] font-semibold text-amber-300">
-              ⚓ Founding
-            </span>
-          )}
           {isColleague && (
             <span className="inline-flex items-center gap-1 rounded-full bg-teal-400/20 backdrop-blur-sm border border-teal-400/30 px-2.5 py-0.5 text-[10px] font-medium text-teal-300">
               🤝 Colleague
