@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { MessageSquareQuote } from 'lucide-react'
@@ -14,6 +14,7 @@ interface EndorsementsTileProps {
 export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps) {
   const shown = endorsements.slice(0, 3)
   const [activeIndex, setActiveIndex] = useState(0)
+  const touchStart = useRef<number | null>(null)
 
   // Auto-cycle every 5 seconds if multiple endorsements
   useEffect(() => {
@@ -24,6 +25,18 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
     return () => clearInterval(timer)
   }, [shown.length])
 
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStart.current = e.touches[0].clientX
+  }
+  function handleTouchEnd(e: React.TouchEvent) {
+    if (touchStart.current === null) return
+    const dx = e.changedTouches[0].clientX - touchStart.current
+    touchStart.current = null
+    if (Math.abs(dx) > 40) {
+      setActiveIndex((i) => dx > 0 ? (i - 1 + shown.length) % shown.length : (i + 1) % shown.length)
+    }
+  }
+
   const current = shown[activeIndex]
   if (!current) return null
 
@@ -33,15 +46,16 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
   const yachtName = current.yacht?.name
 
   return (
-    <div className="h-full rounded-xl bg-white/80 p-5 flex flex-col">
+    <div className="h-full rounded-xl bg-white/80 p-5 flex flex-col" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       <div className="flex items-center gap-2 mb-3">
         <MessageSquareQuote size={14} className="text-rose-500" />
         <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">Endorsements</span>
         {shown.length > 1 && (
           <div className="flex gap-1 ml-auto">
             {shown.map((_, i) => (
-              <span
+              <button
                 key={i}
+                onClick={(e) => { e.stopPropagation(); setActiveIndex(i) }}
                 className={`w-1.5 h-1.5 rounded-full transition-colors ${i === activeIndex ? 'bg-[var(--accent-500,#14b8a6)]' : 'bg-gray-300'}`}
               />
             ))}
