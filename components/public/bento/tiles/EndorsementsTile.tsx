@@ -86,7 +86,7 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
             )}
           </div>
         </div>
-        <p className="text-sm text-[var(--color-text-primary)] italic line-clamp-2 flex-1">
+        <p className="text-sm text-[var(--color-text-primary)] italic line-clamp-4 flex-1">
           &ldquo;{current.content}&rdquo;
         </p>
       </div>
