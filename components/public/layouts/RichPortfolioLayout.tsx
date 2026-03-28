@@ -299,7 +299,8 @@ export function RichPortfolioLayout({
               </button>
             </div>
             {/* Photo grid */}
-            <div className="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2 p-4 content-start">
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {galleryPhotos.map((photo, i) => (
                 <button
                   key={photo.id}
@@ -314,6 +315,7 @@ export function RichPortfolioLayout({
                   />
                 </button>
               ))}
+              </div>
             </div>
           </div>
           {/* Click outside to close */}
