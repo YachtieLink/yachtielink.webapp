@@ -15,7 +15,7 @@ export function HobbiesTile({ hobbies }: HobbiesTileProps) {
       </div>
       <div className="flex flex-wrap gap-1.5 flex-1">
         {hobbies.map((h) => (
-          <span key={h} className="text-xs px-2.5 py-1 rounded-full bg-transparent text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)]">
+          <span key={h} className="text-xs px-2.5 py-1 rounded-full bg-transparent text-[var(--color-text-secondary)] border border-[var(--color-border)]">
             {h}
           </span>
         ))}

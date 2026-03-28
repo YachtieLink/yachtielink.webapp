@@ -26,7 +26,7 @@ export function CertsTile({ certifications, handle }: CertsTileProps) {
           return (
             <span
               key={cert.id}
-              className="text-xs px-2.5 py-1 rounded-full bg-transparent text-[var(--color-text-primary)] border border-[var(--color-border-subtle)]"
+              className="text-xs px-2.5 py-1 rounded-full bg-transparent text-[var(--color-text-primary)] border border-[var(--color-border)]"
             >
               {name}
             </span>
