@@ -570,13 +570,6 @@ function ProfileModeContent({
         onClose={() => setProfileModal(null)}
         footer={
           <div className="flex gap-3">
-            {isLoggedIn && !isOwnProfile && (
-              <SaveProfileButton
-                savedUserId={user.id}
-                initialSaved={!!savedStatus}
-                initialFolderId={savedStatus?.folder_id}
-              />
-            )}
             <button
               onClick={() => {
                 if (navigator.share) {

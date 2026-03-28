@@ -571,7 +571,13 @@ export function RichPortfolioLayout({
             <div key={att.id} className="flex gap-3">
               <div className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--accent-500,#0f9b8e)]" />
               <div>
-                <p className="text-sm font-medium text-[var(--color-text-primary)]">{att.yachts?.name ?? 'Unknown Yacht'}</p>
+                {att.yachts?.id ? (
+                  <button onClick={() => setPendingNav({ url: `/yacht/${att.yachts!.id}`, label: att.yachts!.name ?? 'Yacht' })} className="text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] text-left transition-colors">
+                    {att.yachts.name ?? 'Unknown Yacht'}
+                  </button>
+                ) : (
+                  <p className="text-sm font-medium text-[var(--color-text-primary)]">{att.yachts?.name ?? 'Unknown Yacht'}</p>
+                )}
                 {att.role_label && <p className="text-sm text-[var(--color-text-secondary)]">{att.role_label}</p>}
                 {(att.started_at || att.ended_at) && (
                   <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">
@@ -619,7 +625,11 @@ export function RichPortfolioLayout({
                       <p className="text-sm font-semibold text-[var(--color-text-primary)]">{endorserName}</p>
                     )}
                     {(end.endorser_role_label || end.yacht?.name) && (
-                      <p className="text-xs text-[var(--color-text-secondary)]">{end.endorser_role_label}{end.endorser_role_label && end.yacht?.name ? ' · ' : ''}{end.yacht?.name}</p>
+                      <p className="text-xs text-[var(--color-text-secondary)]">
+                        {end.endorser_role_label}
+                        {end.endorser_role_label && end.yacht?.name ? ' · ' : ''}
+                        {end.yacht?.name}
+                      </p>
                     )}
                   </div>
                 </div>
