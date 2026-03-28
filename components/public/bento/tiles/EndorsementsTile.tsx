@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import Link from 'next/link'
 import Image from 'next/image'
 import { MessageSquareQuote } from 'lucide-react'
 import type { PublicEndorsement } from '@/lib/queries/types'
@@ -16,12 +15,11 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
   const [activeIndex, setActiveIndex] = useState(0)
   const touchStart = useRef<number | null>(null)
 
-  // Auto-cycle every 5 seconds if multiple endorsements
   useEffect(() => {
     if (shown.length <= 1) return
     const timer = setInterval(() => {
       setActiveIndex((i) => (i + 1) % shown.length)
-    }, 5000)
+    }, 8000)
     return () => clearInterval(timer)
   }, [shown.length])
 
@@ -41,12 +39,12 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
   if (!current) return null
 
   const endorserName = current.endorser?.display_name || current.endorser?.full_name || 'Anonymous'
-  const endorserHandle = current.endorser?.handle
   const endorserAvatar = current.endorser?.profile_photo_url
   const yachtName = current.yacht?.name
 
   return (
-    <div className="h-full rounded-xl bg-white/80 p-5 flex flex-col" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+    <div className="h-full rounded-xl bg-white/80 p-5 flex flex-col justify-between" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <MessageSquareQuote size={14} className="text-rose-500" />
         <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">Endorsements</span>
@@ -62,33 +60,35 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
           </div>
         )}
       </div>
-      <div className="flex-1 flex flex-col">
-        <div className="flex items-center gap-2 mb-2">
-          {endorserAvatar ? (
-            <Image
-              src={endorserAvatar}
-              alt={endorserName}
-              width={24}
-              height={24}
-              className="rounded-full object-cover shrink-0"
-            />
-          ) : (
-            <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500 shrink-0">
-              {endorserName.charAt(0)}
-            </div>
-          )}
-          <div className="min-w-0">
-            <p className="text-xs font-semibold text-[var(--color-text-primary)] truncate">{endorserName}</p>
-            {(current.endorser_role_label || yachtName) && (
-              <p className="text-[10px] text-[var(--color-text-secondary)] truncate">
-                {current.endorser_role_label}{current.endorser_role_label && yachtName ? ' · ' : ''}{yachtName}
-              </p>
-            )}
+
+      {/* Quote */}
+      <p className="text-sm text-[var(--color-text-primary)] italic leading-relaxed flex-1">
+        &ldquo;{current.content}&rdquo;
+      </p>
+
+      {/* Endorser — pinned to bottom */}
+      <div className="flex items-center gap-2.5 mt-3 pt-3 border-t border-[var(--color-border-subtle)]">
+        {endorserAvatar ? (
+          <Image
+            src={endorserAvatar}
+            alt={endorserName}
+            width={28}
+            height={28}
+            className="rounded-full object-cover shrink-0"
+          />
+        ) : (
+          <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-500 shrink-0">
+            {endorserName.charAt(0)}
           </div>
+        )}
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-[var(--color-text-primary)] truncate">{endorserName}</p>
+          {(current.endorser_role_label || yachtName) && (
+            <p className="text-[10px] text-[var(--color-text-secondary)] truncate">
+              {current.endorser_role_label}{current.endorser_role_label && yachtName ? ' · ' : ''}{yachtName}
+            </p>
+          )}
         </div>
-        <p className="text-sm text-[var(--color-text-primary)] italic line-clamp-4 flex-1">
-          &ldquo;{current.content}&rdquo;
-        </p>
       </div>
     </div>
   )
