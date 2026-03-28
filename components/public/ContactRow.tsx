@@ -28,34 +28,27 @@ export function ContactRow({
 
   if (!hasAny) return null
 
-  const iconClass = "flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:text-[var(--color-interactive)] hover:border-[var(--color-interactive)] transition-colors"
-  const whatsappClass = "flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:text-green-600 hover:border-green-500 transition-colors"
+  // Match Rich Portfolio styling exactly
+  const iconClass = "flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors"
 
-  // If onTap is provided, all icons open the modal instead of direct action
   if (onTap) {
     return (
-      <div className="flex items-center gap-3 py-2">
+      <button onClick={onTap} className="flex gap-3">
         {showEmail && email && (
-          <button onClick={onTap} className={iconClass} aria-label="Email">
-            <Mail size={18} />
-          </button>
+          <span className={iconClass}><Mail size={18} /></span>
         )}
         {showPhone && phone && (
-          <button onClick={onTap} className={iconClass} aria-label="Phone">
-            <Phone size={18} />
-          </button>
+          <span className={iconClass}><Phone size={18} /></span>
         )}
         {showWhatsapp && whatsapp && (
-          <button onClick={onTap} className={whatsappClass} aria-label="WhatsApp">
-            <WhatsAppIcon size={18} />
-          </button>
+          <span className={iconClass}><WhatsAppIcon size={18} /></span>
         )}
-      </div>
+      </button>
     )
   }
 
   return (
-    <div className="flex items-center gap-3 py-2">
+    <div className="flex gap-3">
       {showEmail && email && (
         <a
           href={`mailto:${email}?subject=${encodeURIComponent(`Hey ${firstName}`)}&body=${encodeURIComponent(`Hey ${firstName}, I saw your profile on YachtieLink.\n\n`)}`}
@@ -66,11 +59,7 @@ export function ContactRow({
         </a>
       )}
       {showPhone && phone && (
-        <a
-          href={`tel:${phone}`}
-          className={iconClass}
-          aria-label="Phone"
-        >
+        <a href={`tel:${phone}`} className={iconClass} aria-label="Phone">
           <Phone size={18} />
         </a>
       )}
@@ -79,7 +68,7 @@ export function ContactRow({
           href={`https://wa.me/${whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hey ${firstName}, I saw your profile on YachtieLink. `)}`}
           target="_blank"
           rel="noopener noreferrer"
-          className={whatsappClass}
+          className={iconClass}
           aria-label="WhatsApp"
         >
           <WhatsAppIcon size={18} />

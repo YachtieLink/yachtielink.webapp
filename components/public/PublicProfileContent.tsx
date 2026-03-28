@@ -328,8 +328,8 @@ function ProfileModeContent({
       <div className="flex-1">
         <div className="flex flex-col gap-4 px-4 pt-4 pb-24 max-w-[680px] mx-auto w-full">
 
-          {/* Contact + CV row — tappable to open modals */}
-          <div className="flex items-center justify-between">
+          {/* Contact + CV row — matches Rich Portfolio exactly */}
+          <div className="flex items-center justify-between ml-1 mr-1">
             <ContactRow
               email={user.email}
               phone={user.phone}
@@ -348,7 +348,7 @@ function ProfileModeContent({
                 className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
               >
                 <FileText size={16} className="text-[var(--color-text-secondary)]" />
-                View CV
+                View my CV
               </button>
             )}
           </div>
@@ -519,7 +519,7 @@ function ProfileModeContent({
                 href="/login"
                 className="w-full flex items-center justify-center text-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
               >
-                Sign in to see how you know {displayName}
+                Sign in to see how you know<br />{displayName}
               </Link>
             </>
           ) : isOwnProfile ? (

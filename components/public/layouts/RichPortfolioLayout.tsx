@@ -403,7 +403,7 @@ export function RichPortfolioLayout({
               href="/login"
               className="w-full flex items-center justify-center text-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
             >
-              Sign in to see how you know {displayName}
+              Sign in to see how you know<br />{displayName}
             </Link>
           </>
         ) : isOwnProfile ? (
