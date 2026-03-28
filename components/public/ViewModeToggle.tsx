@@ -23,7 +23,7 @@ export function ViewModeToggle({
 
   return (
     <div
-      className={`inline-flex rounded-full p-0.5 backdrop-blur-md ${
+      className={`self-start inline-flex rounded-full p-0.5 backdrop-blur-md ${
         isDark ? 'bg-white/15' : 'bg-black/10'
       }`}
     >

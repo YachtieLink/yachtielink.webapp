@@ -20,7 +20,7 @@ import { formatSeaTime } from '@/lib/sea-time'
 import type { BentoTile, BentoTemplateSlot } from '@/lib/bento/types'
 import type {
   PublicAttachment, PublicCertification, PublicEndorsement,
-  ProfilePhoto, Hobby, Education, Skill,
+  GalleryItem, Hobby, Education, Skill,
 } from '@/lib/queries/types'
 
 const PhotoLightbox = dynamic(() => import('../PhotoLightbox').then(m => ({ default: m.PhotoLightbox })), { ssr: false })
@@ -48,7 +48,7 @@ interface RichPortfolioLayoutProps {
   education: Education[]
   skills: Skill[]
   hobbies: Hobby[]
-  profilePhotos: ProfilePhoto[]
+  gallery: GalleryItem[]
   seaTimeTotalDays: number
   accentColor: string
   handle: string
@@ -63,7 +63,7 @@ export function RichPortfolioLayout({
   education,
   skills,
   hobbies,
-  profilePhotos,
+  gallery,
   seaTimeTotalDays,
   accentColor,
   handle,
@@ -71,10 +71,8 @@ export function RichPortfolioLayout({
 }: RichPortfolioLayoutProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
-  // Gallery photos: sort_order > 0 (exclude hero)
-  const galleryPhotos = profilePhotos
-    .filter((p) => p.sort_order > 0)
-    .sort((a, b) => a.sort_order - b.sort_order)
+  // Gallery photos from user_gallery (work portfolio, not profile headshots)
+  const galleryPhotos = gallery.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
 
   const aboutText = user.ai_summary || user.bio
   const seaTimeFormatted = seaTimeTotalDays > 0 ? formatSeaTime(seaTimeTotalDays).displayShort : ''
@@ -122,7 +120,7 @@ export function RichPortfolioLayout({
       content: (
         <MorePhotosTile
           handle={handle}
-          backgroundUrl={overflowPhoto?.photo_url}
+          backgroundUrl={overflowPhoto?.image_url}
           totalCount={galleryPhotos.length}
         />
       ),
@@ -139,9 +137,9 @@ export function RichPortfolioLayout({
           type: 'photo',
           content: (
             <PhotoTile
-              url={photo.photo_url}
-              focalX={Number(photo.focal_x) || 50}
-              focalY={Number(photo.focal_y) || 50}
+              url={photo.image_url}
+              focalX={50}
+              focalY={50}
               onClick={() => setLightboxIndex(currentPhotoIndex)}
             />
           ),
@@ -246,7 +244,7 @@ export function RichPortfolioLayout({
       {lightboxIndex !== null && (
         <PhotoLightbox
           photos={galleryPhotos.map((p) => ({
-            url: p.photo_url,
+            url: p.image_url,
           }))}
           initialIndex={lightboxIndex}
           open={true}

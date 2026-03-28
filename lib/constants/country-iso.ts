@@ -249,7 +249,7 @@ export const COUNTRY_TO_ISO: Record<string, string> = {
   "uganda": "UG",
   "ukraine": "UA",
   "united arab emirates": "AE",
-  "united kingdom": "UK",
+  "united kingdom": "GB",
   "united nations": "UN",
   "united states": "US",
   "unknown region": "ZZ",

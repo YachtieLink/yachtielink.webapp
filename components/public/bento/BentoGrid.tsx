@@ -43,7 +43,7 @@ export function BentoGrid({ variant, tiles, gap = 12, accentColor }: BentoGridPr
           display: grid;
           grid-template-areas: ${variant.areas.desktop.split('\n').join(' ')};
           grid-template-columns: repeat(4, 1fr);
-          grid-auto-rows: minmax(120px, auto);
+          grid-auto-rows: 160px;
           gap: ${gap}px;
           width: 100%;
         }
@@ -51,7 +51,12 @@ export function BentoGrid({ variant, tiles, gap = 12, accentColor }: BentoGridPr
           .${scopeClass} {
             grid-template-areas: ${variant.areas.mobile.split('\n').join(' ')};
             grid-template-columns: repeat(2, 1fr);
+            grid-auto-rows: 140px;
           }
+        }
+        .${scopeClass} > div {
+          overflow: hidden;
+          border-radius: 16px;
         }
       `}</style>
       <div

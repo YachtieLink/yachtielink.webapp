@@ -1,9 +1,9 @@
 'use client'
 
 import { useScroll, useTransform, motion } from 'framer-motion'
+import Image from 'next/image'
 import Link from 'next/link'
 import { MapPin, ChevronLeft, Pencil } from 'lucide-react'
-import { PhotoGallery } from '@/components/profile/PhotoGallery'
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { ShareButton } from './ShareButton'
 import { SaveProfileButton } from '@/components/profile/SaveProfileButton'
@@ -62,7 +62,7 @@ export function HeroSection({
   viewModeToggle,
   scrimPreset: scrimPresetKey,
   focalX = 50,
-  focalY = 50,
+  focalY = 30,
 }: HeroSectionProps) {
   const scrim = scrimPresets[scrimPresetKey ?? 'dark']
   const { scrollY } = useScroll()
@@ -76,21 +76,28 @@ export function HeroSection({
       className="relative shrink-0 overflow-hidden"
       style={{ height: heroHeight, marginLeft: marginInline, marginRight: marginInline, borderRadius }}
     >
-      {/* Photo fills this panel */}
-      <div className="relative h-full w-full">
-        <PhotoGallery
-          photos={profilePhotos}
-          profilePhotoUrl={profilePhotoUrl}
-          displayName={displayName}
-          fillContainer
-        />
+      {/* Single hero photo — primary profile photo only */}
+      <div className="absolute inset-0">
+        {(profilePhotoUrl || profilePhotos[0]?.photo_url) ? (
+          <Image
+            src={profilePhotos[0]?.photo_url || profilePhotoUrl!}
+            alt={displayName}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+            style={{ objectPosition: `${focalX}% ${focalY}%` }}
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-500" />
+        )}
       </div>
 
-      {/* Scrim gradient — top (for buttons) and bottom (for identity) */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className={`h-28 bg-gradient-to-b ${scrim.topGradient}`} />
-        <div className={`absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t ${scrim.bottomGradient}`} />
-      </div>
+      {/* Scrim gradient — smooth four-stop: subtle at top, clear in middle, darker at bottom for text */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: scrim.gradient }}
+      />
 
       {/* Top bar — icon-only buttons over photo */}
       <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top,0px),1rem)] z-10">

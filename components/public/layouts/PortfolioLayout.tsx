@@ -10,7 +10,7 @@ import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { MiniBentoGallery } from '../MiniBentoGallery'
 import type {
   PublicAttachment, PublicCertification, PublicEndorsement,
-  ProfilePhoto, Hobby, Education, Skill,
+  GalleryItem, Hobby, Education, Skill,
 } from '@/lib/queries/types'
 
 interface PortfolioLayoutProps {
@@ -30,7 +30,7 @@ interface PortfolioLayoutProps {
   education: Education[]
   skills: Skill[]
   hobbies: Hobby[]
-  profilePhotos: ProfilePhoto[]
+  gallery: GalleryItem[]
   accentColor: string
   handle: string
   isLoggedIn?: boolean
@@ -101,7 +101,7 @@ export function PortfolioLayout({
   education,
   skills,
   hobbies,
-  profilePhotos,
+  gallery,
   accentColor,
   handle,
   isLoggedIn,
@@ -109,9 +109,9 @@ export function PortfolioLayout({
 }: PortfolioLayoutProps) {
   const aboutText = user.ai_summary || user.bio
 
-  // Gallery photos: sort_order > 0 (exclude hero), take first 3
-  const galleryPhotos = profilePhotos
-    .filter((p) => p.sort_order > 0)
+  // Gallery photos from user_gallery (work portfolio), take first 3 for mini bento
+  const galleryPhotos = gallery
+    .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
     .slice(0, 3)
 
   return (
@@ -272,12 +272,12 @@ export function PortfolioLayout({
         <MiniBentoGallery
           photos={galleryPhotos.map((p) => ({
             id: p.id,
-            url: p.photo_url,
-            focal_x: p.focal_x,
-            focal_y: p.focal_y,
+            url: p.image_url,
+            focal_x: 50,
+            focal_y: 50,
           }))}
           handle={handle}
-          totalPhotoCount={profilePhotos.filter((p) => p.sort_order > 0).length}
+          totalPhotoCount={gallery.length}
         />
       )}
 

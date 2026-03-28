@@ -15,7 +15,7 @@ import { ContactRow } from './ContactRow'
 import { ViewModeToggle } from './ViewModeToggle'
 import { PortfolioLayout } from './layouts/PortfolioLayout'
 import { RichPortfolioLayout } from './layouts/RichPortfolioLayout'
-import { isProFromRecord } from '@/lib/stripe/pro'
+import { isProFromRecord } from '@/lib/stripe/pro-shared'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { formatSeaTime } from '@/lib/sea-time'
 import { countryToFlag } from '@/lib/constants/country-iso'
@@ -223,7 +223,7 @@ export function PublicProfileContent({
             education={education}
             skills={skills}
             hobbies={hobbies}
-            profilePhotos={profilePhotos}
+            gallery={gallery}
             seaTimeTotalDays={seaTimeTotalDays}
             accentColor={resolvedAccent[500]}
             handle={user.handle}
@@ -240,7 +240,7 @@ export function PublicProfileContent({
             education={education}
             skills={skills}
             hobbies={hobbies}
-            profilePhotos={profilePhotos}
+            gallery={gallery}
             accentColor={resolvedAccent[500]}
             handle={user.handle}
             isLoggedIn={isLoggedIn}

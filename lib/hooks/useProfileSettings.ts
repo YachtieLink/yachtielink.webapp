@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/components/ui/Toast'
-import { isProFromRecord } from '@/lib/stripe/pro'
+import { isProFromRecord } from '@/lib/stripe/pro-shared'
 
 export interface ProfileSettings {
   phone:            string

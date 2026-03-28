@@ -82,6 +82,7 @@ export type GalleryItem = {
   id: string
   image_url: string
   caption?: string | null
+  sort_order?: number
   yachts?: { name: string } | null
 }
 

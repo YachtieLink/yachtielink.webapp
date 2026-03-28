@@ -1,25 +1,8 @@
 import { createClient } from '@/lib/supabase/server';
+import { isProFromRecord, type ProStatus } from './pro-shared';
 
-export interface ProStatus {
-  isPro: boolean;
-  plan: 'monthly' | 'annual' | null;
-  endsAt: string | null;
-}
-
-/**
- * Pure check for Pro status from an already-fetched user record.
- * Use this when you already have the user row and don't want a second DB query.
- * Canonical logic — matches getProStatus().
- */
-export function isProFromRecord(user: {
-  subscription_status: string | null;
-  subscription_ends_at: string | null;
-}): boolean {
-  return (
-    user.subscription_status === 'pro' &&
-    (!user.subscription_ends_at || new Date(user.subscription_ends_at) > new Date())
-  );
-}
+// Re-export pure helpers so existing server-side `import { isProFromRecord } from '@/lib/stripe/pro'` still works.
+export { isProFromRecord, type ProStatus } from './pro-shared';
 
 /**
  * Returns Pro subscription status for a user.

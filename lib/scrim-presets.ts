@@ -1,7 +1,6 @@
 export const scrimPresets = {
   dark: {
-    topGradient: 'from-black/50 to-transparent',
-    bottomGradient: 'from-transparent to-black/70',
+    gradient: 'linear-gradient(to bottom, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.45) 100%)',
     textColor: 'text-white',
     subtextColor: 'text-white/80',
     textShadow: '0 1px 3px rgba(0,0,0,0.6)',
@@ -9,8 +8,7 @@ export const scrimPresets = {
     variant: 'dark' as const,
   },
   light: {
-    topGradient: 'from-white/50 to-transparent',
-    bottomGradient: 'from-transparent to-white/70',
+    gradient: 'linear-gradient(to bottom, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.5) 100%)',
     textColor: 'text-gray-900',
     subtextColor: 'text-gray-700',
     textShadow: 'none',
@@ -18,8 +16,7 @@ export const scrimPresets = {
     variant: 'light' as const,
   },
   teal: {
-    topGradient: 'from-teal-900/50 to-transparent',
-    bottomGradient: 'from-transparent to-teal-900/70',
+    gradient: 'linear-gradient(to bottom, rgba(19,78,74,0.25) 0%, rgba(19,78,74,0) 30%, rgba(19,78,74,0) 50%, rgba(19,78,74,0.45) 100%)',
     textColor: 'text-white',
     subtextColor: 'text-teal-100',
     textShadow: '0 1px 3px rgba(0,0,0,0.4)',
@@ -27,8 +24,7 @@ export const scrimPresets = {
     variant: 'dark' as const,
   },
   warm: {
-    topGradient: 'from-amber-900/40 to-transparent',
-    bottomGradient: 'from-transparent to-amber-900/60',
+    gradient: 'linear-gradient(to bottom, rgba(120,53,15,0.2) 0%, rgba(120,53,15,0) 30%, rgba(120,53,15,0) 50%, rgba(120,53,15,0.4) 100%)',
     textColor: 'text-white',
     subtextColor: 'text-amber-100',
     textShadow: '0 1px 3px rgba(0,0,0,0.4)',
