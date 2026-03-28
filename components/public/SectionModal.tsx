@@ -7,9 +7,10 @@ interface SectionModalProps {
   open: boolean
   onClose: () => void
   children: React.ReactNode
+  footer?: React.ReactNode
 }
 
-export function SectionModal({ title, open, onClose, children }: SectionModalProps) {
+export function SectionModal({ title, open, onClose, children, footer }: SectionModalProps) {
   if (!open) return null
 
   return (
@@ -32,6 +33,12 @@ export function SectionModal({ title, open, onClose, children }: SectionModalPro
         <div className="flex-1 overflow-y-auto p-5">
           {children}
         </div>
+        {/* Footer — sticky action buttons */}
+        {footer && (
+          <div className="px-5 py-3 border-t border-[var(--color-border-subtle)]">
+            {footer}
+          </div>
+        )}
       </div>
       {/* Click outside to close */}
       <div className="absolute inset-0 -z-10" onClick={onClose} />

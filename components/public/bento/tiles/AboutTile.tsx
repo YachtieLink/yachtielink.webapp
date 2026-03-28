@@ -8,6 +8,8 @@ interface AboutTileProps {
 }
 
 export function AboutTile({ bio }: AboutTileProps) {
+  const isTruncated = bio.length > 200
+
   return (
     <div className="h-full rounded-xl bg-white/80 p-5 flex flex-col">
       <div className="flex items-center gap-2 mb-3">
@@ -17,6 +19,9 @@ export function AboutTile({ bio }: AboutTileProps) {
       <p className="text-sm text-[var(--color-text-primary)] leading-relaxed whitespace-pre-line line-clamp-6 flex-1">
         {bio}
       </p>
+      {isTruncated && (
+        <span className="mt-2 text-xs font-medium text-[var(--accent-500,#14b8a6)]">Read more &rarr;</span>
+      )}
     </div>
   )
 }

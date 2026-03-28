@@ -322,12 +322,12 @@ export function RichPortfolioLayout({
       )}
 
       {/* Section modals — full content overlays */}
-      <SectionModal title="CV Preview" open={activeModal === 'cv'} onClose={() => setActiveModal(null)}>
-        <div className="flex flex-col gap-4 h-full">
-          <div className="flex-1 rounded-xl overflow-hidden bg-gray-100 min-h-0">
-            <iframe src={`/api/cv/public-download/${handle}`} className="w-full h-full border-0" title="CV Preview" />
-          </div>
-          <div className="flex gap-3 shrink-0">
+      <SectionModal
+        title="CV Preview"
+        open={activeModal === 'cv'}
+        onClose={() => setActiveModal(null)}
+        footer={
+          <div className="flex gap-3">
             <a
               href={`/api/cv/public-download/${handle}`}
               download
@@ -344,11 +344,37 @@ export function RichPortfolioLayout({
               Share
             </button>
           </div>
+        }
+      >
+        <div className="h-full rounded-xl overflow-hidden bg-gray-100">
+          <iframe src={`/api/cv/public-download/${handle}`} className="w-full h-full border-0" title="CV Preview" />
         </div>
       </SectionModal>
 
-      <SectionModal title="Contact" open={activeModal === 'contact'} onClose={() => setActiveModal(null)}>
-        <div className="flex flex-col gap-4">
+      <SectionModal
+        title="Contact"
+        open={activeModal === 'contact'}
+        onClose={() => setActiveModal(null)}
+        footer={
+          <div className="flex gap-3">
+            <button
+              onClick={() => { navigator.clipboard.writeText(`https://yachtie.link/u/${handle}`); }}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              <Share2 size={14} />
+              Share Profile
+            </button>
+            <button
+              onClick={() => { navigator.clipboard.writeText(`https://yachtie.link/u/${handle}`); }}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+            >
+              <Copy size={14} />
+              Copy Link
+            </button>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-3">
           {user.show_email !== false && user.email && (
             <a href={`mailto:${user.email}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
               <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><Mail size={18} className="text-[var(--color-text-secondary)]" /></span>
@@ -379,18 +405,6 @@ export function RichPortfolioLayout({
               <ExternalLink size={14} className="text-[var(--color-text-tertiary)]" />
             </a>
           )}
-          <hr className="border-[var(--color-border-subtle)]" />
-          <button
-            onClick={() => { navigator.clipboard.writeText(`https://yachtie.link/u/${handle}`); }}
-            className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors"
-          >
-            <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><Share2 size={18} className="text-[var(--color-text-secondary)]" /></span>
-            <div className="flex-1 min-w-0 text-left">
-              <p className="text-sm font-medium text-[var(--color-text-primary)]">Share Profile</p>
-              <p className="text-xs text-[var(--color-text-secondary)]">Copy profile link</p>
-            </div>
-            <Copy size={14} className="text-[var(--color-text-tertiary)]" />
-          </button>
         </div>
       </SectionModal>
 
