@@ -20,8 +20,8 @@ export default async function OnboardingPage() {
     .eq("id", user!.id)
     .single();
 
-  // Already completed onboarding — skip straight to profile
-  if (profile?.onboarding_complete) redirect("/app/profile");
+  // Already completed onboarding (or has handle — functionally complete) — skip to profile
+  if (profile?.onboarding_complete || profile?.handle) redirect("/app/profile");
 
   return (
     <Wizard
