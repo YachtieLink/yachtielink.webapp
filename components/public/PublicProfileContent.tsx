@@ -229,6 +229,7 @@ export function PublicProfileContent({
             colleagueCount={colleagueCount}
             accentColor={resolvedAccent[500]}
             handle={user.handle}
+            displayName={displayName}
             templateId={user.profile_template ?? 'classic'}
           />
         </div>

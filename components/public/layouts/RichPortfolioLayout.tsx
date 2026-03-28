@@ -58,6 +58,7 @@ interface RichPortfolioLayoutProps {
   colleagueCount: number
   accentColor: string
   handle: string
+  displayName: string
   templateId?: string
 }
 
@@ -74,6 +75,7 @@ export function RichPortfolioLayout({
   colleagueCount,
   accentColor,
   handle,
+  displayName,
   templateId = 'classic',
 }: RichPortfolioLayoutProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
@@ -81,7 +83,6 @@ export function RichPortfolioLayout({
   const [activeModal, setActiveModal] = useState<string | null>(null)
   const [pendingNav, setPendingNav] = useState<{ url: string; label: string } | null>(null)
 
-  const displayName = user.handle // used for "leaving X's profile" message
 
   // Gallery photos from user_gallery (work portfolio, not profile headshots)
   const galleryPhotos = gallery.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
@@ -212,11 +213,13 @@ export function RichPortfolioLayout({
           type: 'stats',
           content: (
             <StatsTile
+              displayName={displayName}
               seaTime={seaTimeFormatted}
               yachtCount={attachments.length}
               certCount={certifications.length}
               endorsementCount={endorsements.length}
               colleagueCount={colleagueCount}
+              onClickSection={setActiveModal}
             />
           ),
         }
