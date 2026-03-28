@@ -72,7 +72,7 @@ export const getUserByHandle = cache(async (handle: string) => {
       home_country, languages, available_for_work,
       smoke_pref, appearance_note, travel_docs, license_info, show_dob, show_home_country,
       subscription_status, subscription_ends_at, subdomain_suspended,
-      profile_view_mode, scrim_preset, accent_color
+      profile_view_mode, scrim_preset, accent_color, profile_template
     `)
     .eq('handle', handle.toLowerCase())
     .single()

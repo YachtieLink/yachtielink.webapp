@@ -83,7 +83,7 @@ One-line: Server-rendered public profile page at `/u/{handle}` with SEO metadata
 
 ## Next Steps
 
-- [ ] Sprint 11c: Rich Portfolio mode — bento grid engine, templates, tiles, Pro gating
+- [x] Sprint 11c: Rich Portfolio mode — bento grid engine, templates, tiles, Pro gating (built, pending merge)
 - [ ] Custom domain support for Pro users (display `handle.yachtie.link` prominently)
 - [ ] PDF template polish (additional templates, layout improvements)
 - [ ] Profile analytics dashboard (view count, referrer breakdown) — Pro feature

@@ -4,6 +4,8 @@ Append-only. Never edit existing entries. Newest at top.
 
 When you make changes to this module, append a one-line entry with date, agent name, and what changed.
 
+**2026-03-28** — Claude Code (Opus 4.6) (Sprint 11c): Added `profile_template` to `getUserByHandle` and `useProfileSettings`. Template picker UI in settings page (Pro only). `FocalPointPicker` component with pointer-capture drag. Focal point PATCH endpoint on `/api/user-photos/[id]`. GET photos now returns `focal_x, focal_y`. `MAX_PHOTOS_PRO` bumped 9→15 in photos page and API. `isProFromRecord()` used in settings hook (drift-check fix). Pro gate restored in settings save for `rich_portfolio`.
+
 **2026-03-28** — Claude Code (Opus 4.6) (Sprint 11b): Added `focal_x`/`focal_y` to `ProfilePhoto` type in `lib/queries/types.ts`. Added `profile_view_mode`, `scrim_preset`, `accent_color` to `getUserByHandle` select in `lib/queries/profile.ts`. These query changes feed the public profile dual-layout system.
 
 **2026-03-28** — Claude Code (Opus 4.6) (Sprint 11a): Public profile rewrite — `PublicProfileContent` refactored to single-column editorial layout (680px). `ProfileAccordion` gains `icon` prop. Section components gain `sectionColor` tokens. `EndorsementsSection` gates "See all" on count > 3. Display settings foundation: `useProfileSettings` typed with union types, settings page gains View Mode/Scrim/Accent selectors. Schema migration adds `accent_color`, `scrim_preset`, `profile_view_mode` to users, `focal_x`/`focal_y` to `user_photos` with CHECK constraints. `CvActions` removes regenerate pattern, adds `hasGeneratedPdf` tracking. `displaySettingsSchema` added to validation. Middleware subdomain logic simplified.

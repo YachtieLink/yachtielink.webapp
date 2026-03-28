@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useToast } from '@/components/ui/Toast'
+import { isProFromRecord } from '@/lib/stripe/pro'
 
 export interface ProfileSettings {
   phone:            string
@@ -26,6 +27,7 @@ export interface ProfileSettings {
   profile_view_mode: 'profile' | 'portfolio' | 'rich_portfolio'
   scrim_preset:      'dark' | 'light' | 'teal' | 'warm'
   accent_color:      'teal' | 'coral' | 'navy' | 'amber' | 'sand'
+  profile_template:  'classic' | 'bold'
 }
 
 const DEFAULT_SETTINGS: ProfileSettings = {
@@ -34,9 +36,10 @@ const DEFAULT_SETTINGS: ProfileSettings = {
   dob: '', home_country: '', smoke_pref: '', appearance_note: '',
   travel_docs: [], license_info: '', show_dob: false, show_home_country: false,
   profile_view_mode: 'portfolio', scrim_preset: 'dark', accent_color: 'teal',
+  profile_template: 'classic',
 }
 
-const SETTINGS_COLUMNS = 'phone, whatsapp, email, location_country, location_city, show_phone, show_whatsapp, show_email, show_location, dob, home_country, smoke_pref, appearance_note, travel_docs, license_info, show_dob, show_home_country, profile_view_mode, scrim_preset, accent_color'
+const SETTINGS_COLUMNS = 'phone, whatsapp, email, location_country, location_city, show_phone, show_whatsapp, show_email, show_location, dob, home_country, smoke_pref, appearance_note, travel_docs, license_info, show_dob, show_home_country, profile_view_mode, scrim_preset, accent_color, profile_template'
 
 export function useProfileSettings() {
   const router = useRouter()
@@ -44,6 +47,7 @@ export function useProfileSettings() {
   const supabase = useMemo(() => createClient(), [])
   const [loaded, setLoaded] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [isPro, setIsPro] = useState(false)
   const [form, setForm] = useState<ProfileSettings>(DEFAULT_SETTINGS)
 
   useEffect(() => {
@@ -52,9 +56,15 @@ export function useProfileSettings() {
       if (!user) { setLoaded(true); return }
       const { data } = await supabase
         .from('users')
-        .select(SETTINGS_COLUMNS)
+        .select(`${SETTINGS_COLUMNS}, subscription_status, subscription_ends_at`)
         .eq('id', user.id)
         .single()
+      if (data) {
+        setIsPro(isProFromRecord({
+          subscription_status: data.subscription_status ?? null,
+          subscription_ends_at: data.subscription_ends_at ?? null,
+        }))
+      }
       if (data) {
         setForm({
           phone:             data.phone             ?? '',
@@ -77,6 +87,7 @@ export function useProfileSettings() {
           profile_view_mode: data.profile_view_mode  ?? 'portfolio',
           scrim_preset:      data.scrim_preset       ?? 'dark',
           accent_color:      data.accent_color       ?? 'teal',
+          profile_template:  data.profile_template   ?? 'classic',
         })
       }
       setLoaded(true)
@@ -113,9 +124,10 @@ export function useProfileSettings() {
           license_info:      form.license_info.trim()       || null,
           show_dob:          form.show_dob,
           show_home_country: form.show_home_country,
-          profile_view_mode: form.profile_view_mode === 'rich_portfolio' ? 'portfolio' : form.profile_view_mode,
+          profile_view_mode: form.profile_view_mode === 'rich_portfolio' && !isPro ? 'portfolio' : form.profile_view_mode,
           scrim_preset:      form.scrim_preset,
           accent_color:      form.accent_color,
+          profile_template:  form.profile_template,
         })
         .eq('id', user.id)
 
@@ -128,5 +140,5 @@ export function useProfileSettings() {
     }
   }
 
-  return { form, set, save, loaded, saving }
+  return { form, set, save, loaded, saving, isPro }
 }

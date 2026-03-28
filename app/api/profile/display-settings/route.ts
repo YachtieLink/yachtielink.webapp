@@ -13,7 +13,7 @@ export async function GET() {
 
     const { data, error } = await supabase
       .from('users')
-      .select('profile_view_mode, scrim_preset, accent_color')
+      .select('profile_view_mode, scrim_preset, accent_color, profile_template')
       .eq('id', user.id)
       .single()
 

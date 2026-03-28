@@ -14,6 +14,8 @@ import { HeroSection } from './HeroSection'
 import { ContactRow } from './ContactRow'
 import { ViewModeToggle } from './ViewModeToggle'
 import { PortfolioLayout } from './layouts/PortfolioLayout'
+import { RichPortfolioLayout } from './layouts/RichPortfolioLayout'
+import { isProFromRecord } from '@/lib/stripe/pro'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { formatSeaTime } from '@/lib/sea-time'
 import { countryToFlag } from '@/lib/constants/country-iso'
@@ -65,6 +67,9 @@ interface UserProfile {
   profile_view_mode?: 'profile' | 'portfolio' | 'rich_portfolio'
   scrim_preset?: 'dark' | 'light' | 'teal' | 'warm'
   accent_color?: string
+  profile_template?: string
+  subscription_status?: string | null
+  subscription_ends_at?: string | null
 }
 
 export interface PublicProfileContentProps {
@@ -114,7 +119,13 @@ export function PublicProfileContent({
   seaTimeYachtCount = 0,
   age,
 }: PublicProfileContentProps) {
-  const ownerDefault = user.profile_view_mode ?? 'portfolio'
+  // Pro fallback: rich_portfolio requires Pro subscription
+  const isPro = isProFromRecord({
+    subscription_status: user.subscription_status ?? null,
+    subscription_ends_at: user.subscription_ends_at ?? null,
+  })
+  const rawDefault = user.profile_view_mode ?? 'portfolio'
+  const ownerDefault = rawDefault === 'rich_portfolio' && !isPro ? 'portfolio' : rawDefault
   const [activeMode, setActiveMode] = useState<'profile' | 'portfolio' | 'rich_portfolio'>(ownerDefault)
 
   // Resolve accent color — fall back to teal for unknown values
@@ -202,7 +213,24 @@ export function PublicProfileContent({
       />
 
       {/* ── Content — switches based on active view mode ─────────────── */}
-      {activeMode === 'portfolio' || activeMode === 'rich_portfolio' ? (
+      {activeMode === 'rich_portfolio' ? (
+        <div className="flex-1">
+          <RichPortfolioLayout
+            user={user}
+            attachments={attachments}
+            certifications={certifications}
+            endorsements={endorsements}
+            education={education}
+            skills={skills}
+            hobbies={hobbies}
+            profilePhotos={profilePhotos}
+            seaTimeTotalDays={seaTimeTotalDays}
+            accentColor={resolvedAccent[500]}
+            handle={user.handle}
+            templateId={user.profile_template ?? 'classic'}
+          />
+        </div>
+      ) : activeMode === 'portfolio' ? (
         <div className="flex-1">
           <PortfolioLayout
             user={user}

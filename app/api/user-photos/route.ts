@@ -6,7 +6,7 @@ import { handleApiError } from '@/lib/api/errors'
 import { trackServerEvent } from '@/lib/analytics/server'
 
 const FREE_LIMIT = 3
-const PRO_LIMIT = 9
+const PRO_LIMIT = 15
 
 export async function GET() {
   try {
@@ -16,7 +16,7 @@ export async function GET() {
 
     const { data } = await supabase
       .from('user_photos')
-      .select('id, photo_url, sort_order, created_at')
+      .select('id, photo_url, sort_order, focal_x, focal_y, created_at')
       .eq('user_id', user.id)
       .order('sort_order')
 

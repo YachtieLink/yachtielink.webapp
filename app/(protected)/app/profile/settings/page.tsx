@@ -62,7 +62,7 @@ function ToggleRow({
 
 export default function ProfileSettingsPage() {
   const router = useRouter()
-  const { form, set, save, loaded, saving } = useProfileSettings()
+  const { form, set, save, loaded, saving, isPro } = useProfileSettings()
 
   if (!loaded) {
     return (
@@ -197,7 +197,7 @@ export default function ProfileSettingsPage() {
             {([
               { id: 'profile', label: 'Profile', enabled: true },
               { id: 'portfolio', label: 'Portfolio', enabled: true },
-              { id: 'rich_portfolio', label: 'Rich Portfolio', enabled: false },
+              { id: 'rich_portfolio', label: 'Rich Portfolio', enabled: isPro },
             ] as const).map((mode) => (
               <button
                 key={mode.id}
@@ -262,6 +262,32 @@ export default function ProfileSettingsPage() {
             ))}
           </div>
         </div>
+
+        {/* Template selector — only visible for rich_portfolio */}
+        {form.profile_view_mode === 'rich_portfolio' && (
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-medium text-[var(--color-text-primary)]">Portfolio Template</p>
+            <div className="flex gap-2">
+              {([
+                { id: 'classic', label: 'Classic', desc: 'Balanced, editorial' },
+                { id: 'bold', label: 'Bold', desc: 'Photo-forward, dramatic' },
+              ] as const).map((tpl) => (
+                <button
+                  key={tpl.id}
+                  onClick={() => set('profile_template', tpl.id)}
+                  className={`flex-1 rounded-lg border p-3 text-center transition-colors ${
+                    form.profile_template === tpl.id
+                      ? 'border-[var(--color-interactive)] border-2 bg-[var(--color-surface)]'
+                      : 'border-[var(--color-border)] hover:bg-[var(--color-surface-raised)] cursor-pointer'
+                  }`}
+                >
+                  <p className="text-sm font-medium text-[var(--color-text-primary)]">{tpl.label}</p>
+                  <p className="text-[10px] text-[var(--color-text-tertiary)]">{tpl.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Save */}

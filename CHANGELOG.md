@@ -22,6 +22,43 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-28 — Claude Code (Opus 4.6) — Sprint 11c Build + Review (Overnight)
+
+### Done
+
+- **Sprint 11c built:** Rich Portfolio Mode (Pro) — bento grid engine, 2 templates (Classic/Bold) with 3 density variants each, 12 tile components, layout assembly with density auto-detection, template selection settings, focal point picker, photo limit bump (9→15), Pro gating.
+- **Bento grid engine:** `BentoGrid` component renders CSS Grid with `grid-template-areas` (responsive via scoped `<style>` with media query). `lib/bento/types.ts` defines template/slot/tile interfaces. `lib/bento/density.ts` auto-detects full/medium/minimal variant.
+- **Templates:** Classic (balanced editorial) and Bold (photo-forward dramatic) — each with full/medium/minimal desktop+mobile grid layouts.
+- **Tile components (12):** PhotoTile, AboutTile, ExperienceTile, EndorsementsTile, CertsTile, ContactTile, CvTile, StatsTile, EducationTile, SkillsTile, MorePhotosTile. All self-contained with proper type imports.
+- **RichPortfolioLayout:** Orchestrator mapping user data → density → template variant → tiles → BentoGrid. Empty sections collapse (null tiles), orphaned grid areas filled with invisible spacers.
+- **PublicProfileContent:** Three-way layout branching (profile/portfolio/rich_portfolio). Pro fallback via `isProFromRecord()`.
+- **Template selection:** Settings page shows Classic/Bold picker when `profile_view_mode === 'rich_portfolio'`. Display settings API extended for `profile_template`. Schema migration adds column with CHECK constraint.
+- **Focal point picker:** `FocalPointPicker` with pointer-capture drag, crosshair indicator, and hero crop preview. Integrated into photos page as modal. New PATCH endpoint on `/api/user-photos/[id]`.
+- **Photo limit bump:** `MAX_PHOTOS_PRO` 9→15 in both client (photos page) and server (API route).
+- **Pro gating:** Rich Portfolio radio enabled for Pro users in settings. Client-side save coerces `rich_portfolio` → `portfolio` for non-Pro. Server-side check in display-settings PATCH. View mode toggle labels adapt based on `ownerDefault`.
+- **Review findings fixed:** CRITICAL Pro gate restored in settings save, HIGH orphaned grid areas handled via spacer divs, HIGH stats tile null guard added, MEDIUM mobile `more` area check, LOW pointercancel handler.
+
+### Context
+
+- Branch: `sprint-11c/rich-portfolio` — ~30 new + ~10 modified files, ready to commit
+- Overnight session — autonomous execution per founder instruction
+- Sprint 11a committed (`30f89ca`), Sprint 11b committed (`f116427`)
+- All three 11a/b/c builds complete. Founder morning review needed.
+
+### Next
+
+1. **Commit Sprint 11c** (no push)
+2. **Morning: founder review** — visual QA of all 3 sprints, merge PRs
+
+### Flags
+
+- ⚠️ Test-yl ran without preview browser tools — code-path verification only. Rich Portfolio bento needs visual QA.
+- ⚠️ Migration `20260328000003_sprint11c_profile_template.sql` needs `supabase db push`.
+- ⚠️ Photo limit bump (9→15) is consistent client+server but `LOW: magic numbers not shared` — could extract to shared constant later.
+- ⚠️ Empty grid areas render invisible spacer divs — acceptable for launch but grid-area removal approach would be more elegant.
+
+---
+
 ## 2026-03-28 — Claude Code (Opus 4.6) — Sprint 11b Build + Review (Overnight)
 
 ### Done
