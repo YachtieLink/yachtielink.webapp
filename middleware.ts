@@ -15,6 +15,11 @@ function withCookies(target: NextResponse, source: NextResponse): NextResponse {
   return target
 }
 
+/** Routes that skip getUser() to avoid unnecessary token refresh.
+ * Prevents rate-limit loops when stale sessions trigger repeated POST /token.
+ * Auth-only routes (login/signup) handle logged-in redirects client-side. */
+const SKIP_AUTH_PREFIXES = ['/u/', '/invite-only', '/api/public', '/welcome', '/login', '/signup', '/reset-password']
+
 export async function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? ''
   const isSubdomain =
@@ -22,23 +27,28 @@ export async function middleware(request: NextRequest) {
     host !== 'yachtie.link' &&
     host !== 'www.yachtie.link'
 
-  // ── Supabase auth (cookie refresh) — runs for ALL requests ───────────
-  // Must run before subdomain rewrite so expired cookies get refreshed
-  // and the subdomain page can identify the viewer.
-  // NOTE: `auth` uses a getter — always reads the latest response after
-  // Supabase's setAll has fired (see lib/supabase/middleware.ts).
+  const { pathname } = request.nextUrl
+
+  // ── Supabase auth (cookie refresh) ─────────────────────────────────
+  // Only call getUser() when we actually need auth state.
+  // Skipping on public routes avoids unnecessary token refresh attempts
+  // which can cause rate-limit loops with stale sessions.
   const auth = createMiddlewareClient(request)
-  const {
-    data: { user },
-  } = await auth.supabase.auth.getUser()
+  const needsAuth = !SKIP_AUTH_PREFIXES.some((p) => pathname.startsWith(p)) ||
+    PROTECTED_PREFIXES.some((p) => pathname.startsWith(p)) ||
+    pathname === '/'
+
+  let user: { id: string } | null = null
+  if (needsAuth) {
+    const { data } = await auth.supabase.auth.getUser()
+    user = data.user
+  }
 
   // ── Subdomain detection ──────────────────────────────────────────────
   // {handle}.yachtie.link → rewrite to /subdomain/{handle}
   if (isSubdomain) {
     const subdomain = host.split('.yachtie.link')[0]
     if (!subdomain) return auth.response // guard against malformed host
-
-    const { pathname } = request.nextUrl
 
     // Root path → rewrite to subdomain profile page
     if (pathname === '/' || pathname === '') {
@@ -69,7 +79,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── Route protection ─────────────────────────────────────────────────
-  const { pathname, searchParams } = request.nextUrl
+  const { searchParams } = request.nextUrl
 
   // Redirect authenticated users from root to their profile
   if (user && pathname === '/') {
