@@ -1,6 +1,7 @@
 'use client'
 
-import { Mail, Phone, MessageSquare } from 'lucide-react'
+import { Mail, Phone } from 'lucide-react'
+import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 
 interface ContactTileProps {
   email?: string | null
@@ -22,7 +23,7 @@ export function ContactTile({ email, phone, whatsapp, showEmail, showPhone, show
   }
   if (showWhatsapp !== false && whatsapp) {
     const clean = whatsapp.replace(/\D/g, '')
-    items.push({ icon: <MessageSquare size={16} />, label: 'WhatsApp', href: `https://wa.me/${clean}` })
+    items.push({ icon: <WhatsAppIcon size={16} />, label: 'WhatsApp', href: `https://wa.me/${clean}` })
   }
 
   if (items.length === 0) return null

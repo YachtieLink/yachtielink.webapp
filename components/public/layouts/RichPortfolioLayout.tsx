@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { X, Mail, Phone, MessageSquare, Copy, Share2, ExternalLink, FileText } from 'lucide-react'
+import { X, Mail, Phone, Copy, Share2, ExternalLink, FileText } from 'lucide-react'
+import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
 import { BentoGrid } from '../bento/BentoGrid'
 import { SectionModal } from '../SectionModal'
 import { PhotoTile } from '../bento/tiles/PhotoTile'
@@ -273,7 +274,7 @@ export function RichPortfolioLayout({
               )}
               {user.show_whatsapp !== false && user.whatsapp && (
                 <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">
-                  <MessageSquare size={18} />
+                  <WhatsAppIcon size={18} />
                 </span>
               )}
             </button>
@@ -452,7 +453,7 @@ export function RichPortfolioLayout({
           )}
           {user.show_whatsapp !== false && user.whatsapp && (
             <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
-              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><MessageSquare size={18} className="text-[var(--color-text-secondary)]" /></span>
+              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><WhatsAppIcon size={18} className="text-[var(--color-text-secondary)]" /></span>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-[var(--color-text-primary)]">WhatsApp</p>
                 <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.whatsapp}</p>
