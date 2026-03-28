@@ -29,7 +29,7 @@ export function ContactTile({ email, phone, whatsapp, showEmail, showPhone, show
   if (items.length === 0) return null
 
   return (
-    <div className="h-full rounded-xl bg-white/80 p-4 flex flex-col justify-center gap-2.5">
+    <div className="h-full rounded-xl bg-[var(--color-sand-100)]/30 p-4 flex flex-col justify-center gap-2.5">
       {items.map((item) => (
         <a
           key={item.label}

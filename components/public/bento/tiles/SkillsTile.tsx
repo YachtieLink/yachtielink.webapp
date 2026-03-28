@@ -8,7 +8,7 @@ interface SkillsTileProps {
 
 export function SkillsTile({ skills }: SkillsTileProps) {
   return (
-    <div className="h-full rounded-xl bg-white/80 p-5 flex flex-col">
+    <div className="h-full rounded-xl bg-[var(--color-teal-50)]/30 p-5 flex flex-col">
       <div className="flex items-center gap-2 mb-3">
         <Wrench size={14} className="text-[var(--color-text-tertiary)]" />
         <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">Skills</span>

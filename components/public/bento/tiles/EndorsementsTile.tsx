@@ -43,7 +43,7 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
   const yachtName = current.yacht?.name
 
   return (
-    <div className="h-full rounded-xl bg-white/80 p-5 flex flex-col justify-between" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+    <div className="h-full rounded-xl bg-[var(--color-coral-50)]/50 p-5 flex flex-col justify-between" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
         <MessageSquareQuote size={14} className="text-[#F08080]" />
