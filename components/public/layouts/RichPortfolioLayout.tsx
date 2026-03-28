@@ -270,9 +270,9 @@ export function RichPortfolioLayout({
         </div>
       )}
 
-      {/* Gallery modal — full photo grid overlay */}
+      {/* Gallery modal — full photo grid overlay (z-40, below lightbox z-50) */}
       {showGalleryModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center overflow-y-auto">
+        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-start justify-center overflow-y-auto">
           <div className="relative w-full max-w-[960px] mx-4 my-8 bg-[var(--color-surface)] rounded-2xl overflow-hidden">
             {/* Header */}
             <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-[var(--color-surface)] border-b border-[var(--color-border-subtle)]">
@@ -292,10 +292,7 @@ export function RichPortfolioLayout({
               {galleryPhotos.map((photo, i) => (
                 <button
                   key={photo.id}
-                  onClick={() => {
-                    setShowGalleryModal(false)
-                    setLightboxIndex(i)
-                  }}
+                  onClick={() => setLightboxIndex(i)}
                   className="aspect-square rounded-xl overflow-hidden group cursor-pointer"
                 >
                   <img
