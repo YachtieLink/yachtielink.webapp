@@ -9,22 +9,23 @@ export function detectDensity(data: {
   educationCount: number
   hasSkills: boolean
 }): BentoDensity {
-  const { photoCount, hasAbout, experienceCount, certCount, endorsementCount, educationCount, hasSkills } = data
+  const { photoCount, experienceCount, certCount, endorsementCount, educationCount, hasSkills, hasAbout } = data
 
-  // Full: 6+ photos AND rich content
-  if (photoCount >= 6 && experienceCount >= 3 && endorsementCount >= 2 && certCount >= 3) {
-    return 'full'
-  }
-
-  // Medium: moderate photos OR moderate content
+  // Full: enough photos to fill the bento AND some content
   const populatedSections = [
     endorsementCount >= 1,
     certCount >= 1,
     educationCount >= 1,
     hasSkills,
     hasAbout,
+    experienceCount >= 1,
   ].filter(Boolean).length
 
+  if (photoCount >= 4 && populatedSections >= 3) {
+    return 'full'
+  }
+
+  // Medium: some photos or moderate content
   if (photoCount >= 2 || (experienceCount >= 1 && populatedSections >= 2)) {
     return 'medium'
   }
