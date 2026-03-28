@@ -187,12 +187,12 @@ export function HeroSection({
       {(isColleague || (showMutual && firstMutualName)) && (
         <div className="absolute top-16 left-4 z-10 flex flex-col gap-1.5">
           {isColleague && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-teal-400/20 backdrop-blur-sm border border-teal-400/30 px-2.5 py-0.5 text-[10px] font-medium text-teal-300">
-              🤝 Colleague
+            <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-medium text-white/90" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+              Colleague
             </span>
           )}
           {showMutual && firstMutualName && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 px-2.5 py-0.5 text-[10px] font-medium text-white/70">
+            <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-medium text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
               via {firstMutualName}
             </span>
           )}
