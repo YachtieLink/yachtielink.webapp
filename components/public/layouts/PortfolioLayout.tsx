@@ -158,24 +158,47 @@ export function PortfolioLayout({
       {/* Endorsements */}
       {sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) && (
         <SectionCard title="Endorsements" icon={<MessageSquareQuote size={16} />} accentColor="#f97066">
-          <div className="flex flex-col gap-3">
-            {endorsements.slice(0, 3).map((end) => (
-              <div key={end.id} className="border-l-2 border-[var(--color-border)] pl-3">
-                <p className="text-sm text-[var(--color-text-primary)] italic line-clamp-3">
-                  &ldquo;{end.content}&rdquo;
-                </p>
-                <p className="text-xs text-[var(--color-text-secondary)] mt-1">
-                  — {end.endorser?.display_name || end.endorser?.full_name || 'Anonymous'}
-                  {end.yacht?.name && <span className="text-[var(--color-text-tertiary)]"> on {end.yacht.name}</span>}
-                </p>
-              </div>
-            ))}
+          <div className="flex flex-col gap-4">
+            {endorsements.slice(0, 3).map((end) => {
+              const endorserName = end.endorser?.display_name || end.endorser?.full_name || 'Anonymous'
+              const endorserHandle = end.endorser?.handle
+              return (
+                <div key={end.id}>
+                  <p className="text-sm text-[var(--color-text-primary)] italic line-clamp-3">
+                    &ldquo;{end.content}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-2 mt-2">
+                    {end.endorser?.profile_photo_url ? (
+                      <img src={end.endorser.profile_photo_url} alt={endorserName} className="w-6 h-6 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">
+                        {endorserName.charAt(0)}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      {endorserHandle ? (
+                        <a href={`/u/${endorserHandle}`} className="text-xs font-medium text-[var(--color-text-primary)] hover:underline truncate block">
+                          {endorserName}
+                        </a>
+                      ) : (
+                        <span className="text-xs font-medium text-[var(--color-text-primary)] truncate block">{endorserName}</span>
+                      )}
+                      {(end.endorser_role_label || end.yacht?.name) && (
+                        <p className="text-[10px] text-[var(--color-text-secondary)] truncate">
+                          {end.endorser_role_label}{end.endorser_role_label && end.yacht?.name ? ' · ' : ''}{end.yacht?.name}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
           <Link
             href={`/u/${handle}/endorsements`}
             className="mt-3 block text-xs font-medium text-[var(--accent-500,var(--color-interactive))] hover:underline"
           >
-            See all {endorsements.length} endorsements &rarr;
+            See all {endorsements.length} {endorsements.length === 1 ? 'endorsement' : 'endorsements'} &rarr;
           </Link>
         </SectionCard>
       )}

@@ -173,7 +173,11 @@ export function RichPortfolioLayout({
           type: 'certifications',
           content: <CertsTile certifications={certifications} handle={handle} />,
         }
-      case 'contact':
+      case 'contact': {
+        const hasContact = (user.show_email !== false && user.email) ||
+          (user.show_phone !== false && user.phone) ||
+          (user.show_whatsapp !== false && user.whatsapp)
+        if (!hasContact) return null
         return {
           areaName: slot.areaName,
           type: 'contact',
@@ -188,6 +192,7 @@ export function RichPortfolioLayout({
             />
           ),
         }
+      }
       case 'cv':
         if (!hasCv) return null
         return {

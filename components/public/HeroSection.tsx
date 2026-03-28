@@ -66,9 +66,9 @@ export function HeroSection({
 }: HeroSectionProps) {
   const scrim = scrimPresets[scrimPresetKey ?? 'dark']
   const { scrollY } = useScroll()
-  const heroHeight = useTransform(scrollY, [0, 200], ['70vh', '40vh'])
-  const marginInline = useTransform(scrollY, [0, 200], ['0px', '16px'])
-  const borderRadius = useTransform(scrollY, [0, 200], ['0px', '16px'])
+  const heroHeight = useTransform(scrollY, [0, 200], ['70vh', '50vh'])
+  const marginInline = useTransform(scrollY, [0, 200], ['12px', '16px'])
+  const borderRadius = useTransform(scrollY, [0, 200], ['20px', '16px'])
 
   return (
     // Animated hero — renders on all breakpoints (single-column layout)
@@ -143,8 +143,11 @@ export function HeroSection({
         )}
 
         {/* Name — large, confident, serif */}
-        <h1 className={`${scrim.textColor} font-serif text-4xl leading-[1.1] tracking-tight`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
-          {displayName}{homeCountryFlag ? <span className="ml-2 text-3xl align-middle">{homeCountryFlag}</span> : null}
+        <h1 className={`${scrim.textColor} font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
+          <span className="inline-flex items-baseline gap-2 flex-wrap">
+            <span>{displayName}</span>
+            {homeCountryFlag && <span className="text-2xl sm:text-3xl">{homeCountryFlag}</span>}
+          </span>
         </h1>
 
         {/* Role + Department — unified line */}

@@ -42,7 +42,7 @@ export function EndorsementsSection({ endorsements, mutualEndorserCount, handle 
             href={`/u/${handle}/endorsements`}
             className="mt-3 block text-sm font-medium text-[var(--color-interactive)] hover:underline"
           >
-            See all {endorsements.length} endorsements
+            See all {endorsements.length} {endorsements.length === 1 ? 'endorsement' : 'endorsements'}
           </Link>
         )}
       </ProfileAccordion>
