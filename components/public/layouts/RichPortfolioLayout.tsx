@@ -127,12 +127,13 @@ export function RichPortfolioLayout({
         return {
           areaName: slot.areaName,
           type: 'photo',
+          onClick: () => setShowGalleryModal(true),
           content: (
             <PhotoTile
               url={photo.image_url}
               focalX={50}
               focalY={50}
-              onClick={() => setLightboxIndex(currentPhotoIndex)}
+              onClick={() => setShowGalleryModal(true)}
             />
           ),
         }
