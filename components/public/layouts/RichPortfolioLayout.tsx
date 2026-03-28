@@ -179,7 +179,6 @@ export function RichPortfolioLayout({
               showEmail={user.show_email}
               showPhone={user.show_phone}
               showWhatsapp={user.show_whatsapp}
-              availableForWork={user.available_for_work}
             />
           ),
         }

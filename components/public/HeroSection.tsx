@@ -134,8 +134,11 @@ export function HeroSection({
 
       {/* Identity — overlaid at bottom-left, stacked vertically */}
       <div className="absolute bottom-14 left-0 right-0 px-5 z-10 flex flex-col gap-1.5">
-        <h1 className={`${scrim.textColor} font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
-          {displayName}{homeCountryFlag ? <span className="ml-2 text-2xl sm:text-3xl align-middle">{homeCountryFlag}</span> : null}
+        <h1 className={`${scrim.textColor} font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight flex items-center gap-2`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
+          {availableForWork && (
+            <span className="w-3 h-3 rounded-full bg-green-400 animate-pulse shrink-0" style={{ boxShadow: '0 0 8px rgba(74,222,128,0.6), 0 0 20px rgba(74,222,128,0.3)' }} title="Available for work" />
+          )}
+          <span>{displayName}{homeCountryFlag ? <span className="ml-2 text-2xl sm:text-3xl align-middle">{homeCountryFlag}</span> : null}</span>
         </h1>
         {primaryRole && (
           <p className={`${scrim.subtextColor} text-sm font-medium`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 6px rgba(0,0,0,0.5)' }}>

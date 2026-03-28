@@ -10,6 +10,11 @@ export interface BentoTemplateVariant {
     desktop: string
     mobile: string
   }
+  /** Optional explicit row sizes (CSS grid-template-rows). Falls back to grid-auto-rows if not set. */
+  rowSizes?: {
+    desktop?: string
+    mobile?: string
+  }
 }
 
 export interface BentoTemplate {
