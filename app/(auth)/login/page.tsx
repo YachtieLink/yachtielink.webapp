@@ -37,11 +37,9 @@ export default function LoginPage() {
       return;
     }
 
-    // Hard navigation ensures cookies from signInWithPassword are sent
-    // with the request. router.push() + router.refresh() can race —
-    // the server sees stale cookies and redirects back to /login.
     const destination = returnTo && returnTo.startsWith("/") ? returnTo : "/app/profile";
-    window.location.href = destination;
+    router.push(destination);
+    router.refresh();
   }
 
   return (

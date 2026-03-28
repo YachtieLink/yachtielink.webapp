@@ -17,8 +17,8 @@ function withCookies(target: NextResponse, source: NextResponse): NextResponse {
 
 /** Routes that skip getUser() to avoid unnecessary token refresh.
  * Prevents rate-limit loops when stale sessions trigger repeated POST /token.
- * Auth-only routes (login/signup) handle logged-in redirects client-side. */
-const SKIP_AUTH_PREFIXES = ['/u/', '/invite-only', '/api/public', '/welcome', '/login', '/signup', '/reset-password']
+ * Auth-only routes still need getUser() to redirect logged-in users away. */
+const SKIP_AUTH_PREFIXES = ['/u/', '/invite-only', '/api/public']
 
 export async function middleware(request: NextRequest) {
   const host = request.headers.get('host') ?? ''
@@ -36,6 +36,7 @@ export async function middleware(request: NextRequest) {
   const auth = createMiddlewareClient(request)
   const needsAuth = !SKIP_AUTH_PREFIXES.some((p) => pathname.startsWith(p)) ||
     PROTECTED_PREFIXES.some((p) => pathname.startsWith(p)) ||
+    AUTH_ONLY_PREFIXES.some((p) => pathname.startsWith(p)) ||
     pathname === '/'
 
   let user: { id: string } | null = null
