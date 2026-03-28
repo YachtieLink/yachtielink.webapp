@@ -140,7 +140,7 @@ export function HeroSection({
         {primaryRole && (
           <p className={`${scrim.subtextColor} text-sm font-medium flex items-center gap-1.5`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 6px rgba(0,0,0,0.5)' }}>
             {availableForWork && (
-              <span className="w-2 h-2 rounded-full bg-green-400 shrink-0" style={{ boxShadow: '0 0 4px rgba(74,222,128,0.4)' }} title="Available for work" />
+              <span className="w-2 h-2 rounded-full bg-green-400/75 shrink-0" style={{ boxShadow: '0 0 4px rgba(74,222,128,0.3)' }} title="Available for work" />
             )}
             {primaryRole}
           </p>
