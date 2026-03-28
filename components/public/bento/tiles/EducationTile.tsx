@@ -14,7 +14,7 @@ export function EducationTile({ education, handle }: EducationTileProps) {
   const remaining = education.length - shown.length
 
   return (
-    <div className="h-full rounded-xl bg-[var(--color-navy-50)]/50 p-5 flex flex-col">
+    <div className="h-full rounded-xl bg-[var(--color-navy-50)]/75 p-5 flex flex-col">
       <div className="flex items-center gap-2 mb-3">
         <GraduationCap size={14} className="text-[var(--color-text-tertiary)]" />
         <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">Education</span>
