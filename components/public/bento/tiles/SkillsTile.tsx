@@ -15,7 +15,7 @@ export function SkillsTile({ skills }: SkillsTileProps) {
       </div>
       <div className="flex flex-wrap gap-1.5 flex-1">
         {skills.map((s) => (
-          <span key={s} className="text-xs px-2.5 py-1 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]">
+          <span key={s} className="text-xs px-2.5 py-1 rounded-full bg-white/40 text-[var(--color-text-primary)] border border-[var(--color-border-subtle)]">
             {s}
           </span>
         ))}
