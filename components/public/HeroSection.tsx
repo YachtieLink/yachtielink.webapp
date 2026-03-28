@@ -162,21 +162,25 @@ export function HeroSection({
             <MapPin size={12} />{location}
           </p>
         )}
-        {isPro && (
-          <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/90 self-start" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-            Pro
-          </span>
-        )}
       </div>
 
-      {/* Bottom-right: view mode toggle + social links (subtle) */}
-      <div className="absolute bottom-3 right-4 z-10 flex items-center gap-2">
-        {/* Social links */}
-        {socialLinks && socialLinks.length > 0 && (
-          <SocialLinksRow links={socialLinks as any} variant="light" />
-        )}
-        {/* View mode toggle — compact */}
-        {viewModeToggle}
+      {/* Bottom bar: Pro badge left, toggle + social links right */}
+      <div className="absolute bottom-3 left-5 right-4 z-10 flex items-center justify-between">
+        {/* Pro badge — left */}
+        <div>
+          {isPro && (
+            <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/90" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+              Pro
+            </span>
+          )}
+        </div>
+        {/* Social links + toggle — right */}
+        <div className="flex items-center gap-2">
+          {socialLinks && socialLinks.length > 0 && (
+            <SocialLinksRow links={socialLinks as any} variant="light" />
+          )}
+          {viewModeToggle}
+        </div>
       </div>
 
       {/* Badges — Pro, colleague, mutual (top-left below back button) */}
