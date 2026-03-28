@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-28 (Sprint 11c QA + interactive polish with founder. ~40 fixes. Branch pushed. Profile tab next.)
+**Last updated:** 2026-03-28 (Sprint 11 full QA complete. 112 commits on branch. Build + type-check clean. Ready to merge.)
 
 ---
 
@@ -18,14 +18,13 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 |--------|-------|--------|-------|
 | [Sprint 11a](./sprints/major/phase-1b/sprint-11/build_plan_11a.md) | 1B | ✅ Committed (`30f89ca`) | Public Profile Rewrite — Profile mode fixes + schema foundation |
 | [Sprint 11b](./sprints/major/phase-1b/sprint-11/build_plan_11b.md) | 1B | ✅ Committed (`f116427`) | Public Profile Rewrite — Portfolio mode |
-| [Sprint 11c](./sprints/major/phase-1b/sprint-11/build_plan_11c.md) | 1B | ✅ Built (pending commit) | Public Profile Rewrite — Rich Portfolio bento |
+| [Sprint 11c](./sprints/major/phase-1b/sprint-11/build_plan_11c.md) | 1B | ✅ QA complete (ready to merge) | Public Profile Rewrite — Rich Portfolio bento + full QA |
 
-**Next action:** Apply portfolio design lessons to Profile tab → merge PRs
+**Next action:** Create PR → founder merges → Sprint 11d
 
 **Post-build flags:**
-- ⚠️ 2 migrations need `supabase db push`: endorsement pin policy (11b) + profile_template column (11c)
-- ⚠️ Visual QA needed for all 3 sprints — overnight tests were code-path analysis only (no preview tools)
-- ⚠️ Photo limit bumped 9→15 (Pro) — magic numbers not shared between client/server (low risk, noted for cleanup)
+- ⚠️ 2 migrations already pushed: endorsement pin policy (11b) + profile_template column (11c)
+- ⚠️ Drift check: 1 false positive (pro-shared.ts), 2 hotspot warnings (large layout files)
 
 ---
 
@@ -33,7 +32,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
-| Sprint 11c QA + Polish | 2026-03-28 | ~40 interactive fixes: hero overhaul, gallery data fix, section modals, endorsement carousel, conversational stats, brand colour tiles, first person headings |
+| Sprint 11 Full QA | 2026-03-28 | ~60 fixes: scrim, badges, contact modals (vCard, Call/Message/Copy), save heart sync, yacht links, education summary, onboarding fix, CTA consistency |
 | Sprint 11c build | 2026-03-28 | Rich Portfolio (Pro): bento grid engine, 2 templates (Classic/Bold), 12 tile components, focal point picker, photo limit 9→15, Pro gating |
 | Sprint 11b build | 2026-03-28 | Portfolio mode: view mode toggle, card-based layout, mini bento gallery, lightbox, endorsement pinning, scrim/accent rendering |
 | Sprint 11a build | 2026-03-28 | Public profile rewrite: editorial layout, schema migration (accent_color, focal_x/y), CV on-demand, display settings foundation, validation hardening |
@@ -47,7 +46,8 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Apply portfolio lessons to Profile tab** — first person headings, modals, brand colours, endorsement carousel
+1. **Merge sprint-11c/rich-portfolio** → create PR, founder merges
+2. **Sprint 11d** — 18 remaining items: settings UI, sub-pages, endorsement pinning, CV rework
 4. **Sprint 12 — Yacht Graph Foundation** (6–8 days) — yacht detail pages, colleagues explorer, sea time display
 5. **Sprint 13 — Launch Polish** (6–7 days) — public layout, marketing page, ops config, legal sign-off, go-live
 6. **Media/CRUD standardization** (junior sprint after Phase 1B — photo/gallery dedup, shared Pro gating)

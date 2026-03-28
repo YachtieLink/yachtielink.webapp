@@ -2,7 +2,7 @@
 date: 2026-03-28
 agent: Claude Code (Opus 4.6)
 sprint: Sprint 11c QA + Interactive Polish
-modules_touched: [public-profile, bento, hero, endorsements, gallery, stats, contact]
+modules_touched: [public-profile, bento, hero, endorsements, gallery, stats, contact, onboarding, stripe]
 ---
 
 ## Summary
@@ -39,3 +39,5 @@ Interactive QA and design polish session with founder on Sprint 11c Rich Portfol
 **Backlog items created** — Share button QR code, stock gallery placeholders (+ department hero stock), CV & Sharing page rework, social links add prompt, skill/hobby attached notes, colleague graph explorer.
 
 **Test data** — Charlotte made Pro, given contact info + CV. 3 additional endorsements added (James, Sofia, Marcus).
+
+**Extended QA session** — Continued with Profile + Portfolio mode consistency pass. All three modes got identical contact/CV row, CTAs, and contact modals. Pro badge (✦ gold) + Colleague badge (🔗) added to hero bottom bar. Clickable: Pro → billing, Colleague → relationship page. Save heart synced via custom DOM event. Yacht names clickable in experience + endorsement modals. Education summary shows institution + count. Scrim gradient strengthened to 75%. Onboarding stuck bug fixed (server-side redirect). Sign in CTA: teal reversed (#0f9b8e). vCard download in Add to Contacts. Sprint 11d build plan created (18 items). 112 commits on branch, build + type-check clean.
