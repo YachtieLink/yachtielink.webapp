@@ -25,8 +25,8 @@ export const classicTemplate: BentoTemplate = {
       ],
       areas: {
         desktop: [
-          '"about   about   contact cv"',
-          '"about   about   photo1  photo1"',
+          '"contact cv      about   about"',
+          '"photo1  photo1  about   about"',
           '"exp     exp     photo1  photo1"',
           '"exp     exp     photo2  photo2"',
           '"endorse endorse photo2  photo2"',
@@ -36,8 +36,8 @@ export const classicTemplate: BentoTemplate = {
           '"skills  skills  hobbies hobbies"',
         ].join('\n'),
         mobile: [
-          '"about   about"',
           '"contact cv"',
+          '"about   about"',
           '"exp     exp"',
           '"photo1  photo2"',
           '"endorse endorse"',

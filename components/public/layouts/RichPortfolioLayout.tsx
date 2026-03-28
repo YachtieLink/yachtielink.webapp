@@ -258,22 +258,23 @@ export function RichPortfolioLayout({
         accentColor={accentColor}
       />
 
-      {/* Gallery carousel — tappable, opens gallery grid */}
+      {/* Gallery carousel — header opens grid, thumbnails are scrollable */}
       {overflowPhotos.length > 0 && (
-        <button
-          onClick={() => setShowGalleryModal(true)}
-          className="mt-4 w-full text-left cursor-pointer"
-        >
-          <div className="flex items-center gap-2 mb-3 px-1">
+        <div className="mt-4">
+          <button
+            onClick={() => setShowGalleryModal(true)}
+            className="flex items-center gap-2 mb-3 px-1 w-full text-left cursor-pointer"
+          >
             <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">Gallery</span>
             <span className="text-xs text-[var(--color-text-tertiary)]">· {galleryPhotos.length} photos</span>
             <span className="text-xs font-medium text-[var(--accent-500,#14b8a6)] ml-auto">View all &rarr;</span>
-          </div>
-          <div className="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide pointer-events-none">
-            {overflowPhotos.slice(0, 4).map((photo) => (
-              <div
+          </button>
+          <div className="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide">
+            {overflowPhotos.map((photo, i) => (
+              <button
                 key={photo.id}
-                className="shrink-0 snap-start rounded-2xl overflow-hidden"
+                onClick={() => setLightboxIndex(photoSlots.length + i)}
+                className="shrink-0 snap-start rounded-2xl overflow-hidden cursor-pointer"
                 style={{ width: 140, height: 140 }}
               >
                 <img
@@ -282,10 +283,17 @@ export function RichPortfolioLayout({
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
-              </div>
+              </button>
             ))}
+            <button
+              onClick={() => setShowGalleryModal(true)}
+              className="shrink-0 snap-start rounded-2xl flex items-center justify-center bg-[var(--color-surface-raised)] hover:bg-[var(--color-border)] transition-colors cursor-pointer"
+              style={{ width: 140, height: 140 }}
+            >
+              <span className="text-sm font-medium text-[var(--accent-500,#14b8a6)]">See all &rarr;</span>
+            </button>
           </div>
-        </button>
+        </div>
       )}
 
       {/* Gallery modal — full photo grid overlay (z-40, below lightbox z-50) */}
