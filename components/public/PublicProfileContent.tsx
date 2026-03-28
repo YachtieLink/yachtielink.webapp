@@ -285,7 +285,10 @@ export function PublicProfileContent({
                 const scrollToSection = (id: string) => {
                   const el = document.getElementById(id)
                   if (!el) return
-                  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                  // Position heading ~25% from top of viewport
+                  const rect = el.getBoundingClientRect()
+                  const offset = window.scrollY + rect.top - (window.innerHeight * 0.25)
+                  window.scrollTo({ top: offset, behavior: 'smooth' })
                   // Open the accordion by clicking its header button
                   setTimeout(() => {
                     const btn = el.querySelector('button[aria-expanded]') as HTMLButtonElement | null
