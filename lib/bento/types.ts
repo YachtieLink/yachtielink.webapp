@@ -34,4 +34,5 @@ export interface BentoTile {
   areaName: string
   type: BentoTemplateSlot['type']
   content: React.ReactNode
+  onClick?: () => void
 }

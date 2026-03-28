@@ -71,7 +71,14 @@ export function HeroSection({
   const borderRadius = useTransform(scrollY, [0, 200], ['20px', '16px'])
 
   return (
-    // Animated hero — renders on all breakpoints (single-column layout)
+    <>
+    <style>{`
+      @keyframes availPulse {
+        0%, 85%, 100% { opacity: 0.6; box-shadow: 0 0 6px rgba(74,222,128,0.25); }
+        90% { opacity: 1; box-shadow: 0 0 8px rgba(74,222,128,0.5); }
+      }
+    `}</style>
+    {/* Animated hero — renders on all breakpoints (single-column layout) */}
     <motion.div
       className="relative shrink-0 overflow-hidden"
       style={{ height: heroHeight, marginTop: 12, marginLeft: marginInline, marginRight: marginInline, borderRadius }}
@@ -140,7 +147,7 @@ export function HeroSection({
         {primaryRole && (
           <p className={`${scrim.subtextColor} text-sm font-medium flex items-center gap-1.5`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 6px rgba(0,0,0,0.5)' }}>
             {availableForWork && (
-              <span className="w-2 h-2 rounded-full bg-green-400/75 shrink-0" style={{ boxShadow: '0 0 4px rgba(74,222,128,0.3)' }} title="Available for work" />
+              <span className="w-2 h-2 rounded-full bg-green-400/60 shrink-0" style={{ boxShadow: '0 0 6px rgba(74,222,128,0.25)', animation: 'availPulse 5s ease-in-out infinite' }} title="Available for work" />
             )}
             {primaryRole}
           </p>
@@ -188,5 +195,6 @@ export function HeroSection({
         </div>
       )}
     </motion.div>
+    </>
   )
 }

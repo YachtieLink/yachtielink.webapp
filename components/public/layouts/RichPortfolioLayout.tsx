@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { X } from 'lucide-react'
+import { X, Mail, Phone, MessageCircle, Copy, Share2, ExternalLink } from 'lucide-react'
 import { BentoGrid } from '../bento/BentoGrid'
+import { SectionModal } from '../SectionModal'
 import { PhotoTile } from '../bento/tiles/PhotoTile'
 import { AboutTile } from '../bento/tiles/AboutTile'
 import { ExperienceTile } from '../bento/tiles/ExperienceTile'
@@ -73,6 +74,7 @@ export function RichPortfolioLayout({
 }: RichPortfolioLayoutProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [showGalleryModal, setShowGalleryModal] = useState(false)
+  const [activeModal, setActiveModal] = useState<string | null>(null)
 
   // Gallery photos from user_gallery (work portfolio, not profile headshots)
   const galleryPhotos = gallery.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
@@ -140,6 +142,7 @@ export function RichPortfolioLayout({
         return {
           areaName: slot.areaName,
           type: 'about',
+          onClick: () => setActiveModal('about'),
           content: <AboutTile bio={aboutText} accentColor={accentColor} />,
         }
       case 'experience':
@@ -147,6 +150,7 @@ export function RichPortfolioLayout({
         return {
           areaName: slot.areaName,
           type: 'experience',
+          onClick: () => setActiveModal('experience'),
           content: <ExperienceTile attachments={attachments} handle={handle} />,
         }
       case 'endorsements':
@@ -154,6 +158,7 @@ export function RichPortfolioLayout({
         return {
           areaName: slot.areaName,
           type: 'endorsements',
+          onClick: () => setActiveModal('endorsements'),
           content: <EndorsementsTile endorsements={endorsements} handle={handle} />,
         }
       case 'certifications':
@@ -161,6 +166,7 @@ export function RichPortfolioLayout({
         return {
           areaName: slot.areaName,
           type: 'certifications',
+          onClick: () => setActiveModal('certifications'),
           content: <CertsTile certifications={certifications} handle={handle} />,
         }
       case 'contact': {
@@ -171,6 +177,7 @@ export function RichPortfolioLayout({
         return {
           areaName: slot.areaName,
           type: 'contact',
+          onClick: () => setActiveModal('contact'),
           content: (
             <ContactTile
               email={user.email}
@@ -209,6 +216,7 @@ export function RichPortfolioLayout({
         return {
           areaName: slot.areaName,
           type: 'education',
+          onClick: () => setActiveModal('education'),
           content: <EducationTile education={education} handle={handle} />,
         }
       case 'skills': {
@@ -218,6 +226,7 @@ export function RichPortfolioLayout({
         return {
           areaName: slot.areaName,
           type: 'skills',
+          onClick: () => setActiveModal('skills'),
           content: <SkillsTile skills={skillNames} hobbies={hobbyNames} />,
         }
       }
@@ -310,6 +319,156 @@ export function RichPortfolioLayout({
           <div className="absolute inset-0 -z-10" onClick={() => setShowGalleryModal(false)} />
         </div>
       )}
+
+      {/* Section modals — full content overlays */}
+      <SectionModal title="Contact" open={activeModal === 'contact'} onClose={() => setActiveModal(null)}>
+        <div className="flex flex-col gap-4">
+          {user.show_email !== false && user.email && (
+            <a href={`mailto:${user.email}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
+              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><Mail size={18} className="text-[var(--color-text-secondary)]" /></span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-[var(--color-text-primary)]">Email</p>
+                <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.email}</p>
+              </div>
+              <ExternalLink size={14} className="text-[var(--color-text-tertiary)]" />
+            </a>
+          )}
+          {user.show_phone !== false && user.phone && (
+            <a href={`tel:${user.phone}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
+              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><Phone size={18} className="text-[var(--color-text-secondary)]" /></span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-[var(--color-text-primary)]">Call</p>
+                <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.phone}</p>
+              </div>
+              <ExternalLink size={14} className="text-[var(--color-text-tertiary)]" />
+            </a>
+          )}
+          {user.show_whatsapp !== false && user.whatsapp && (
+            <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
+              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><MessageCircle size={18} className="text-[var(--color-text-secondary)]" /></span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-[var(--color-text-primary)]">WhatsApp</p>
+                <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.whatsapp}</p>
+              </div>
+              <ExternalLink size={14} className="text-[var(--color-text-tertiary)]" />
+            </a>
+          )}
+          <hr className="border-[var(--color-border-subtle)]" />
+          <button
+            onClick={() => { navigator.clipboard.writeText(`https://yachtie.link/u/${handle}`); }}
+            className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors"
+          >
+            <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><Share2 size={18} className="text-[var(--color-text-secondary)]" /></span>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-sm font-medium text-[var(--color-text-primary)]">Share Profile</p>
+              <p className="text-xs text-[var(--color-text-secondary)]">Copy profile link</p>
+            </div>
+            <Copy size={14} className="text-[var(--color-text-tertiary)]" />
+          </button>
+        </div>
+      </SectionModal>
+
+      <SectionModal title="About" open={activeModal === 'about'} onClose={() => setActiveModal(null)}>
+        <p className="text-sm text-[var(--color-text-primary)] leading-relaxed whitespace-pre-line">{aboutText}</p>
+      </SectionModal>
+
+      <SectionModal title="Experience" open={activeModal === 'experience'} onClose={() => setActiveModal(null)}>
+        <div className="flex flex-col gap-4">
+          {attachments.map((att) => (
+            <div key={att.id} className="flex gap-3">
+              <div className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--accent-500,#14b8a6)]" />
+              <div>
+                <p className="text-sm font-medium text-[var(--color-text-primary)]">{att.yachts?.name ?? 'Unknown Yacht'}</p>
+                {att.role_label && <p className="text-sm text-[var(--color-text-secondary)]">{att.role_label}</p>}
+                {(att.started_at || att.ended_at) && (
+                  <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">
+                    {att.started_at ? new Date(att.started_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : ''}
+                    {att.started_at && ' – '}
+                    {att.ended_at ? new Date(att.ended_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : 'Present'}
+                  </p>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </SectionModal>
+
+      <SectionModal title="Endorsements" open={activeModal === 'endorsements'} onClose={() => setActiveModal(null)}>
+        <div className="flex flex-col gap-5">
+          {endorsements.map((end) => (
+            <div key={end.id}>
+              <p className="text-sm text-[var(--color-text-primary)] italic">&ldquo;{end.content}&rdquo;</p>
+              <div className="flex items-center gap-2 mt-2">
+                {end.endorser?.profile_photo_url ? (
+                  <img src={end.endorser.profile_photo_url} alt="" className="w-7 h-7 rounded-full object-cover" />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">
+                    {(end.endorser?.display_name || end.endorser?.full_name || '?').charAt(0)}
+                  </div>
+                )}
+                <div>
+                  <p className="text-xs font-medium text-[var(--color-text-primary)]">{end.endorser?.display_name || end.endorser?.full_name || 'Anonymous'}</p>
+                  {(end.endorser_role_label || end.yacht?.name) && (
+                    <p className="text-[10px] text-[var(--color-text-secondary)]">{end.endorser_role_label}{end.endorser_role_label && end.yacht?.name ? ' · ' : ''}{end.yacht?.name}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </SectionModal>
+
+      <SectionModal title="Certifications" open={activeModal === 'certifications'} onClose={() => setActiveModal(null)}>
+        <div className="flex flex-wrap gap-2">
+          {certifications.map((cert) => (
+            <span key={cert.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]">
+              {cert.certification_types?.name || cert.custom_cert_name}
+            </span>
+          ))}
+        </div>
+      </SectionModal>
+
+      <SectionModal title="Education" open={activeModal === 'education'} onClose={() => setActiveModal(null)}>
+        <div className="flex flex-col gap-4">
+          {education.map((edu) => (
+            <div key={edu.id}>
+              <p className="text-sm font-medium text-[var(--color-text-primary)]">{edu.institution}</p>
+              {edu.qualification && <p className="text-sm text-[var(--color-text-secondary)]">{edu.qualification}</p>}
+              {edu.field_of_study && <p className="text-xs text-[var(--color-text-tertiary)]">{edu.field_of_study}</p>}
+              {(edu.started_at || edu.ended_at) && (
+                <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">
+                  {edu.started_at ? new Date(edu.started_at).getFullYear() : ''}{edu.started_at && edu.ended_at ? ' – ' : ''}{edu.ended_at ? new Date(edu.ended_at).getFullYear() : ''}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </SectionModal>
+
+      <SectionModal title="Skills & Interests" open={activeModal === 'skills'} onClose={() => setActiveModal(null)}>
+        <div className="flex flex-col gap-4">
+          {skills.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-2">Skills</p>
+              <div className="flex flex-wrap gap-2">
+                {skills.map((s) => (
+                  <span key={s.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]">{s.name}</span>
+                ))}
+              </div>
+            </div>
+          )}
+          {hobbies.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-2">Interests</p>
+              <div className="flex flex-wrap gap-2">
+                {hobbies.map((h) => (
+                  <span key={h.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]">{h.emoji ? `${h.emoji} ${h.name}` : h.name}</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </SectionModal>
 
       {/* Lightbox */}
       {lightboxIndex !== null && (

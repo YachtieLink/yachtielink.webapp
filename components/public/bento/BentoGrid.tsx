@@ -82,7 +82,10 @@ export function BentoGrid({ variant, tiles, gap = 12, accentColor }: BentoGridPr
           <div
             key={tile.areaName}
             style={{ gridArea: tile.areaName }}
-            className="min-w-0 min-h-0"
+            className={`min-w-0 min-h-0${tile.onClick ? ' cursor-pointer' : ''}`}
+            onClick={tile.onClick}
+            role={tile.onClick ? 'button' : undefined}
+            tabIndex={tile.onClick ? 0 : undefined}
           >
             {tile.content}
           </div>
