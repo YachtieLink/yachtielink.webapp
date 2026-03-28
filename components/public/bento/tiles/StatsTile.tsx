@@ -30,7 +30,7 @@ export function StatsTile({ displayName, seaTime, yachtCount, certCount, endorse
         {yachtCount > 0 && <> across <Tap section="experience">{yachtCount} {yachtCount === 1 ? 'yacht' : 'yachts'}</Tap></>}
         {certCount > 0 && <>, holds <Tap section="certifications">{certCount} {certCount === 1 ? 'certification' : 'certifications'}</Tap></>}
         {colleagueCount > 0 && <> and has worked with <Tap section="colleagues">{colleagueCount} {colleagueCount === 1 ? 'colleague' : 'colleagues'}</Tap></>}
-        {endorsementCount > 0 && <>, of which <Tap section="endorsements">{endorsementCount}</Tap> have endorsed her</>}
+        {endorsementCount > 0 && <>, of which <Tap section="endorsements">{endorsementCount} endorsed</Tap> her</>}
         .
       </p>
     </div>
