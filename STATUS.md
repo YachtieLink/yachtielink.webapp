@@ -2,13 +2,13 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-28 (Sprint 11 full QA complete. 112 commits on branch. Build + type-check clean. Ready to merge.)
+**Last updated:** 2026-03-29 (Sprint 11 merged. Production incident resolved. Rally 005 auth resilience shipped.)
 
 ---
 
 ## Current Phase
 
-**Phase 1B active.** Phase 1A complete (Sprint 10.1 ✅). Sprint 11 (Public Profile Rewrite): 11a committed, 11b committed, 11c built + reviewed (pending commit). Full public profile rewrite across 3 sub-sprints — all code complete, awaiting founder review + merge.
+**Phase 1B active.** Sprint 11 (Public Profile Rewrite) shipped and merged (PR #107). Rally 005 (Auth Resilience) shipped and merged (PR #112). Sprint 11d next (18 remaining profile items).
 
 ---
 
@@ -16,15 +16,11 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Sprint | Phase | Status | Focus |
 |--------|-------|--------|-------|
-| [Sprint 11a](./sprints/major/phase-1b/sprint-11/build_plan_11a.md) | 1B | ✅ Committed (`30f89ca`) | Public Profile Rewrite — Profile mode fixes + schema foundation |
-| [Sprint 11b](./sprints/major/phase-1b/sprint-11/build_plan_11b.md) | 1B | ✅ Committed (`f116427`) | Public Profile Rewrite — Portfolio mode |
-| [Sprint 11c](./sprints/major/phase-1b/sprint-11/build_plan_11c.md) | 1B | ✅ QA complete (ready to merge) | Public Profile Rewrite — Rich Portfolio bento + full QA |
+| [Sprint 11a/b/c](./sprints/major/phase-1b/sprint-11/) | 1B | ✅ Merged (PR #107) | Public Profile Rewrite — 3 view modes, bento grid, section modals |
+| [Rally 005](./sprints/rallies/rally-005-auth-resilience/) | — | ✅ Merged (PR #112) | Auth resilience — 12 fixes after production incident |
+| [Sprint 11d](./sprints/major/phase-1b/sprint-11/build_plan_11d.md) | 1B | 📋 Ready | Remaining profile items — settings UI, sub-pages, endorsement pinning |
 
-**Next action:** Founder merges PR #107 → Sprint 11d
-
-**Post-build flags:**
-- ⚠️ 2 migrations already pushed: endorsement pin policy (11b) + profile_template column (11c)
-- ⚠️ Drift check: 1 false positive (pro-shared.ts), 2 hotspot warnings (large layout files)
+**Next action:** Sprint 11d execution
 
 ---
 
@@ -32,21 +28,18 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
-| Sprint 11 Full QA | 2026-03-28 | ~60 fixes: scrim, badges, contact modals (vCard, Call/Message/Copy), save heart sync, yacht links, education summary, onboarding fix, CTA consistency |
-| Sprint 11c build | 2026-03-28 | Rich Portfolio (Pro): bento grid engine, 2 templates (Classic/Bold), 12 tile components, focal point picker, photo limit 9→15, Pro gating |
-| Sprint 11b build | 2026-03-28 | Portfolio mode: view mode toggle, card-based layout, mini bento gallery, lightbox, endorsement pinning, scrim/accent rendering |
-| Sprint 11a build | 2026-03-28 | Public profile rewrite: editorial layout, schema migration (accent_color, focal_x/y), CV on-demand, display settings foundation, validation hardening |
-| Sprint 10.1 polish | 2026-03-27 | Typography (font-serif on 6 h1s), education per-item links, nav badge popIn, saved profile cardHover, network tab count badges (PR #103) |
-| Sprint CV-Parse-Bugfix | 2026-03-27 | 8 bugs: CV view 404 fix, country flag in hero, CV mobile scroll, share/download buttons, cert/education wizard editing, visibility link, ParseProgress fix (PR #104) |
-| Skill ecosystem | 2026-03-27 | 3 new skills (test-yl, sprint-start-yl, sprint-build-yl) + auto-chain wiring + overnight mode |
-| Build plans 11b + 11c | 2026-03-28 | Planning only — both plans reviewed (2-phase) and founder-flagged. Ready for execution. |
-| Pro subdomain routing | 2026-03-26 | Middleware rewrite for `*.yachtie.link`, reserved landing page, handle blocklist, Pro link in hero card |
+| Rally 005 Auth Resilience | 2026-03-29 | 12 fixes: middleware try-catch, needsAuth simplification, /api/ excluded from matcher, secure cookies, polling jitter, AuthStateListener, env guard (PR #112) |
+| Sprint 11 merged | 2026-03-28 | Public Profile Rewrite: 3 view modes (Profile/Portfolio/Rich Portfolio), bento grid, section modals, ~60 QA fixes (PR #107) |
+| Sprint 10.1 polish | 2026-03-27 | Typography, education links, nav badge, saved profile cardHover (PR #103) |
+| Sprint CV-Parse-Bugfix | 2026-03-27 | 8 bugs fixed (PR #104) |
+| Skill ecosystem | 2026-03-27 | test-yl, sprint-start-yl, sprint-build-yl + auto-chain |
+| Pro subdomain routing | 2026-03-26 | Middleware rewrite for `*.yachtie.link` |
 
 ---
 
 ## Up Next (ordered)
 
-1. **Merge sprint-11c/rich-portfolio** → create PR, founder merges
+1. **Verify production login** — test Rally 005 fixes in production
 2. **Sprint 11d** — 18 remaining items: settings UI, sub-pages, endorsement pinning, CV rework
 4. **Sprint 12 — Yacht Graph Foundation** (6–8 days) — yacht detail pages, colleagues explorer, sea time display
 5. **Sprint 13 — Launch Polish** (6–7 days) — public layout, marketing page, ops config, legal sign-off, go-live

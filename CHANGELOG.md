@@ -22,6 +22,42 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-29 — Claude Code (Opus 4.6) — Production Incident Response + Rally 005 Auth Resilience
+
+### Done
+
+- **Production incident response:** Dev server login redirect loop sent 1,500+ auth requests to Supabase, exhausting rate limit and locking all users out of production. Root cause: middleware `getUser()` on every request with no error handling, dev/prod sharing same Supabase instance.
+- **Hotfix PRs #108-#111:** Middleware `SKIP_AUTH_PREFIXES` for public routes, login page `router.push` vs `window.location.href` investigation, auth check restoration for login routes. Iterative debugging of login redirect loop (`/welcome?returnTo=/app/profile`).
+- **Rally 005 — Auth Resilience Hardening (PR #112, merged):** 12 fixes across 11 files:
+  - CRITICAL: Middleware try-catch around `getUser()`, simplified `needsAuth` logic (explicit route matching), `/api/*` excluded from middleware matcher (~80 redundant `getUser()` calls eliminated), `secure=true` on cookies in production, `www.yachtie.link` → `yachtie.link` 301 redirect.
+  - HIGH: Layout `getUser()` wrapped in try-catch (app + auth), polling interval 60s → 5min + random jitter, Server Component cookie catch logging in dev.
+  - MEDIUM: `AuthStateListener` component (onAuthStateChange for cross-tab session sync), dev/prod Supabase env guard in instrumentation.ts, Redis failOpen error logging.
+- **6-agent auth audit** (`/codebase-rally`): 3 R1 research agents (call sites, cookie lifecycle, rate limits) + 3 R2 challenger agents. Found: 99+ `getUser()` calls, 3-4x per request amplification, `httpOnly: false` on auth cookies (inherent @supabase/ssr limitation), no retry backoff, no error boundaries.
+- **Backlog:** Crew pass (background checks) added.
+
+### Context
+
+- All fixes merged to main. Production auth is now hardened.
+- Sprint 11 (a/b/c) merged earlier this session (PR #107). Sprint 11d planned (18 remaining items).
+- `httpOnly` on cookies is NOT fixable — @supabase/ssr requires `document.cookie` access. `secure` flag IS now set.
+- Stale uncommitted changes on main from earlier work (profile queries, settings page) — need to investigate.
+
+### Next
+
+1. **Test production login** — verify Rally 005 fixes are working (no more loops, no more 500s)
+2. **Sprint 11d** — settings UI, sub-pages, endorsement pinning, CV rework, photo management
+3. **Sprint 12 — Yacht Graph Foundation**
+4. **CV parser dedup fix** — education/certs/hobbies duplication from multiple imports
+
+### Flags
+
+- ⚠️ Production incident 2026-03-28: resolved. Root cause documented in Rally 005 spec + lessons-learned.
+- ⚠️ `httpOnly: false` on auth cookies is an inherent @supabase/ssr limitation — cannot be fixed without migrating away from their cookie-based approach. Documented as accepted risk.
+- ⚠️ Dev/prod share same Supabase project — env guard warning added but real fix is separate Supabase projects.
+- ⚠️ Stale uncommitted changes on main (profile queries, settings) — need investigation.
+
+---
+
 ## 2026-03-28 — Claude Code (Opus 4.6) — Sprint 11 Full QA + Profile Consistency Pass
 
 ### Done
