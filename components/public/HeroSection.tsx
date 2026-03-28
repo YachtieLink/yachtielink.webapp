@@ -176,7 +176,7 @@ export function HeroSection({
               className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-medium text-white/90 hover:bg-white/25 transition-colors"
               style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
             >
-              ⚓ Colleague
+              🔗 Colleague
             </Link>
           )}
           {isPro && (
