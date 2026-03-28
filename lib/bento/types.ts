@@ -1,7 +1,7 @@
 export interface BentoTemplateSlot {
   id: string
   areaName: string
-  type: 'photo' | 'about' | 'experience' | 'certifications' | 'endorsements' | 'education' | 'skills' | 'contact' | 'cv' | 'stats' | 'spacer'
+  type: 'photo' | 'about' | 'experience' | 'certifications' | 'endorsements' | 'education' | 'skills' | 'hobbies' | 'contact' | 'cv' | 'stats' | 'spacer'
 }
 
 export interface BentoTemplateVariant {

@@ -15,6 +15,7 @@ import { CvTile } from '../bento/tiles/CvTile'
 import { StatsTile } from '../bento/tiles/StatsTile'
 import { EducationTile } from '../bento/tiles/EducationTile'
 import { SkillsTile } from '../bento/tiles/SkillsTile'
+import { HobbiesTile } from '../bento/tiles/HobbiesTile'
 import { MorePhotosTile } from '../bento/tiles/MorePhotosTile'
 import { detectDensity } from '@/lib/bento/density'
 import { getTemplateVariant } from '@/lib/bento/templates'
@@ -222,13 +223,22 @@ export function RichPortfolioLayout({
         }
       case 'skills': {
         const skillNames = skills.map((s) => s.name)
-        const hobbyNames = hobbies.map((h) => h.emoji ? `${h.emoji} ${h.name}` : h.name)
-        if (skillNames.length === 0 && hobbyNames.length === 0) return null
+        if (skillNames.length === 0) return null
         return {
           areaName: slot.areaName,
           type: 'skills',
           onClick: () => setActiveModal('skills'),
-          content: <SkillsTile skills={skillNames} hobbies={hobbyNames} />,
+          content: <SkillsTile skills={skillNames} />,
+        }
+      }
+      case 'hobbies': {
+        if (hobbies.length === 0) return null
+        const hobbyNames = hobbies.map((h) => h.emoji ? `${h.emoji} ${h.name}` : h.name)
+        return {
+          areaName: slot.areaName,
+          type: 'hobbies',
+          onClick: () => setActiveModal('hobbies'),
+          content: <HobbiesTile hobbies={hobbyNames} />,
         }
       }
       default:
@@ -481,28 +491,19 @@ export function RichPortfolioLayout({
         </div>
       </SectionModal>
 
-      <SectionModal title="Skills & Interests" open={activeModal === 'skills'} onClose={() => setActiveModal(null)}>
-        <div className="flex flex-col gap-4">
-          {skills.length > 0 && (
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-2">Skills</p>
-              <div className="flex flex-wrap gap-2">
-                {skills.map((s) => (
-                  <span key={s.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]">{s.name}</span>
-                ))}
-              </div>
-            </div>
-          )}
-          {hobbies.length > 0 && (
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-2">Interests</p>
-              <div className="flex flex-wrap gap-2">
-                {hobbies.map((h) => (
-                  <span key={h.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]">{h.emoji ? `${h.emoji} ${h.name}` : h.name}</span>
-                ))}
-              </div>
-            </div>
-          )}
+      <SectionModal title="Skills" open={activeModal === 'skills'} onClose={() => setActiveModal(null)}>
+        <div className="flex flex-wrap gap-2">
+          {skills.map((s) => (
+            <span key={s.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]">{s.name}</span>
+          ))}
+        </div>
+      </SectionModal>
+
+      <SectionModal title="Interests" open={activeModal === 'hobbies'} onClose={() => setActiveModal(null)}>
+        <div className="flex flex-wrap gap-2">
+          {hobbies.map((h) => (
+            <span key={h.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]">{h.emoji ? `${h.emoji} ${h.name}` : h.name}</span>
+          ))}
         </div>
       </SectionModal>
 

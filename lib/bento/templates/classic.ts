@@ -20,6 +20,7 @@ export const classicTemplate: BentoTemplate = {
         { id: 'education', areaName: 'edu', type: 'education' },
         { id: 'photo4', areaName: 'photo4', type: 'photo' },
         { id: 'skills', areaName: 'skills', type: 'skills' },
+        { id: 'hobbies', areaName: 'hobbies', type: 'hobbies' },
         { id: 'photo5', areaName: 'photo5', type: 'photo' },
       ],
       areas: {
@@ -31,7 +32,7 @@ export const classicTemplate: BentoTemplate = {
           '"endorse endorse photo2  photo2"',
           '"certs   stats   photo3  photo3"',
           '"edu     edu     photo3  photo3"',
-          '"skills  skills  photo4  photo5"',
+          '"skills  hobbies photo4  photo5"',
         ].join('\n'),
         mobile: [
           '"about   about"',
@@ -42,8 +43,8 @@ export const classicTemplate: BentoTemplate = {
           '"certs   stats"',
           '"photo3  photo3"',
           '"edu     edu"',
+          '"skills  hobbies"',
           '"photo4  photo5"',
-          '"skills  skills"',
         ].join('\n'),
       },
     },
