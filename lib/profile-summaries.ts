@@ -84,14 +84,11 @@ type Education = { qualification?: string | null; institution: string; ended_at?
 
 export function educationSummary(education: Education[]): string {
   if (education.length === 0) return 'No education added'
-  const sorted = [...education].sort((a, b) => {
-    if (!a.ended_at) return -1
-    if (!b.ended_at) return 1
-    return new Date(b.ended_at).getTime() - new Date(a.ended_at).getTime()
-  })
-  const top = sorted[0]
-  const label = top.qualification || top.institution
-  return label.length > 60 ? label.slice(0, 60) + '…' : label
+  const top = education[0]
+  const label = top.institution || top.qualification || 'Education'
+  const extra = education.length > 1 ? ` + ${education.length - 1} more` : ''
+  const full = label + extra
+  return full.length > 60 ? full.slice(0, 60) + '…' : full
 }
 
 type Hobby = { name: string; emoji?: string | null }
