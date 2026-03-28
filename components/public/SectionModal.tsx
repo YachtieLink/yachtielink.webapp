@@ -14,7 +14,7 @@ export function SectionModal({ title, open, onClose, children }: SectionModalPro
 
   return (
     <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center">
-      <div className="relative w-full sm:max-w-[480px] max-h-[85vh] bg-[var(--color-surface)] rounded-t-2xl sm:rounded-2xl overflow-hidden flex flex-col">
+      <div className="relative w-full mx-4 sm:max-w-[480px] max-h-[85vh] mb-4 sm:mb-0 bg-[var(--color-surface)] rounded-2xl overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--color-border-subtle)]">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-text-primary)]">
