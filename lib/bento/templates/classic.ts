@@ -43,7 +43,6 @@ export const classicTemplate: BentoTemplate = {
           '"endorse endorse"',
           '"endorse endorse"',
           '"certs   certs"',
-          '"stats   stats"',
           '"photo3  photo3"',
           '"edu     edu"',
           '"photo4  photo5"',
