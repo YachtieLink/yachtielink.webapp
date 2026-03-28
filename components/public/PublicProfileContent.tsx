@@ -509,13 +509,13 @@ function ProfileModeContent({
             <>
               <Link
                 href="/signup"
-                className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-medium text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
+                className="w-full flex items-center justify-center text-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-medium text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
               >
                 Build your crew profile — it&apos;s free
               </Link>
               <Link
                 href="/login"
-                className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+                className="w-full flex items-center justify-center text-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
               >
                 Sign in to see how you know {displayName}
               </Link>
