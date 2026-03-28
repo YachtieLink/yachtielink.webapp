@@ -581,14 +581,19 @@ function ProfileModeContent({
       >
         <div className="flex flex-col gap-3">
           {user.show_email !== false && user.email && (
-            <a href={`mailto:${user.email}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
-              <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><Mail size={18} className="text-[var(--color-text-secondary)]" /></span>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-[var(--color-text-primary)]">Email</p>
-                <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.email}</p>
+            <div className="rounded-xl border border-[var(--color-border-subtle)] overflow-hidden">
+              <div className="flex items-center gap-3 p-3">
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><Mail size={18} className="text-[var(--color-text-secondary)]" /></span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[var(--color-text-primary)]">Email</p>
+                  <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.email}</p>
+                </div>
               </div>
-              <ExternalLink size={14} className="text-[var(--color-text-tertiary)]" />
-            </a>
+              <div className="flex border-t border-[var(--color-border-subtle)] divide-x divide-[var(--color-border-subtle)]">
+                <a href={`mailto:${user.email}?subject=${encodeURIComponent(`Hey ${firstName}`)}&body=${encodeURIComponent(`Hey ${firstName}, I saw your profile on YachtieLink.\n\n`)}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--color-surface-raised)] transition-colors">Email</a>
+                <button onClick={() => { navigator.clipboard.writeText(user.email!) }} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] transition-colors">Copy</button>
+              </div>
+            </div>
           )}
           {user.show_phone !== false && user.phone && (
             <div className="rounded-xl border border-[var(--color-border-subtle)] overflow-hidden">
