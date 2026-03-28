@@ -20,7 +20,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 | [Sprint 11b](./sprints/major/phase-1b/sprint-11/build_plan_11b.md) | 1B | ✅ Committed (`f116427`) | Public Profile Rewrite — Portfolio mode |
 | [Sprint 11c](./sprints/major/phase-1b/sprint-11/build_plan_11c.md) | 1B | ✅ QA complete (ready to merge) | Public Profile Rewrite — Rich Portfolio bento + full QA |
 
-**Next action:** Create PR → founder merges → Sprint 11d
+**Next action:** Founder merges PR #107 → Sprint 11d
 
 **Post-build flags:**
 - ⚠️ 2 migrations already pushed: endorsement pin policy (11b) + profile_template column (11c)
