@@ -146,7 +146,7 @@ export function HeroSection({
             {displayName}{homeCountryFlag ? <span className="ml-2 text-2xl sm:text-3xl align-middle">{homeCountryFlag}</span> : null}
           </h1>
           {isPro && (
-            <span className="inline-flex items-center rounded-full bg-amber-400/20 backdrop-blur-sm border border-amber-400/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-300 shrink-0" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+            <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/90 shrink-0" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
               Pro
             </span>
           )}
