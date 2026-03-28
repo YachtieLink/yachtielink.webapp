@@ -34,6 +34,7 @@ interface PortfolioLayoutProps {
   accentColor: string
   handle: string
   isLoggedIn?: boolean
+  isOwnProfile?: boolean
   sectionVisibility: Record<string, boolean>
 }
 
@@ -105,6 +106,7 @@ export function PortfolioLayout({
   accentColor,
   handle,
   isLoggedIn,
+  isOwnProfile,
   sectionVisibility,
 }: PortfolioLayoutProps) {
   const aboutText = user.ai_summary || user.bio
@@ -304,8 +306,8 @@ export function PortfolioLayout({
         />
       )}
 
-      {/* Bottom CTA for non-logged-in viewers */}
-      {!isLoggedIn && (
+      {/* Bottom CTAs */}
+      {!isLoggedIn ? (
         <Link
           href="/signup"
           className="w-full flex items-center justify-center rounded-xl px-6 py-3 text-sm font-semibold text-white hover:opacity-90 transition-opacity"
@@ -313,7 +315,14 @@ export function PortfolioLayout({
         >
           Build your crew profile — it&apos;s free
         </Link>
-      )}
+      ) : isOwnProfile ? (
+        <Link
+          href="/app/profile"
+          className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+        >
+          Back to My Profile
+        </Link>
+      ) : null}
     </div>
   )
 }

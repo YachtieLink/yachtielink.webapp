@@ -250,6 +250,7 @@ export function PublicProfileContent({
             accentColor={resolvedAccent[500]}
             handle={user.handle}
             isLoggedIn={isLoggedIn}
+            isOwnProfile={isOwnProfile}
             sectionVisibility={sectionVisibility}
           />
         </div>
@@ -529,7 +530,7 @@ function ProfileModeContent({
               href="/app/profile"
               className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
             >
-              Back to my profile
+              Back to My Profile
             </Link>
           ) : (
             <Link
