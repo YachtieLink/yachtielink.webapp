@@ -60,3 +60,9 @@ Any context, constraints, or open questions.
 | [Endorsement Context Display](./endorsement-context-display.md) | promoted (Sprint 11) | P2 |
 | [Onboarding Name from Email](./onboarding-name-from-email.md) | idea | P3 |
 | [Pro Upsell Consistency](./pro-upsell-consistency.md) | idea | P2 |
+| [Share Button QR Code](./share-button-qr-code.md) | idea | P2 |
+| [Stock Gallery Placeholders](./stock-gallery-placeholders.md) | idea | P2 |
+| [CV & Sharing Page Rework](./cv-sharing-page-rework.md) | idea | P2 |
+| [Social Links Add Prompt](./social-links-add-prompt.md) | idea | P3 |
+| [Skill & Hobby Notes](./skill-hobby-notes.md) | idea | P3 |
+| [Colleague Graph Explorer](./colleague-graph-explorer.md) | idea | P1 |

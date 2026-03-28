@@ -22,6 +22,46 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-28 — Claude Code (Opus 4.6) — Sprint 11c QA + Interactive Polish
+
+### Done
+
+- **~40 iterative fixes** across hero, bento grid, gallery, endorsements, stats, contact, and section modals — all driven by live founder feedback.
+- **Build fix:** `isProFromRecord` split into `lib/stripe/pro-shared.ts` (client-safe). Fixed `useProfileSettings` and `PublicProfileContent` imports.
+- **Hero overhaul:** Single photo (no carousel), single 4-stop scrim gradient (no seam), framed with margin + rounded corners, minimal identity (name + flag + role + sea time + location), icon toggle (List/LayoutGrid), green availability dot next to role.
+- **Gallery data source fix:** Bento + Portfolio gallery now pull from `user_gallery` (work portfolio) not `user_photos` (headshots).
+- **Bento grid polish:** Fixed 160px row heights, empty row collapse, content-first layout, density thresholds relaxed, brand colour tile backgrounds (alternating sand/teal), transparent chips with borders.
+- **Section modals:** All content tiles tappable → overlay modals (SectionModal component with footer prop). Contact, CV preview, About, Experience, Endorsements, Certs, Education, Skills, Hobbies. Gallery grid modal with lightbox layering.
+- **Endorsement tile:** Auto-carousel (9s, swipeable, tappable dots), double-height, quote centred, endorser pinned bottom, coral icon.
+- **Stats tile:** Conversational first person ("I've spent 6y 7mo working at sea..."), each stat clickable, colleague count from DB query, accent gradient background.
+- **Contact/CV utility row:** Moved out of bento grid. WhatsApp custom SVG icon. Share Profile + Copy Link in contact modal footer.
+- **First person headings:** About Me, My Experience, My Endorsements, My Certifications, My Education, My Skills, My Interests, My Gallery.
+- **Other fixes:** UK flag ISO (UK→GB), save button → heart icon, endorsement plural, flag wrapping, leaving-profile confirmation, lightbox "View all" button.
+- **6 backlog items created:** share-button-qr-code, stock-gallery-placeholders, cv-sharing-page-rework, social-links-add-prompt, skill-hobby-notes, colleague-graph-explorer.
+
+### Context
+
+- Branch: `sprint-11c/rich-portfolio` — pushed to origin. ~45 commits this session.
+- Charlotte test account: Pro, 4 endorsements, contact info, generated CV, 12 gallery photos.
+- Profile tab (accordion mode) needs same principles applied: first person headings, modals, brand colours, hero changes.
+
+### Next
+
+1. **Apply portfolio lessons to Profile tab** — first person headings, section modals, brand colours, transparent chips
+2. **Profile mode (accordion)** needs endorsement carousel, gallery modal, contact/CV utility row
+3. **Share button QR code** (backlog)
+4. **CV parser dedup fix** — education has zero dedup, certs have weak fuzzy match
+5. **Colleague graph explorer** (backlog)
+
+### Flags
+
+- ⚠️ CV preview iframe blocked in preview tool (Supabase external URL). Works in real browser.
+- ⚠️ Cert/education/hobby data duplication on founder's account — data issue from multiple CV parses, not code bug.
+- ⚠️ `colleagueCount` query is N+1-ish (fetches all attachment rows to count unique users). Fine at current scale, should become an RPC at scale.
+- ⚠️ Profile mode (accordion) hasn't been updated with this session's changes — needs a follow-up pass.
+
+---
+
 ## 2026-03-28 — Claude Code (Opus 4.6) — Sprint 11c Build + Review (Overnight)
 
 ### Done

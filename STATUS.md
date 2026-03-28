@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-28 (Sprints 11a/b/c all built + reviewed. 11a + 11b committed. 11c ready to commit. Morning founder review needed.)
+**Last updated:** 2026-03-28 (Sprint 11c QA + interactive polish with founder. ~40 fixes. Branch pushed. Profile tab next.)
 
 ---
 
@@ -20,7 +20,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 | [Sprint 11b](./sprints/major/phase-1b/sprint-11/build_plan_11b.md) | 1B | ✅ Committed (`f116427`) | Public Profile Rewrite — Portfolio mode |
 | [Sprint 11c](./sprints/major/phase-1b/sprint-11/build_plan_11c.md) | 1B | ✅ Built (pending commit) | Public Profile Rewrite — Rich Portfolio bento |
 
-**Next action:** Commit 11c → morning founder review → merge PRs
+**Next action:** Apply portfolio design lessons to Profile tab → merge PRs
 
 **Post-build flags:**
 - ⚠️ 2 migrations need `supabase db push`: endorsement pin policy (11b) + profile_template column (11c)
@@ -33,6 +33,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
+| Sprint 11c QA + Polish | 2026-03-28 | ~40 interactive fixes: hero overhaul, gallery data fix, section modals, endorsement carousel, conversational stats, brand colour tiles, first person headings |
 | Sprint 11c build | 2026-03-28 | Rich Portfolio (Pro): bento grid engine, 2 templates (Classic/Bold), 12 tile components, focal point picker, photo limit 9→15, Pro gating |
 | Sprint 11b build | 2026-03-28 | Portfolio mode: view mode toggle, card-based layout, mini bento gallery, lightbox, endorsement pinning, scrim/accent rendering |
 | Sprint 11a build | 2026-03-28 | Public profile rewrite: editorial layout, schema migration (accent_color, focal_x/y), CV on-demand, display settings foundation, validation hardening |
@@ -46,7 +47,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Morning founder review** — visual QA of Sprints 11a/b/c, merge PRs, push migrations
+1. **Apply portfolio lessons to Profile tab** — first person headings, modals, brand colours, endorsement carousel
 4. **Sprint 12 — Yacht Graph Foundation** (6–8 days) — yacht detail pages, colleagues explorer, sea time display
 5. **Sprint 13 — Launch Polish** (6–7 days) — public layout, marketing page, ops config, legal sign-off, go-live
 6. **Media/CRUD standardization** (junior sprint after Phase 1B — photo/gallery dedup, shared Pro gating)
