@@ -18,9 +18,9 @@ export function ExperienceSection({ attachments, sharedYachtIdSet }: ExperienceS
   return (
     <ScrollReveal>
       <ProfileAccordion
-        title="Experience"
+        title="My Experience"
         summary={experienceSummary(attachments)}
-        accentColor="navy"
+        accentColor="teal"
         icon={<Anchor size={16} />}
       >
         <div className="flex flex-col gap-3">

@@ -19,8 +19,9 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
   return (
     <ScrollReveal>
       <ProfileAccordion
-        title="Extra Skills"
+        title="My Skills"
         summary={skillsSummary(skills)}
+        accentColor="teal"
         icon={<Sparkles size={16} />}
       >
         {Object.entries(grouped).map(([cat, items]) => (
@@ -28,7 +29,7 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
             <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-1.5 capitalize">{cat}</p>
             <div className="flex flex-wrap gap-2">
               {items.map((s) => (
-                <span key={s.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]">
+                <span key={s.id} className="text-sm px-3 py-1.5 rounded-full bg-transparent border border-[var(--color-border)] text-[var(--color-text-primary)]">
                   {s.name}
                 </span>
               ))}

@@ -254,7 +254,6 @@ export function PublicProfileContent({
       <div className="flex-1">
         <div className="flex flex-col gap-4 px-4 pt-4 pb-24 max-w-[680px] mx-auto w-full">
 
-          {/* Contact — tappable icon row */}
           {/* Contact + CV row */}
           <div className="flex items-center justify-between">
             <ContactRow
@@ -274,18 +273,46 @@ export function PublicProfileContent({
                 className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
               >
                 <FileText size={16} className="text-[var(--color-text-secondary)]" />
-                View my CV
+                View CV
               </Link>
             )}
           </div>
 
-          {/* About */}
+          {/* Stats — conversational introduction */}
+          {(seaTimeTotalDays > 0 || seaTimeYachtCount > 0) && (
+            <div className="text-center italic text-sm text-[var(--color-text-secondary)] leading-relaxed px-2">
+              {(() => {
+                const parts: React.ReactNode[] = []
+                const fname = firstName
+
+                if (seaTimeTotalDays > 0) {
+                  const seaTimeStr = formatSeaTime(seaTimeTotalDays).displayLong
+                  parts.push(<span key="sea">I&apos;ve spent <strong className="font-semibold text-[var(--color-text-primary)]">{seaTimeStr}</strong> working at sea</span>)
+                }
+                if (seaTimeYachtCount > 0) {
+                  parts.push(<span key="yacht"> across <strong className="font-semibold text-[var(--color-text-primary)]">{seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}</strong></span>)
+                }
+                if (certifications.length > 0) {
+                  parts.push(<span key="cert">, hold <strong className="font-semibold text-[var(--color-text-primary)]">{certifications.length} {certifications.length === 1 ? 'certification' : 'certifications'}</strong></span>)
+                }
+                if (colleagueCount > 0) {
+                  parts.push(<span key="col"> and have worked with <strong className="font-semibold text-[var(--color-text-primary)]">{colleagueCount} {colleagueCount === 1 ? 'colleague' : 'colleagues'}</strong></span>)
+                }
+                if (endorsements.length > 0) {
+                  parts.push(<span key="end">, of which <strong className="font-semibold text-[var(--color-text-primary)]">{endorsements.length} endorsed</strong></span>)
+                }
+                return <>{parts}.</>
+              })()}
+            </div>
+          )}
+
+          {/* About Me */}
           {sectionVisible(sectionVisibility, 'about', !!(user.ai_summary || user.bio)) && (
             <ScrollReveal>
             <ProfileAccordion
-              title="About"
+              title="About Me"
               summary={aboutSummary(user.ai_summary, user.bio)}
-              accentColor="teal"
+              accentColor="sand"
               icon={<User size={16} />}
             >
               <p className="text-sm text-[var(--color-text-primary)] leading-relaxed whitespace-pre-line">
@@ -295,26 +322,26 @@ export function PublicProfileContent({
             </ScrollReveal>
           )}
 
-          {/* Experience */}
+          {/* My Experience */}
           {sectionVisible(sectionVisibility, 'experience', attachments.length > 0) && (
             <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} />
           )}
 
-          {/* Endorsements */}
+          {/* My Endorsements */}
           {sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) && (
             <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} />
           )}
 
-          {/* Certifications */}
+          {/* My Certifications */}
           {sectionVisible(sectionVisibility, 'certifications', certifications.length > 0) && (
             <CertificationsSection certifications={certifications} />
           )}
 
-          {/* Education */}
+          {/* My Education */}
           {sectionVisible(sectionVisibility, 'education', education.length > 0) && (
             <ScrollReveal>
             <ProfileAccordion
-              title="Education"
+              title="My Education"
               summary={educationSummary(education)}
               accentColor="teal"
               icon={<GraduationCap size={16} />}
@@ -337,17 +364,18 @@ export function PublicProfileContent({
             </ScrollReveal>
           )}
 
-          {/* Hobbies */}
+          {/* My Interests */}
           {sectionVisible(sectionVisibility, 'hobbies', hobbies.length > 0) && (
             <ScrollReveal>
             <ProfileAccordion
-              title="Hobbies"
+              title="My Interests"
               summary={hobbiesSummary(hobbies)}
+              accentColor="sand"
               icon={<Heart size={16} />}
             >
               <div className="flex flex-wrap gap-2">
                 {hobbies.map((h) => (
-                  <span key={h.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]">
+                  <span key={h.id} className="text-sm px-3 py-1.5 rounded-full bg-transparent border border-[var(--color-border)] text-[var(--color-text-primary)]">
                     {h.emoji ? `${h.emoji} ${h.name}` : h.name}
                   </span>
                 ))}
@@ -356,12 +384,12 @@ export function PublicProfileContent({
             </ScrollReveal>
           )}
 
-          {/* Skills */}
+          {/* My Skills */}
           {sectionVisible(sectionVisibility, 'skills', skills.length > 0) && (
             <SkillsSection skills={skills} />
           )}
 
-          {/* Gallery */}
+          {/* My Gallery */}
           {sectionVisible(sectionVisibility, 'gallery', gallery.length > 0) && (
             <GallerySection gallery={gallery} />
           )}

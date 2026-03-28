@@ -14,9 +14,9 @@ export function GallerySection({ gallery }: GallerySectionProps) {
   return (
     <ScrollReveal>
       <ProfileAccordion
-        title="Gallery"
+        title="My Gallery"
         summary={gallerySummary(gallery.length)}
-        accentColor="teal"
+        accentColor="sand"
         icon={<Camera size={16} />}
       >
         <div className="grid grid-cols-3 gap-1.5">

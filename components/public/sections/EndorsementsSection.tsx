@@ -17,7 +17,7 @@ export function EndorsementsSection({ endorsements, mutualEndorserCount, handle 
   return (
     <ScrollReveal>
       <ProfileAccordion
-        title="Endorsements"
+        title="My Endorsements"
         summary={endorsementsSummary(endorsements.length, mutualEndorserCount)}
         accentColor="coral"
         icon={<Star size={16} />}

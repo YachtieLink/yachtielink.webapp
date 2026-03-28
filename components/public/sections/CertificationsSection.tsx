@@ -29,9 +29,9 @@ export function CertificationsSection({ certifications }: CertificationsSectionP
   return (
     <ScrollReveal>
       <ProfileAccordion
-        title="Certifications"
+        title="My Certifications"
         summary={certificationsSummary(certifications.length, expiringCount)}
-        accentColor="amber"
+        accentColor="sand"
         icon={<Shield size={16} />}
       >
         <div className="flex flex-col gap-2">
