@@ -603,6 +603,19 @@ export function RichPortfolioLayout({
         </div>
       </SectionModal>
 
+      <SectionModal title="My Colleagues" open={activeModal === 'colleagues'} onClose={() => setActiveModal(null)}>
+        <div className="flex flex-col items-center justify-center py-8 text-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-[var(--accent-100,#ccfbf1)] flex items-center justify-center">
+            <span className="text-xl">🤝</span>
+          </div>
+          <p className="text-sm font-medium text-[var(--color-text-primary)]">Colleague Explorer</p>
+          <p className="text-xs text-[var(--color-text-secondary)] max-w-[260px]">
+            See everyone {displayName.split(' ')[0]} has worked with, explore shared connections, and discover the yacht crew network.
+          </p>
+          <p className="text-xs text-[var(--color-text-tertiary)] italic mt-2">Coming soon</p>
+        </div>
+      </SectionModal>
+
       {/* Navigation confirmation — "leaving this profile" */}
       {pendingNav && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6">
