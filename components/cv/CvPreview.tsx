@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { formatDate } from '@/lib/format-date'
 
 interface CvPreviewProps {
   mode: 'owner' | 'viewer'
@@ -9,12 +10,6 @@ interface CvPreviewProps {
   education: any[]
   skills: any[]
   hobbies: any[]
-}
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return ''
-  const d = new Date(dateStr)
-  return d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
 }
 
 function calculateAge(dob: string): number {

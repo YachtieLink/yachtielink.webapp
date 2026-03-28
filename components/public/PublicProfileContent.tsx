@@ -8,13 +8,12 @@
  * Section rendering is delegated to components/public/sections/.
  */
 import { useState } from 'react'
-import Link from 'next/link'
-import { FileText, User, GraduationCap, Heart, Mail, Phone, ExternalLink, Copy, Share2 } from 'lucide-react'
-import { WhatsAppIcon } from '@/components/icons/WhatsAppIcon'
+import { FileText, User, GraduationCap, Heart } from 'lucide-react'
 import { HeroSection } from './HeroSection'
 import { ContactRow } from './ContactRow'
-import { SectionModal } from './SectionModal'
-import { SaveProfileButton } from '@/components/profile/SaveProfileButton'
+import { ContactModal } from './ContactModal'
+import { CvPreviewModal } from './CvPreviewModal'
+import { BottomCTA } from './BottomCTA'
 import { ViewModeToggle } from './ViewModeToggle'
 import { PortfolioLayout } from './layouts/PortfolioLayout'
 import { RichPortfolioLayout } from './layouts/RichPortfolioLayout'
@@ -85,7 +84,6 @@ export interface PublicProfileContentProps {
   education: Education[]
   skills: Skill[]
   gallery: GalleryItem[]
-  isFoundingMember?: boolean
   isLoggedIn?: boolean
   viewerRelationship?: ViewerRelationship
   sectionVisibility?: Record<string, boolean>
@@ -114,7 +112,6 @@ export function PublicProfileContent({
   education,
   skills,
   gallery,
-  isFoundingMember = false,
   isLoggedIn,
   viewerRelationship,
   sectionVisibility = {},
@@ -323,6 +320,7 @@ function ProfileModeContent({
   savedStatus?: { id: string; folder_id: string | null } | null
 }) {
   const [profileModal, setProfileModal] = useState<string | null>(null)
+  const [pendingNav, setPendingNav] = useState<{ url: string; label: string } | null>(null)
   const handle = user.handle
 
   return (
@@ -431,14 +429,14 @@ function ProfileModeContent({
           {/* My Experience */}
           {sectionVisible(sectionVisibility, 'experience', attachments.length > 0) && (
             <div id="section-experience">
-              <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} seaTimeTotalDays={seaTimeTotalDays} seaTimeYachtCount={seaTimeYachtCount} />
+              <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} seaTimeTotalDays={seaTimeTotalDays} seaTimeYachtCount={seaTimeYachtCount} onNavigate={(url, label) => setPendingNav({ url, label })} />
             </div>
           )}
 
           {/* My Endorsements */}
           {sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) && (
             <div id="section-endorsements">
-              <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} />
+              <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} onNavigate={(url, label) => setPendingNav({ url, label })} />
             </div>
           )}
 
@@ -524,181 +522,51 @@ function ProfileModeContent({
         )}
 
         {/* Bottom CTAs */}
-        <div className="px-4 pb-8 flex flex-col gap-3 max-w-[680px] mx-auto w-full">
-          {!isLoggedIn ? (
-            <>
-              <Link
-                href="/signup"
-                className="w-full flex items-center justify-center text-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-medium text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
-              >
-                Build your crew profile — it&apos;s free
-              </Link>
-              <Link
-                href="/login"
-                className="w-full flex items-center justify-center text-center rounded-xl border border-[#0f9b8e] px-6 py-3 text-sm font-medium text-[#0f9b8e] hover:bg-[#0f9b8e]/5 transition-colors"
-              >
-                Sign in to see how you know<br />{displayName}
-              </Link>
-            </>
-          ) : isOwnProfile ? (
-            <Link
-              href="/app/profile"
-              className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
-            >
-              Back to My Profile
-            </Link>
-          ) : (
-            <Link
-              href="/app/profile"
-              className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
-            >
-              Back to My Profile
-            </Link>
-          )}
+        <div className="px-4 pb-8">
+          <BottomCTA isLoggedIn={isLoggedIn} isOwnProfile={isOwnProfile} displayName={displayName} />
         </div>
-
-        <footer className="text-center pb-6">
-          <p className="text-xs text-[var(--color-text-secondary)]">
-            <Link href="/welcome" className="hover:underline">YachtieLink</Link> — Professional profiles for yacht crew
-          </p>
-        </footer>
       </div>
 
       {/* ── Contact modal ──────────────────────────────────────────── */}
-      <SectionModal
-        title="Contact"
+      <ContactModal
         open={profileModal === 'contact'}
         onClose={() => setProfileModal(null)}
-        footer={
-          <div className="flex gap-3">
-            {isLoggedIn && !isOwnProfile && (
-              <SaveProfileButton
-                savedUserId={user.id}
-                initialSaved={!!savedStatus}
-                initialFolderId={savedStatus?.folder_id}
-              />
-            )}
-            <button
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({ title: `${displayName} — YachtieLink`, url: profileUrl })
-                } else {
-                  navigator.clipboard.writeText(profileUrl)
-                }
-              }}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#0f9b8e)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
-            >
-              <Share2 size={14} />
-              Share
-            </button>
-            <button
-              onClick={() => {
-                const parts = [
-                  'BEGIN:VCARD',
-                  'VERSION:3.0',
-                  `FN:${displayName}`,
-                  user.email ? `EMAIL:${user.email}` : '',
-                  user.phone ? `TEL:${user.phone}` : '',
-                  user.primary_role ? `TITLE:${user.primary_role}` : '',
-                  'ORG:YachtieLink',
-                  `URL:${profileUrl}`,
-                  'END:VCARD',
-                ].filter(Boolean).join('\n')
-                const blob = new Blob([parts], { type: 'text/vcard' })
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement('a')
-                a.href = url
-                a.download = `${displayName.replace(/\s+/g, '_')}.vcf`
-                a.click()
-                URL.revokeObjectURL(url)
-              }}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
-            >
-              <User size={14} />
-              Add to Contacts
-            </button>
-          </div>
-        }
-      >
-        <div className="flex flex-col gap-3">
-          {user.show_email !== false && user.email && (
-            <div className="rounded-xl border border-[var(--color-border-subtle)] overflow-hidden">
-              <div className="flex items-center gap-3 p-3">
-                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><Mail size={18} className="text-[var(--color-text-secondary)]" /></span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[var(--color-text-primary)]">Email</p>
-                  <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.email}</p>
-                </div>
-              </div>
-              <div className="flex border-t border-[var(--color-border-subtle)] divide-x divide-[var(--color-border-subtle)]">
-                <a href={`mailto:${user.email}?subject=${encodeURIComponent(`Hey ${firstName}`)}&body=${encodeURIComponent(`Hey ${firstName}, I saw your profile on YachtieLink.\n\n`)}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#0f9b8e)] hover:bg-[var(--color-surface-raised)] transition-colors">Email</a>
-                <button onClick={() => { navigator.clipboard.writeText(user.email!) }} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] transition-colors">Copy</button>
-              </div>
-            </div>
-          )}
-          {user.show_phone !== false && user.phone && (
-            <div className="rounded-xl border border-[var(--color-border-subtle)] overflow-hidden">
-              <div className="flex items-center gap-3 p-3">
-                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><Phone size={18} className="text-[var(--color-text-secondary)]" /></span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[var(--color-text-primary)]">Phone</p>
-                  <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.phone}</p>
-                </div>
-              </div>
-              <div className="flex border-t border-[var(--color-border-subtle)] divide-x divide-[var(--color-border-subtle)]">
-                <a href={`tel:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#0f9b8e)] hover:bg-[var(--color-surface-raised)] transition-colors">Call</a>
-                <a href={`sms:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#0f9b8e)] hover:bg-[var(--color-surface-raised)] transition-colors">Message</a>
-                <button onClick={() => { navigator.clipboard.writeText(user.phone!) }} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] transition-colors">Copy</button>
-              </div>
-            </div>
-          )}
-          {user.show_whatsapp !== false && user.whatsapp && (
-            <div className="rounded-xl border border-[var(--color-border-subtle)] overflow-hidden">
-              <div className="flex items-center gap-3 p-3">
-                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)]"><WhatsAppIcon size={18} className="text-green-600" /></span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[var(--color-text-primary)]">WhatsApp</p>
-                  <p className="text-xs text-[var(--color-text-secondary)] truncate">{user.whatsapp}</p>
-                </div>
-              </div>
-              <div className="flex border-t border-[var(--color-border-subtle)] divide-x divide-[var(--color-border-subtle)]">
-                <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-2.5 text-center text-xs font-medium text-green-600 hover:bg-[var(--color-surface-raised)] transition-colors">Call</a>
-                <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex-1 py-2.5 text-center text-xs font-medium text-green-600 hover:bg-[var(--color-surface-raised)] transition-colors">Message</a>
-                <button onClick={() => { navigator.clipboard.writeText(user.whatsapp!) }} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] transition-colors">Copy</button>
-              </div>
-            </div>
-          )}
-        </div>
-      </SectionModal>
+        user={user}
+        displayName={displayName}
+        firstName={firstName}
+        profileUrl={profileUrl}
+        isLoggedIn={isLoggedIn}
+        isOwnProfile={isOwnProfile}
+        savedStatus={savedStatus}
+      />
 
       {/* ── CV preview modal ──────────────────────────────────────── */}
-      <SectionModal
-        title="CV Preview"
-        open={profileModal === 'cv'}
-        onClose={() => setProfileModal(null)}
-        footer={
-          <div className="flex gap-3">
-            <a
-              href={`/api/cv/public-download/${handle}`}
-              download
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#0f9b8e)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
-            >
-              Download CV
-            </a>
-            <button
-              onClick={() => { navigator.clipboard.writeText(`https://yachtie.link/u/${handle}/cv`); }}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
-            >
-              <Share2 size={14} />
-              Share
-            </button>
+      <CvPreviewModal open={profileModal === 'cv'} onClose={() => setProfileModal(null)} handle={handle} />
+
+      {/* Navigation confirmation — "leaving this profile" */}
+      {pendingNav && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="bg-[var(--color-surface)] rounded-2xl p-6 max-w-[320px] w-full flex flex-col gap-4 text-center">
+            <p className="text-sm text-[var(--color-text-primary)]">
+              You&apos;re about to leave this profile to view <span className="font-semibold">{pendingNav.label}</span>
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPendingNav(null)}
+                className="flex-1 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+              >
+                Stay here
+              </button>
+              <a
+                href={pendingNav.url}
+                className="flex-1 py-2.5 rounded-xl bg-[var(--accent-500,#0f9b8e)] text-white text-sm font-semibold text-center hover:opacity-90 transition-opacity"
+              >
+                Continue
+              </a>
+            </div>
           </div>
-        }
-      >
-        <div className="h-[60vh] rounded-xl overflow-hidden bg-gray-100">
-          <iframe src={`/api/cv/public-download/${handle}`} className="w-full h-full border-0" title="CV Preview" />
         </div>
-      </SectionModal>
+      )}
     </>
   )
 }

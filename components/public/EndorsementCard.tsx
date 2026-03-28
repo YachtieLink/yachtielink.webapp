@@ -13,10 +13,13 @@ interface EndorsementCardProps {
   endorserPhoto?: string | null
   endorserHandle?: string | null
   yachtName?: string | null
+  yachtId?: string | null
   date: string
   content: string
   isPinned?: boolean
   onPin?: (isPinned: boolean) => void
+  /** When provided, navigation to endorser/yacht profiles goes through a confirmation callback instead of direct links */
+  onNavigate?: (url: string, label: string) => void
 }
 
 const TRUNCATE_LENGTH = 150
@@ -27,10 +30,12 @@ export function EndorsementCard({
   endorserPhoto,
   endorserHandle,
   yachtName,
+  yachtId,
   date,
   content,
   isPinned,
   onPin,
+  onNavigate,
 }: EndorsementCardProps) {
   const [expanded, setExpanded] = useState(false)
   const needsTruncation = content.length > TRUNCATE_LENGTH
@@ -68,17 +73,29 @@ export function EndorsementCard({
       {/* Endorser info */}
       <div className="flex items-center gap-3 mb-3">
         {endorserHandle ? (
-          <Link href={`/u/${endorserHandle}`}>
-            <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
-          </Link>
+          onNavigate ? (
+            <button onClick={() => onNavigate(`/u/${endorserHandle}`, endorserName)}>
+              <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
+            </button>
+          ) : (
+            <Link href={`/u/${endorserHandle}`}>
+              <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
+            </Link>
+          )
         ) : (
           <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
         )}
         <div className="min-w-0 flex-1">
           {endorserHandle ? (
-            <Link href={`/u/${endorserHandle}`} className="text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--color-interactive)] truncate block">
-              {endorserName}
-            </Link>
+            onNavigate ? (
+              <button onClick={() => onNavigate(`/u/${endorserHandle}`, endorserName)} className="text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] truncate block text-left transition-colors">
+                {endorserName}
+              </button>
+            ) : (
+              <Link href={`/u/${endorserHandle}`} className="text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--color-interactive)] truncate block">
+                {endorserName}
+              </Link>
+            )
           ) : (
             <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
               {endorserName}
@@ -90,7 +107,16 @@ export function EndorsementCard({
             </p>
           )}
           <p className="text-xs text-[var(--color-text-tertiary)]">
-            {yachtName && <>{yachtName} · </>}
+            {yachtName && (
+              <>
+                {yachtId && onNavigate ? (
+                  <button onClick={() => onNavigate(`/yacht/${yachtId}`, yachtName)} className="hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
+                    {yachtName}
+                  </button>
+                ) : yachtName}
+                {' · '}
+              </>
+            )}
             {formattedDate}
           </p>
         </div>

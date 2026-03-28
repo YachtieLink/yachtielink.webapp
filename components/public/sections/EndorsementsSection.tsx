@@ -11,9 +11,10 @@ interface EndorsementsSectionProps {
   endorsements: PublicEndorsement[]
   mutualEndorserCount: number
   handle: string
+  onNavigate?: (url: string, label: string) => void
 }
 
-export function EndorsementsSection({ endorsements, mutualEndorserCount, handle }: EndorsementsSectionProps) {
+export function EndorsementsSection({ endorsements, mutualEndorserCount, handle, onNavigate }: EndorsementsSectionProps) {
   return (
     <ScrollReveal>
       <ProfileAccordion
@@ -31,8 +32,10 @@ export function EndorsementsSection({ endorsements, mutualEndorserCount, handle 
                 endorserPhoto={end.endorser?.profile_photo_url}
                 endorserHandle={end.endorser?.handle}
                 yachtName={end.yacht?.name}
+                yachtId={end.yacht?.id}
                 date={end.created_at}
                 content={end.content}
+                onNavigate={onNavigate}
               />
             </StaggeredItem>
           ))}

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import { ChevronLeft } from 'lucide-react'
 import { getUserByHandle, getPublicProfileSections } from '@/lib/queries/profile'
+import { formatDate } from '@/lib/format-date'
 
 interface Props {
   params: Promise<{ handle: string }>
@@ -14,11 +15,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!user) return { title: 'Not Found' }
   const name = user.display_name || user.full_name
   return { title: `Experience — ${name} — YachtieLink` }
-}
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
 }
 
 export default async function ExperiencePage({ params }: Props) {

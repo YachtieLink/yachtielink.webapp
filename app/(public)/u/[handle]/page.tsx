@@ -139,7 +139,6 @@ export default async function PublicProfilePage({ params }: Props) {
         education={extended.education as Education[]}
         skills={extended.skills as Skill[]}
         gallery={extended.gallery as unknown as GalleryItem[]}
-        isFoundingMember={user.founding_member === true}
         isLoggedIn={!!viewer}
         viewerRelationship={viewerRelationship}
         sectionVisibility={sectionVisibility}

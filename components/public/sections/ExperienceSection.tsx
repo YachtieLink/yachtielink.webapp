@@ -2,21 +2,18 @@ import { Anchor } from 'lucide-react'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { formatSeaTime } from '@/lib/sea-time'
+import { formatDate } from '@/lib/format-date'
 import type { PublicAttachment } from '@/lib/queries/types'
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
-}
 
 interface ExperienceSectionProps {
   attachments: PublicAttachment[]
   sharedYachtIdSet: Set<string>
   seaTimeTotalDays?: number
   seaTimeYachtCount?: number
+  onNavigate?: (url: string, label: string) => void
 }
 
-export function ExperienceSection({ attachments, sharedYachtIdSet, seaTimeTotalDays = 0, seaTimeYachtCount = 0 }: ExperienceSectionProps) {
+export function ExperienceSection({ attachments, sharedYachtIdSet, seaTimeTotalDays = 0, seaTimeYachtCount = 0, onNavigate }: ExperienceSectionProps) {
   const yachtCount = seaTimeYachtCount || attachments.length
   const summary = seaTimeTotalDays > 0
     ? `${formatSeaTime(seaTimeTotalDays).displayShort} sea time · ${yachtCount} ${yachtCount === 1 ? 'yacht' : 'yachts'}`
@@ -40,7 +37,13 @@ export function ExperienceSection({ attachments, sharedYachtIdSet, seaTimeTotalD
                 <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--color-interactive)]" />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-[var(--color-text-primary)]">
-                    {att.yachts?.name ?? 'Unknown Yacht'}
+                    {att.yachts?.id && onNavigate ? (
+                      <button onClick={() => onNavigate(`/yacht/${att.yachts!.id}`, att.yachts!.name ?? 'Yacht')} className="hover:text-[var(--accent-500,#0f9b8e)] text-left transition-colors">
+                        {att.yachts.name ?? 'Unknown Yacht'}
+                      </button>
+                    ) : (
+                      <>{att.yachts?.name ?? 'Unknown Yacht'}</>
+                    )}
                     {att.role_label && <span className="font-normal text-[var(--color-text-secondary)]"> — {att.role_label}</span>}
                     {isShared && <span className="ml-2 text-xs text-[var(--color-interactive)]">You worked here</span>}
                   </p>

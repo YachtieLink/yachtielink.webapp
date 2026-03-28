@@ -2,17 +2,13 @@
 
 import Link from 'next/link'
 import { Anchor } from 'lucide-react'
+import { formatDate } from '@/lib/format-date'
 import type { PublicAttachment } from '@/lib/queries/types'
 
 interface ExperienceTileProps {
   attachments: PublicAttachment[]
   handle: string
   maxShow?: number
-}
-
-function formatDate(dateStr: string | null | undefined): string {
-  if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
 }
 
 export function ExperienceTile({ attachments, handle, maxShow = 3 }: ExperienceTileProps) {
