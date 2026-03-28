@@ -383,14 +383,14 @@ export function PortfolioLayout({
               Sign in to see how you know<br />{displayName ?? handle}
             </Link>
           </>
-        ) : isOwnProfile ? (
+        ) : (
           <Link
             href="/app/profile"
             className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
           >
             Back to My Profile
           </Link>
-        ) : null}
+        )}
       </div>
 
       <footer className="text-center py-6">
