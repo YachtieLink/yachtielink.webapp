@@ -8,9 +8,10 @@ interface PhotoLightboxProps {
   initialIndex: number
   open: boolean
   onClose: () => void
+  onViewAll?: () => void
 }
 
-export function PhotoLightbox({ photos, initialIndex, open, onClose }: PhotoLightboxProps) {
+export function PhotoLightbox({ photos, initialIndex, open, onClose, onViewAll }: PhotoLightboxProps) {
   const [index, setIndex] = useState(initialIndex)
   const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null)
 
@@ -111,12 +112,22 @@ export function PhotoLightbox({ photos, initialIndex, open, onClose }: PhotoLigh
         />
       </div>
 
-      {/* Counter */}
-      {photos.length > 1 && (
-        <p className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/70 text-sm font-medium">
-          {index + 1} / {photos.length}
-        </p>
-      )}
+      {/* Bottom bar — counter + view all */}
+      <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-4 px-6">
+        {photos.length > 1 && (
+          <p className="text-white/70 text-sm font-medium">
+            {index + 1} / {photos.length}
+          </p>
+        )}
+        {onViewAll && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onViewAll() }}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/15 backdrop-blur-md text-white text-xs font-semibold hover:bg-white/25 transition-colors"
+          >
+            View all
+          </button>
+        )}
+      </div>
     </div>
   )
 }
