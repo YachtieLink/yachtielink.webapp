@@ -509,7 +509,7 @@ function ProfileModeContent({
             <>
               <Link
                 href="/signup"
-                className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
+                className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-medium text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
               >
                 Build your crew profile — it&apos;s free
               </Link>
