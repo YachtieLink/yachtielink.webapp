@@ -7,9 +7,16 @@ export default async function AuthLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  let user: { id: string } | null = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    // Auth service unavailable — let the auth page render normally.
+    // User can attempt to sign in; if Supabase is down, signIn will show an error.
+    user = null;
+  }
 
   // Already signed in — go to app
   if (user) {

@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { BottomTabBar } from "@/components/nav/BottomTabBar";
 import { SidebarNav } from "@/components/nav/SidebarNav";
+import { AuthStateListener } from "@/components/providers/AuthStateListener";
 
 export default async function AppLayout({
   children,
@@ -9,9 +10,16 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  let user: { id: string } | null = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    // Auth service unavailable — middleware should have caught this,
+    // but belt-and-suspenders: treat as unauthenticated.
+    user = null;
+  }
 
   if (!user) {
     redirect("/welcome");
@@ -33,6 +41,8 @@ export default async function AppLayout({
 
   return (
     <div className="relative flex min-h-screen flex-col bg-[var(--color-surface)]">
+      <AuthStateListener />
+
       {/* Fixed sidebar navigation — desktop only */}
       <SidebarNav />
 

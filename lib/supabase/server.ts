@@ -30,11 +30,16 @@ export async function createClient() {
               cookieStore.set(name, value, {
                 ...options,
                 ...(COOKIE_DOMAIN ? { domain: COOKIE_DOMAIN } : {}),
+                ...(process.env.NODE_ENV === 'production' ? { secure: true } : {}),
               })
             );
-          } catch {
-            // Server Components cannot set cookies — session refresh is
-            // handled by middleware.ts so this is safe to ignore.
+          } catch (error) {
+            // Server Components can't set cookies — middleware handles refresh.
+            // Log in dev for visibility; production stays silent.
+            if (process.env.NODE_ENV === 'development') {
+              console.warn('[supabase/server] Cookie write failed (expected in Server Components):',
+                error instanceof Error ? error.message : error)
+            }
           }
         },
       },
