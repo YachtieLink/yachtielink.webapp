@@ -1,5 +1,7 @@
 'use client'
 
+import { List, LayoutGrid } from 'lucide-react'
+
 interface ViewModeToggleProps {
   ownerDefault: 'portfolio' | 'rich_portfolio'
   activeMode: 'profile' | 'portfolio' | 'rich_portfolio'
@@ -14,16 +16,15 @@ export function ViewModeToggle({
   scrimVariant = 'dark',
 }: ViewModeToggleProps) {
   const isDark = scrimVariant === 'dark'
-  const label = ownerDefault === 'rich_portfolio' ? 'Rich Portfolio' : 'Portfolio'
 
   const modes = [
-    { id: 'profile' as const, label: 'Profile' },
-    { id: ownerDefault, label },
+    { id: 'profile' as const, icon: <List size={14} />, label: 'Profile view' },
+    { id: ownerDefault, icon: <LayoutGrid size={14} />, label: 'Portfolio view' },
   ]
 
   return (
     <div
-      className={`self-start inline-flex rounded-full p-0.5 backdrop-blur-md ${
+      className={`inline-flex rounded-full p-0.5 backdrop-blur-md ${
         isDark ? 'bg-white/15' : 'bg-black/10'
       }`}
     >
@@ -33,15 +34,17 @@ export function ViewModeToggle({
           <button
             key={mode.id}
             onClick={() => onChange(mode.id)}
-            className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
+            className={`p-1.5 rounded-full transition-all ${
               isActive
-                ? 'bg-[var(--accent-500,#14b8a6)] text-white shadow-sm'
+                ? 'bg-white/25 text-white shadow-sm'
                 : isDark
-                ? 'text-white/70 hover:text-white'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'text-white/50 hover:text-white/80'
+                : 'text-gray-400 hover:text-gray-700'
             }`}
+            aria-label={mode.label}
+            title={mode.label}
           >
-            {mode.label}
+            {mode.icon}
           </button>
         )
       })}

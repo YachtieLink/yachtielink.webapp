@@ -132,17 +132,14 @@ export function HeroSection({
         </div>
       </div>
 
-      {/* Identity — overlaid at bottom of photo, minimal */}
-      <div className="absolute bottom-0 left-0 right-0 px-5 pb-5 z-10 flex flex-col gap-1.5">
-        {/* Name — large, confident, serif */}
+      {/* Identity — overlaid at bottom of photo. Just name + role. */}
+      <div className="absolute bottom-0 left-0 right-0 pl-5 pr-20 pb-5 z-10 flex flex-col gap-1">
         <h1 className={`${scrim.textColor} font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
           <span className="inline-flex items-baseline gap-2 flex-wrap">
             <span>{displayName}</span>
             {homeCountryFlag && <span className="text-2xl sm:text-3xl">{homeCountryFlag}</span>}
           </span>
         </h1>
-
-        {/* Role + Department — unified line */}
         {(primaryRole || (departments && departments.length > 0)) && (
           <p className={`${scrim.subtextColor} text-sm font-medium`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 6px rgba(0,0,0,0.5)' }}>
             {primaryRole}
@@ -154,14 +151,6 @@ export function HeroSection({
             )}
           </p>
         )}
-
-        {/* Compact info line: age, sea time, location */}
-        <p className={`${scrim.subtextColor} ${scrim.variant === 'dark' ? 'opacity-60' : ''} text-xs font-medium`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 4px rgba(0,0,0,0.4)' }}>
-          {[
-            ...heroStats,
-            showLocation && location ? location : null,
-          ].filter(Boolean).join(' · ')}
-        </p>
       </div>
 
       {/* Bottom-right: view mode toggle + social links (subtle) */}
