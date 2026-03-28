@@ -25,12 +25,12 @@ export function StatsTile({ displayName, seaTime, yachtCount, certCount, endorse
 
   return (
     <div className="h-full rounded-xl bg-gradient-to-br from-[var(--accent-100,#ccfbf1)]/40 to-white/60 p-6 flex items-center">
-      <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed tracking-wide">
-        {firstName} has spent <Tap section="experience">{seaTime}</Tap> working at sea
+      <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed tracking-wide italic">
+        I&apos;ve spent <Tap section="experience">{seaTime}</Tap> working at sea
         {yachtCount > 0 && <> across <Tap section="experience">{yachtCount} {yachtCount === 1 ? 'yacht' : 'yachts'}</Tap></>}
-        {certCount > 0 && <>, holds <Tap section="certifications">{certCount} {certCount === 1 ? 'certification' : 'certifications'}</Tap></>}
-        {colleagueCount > 0 && <> and has worked with <Tap section="colleagues">{colleagueCount} {colleagueCount === 1 ? 'colleague' : 'colleagues'}</Tap></>}
-        {endorsementCount > 0 && <>, of which <Tap section="endorsements">{endorsementCount} endorsed</Tap> her</>}
+        {certCount > 0 && <>, hold <Tap section="certifications">{certCount} {certCount === 1 ? 'certification' : 'certifications'}</Tap></>}
+        {colleagueCount > 0 && <> and have worked with <Tap section="colleagues">{colleagueCount} {colleagueCount === 1 ? 'colleague' : 'colleagues'}</Tap></>}
+        {endorsementCount > 0 && <>, of which <Tap section="endorsements">{endorsementCount} endorsed</Tap> me</>}
         .
       </p>
     </div>
