@@ -45,6 +45,7 @@ export type PublicEndorsement = {
     profile_photo_url: string | null
   } | null
   yacht: {
+    id: string
     name: string
   } | null
 }

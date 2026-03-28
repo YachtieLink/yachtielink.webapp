@@ -70,7 +70,7 @@ export function SaveProfileButton({ savedUserId, initialSaved, initialFolderId }
     >
       <Heart
         size={18}
-        className={saved ? 'text-pink-500 fill-pink-500' : 'text-white'}
+        className={`transition-all duration-300 ${saved ? 'text-pink-500 fill-pink-500 scale-125' : 'text-white scale-100'}`}
       />
     </button>
   )

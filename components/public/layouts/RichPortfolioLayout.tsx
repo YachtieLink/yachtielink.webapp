@@ -638,7 +638,11 @@ export function RichPortfolioLayout({
                       <p className="text-xs text-[var(--color-text-secondary)]">
                         {end.endorser_role_label}
                         {end.endorser_role_label && end.yacht?.name ? ' · ' : ''}
-                        {end.yacht?.name}
+                        {end.yacht?.id ? (
+                          <button onClick={() => setPendingNav({ url: `/yacht/${end.yacht!.id}`, label: end.yacht!.name ?? 'Yacht' })} className="hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
+                            {end.yacht.name}
+                          </button>
+                        ) : end.yacht?.name}
                       </p>
                     )}
                   </div>

@@ -267,7 +267,7 @@ export async function getPublicProfileSections(userId: string) {
       .select(`
         id, content, created_at, endorser_role_label, recipient_role_label, is_pinned,
         endorser:endorser_id ( id, display_name, full_name, handle, profile_photo_url ),
-        yacht:yachts!yacht_id ( name )
+        yacht:yachts!yacht_id ( id, name )
       `)
       .eq('recipient_id', userId)
       .is('deleted_at', null)
@@ -312,7 +312,7 @@ export async function getCvSections(userId: string) {
       .select(`
         id, content, created_at,
         endorser:endorser_id ( display_name, full_name ),
-        yacht:yachts!yacht_id ( name )
+        yacht:yachts!yacht_id ( id, name )
       `)
       .eq('recipient_id', userId)
       .is('deleted_at', null)
