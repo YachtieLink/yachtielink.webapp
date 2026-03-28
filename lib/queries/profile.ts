@@ -71,7 +71,8 @@ export const getUserByHandle = cache(async (handle: string) => {
       cv_public, cv_public_source, latest_pdf_path, cv_storage_path,
       home_country, languages, available_for_work,
       smoke_pref, appearance_note, travel_docs, license_info, show_dob, show_home_country,
-      subscription_status, subscription_ends_at, subdomain_suspended
+      subscription_status, subscription_ends_at, subdomain_suspended,
+      profile_view_mode, scrim_preset, accent_color
     `)
     .eq('handle', handle.toLowerCase())
     .single()
@@ -144,7 +145,7 @@ export async function getExtendedProfileSections(userId: string) {
       .order('sort_order'),
     supabase
       .from('user_photos')
-      .select('id, photo_url, sort_order')
+      .select('id, photo_url, sort_order, focal_x, focal_y')
       .eq('user_id', userId)
       .order('sort_order'),
     supabase

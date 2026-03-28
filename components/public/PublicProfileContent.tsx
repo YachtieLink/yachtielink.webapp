@@ -1,13 +1,19 @@
+'use client'
+
 /**
- * PublicProfileContent — Single-column editorial layout.
+ * PublicProfileContent — Dual-mode layout (Profile / Portfolio).
  * Full-width hero, then centred content (max 680px).
+ * View mode toggle switches between Profile (editorial) and Portfolio (card-based).
  *
  * Section rendering is delegated to components/public/sections/.
  */
+import { useState } from 'react'
 import Link from 'next/link'
 import { FileText, User, GraduationCap, Heart } from 'lucide-react'
 import { HeroSection } from './HeroSection'
 import { ContactRow } from './ContactRow'
+import { ViewModeToggle } from './ViewModeToggle'
+import { PortfolioLayout } from './layouts/PortfolioLayout'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { formatSeaTime } from '@/lib/sea-time'
 import { countryToFlag } from '@/lib/constants/country-iso'
@@ -18,6 +24,8 @@ import { EndorsementsSection } from './sections/EndorsementsSection'
 import { CertificationsSection } from './sections/CertificationsSection'
 import { SkillsSection } from './sections/SkillsSection'
 import { GallerySection } from './sections/GallerySection'
+import { accentColors, type AccentColor } from '@/lib/accent-colors'
+import { scrimPresets, type ScrimPreset } from '@/lib/scrim-presets'
 import type {
   PublicAttachment, PublicCertification, PublicEndorsement,
   ProfilePhoto, Hobby, Education, Skill, GalleryItem,
@@ -54,6 +62,9 @@ interface UserProfile {
   cv_public_source?: string
   latest_pdf_path?: string | null
   cv_storage_path?: string | null
+  profile_view_mode?: 'profile' | 'portfolio' | 'rich_portfolio'
+  scrim_preset?: 'dark' | 'light' | 'teal' | 'warm'
+  accent_color?: string
 }
 
 export interface PublicProfileContentProps {
@@ -103,6 +114,13 @@ export function PublicProfileContent({
   seaTimeYachtCount = 0,
   age,
 }: PublicProfileContentProps) {
+  const ownerDefault = user.profile_view_mode ?? 'portfolio'
+  const [activeMode, setActiveMode] = useState<'profile' | 'portfolio' | 'rich_portfolio'>(ownerDefault)
+
+  // Resolve accent color — fall back to teal for unknown values
+  const resolvedAccent = accentColors[(user.accent_color as AccentColor)] ?? accentColors.teal
+  const resolvedScrim = scrimPresets[(user.scrim_preset as ScrimPreset)] ?? scrimPresets.dark
+
   const displayName = user.display_name ?? user.full_name
   const firstName = displayName.split(' ')[0]
   const isOwnProfile = viewerRelationship?.isOwnProfile ?? false
@@ -120,6 +138,21 @@ export function PublicProfileContent({
 
   const location = [user.location_city, user.location_country].filter(Boolean).join(', ')
 
+  // View mode toggle — only show if owner's default is portfolio or rich_portfolio
+  const viewModeToggle = (ownerDefault === 'portfolio' || ownerDefault === 'rich_portfolio') ? (
+    <ViewModeToggle
+      ownerDefault={ownerDefault}
+      activeMode={activeMode}
+      onChange={setActiveMode}
+      scrimVariant={resolvedScrim.variant}
+    />
+  ) : null
+
+  // Hero photo focal point
+  const heroPhoto = profilePhotos.find((p) => p.sort_order === 0) ?? profilePhotos[0]
+  const heroFocalX = heroPhoto?.focal_x ?? 50
+  const heroFocalY = heroPhoto?.focal_y ?? 50
+
   // Hero stat parts: age (server-computed) + sea time
   const heroStats: string[] = []
   if (age) heroStats.push(`${age} years old`)
@@ -129,8 +162,15 @@ export function PublicProfileContent({
   const homeCountryFlag = user.show_home_country !== false && flag ? flag : undefined
 
   return (
-    // ── Single-column editorial layout ──────────────────────────────────────
-    <div className="flex flex-col">
+    // ── Dual-mode layout with accent CSS vars ────────────────────────────
+    <div
+      className="flex flex-col"
+      style={{
+        '--accent-500': resolvedAccent[500],
+        '--accent-600': resolvedAccent[600],
+        '--accent-100': resolvedAccent[100],
+      } as React.CSSProperties}
+    >
 
       {/* ── Hero — full-width on all breakpoints ─────────────────────────── */}
       <HeroSection
@@ -155,9 +195,31 @@ export function PublicProfileContent({
         savedStatus={savedStatus}
         heroStats={heroStats}
         homeCountryFlag={homeCountryFlag}
+        viewModeToggle={viewModeToggle}
+        scrimPreset={user.scrim_preset as ScrimPreset}
+        focalX={heroFocalX}
+        focalY={heroFocalY}
       />
 
-      {/* ── Content — centred single column ────────────────────────────── */}
+      {/* ── Content — switches based on active view mode ─────────────── */}
+      {activeMode === 'portfolio' || activeMode === 'rich_portfolio' ? (
+        <div className="flex-1">
+          <PortfolioLayout
+            user={user}
+            attachments={attachments}
+            certifications={certifications}
+            endorsements={endorsements}
+            education={education}
+            skills={skills}
+            hobbies={hobbies}
+            profilePhotos={profilePhotos}
+            accentColor={resolvedAccent[500]}
+            handle={user.handle}
+            isLoggedIn={isLoggedIn}
+            sectionVisibility={sectionVisibility}
+          />
+        </div>
+      ) : (
       <div className="flex-1">
         <div className="flex flex-col gap-4 px-4 pt-4 pb-24 max-w-[680px] mx-auto w-full">
 
@@ -329,6 +391,7 @@ export function PublicProfileContent({
           </p>
         </footer>
       </div>
+      )}
 
       {/* ── Sticky bottom CTA for non-logged-in viewers (mobile only) ───────── */}
       {!isLoggedIn && (

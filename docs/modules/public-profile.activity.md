@@ -4,6 +4,8 @@ Append-only. Never edit existing entries. Newest at top.
 
 When you make changes to this module, append a one-line entry with date, agent name, and what changed.
 
+**2026-03-28** — Claude Code (Opus 4.6) (Sprint 11b): Portfolio mode — `PublicProfileContent` converted to client component with dual-layout branching (profile/portfolio). Created `ViewModeToggle` (two-segment pill in hero), `PortfolioLayout` (card-based sections), `MiniBentoGallery` (asymmetric grid with 3 layout variants), `PhotoLightbox` (full-screen viewer with keyboard/touch nav). `HeroSection` updated with scrim preset system (4 presets from `lib/scrim-presets.ts`), accent color CSS variables (5 palettes from `lib/accent-colors.ts`), toggle render slot, focal point props. Endorsement pinning: API route, RLS migration, `EndorsementCard` pin UI, `EndorsementsPageClient` with optimistic updates. Education sub-page at `/u/[handle]/education`. Review caught CRITICAL RLS gap — new migration adds recipient update policy.
+
 **2026-03-26** — Claude Code (Opus 4.6) (QA session): Fixed profile photo framing (`object-top` in PhotoGallery.tsx), experience summary bug (missing `yacht_id` in profile.ts select), name text-shadow strengthened for light photos (HeroSection + PublicProfileContent). Captured profile-photo-reposition backlog item.
 
 ---

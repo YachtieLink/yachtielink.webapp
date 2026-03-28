@@ -2,8 +2,9 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { ChevronLeft } from 'lucide-react'
+import { createClient } from '@/lib/supabase/server'
 import { getUserByHandle, getPublicProfileSections } from '@/lib/queries/profile'
-import { EndorsementCard } from '@/components/public/EndorsementCard'
+import { EndorsementsPageClient } from './EndorsementsPageClient'
 
 interface Props {
   params: Promise<{ handle: string }>
@@ -19,11 +20,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function EndorsementsPage({ params }: Props) {
   const { handle } = await params
+  const supabase = await createClient()
   const user = await getUserByHandle(handle)
   if (!user) notFound()
 
   const { endorsements } = await getPublicProfileSections(user.id)
   const name = user.display_name || user.full_name
+
+  // Check if viewer is the profile owner
+  const { data: { user: viewer } } = await supabase.auth.getUser()
+  const isOwner = viewer?.id === user.id
 
   return (
     <div className="max-w-[680px] mx-auto px-4 py-6 flex flex-col gap-4">
@@ -42,20 +48,20 @@ export default async function EndorsementsPage({ params }: Props) {
         {endorsements.length} endorsement{endorsements.length !== 1 ? 's' : ''} for {name}
       </p>
 
-      <div className="flex flex-col gap-3">
-        {endorsements.map((end) => (
-          <EndorsementCard
-            key={end.id}
-            endorserName={end.endorser?.display_name ?? end.endorser?.full_name ?? 'Anonymous'}
-            endorserRole={end.endorser_role_label}
-            endorserPhoto={end.endorser?.profile_photo_url}
-            endorserHandle={end.endorser?.handle}
-            yachtName={end.yacht?.name}
-            date={end.created_at}
-            content={end.content}
-          />
-        ))}
-      </div>
+      <EndorsementsPageClient
+        endorsements={endorsements.map((e) => ({
+          id: e.id,
+          content: e.content,
+          created_at: e.created_at,
+          endorser_role_label: e.endorser_role_label,
+          is_pinned: e.is_pinned ?? false,
+          endorserName: e.endorser?.display_name ?? e.endorser?.full_name ?? 'Anonymous',
+          endorserPhoto: e.endorser?.profile_photo_url ?? null,
+          endorserHandle: e.endorser?.handle ?? null,
+          yachtName: e.yacht?.name ?? null,
+        }))}
+        isOwner={isOwner}
+      />
     </div>
   )
 }

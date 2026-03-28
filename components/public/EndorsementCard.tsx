@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { Pin } from 'lucide-react'
 import { cardHover } from '@/lib/motion'
 import { ProfileAvatar } from '@/components/ui/ProfileAvatar'
 
@@ -14,6 +15,8 @@ interface EndorsementCardProps {
   yachtName?: string | null
   date: string
   content: string
+  isPinned?: boolean
+  onPin?: (isPinned: boolean) => void
 }
 
 const TRUNCATE_LENGTH = 150
@@ -26,6 +29,8 @@ export function EndorsementCard({
   yachtName,
   date,
   content,
+  isPinned,
+  onPin,
 }: EndorsementCardProps) {
   const [expanded, setExpanded] = useState(false)
   const needsTruncation = content.length > TRUNCATE_LENGTH
@@ -40,7 +45,26 @@ export function EndorsementCard({
   })
 
   return (
-    <motion.div {...cardHover} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <motion.div {...cardHover} className={`rounded-2xl border bg-[var(--color-surface)] p-4 ${isPinned ? 'border-[var(--accent-500,var(--color-interactive))]/30' : 'border-[var(--color-border)]'}`}>
+      {/* Pin indicator + button */}
+      {(isPinned || onPin) && (
+        <div className="flex items-center justify-between mb-2">
+          {isPinned && (
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-[var(--accent-500,var(--color-interactive))] flex items-center gap-1">
+              <Pin size={10} /> Pinned
+            </span>
+          )}
+          {onPin && (
+            <button
+              onClick={() => onPin(!isPinned)}
+              className={`text-xs font-medium flex items-center gap-1 transition-colors ml-auto ${isPinned ? 'text-[var(--color-text-secondary)] hover:text-[var(--color-error)]' : 'text-[var(--color-text-tertiary)] hover:text-[var(--accent-500,var(--color-interactive))]'}`}
+            >
+              <Pin size={12} /> {isPinned ? 'Unpin' : 'Pin'}
+            </button>
+          )}
+        </div>
+      )}
+
       {/* Endorser info */}
       <div className="flex items-center gap-3 mb-3">
         {endorserHandle ? (

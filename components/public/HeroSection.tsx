@@ -7,6 +7,7 @@ import { PhotoGallery } from '@/components/profile/PhotoGallery'
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { ShareButton } from './ShareButton'
 import { SaveProfileButton } from '@/components/profile/SaveProfileButton'
+import { scrimPresets, type ScrimPreset } from '@/lib/scrim-presets'
 
 interface HeroSectionProps {
   displayName: string
@@ -30,6 +31,10 @@ interface HeroSectionProps {
   savedStatus?: { id: string; folder_id: string | null } | null
   heroStats?: string[]
   homeCountryFlag?: string
+  viewModeToggle?: React.ReactNode
+  scrimPreset?: ScrimPreset
+  focalX?: number
+  focalY?: number
 }
 
 export function HeroSection({
@@ -54,7 +59,12 @@ export function HeroSection({
   savedStatus,
   heroStats = [],
   homeCountryFlag,
+  viewModeToggle,
+  scrimPreset: scrimPresetKey,
+  focalX = 50,
+  focalY = 50,
 }: HeroSectionProps) {
+  const scrim = scrimPresets[scrimPresetKey ?? 'dark']
   const { scrollY } = useScroll()
   const heroHeight = useTransform(scrollY, [0, 200], ['70vh', '40vh'])
   const marginInline = useTransform(scrollY, [0, 200], ['0px', '16px'])
@@ -76,12 +86,10 @@ export function HeroSection({
         />
       </div>
 
-      {/* Strong gradient — dark at top (for buttons) and bottom (for identity) */}
+      {/* Scrim gradient — top (for buttons) and bottom (for identity) */}
       <div className="absolute inset-0 pointer-events-none">
-        {/* Top fade for nav readability */}
-        <div className="h-28 bg-gradient-to-b from-black/50 to-transparent" />
-        {/* Bottom fade for identity readability */}
-        <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+        <div className={`h-28 bg-gradient-to-b ${scrim.topGradient}`} />
+        <div className={`absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t ${scrim.bottomGradient}`} />
       </div>
 
       {/* Top bar — icon-only buttons over photo */}
@@ -121,43 +129,46 @@ export function HeroSection({
       <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 z-10 flex flex-col gap-3">
         {/* Availability badge — top of identity block */}
         {availableForWork && (
-          <span className="self-start flex items-center gap-1.5 bg-green-500/25 backdrop-blur-md border border-green-400/40 rounded-full px-3 py-1 text-xs font-semibold text-green-300 tracking-wide uppercase">
+          <span className={`self-start flex items-center gap-1.5 ${scrim.badgeBg} backdrop-blur-md border border-green-400/40 rounded-full px-3 py-1 text-xs font-semibold text-green-300 tracking-wide uppercase`}>
             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
             Available for work
           </span>
         )}
 
         {/* Name — large, confident, serif */}
-        <h1 className="text-white font-serif text-4xl leading-[1.1] tracking-tight" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
+        <h1 className={`${scrim.textColor} font-serif text-4xl leading-[1.1] tracking-tight`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
           {displayName}{homeCountryFlag ? <span className="ml-2 text-3xl align-middle">{homeCountryFlag}</span> : null}
         </h1>
 
         {/* Role + Department — unified line */}
         {(primaryRole || (departments && departments.length > 0)) && (
-          <p className="text-white/90 text-base font-medium" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
+          <p className={`${scrim.subtextColor} text-base font-medium`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 6px rgba(0,0,0,0.5)' }}>
             {primaryRole}
             {primaryRole && departments && departments.length > 0 && (
-              <span className="text-white/50 mx-2">·</span>
+              <span className="opacity-50 mx-2">·</span>
             )}
             {departments && departments.length > 0 && (
-              <span className="text-white/70">{departments.join(', ')}</span>
+              <span className="opacity-70">{departments.join(', ')}</span>
             )}
           </p>
         )}
 
         {/* Hero stats: age, sea time */}
         {heroStats.length > 0 && (
-          <p className="text-white/70 text-sm font-medium drop-shadow-sm">
+          <p className={`${scrim.subtextColor} ${scrim.variant === 'dark' ? 'opacity-70' : ''} text-sm font-medium`}>
             {heroStats.join(' · ')}
           </p>
         )}
 
         {/* Location */}
         {showLocation && location && (
-          <p className="text-white/60 text-sm flex items-center gap-1.5 font-medium">
-            <MapPin size={13} className="text-white/50" />{location}
+          <p className={`${scrim.subtextColor} ${scrim.variant === 'dark' ? 'opacity-60' : ''} text-sm flex items-center gap-1.5 font-medium`}>
+            <MapPin size={13} className={scrim.variant === 'dark' ? 'opacity-50' : ''} />{location}
           </p>
         )}
+
+        {/* View Mode Toggle */}
+        {viewModeToggle}
 
         {/* Social links row (white variant on dark bg) */}
         {socialLinks && socialLinks.length > 0 && (

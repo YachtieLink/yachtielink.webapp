@@ -53,6 +53,8 @@ export type ProfilePhoto = {
   id: string
   photo_url: string
   sort_order: number
+  focal_x: number
+  focal_y: number
 }
 
 export type Hobby = {

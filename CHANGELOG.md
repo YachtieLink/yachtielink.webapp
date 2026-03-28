@@ -22,6 +22,44 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-28 — Claude Code (Opus 4.6) — Sprint 11b Build + Review (Overnight)
+
+### Done
+
+- **Sprint 11b built:** Portfolio Mode — dual-layout public profile with view mode toggle, card-based portfolio layout, mini bento gallery, photo lightbox, endorsement pinning, and scrim/accent rendering. 16 files (10 new, 6 modified).
+- **View mode toggle:** `ViewModeToggle` — two-segment pill rendered inside hero identity block. Switches between Profile (editorial) and Portfolio (card-based) layouts. Uses `var(--accent-500)` for active segment. Scrim-variant-aware text colors.
+- **Portfolio layout:** `PortfolioLayout` — card-based layout with `SectionCard` components (rounded-xl, bg-white/80). About section with line-clamp-3 + expand. Experience shows top 3 with "See all" link. Certifications as chip row. Endorsements with inline quotes. Bottom CTA for non-logged-in viewers.
+- **Mini bento gallery:** `MiniBentoGallery` — 3 layout variants (1/2/3+ photos) with asymmetric grid. Focal point rendering via `objectPosition`. Lazy-loaded `PhotoLightbox` via `next/dynamic`.
+- **Photo lightbox:** Full-screen viewer with keyboard navigation (Escape, arrows), touch swipe (horizontal nav, down close), body scroll lock, photo counter.
+- **Scrim preset system:** `lib/scrim-presets.ts` — 4 presets (dark/light/teal/warm) controlling hero gradients, text colors, text shadows, badge backgrounds. Applied in HeroSection replacing hardcoded classes.
+- **Accent color system:** `lib/accent-colors.ts` — 5 palettes (teal/coral/navy/amber/sand) with 500/600/100 shades. Injected as CSS custom properties on wrapper div.
+- **Endorsement pinning:** Full stack — API route (`/api/endorsements/[id]/pin`), RLS migration for recipient pin policy, `EndorsementCard` pin UI, `EndorsementsPageClient` with optimistic updates and rollback. Max 3 pinned, sorted pinned-first.
+- **Education sub-page:** `/u/[handle]/education/page.tsx` — server component rendering all education entries.
+- **PublicProfileContent:** Converted to client component (`'use client'`). Added `useState` for view mode switching, accent color CSS variable injection, scrim preset resolution, conditional layout branching.
+- **Two-phase /review:** Phase 1 (Sonnet) caught RLS policy gap (CRITICAL), pin count off-by-one (HIGH), light scrim opacity compounding (HIGH), accentColor prop dropped (MEDIUM), expand heuristic mismatch (MEDIUM). All fixed before commit.
+- **Test-yl:** 14/14 items passed via code-path analysis (preview tools unavailable overnight).
+
+### Context
+
+- Branch: `sprint-11b/portfolio-mode` — 16 files changed, ready to commit
+- Overnight session — autonomous execution per founder instruction
+- Sprint 11a already committed as `30f89ca` on `sprint-11a/profile-rewrite-foundation`
+- Sprint 11c queued next (Rich Portfolio: bento grid engine, templates, tiles, Pro gating)
+
+### Next
+
+1. **Commit Sprint 11b** (no push)
+2. **Build Sprint 11c** — Rich Portfolio mode: bento grid engine, templates, tiles, Pro gating
+3. **Morning: founder review** — present flags from overnight, merge PRs
+
+### Flags
+
+- ⚠️ Test-yl ran without preview browser tools — code-path verification only. Visual QA recommended in morning.
+- ⚠️ RLS migration `20260328000002_endorsement_recipient_pin_policy.sql` adds a new UPDATE policy for endorsement recipients — needs `supabase db push` on preview/production.
+- ⚠️ `numeric` columns in Postgres returned as strings by Supabase JS client (focal_x/focal_y) — cast to number in rendering but not at query level. Low-risk but noted.
+
+---
+
 ## 2026-03-28 — Claude Code (Opus 4.6) — Sprint 11a Build + Review (Overnight)
 
 ### Done
