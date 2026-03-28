@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
-import { X, Mail, Phone, MessageCircle, Copy, Share2, ExternalLink } from 'lucide-react'
+import { X, Mail, Phone, MessageCircle, Copy, Share2, ExternalLink, FileText } from 'lucide-react'
 import { BentoGrid } from '../bento/BentoGrid'
 import { SectionModal } from '../SectionModal'
 import { PhotoTile } from '../bento/tiles/PhotoTile'
@@ -249,8 +249,46 @@ export function RichPortfolioLayout({
     }
   }
 
+  // Contact + CV utility row (above bento, consistent with Profile mode)
+  const hasContact = (user.show_email !== false && user.email) ||
+    (user.show_phone !== false && user.phone) ||
+    (user.show_whatsapp !== false && user.whatsapp)
+
   return (
     <div className="px-4 pt-4 pb-24 max-w-[960px] mx-auto w-full">
+      {/* Contact + CV row */}
+      {(hasContact || hasCv) && (
+        <div className="flex items-center justify-between mb-4">
+          {hasContact && (
+            <button onClick={() => setActiveModal('contact')} className="flex gap-3">
+              {user.show_email !== false && user.email && (
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">
+                  <Mail size={18} />
+                </span>
+              )}
+              {user.show_phone !== false && user.phone && (
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">
+                  <Phone size={18} />
+                </span>
+              )}
+              {user.show_whatsapp !== false && user.whatsapp && (
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">
+                  <MessageCircle size={18} />
+                </span>
+              )}
+            </button>
+          )}
+          {hasCv && (
+            <button
+              onClick={() => setActiveModal('cv')}
+              className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+            >
+              <FileText size={16} className="text-[var(--color-text-secondary)]" />
+              View my CV
+            </button>
+          )}
+        </div>
+      )}
       <BentoGrid
         variant={variant}
         tiles={tiles}

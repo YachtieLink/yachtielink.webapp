@@ -251,28 +251,29 @@ export function PublicProfileContent({
         <div className="flex flex-col gap-4 px-4 pt-4 pb-24 max-w-[680px] mx-auto w-full">
 
           {/* Contact — tappable icon row */}
-          <ContactRow
-            email={user.email}
-            phone={user.phone}
-            whatsapp={user.whatsapp}
-            showEmail={user.show_email}
-            showPhone={user.show_phone}
-            showWhatsapp={user.show_whatsapp}
-            firstName={firstName}
-          />
-
-          {/* View my CV — styled button */}
-          {user.cv_public !== false && (
-            (user.cv_public_source === 'uploaded' ? user.cv_storage_path : user.latest_pdf_path)
-          ) && (
-            <Link
-              href={`/u/${user.handle}/cv`}
-              className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors w-fit"
-            >
-              <FileText size={16} className="text-[var(--color-text-secondary)]" />
-              View my CV
-            </Link>
-          )}
+          {/* Contact + CV row */}
+          <div className="flex items-center justify-between">
+            <ContactRow
+              email={user.email}
+              phone={user.phone}
+              whatsapp={user.whatsapp}
+              showEmail={user.show_email}
+              showPhone={user.show_phone}
+              showWhatsapp={user.show_whatsapp}
+              firstName={firstName}
+            />
+            {user.cv_public !== false && (
+              (user.cv_public_source === 'uploaded' ? user.cv_storage_path : user.latest_pdf_path)
+            ) && (
+              <Link
+                href={`/u/${user.handle}/cv`}
+                className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+              >
+                <FileText size={16} className="text-[var(--color-text-secondary)]" />
+                View my CV
+              </Link>
+            )}
+          </div>
 
           {/* About */}
           {sectionVisible(sectionVisibility, 'about', !!(user.ai_summary || user.bio)) && (

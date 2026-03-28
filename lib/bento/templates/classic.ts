@@ -8,8 +8,6 @@ export const classicTemplate: BentoTemplate = {
     full: {
       slots: [
         { id: 'about', areaName: 'about', type: 'about' },
-        { id: 'contact', areaName: 'contact', type: 'contact' },
-        { id: 'cv', areaName: 'cv', type: 'cv' },
         { id: 'photo1', areaName: 'photo1', type: 'photo' },
         { id: 'experience', areaName: 'exp', type: 'experience' },
         { id: 'photo2', areaName: 'photo2', type: 'photo' },
@@ -25,18 +23,17 @@ export const classicTemplate: BentoTemplate = {
       ],
       areas: {
         desktop: [
-          '"contact cv      about   about"',
-          '"photo1  photo1  about   about"',
-          '"exp     exp     photo1  photo1"',
+          '"about   about   photo1  photo1"',
+          '"about   about   photo1  photo1"',
           '"exp     exp     photo2  photo2"',
-          '"endorse endorse photo2  photo2"',
+          '"exp     exp     photo2  photo2"',
+          '"endorse endorse photo3  photo3"',
           '"certs   stats   photo3  photo3"',
-          '"edu     edu     photo3  photo3"',
-          '"photo4  photo4  photo5  photo5"',
+          '"edu     edu     photo4  photo4"',
+          '"photo5  photo5  photo4  photo4"',
           '"skills  skills  hobbies hobbies"',
         ].join('\n'),
         mobile: [
-          '"contact cv"',
           '"about   about"',
           '"exp     exp"',
           '"photo1  photo2"',
