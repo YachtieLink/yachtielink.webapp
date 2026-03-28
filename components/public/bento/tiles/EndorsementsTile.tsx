@@ -46,7 +46,7 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
           )}
           <div className="min-w-0">
             {endorserHandle ? (
-              <Link href={`/u/${endorserHandle}`} className="text-xs font-medium text-[var(--color-text-primary)] hover:underline truncate block">
+              <Link href={`/u/${endorserHandle}`} onClick={(e) => e.stopPropagation()} className="text-xs font-medium text-[var(--color-text-primary)] hover:underline truncate block">
                 {endorserName}
               </Link>
             ) : (

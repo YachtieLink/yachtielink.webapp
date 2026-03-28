@@ -33,6 +33,7 @@ export function ContactTile({ email, phone, whatsapp, showEmail, showPhone, show
         <a
           key={item.label}
           href={item.href}
+          onClick={(e) => e.stopPropagation()}
           className="flex items-center gap-3 text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors"
           aria-label={item.label}
         >

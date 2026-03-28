@@ -195,6 +195,7 @@ export function RichPortfolioLayout({
         return {
           areaName: slot.areaName,
           type: 'cv',
+          onClick: () => setActiveModal('cv'),
           content: <CvTile handle={handle} />,
         }
       case 'stats': {
@@ -321,6 +322,35 @@ export function RichPortfolioLayout({
       )}
 
       {/* Section modals — full content overlays */}
+      <SectionModal title="CV Preview" open={activeModal === 'cv'} onClose={() => setActiveModal(null)}>
+        <div className="flex flex-col gap-4">
+          <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100">
+            <iframe
+              src={`/api/cv/public-download/${handle}`}
+              className="w-full h-full border-0"
+              title="CV Preview"
+            />
+          </div>
+          <div className="flex gap-3">
+            <a
+              href={`/api/cv/public-download/${handle}`}
+              download
+              onClick={(e) => e.stopPropagation()}
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+            >
+              Download CV
+            </a>
+            <button
+              onClick={() => { navigator.clipboard.writeText(`https://yachtie.link/u/${handle}/cv`); }}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+            >
+              <Share2 size={14} />
+              Share
+            </button>
+          </div>
+        </div>
+      </SectionModal>
+
       <SectionModal title="Contact" open={activeModal === 'contact'} onClose={() => setActiveModal(null)}>
         <div className="flex flex-col gap-4">
           {user.show_email !== false && user.email && (
