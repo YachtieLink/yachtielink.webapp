@@ -17,6 +17,7 @@ interface HeroSectionProps {
   showLocation?: boolean
   availableForWork?: boolean
   isPro?: boolean
+  viewerIsPro?: boolean
   isOwnProfile: boolean
   isLoggedIn?: boolean
   isColleague: boolean
@@ -45,6 +46,7 @@ export function HeroSection({
   showLocation,
   availableForWork,
   isPro,
+  viewerIsPro,
   isOwnProfile,
   isLoggedIn,
   isColleague,
@@ -169,14 +171,28 @@ export function HeroSection({
         {/* Badges — left */}
         <div className="flex items-center gap-1.5">
           {isColleague && (
-            <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-medium text-white/90" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+            <Link
+              href="/app/network/relationship"
+              className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-medium text-white/90 hover:bg-white/25 transition-colors"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
+            >
               Colleague
-            </span>
+            </Link>
           )}
           {isPro && (
-            <span className="inline-flex items-center rounded-full bg-white/15 backdrop-blur-sm border border-white/30 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/90" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
-              Pro
-            </span>
+            isLoggedIn && !viewerIsPro && !isOwnProfile ? (
+              <Link
+                href="/app/billing"
+                className="inline-flex items-center rounded-full bg-amber-400/20 backdrop-blur-sm border border-amber-400/30 px-2 py-0.5 text-[10px] font-medium text-amber-300 hover:bg-amber-400/30 transition-colors"
+                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
+              >
+                Pro
+              </Link>
+            ) : (
+              <span className="inline-flex items-center rounded-full bg-amber-400/20 backdrop-blur-sm border border-amber-400/30 px-2 py-0.5 text-[10px] font-medium text-amber-300" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+                Pro
+              </span>
+            )
           )}
         </div>
         {/* Social links + toggle — right */}
