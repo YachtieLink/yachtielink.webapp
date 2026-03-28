@@ -6,12 +6,40 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 71 lessons
+**Current count:** 73 lessons
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## Dev Server Sharing Production Supabase Can Lock Out All Users
+
+**What happened:** Dev server with hot-reload was running against the same Supabase instance as production. Login page had a redirect loop that generated 1,500+ auth requests in minutes, exhausting the Supabase rate limit. All production users were locked out.
+
+**Root cause:** Three compounding issues: (1) dev and prod shared the same Supabase project, (2) middleware called `getUser()` on every request with no try-catch, so rate-limited responses crashed middleware → 500 → browser retry → loop, (3) 3-4 redundant `getUser()` calls per page amplified the rate-limit surface.
+
+**Fix applied:** Rally 005 — 12 fixes: middleware try-catch, `needsAuth` simplification, `/api/*` excluded from middleware matcher, polling jitter, `AuthStateListener`, dev/prod env guard warning.
+
+**Lesson:** Never let middleware crash on external service failures. Always try-catch calls to external services (Supabase, Stripe, Redis). Dev environments should use separate backend instances. Consider the blast radius of every `getUser()` call — each one is a network request to Supabase Auth.
+
+**Sprint:** Rally 005 | **Caught by:** production incident | **Date:** 2026-03-28
+
+---
+
+## @supabase/ssr Requires httpOnly: false — Cannot Be Changed
+
+**What happened:** Auth audit found cookies have `httpOnly: false`, making session tokens readable by JavaScript (XSS risk). Investigation revealed this is an inherent limitation of `@supabase/ssr` — the library reads cookies from `document.cookie` on the browser side.
+
+**Root cause:** `@supabase/ssr`'s `createBrowserClient` uses `document.cookie` for cookie access, which requires `httpOnly: false`. The default `DEFAULT_COOKIE_OPTIONS` in the library sets this explicitly.
+
+**Fix applied:** Accepted risk. Added `secure: true` for production (HTTPS-only). Documented as known limitation.
+
+**Lesson:** Always audit third-party library defaults for security implications. `@supabase/ssr` optimises for developer experience (client-side cookie access) at the cost of security (httpOnly). The `secure` flag IS configurable and should be set.
+
+**Sprint:** Rally 005 | **Caught by:** R2 challenger agent | **Date:** 2026-03-29
 
 ---
 

@@ -6,12 +6,28 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 31 rules
+**Current count:** 33 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## Notice and Act on Anomalous Server Logs Immediately
+
+**Rule:** When dev server logs show repeating patterns (login loops, rapid-fire requests, error floods), stop and investigate immediately. Do not dismiss them as "local only" or assume they're unrelated to the current task.
+**Origin:** 2026-03-28 — dev server login loop was visible in logs (`GET /login 200 in 58ms` repeating) but was dismissed. It burned 1,500+ auth requests on the shared Supabase instance and locked out production.
+**How to apply:** If you see the same request path repeating rapidly in server output, (1) kill the dev server immediately, (2) check if it's hitting a shared external service, (3) investigate the loop cause before restarting.
+
+---
+
+## Investigate Login/Auth Issues Before Suggesting "Wait a Minute"
+
+**Rule:** When a user reports they can't log in, don't suggest waiting for rate limits to clear. Investigate the cause immediately — a redirect loop, a middleware crash, or a cookie issue won't resolve itself with time.
+**Origin:** 2026-03-28 — founder reported login not working. Agent suggested "wait 60 seconds for rate limit to clear" multiple times while the actual issue (redirect loop, middleware crash) continued burning through rate limits.
+**How to apply:** On auth failures: (1) check if any dev servers are running, (2) check Supabase dashboard for anomalous request patterns, (3) check middleware/login code for recent changes that could cause loops. Only suggest waiting after confirming no active loop exists.
 
 ---
 
