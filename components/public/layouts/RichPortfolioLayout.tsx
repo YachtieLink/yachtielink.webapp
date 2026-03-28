@@ -283,8 +283,8 @@ export function RichPortfolioLayout({
 
       {/* Gallery modal — full photo grid overlay (z-40, below lightbox z-50) */}
       {showGalleryModal && (
-        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-start justify-center overflow-y-auto">
-          <div className="relative w-full max-w-[960px] mx-4 my-8 bg-[var(--color-surface)] rounded-2xl overflow-hidden">
+        <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-stretch justify-center p-4">
+          <div className="relative w-full max-w-[960px] bg-[var(--color-surface)] rounded-2xl overflow-hidden flex flex-col">
             {/* Header */}
             <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-[var(--color-surface)] border-b border-[var(--color-border-subtle)]">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-[var(--color-text-primary)]">
@@ -299,7 +299,7 @@ export function RichPortfolioLayout({
               </button>
             </div>
             {/* Photo grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-4">
+            <div className="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2 p-4 content-start">
               {galleryPhotos.map((photo, i) => (
                 <button
                   key={photo.id}
@@ -323,15 +323,11 @@ export function RichPortfolioLayout({
 
       {/* Section modals — full content overlays */}
       <SectionModal title="CV Preview" open={activeModal === 'cv'} onClose={() => setActiveModal(null)}>
-        <div className="flex flex-col gap-4">
-          <div className="w-full aspect-[3/4] rounded-xl overflow-hidden bg-gray-100">
-            <iframe
-              src={`/api/cv/public-download/${handle}`}
-              className="w-full h-full border-0"
-              title="CV Preview"
-            />
+        <div className="flex flex-col gap-4 h-full">
+          <div className="flex-1 rounded-xl overflow-hidden bg-gray-100 min-h-0">
+            <iframe src={`/api/cv/public-download/${handle}`} className="w-full h-full border-0" title="CV Preview" />
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 shrink-0">
             <a
               href={`/api/cv/public-download/${handle}`}
               download
