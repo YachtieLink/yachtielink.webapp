@@ -32,7 +32,6 @@ export const classicTemplate: BentoTemplate = {
           '"certs   stats   photo3  photo3"',
           '"edu     edu     photo3  photo3"',
           '"skills  skills  photo4  photo5"',
-          '"skills  skills  more    more"',
         ].join('\n'),
         mobile: [
           '"about   about"',
@@ -45,7 +44,6 @@ export const classicTemplate: BentoTemplate = {
           '"edu     edu"',
           '"photo4  photo5"',
           '"skills  skills"',
-          '"more    more"',
         ].join('\n'),
       },
     },

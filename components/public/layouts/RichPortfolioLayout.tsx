@@ -111,21 +111,8 @@ export function RichPortfolioLayout({
     }
   }
 
-  // Add "more" tile if template references it and there are overflow photos
-  if (hasMorePhotos && (variant.areas.desktop.includes('more') || variant.areas.mobile.includes('more'))) {
-    const overflowPhoto = galleryPhotos[photoSlots.length]
-    tiles.push({
-      areaName: 'more',
-      type: 'spacer',
-      content: (
-        <MorePhotosTile
-          handle={handle}
-          backgroundUrl={overflowPhoto?.image_url}
-          totalCount={galleryPhotos.length}
-        />
-      ),
-    })
-  }
+  // Photos that didn't fit in bento slots — shown in carousel below
+  const overflowPhotos = galleryPhotos.slice(photoSlots.length)
 
   function buildTile(slot: BentoTemplateSlot, currentPhotoIndex: number): BentoTile | null {
     switch (slot.type) {
@@ -244,6 +231,42 @@ export function RichPortfolioLayout({
         gap={12}
         accentColor={accentColor}
       />
+
+      {/* Gallery carousel — overflow photos not in bento */}
+      {overflowPhotos.length > 0 && (
+        <div className="mt-4">
+          <div className="flex items-center gap-2 mb-3 px-1">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">Gallery</span>
+            <span className="text-xs text-[var(--color-text-tertiary)]">· {galleryPhotos.length} photos</span>
+          </div>
+          <div className="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide">
+            {overflowPhotos.map((photo, i) => (
+              <button
+                key={photo.id}
+                onClick={() => setLightboxIndex(photoSlots.length + i)}
+                className="shrink-0 snap-start rounded-2xl overflow-hidden group cursor-pointer"
+                style={{ width: 160, height: 200 }}
+              >
+                <img
+                  src={photo.image_url}
+                  alt={photo.caption || ''}
+                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                  loading="lazy"
+                />
+              </button>
+            ))}
+            <a
+              href={`/u/${handle}/gallery`}
+              className="shrink-0 snap-start rounded-2xl overflow-hidden flex items-center justify-center bg-[var(--color-surface-raised)] hover:bg-[var(--color-border)] transition-colors"
+              style={{ width: 160, height: 200 }}
+            >
+              <span className="text-sm font-medium text-[var(--accent-500,#14b8a6)]">
+                See all &rarr;
+              </span>
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Lightbox */}
       {lightboxIndex !== null && (
