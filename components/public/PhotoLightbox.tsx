@@ -112,8 +112,8 @@ export function PhotoLightbox({ photos, initialIndex, open, onClose, onViewAll }
         />
       </div>
 
-      {/* Bottom bar — counter + view all */}
-      <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-4 px-6">
+      {/* Bottom bar — counter + view all, positioned in thumb zone */}
+      <div className="absolute bottom-[20vh] left-0 right-0 flex items-center justify-center gap-4 px-6">
         {photos.length > 1 && (
           <p className="text-white/70 text-sm font-medium">
             {index + 1} / {photos.length}
