@@ -76,6 +76,9 @@ export function RichPortfolioLayout({
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const [showGalleryModal, setShowGalleryModal] = useState(false)
   const [activeModal, setActiveModal] = useState<string | null>(null)
+  const [pendingNav, setPendingNav] = useState<{ url: string; label: string } | null>(null)
+
+  const displayName = user.handle // used for "leaving X's profile" message
 
   // Gallery photos from user_gallery (work portfolio, not profile headshots)
   const galleryPhotos = gallery.sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
@@ -441,26 +444,35 @@ export function RichPortfolioLayout({
 
       <SectionModal title="Endorsements" open={activeModal === 'endorsements'} onClose={() => setActiveModal(null)}>
         <div className="flex flex-col gap-5">
-          {endorsements.map((end) => (
-            <div key={end.id}>
-              <p className="text-sm text-[var(--color-text-primary)] italic">&ldquo;{end.content}&rdquo;</p>
-              <div className="flex items-center gap-2 mt-2">
-                {end.endorser?.profile_photo_url ? (
-                  <img src={end.endorser.profile_photo_url} alt="" className="w-7 h-7 rounded-full object-cover" />
-                ) : (
-                  <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">
-                    {(end.endorser?.display_name || end.endorser?.full_name || '?').charAt(0)}
-                  </div>
-                )}
-                <div>
-                  <p className="text-xs font-medium text-[var(--color-text-primary)]">{end.endorser?.display_name || end.endorser?.full_name || 'Anonymous'}</p>
-                  {(end.endorser_role_label || end.yacht?.name) && (
-                    <p className="text-[10px] text-[var(--color-text-secondary)]">{end.endorser_role_label}{end.endorser_role_label && end.yacht?.name ? ' · ' : ''}{end.yacht?.name}</p>
+          {endorsements.map((end) => {
+            const endorserName = end.endorser?.display_name || end.endorser?.full_name || 'Anonymous'
+            return (
+              <div key={end.id}>
+                <p className="text-sm text-[var(--color-text-primary)] italic">&ldquo;{end.content}&rdquo;</p>
+                <div className="flex items-center gap-2 mt-2">
+                  {end.endorser?.profile_photo_url ? (
+                    <img src={end.endorser.profile_photo_url} alt="" className="w-7 h-7 rounded-full object-cover" />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">
+                      {endorserName.charAt(0)}
+                    </div>
                   )}
+                  <div>
+                    {end.endorser?.handle ? (
+                      <button onClick={() => setPendingNav({ url: `/u/${end.endorser!.handle}`, label: endorserName })} className="text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:underline text-left">
+                        {endorserName}
+                      </button>
+                    ) : (
+                      <p className="text-xs font-medium text-[var(--color-text-primary)]">{endorserName}</p>
+                    )}
+                    {(end.endorser_role_label || end.yacht?.name) && (
+                      <p className="text-[10px] text-[var(--color-text-secondary)]">{end.endorser_role_label}{end.endorser_role_label && end.yacht?.name ? ' · ' : ''}{end.yacht?.name}</p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </SectionModal>
 
@@ -506,6 +518,31 @@ export function RichPortfolioLayout({
           ))}
         </div>
       </SectionModal>
+
+      {/* Navigation confirmation — "leaving this profile" */}
+      {pendingNav && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-6">
+          <div className="bg-[var(--color-surface)] rounded-2xl p-6 max-w-[320px] w-full flex flex-col gap-4 text-center">
+            <p className="text-sm text-[var(--color-text-primary)]">
+              You&apos;re about to leave this profile to view <span className="font-semibold">{pendingNav.label}</span>
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPendingNav(null)}
+                className="flex-1 py-2.5 rounded-xl border border-[var(--color-border)] text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+              >
+                Stay here
+              </button>
+              <a
+                href={pendingNav.url}
+                className="flex-1 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold text-center hover:opacity-90 transition-opacity"
+              >
+                Continue
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Lightbox */}
       {lightboxIndex !== null && (
