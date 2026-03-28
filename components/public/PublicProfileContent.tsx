@@ -249,9 +249,14 @@ export function PublicProfileContent({
             gallery={gallery}
             accentColor={resolvedAccent[500]}
             handle={user.handle}
+            displayName={displayName}
             isLoggedIn={isLoggedIn}
             isOwnProfile={isOwnProfile}
             sectionVisibility={sectionVisibility}
+            seaTimeTotalDays={seaTimeTotalDays}
+            seaTimeYachtCount={seaTimeYachtCount}
+            colleagueCount={colleagueCount}
+            savedStatus={savedStatus}
           />
         </div>
       ) : (
