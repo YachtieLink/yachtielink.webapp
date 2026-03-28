@@ -46,7 +46,7 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
     <div className="h-full rounded-xl bg-white/80 p-5 flex flex-col justify-between" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-3">
-        <MessageSquareQuote size={14} className="text-rose-500" />
+        <MessageSquareQuote size={14} className="text-[#F08080]" />
         <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">Endorsements</span>
         {shown.length > 1 && (
           <div className="flex gap-1 ml-auto">
@@ -61,8 +61,8 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
         )}
       </div>
 
-      {/* Quote — centred, truncates */}
-      <p className="text-sm text-[var(--color-text-primary)] italic leading-relaxed flex-1 text-center line-clamp-5">
+      {/* Quote — centred horizontally and vertically, truncates */}
+      <p className="text-sm text-[var(--color-text-primary)] italic leading-relaxed flex-1 text-center line-clamp-5 flex items-center justify-center">
         &ldquo;{current.content}&rdquo;
       </p>
 

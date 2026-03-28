@@ -213,6 +213,8 @@ export function RichPortfolioLayout({
               seaTime={seaTimeFormatted}
               yachtCount={attachments.length}
               certCount={certifications.length}
+              endorsementCount={endorsements.length}
+              colleagueCount={0}
             />
           ),
         }
