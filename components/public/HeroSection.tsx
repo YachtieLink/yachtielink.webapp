@@ -134,21 +134,12 @@ export function HeroSection({
 
       {/* Identity — overlaid at bottom of photo. Just name + role. */}
       <div className="absolute bottom-0 left-0 right-0 pl-5 pr-20 pb-5 z-10 flex flex-col gap-1">
-        <h1 className={`${scrim.textColor} font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
-          <span className="inline-flex items-baseline gap-2 flex-wrap">
-            <span>{displayName}</span>
-            {homeCountryFlag && <span className="text-2xl sm:text-3xl">{homeCountryFlag}</span>}
-          </span>
+        <h1 className={`${scrim.textColor} font-serif text-3xl sm:text-4xl leading-[1.1] tracking-tight whitespace-nowrap`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
+          {displayName}{homeCountryFlag ? <span className="ml-2 text-2xl sm:text-3xl align-middle">{homeCountryFlag}</span> : null}
         </h1>
-        {(primaryRole || (departments && departments.length > 0)) && (
+        {primaryRole && (
           <p className={`${scrim.subtextColor} text-sm font-medium`} style={{ textShadow: scrim.textShadow === 'none' ? 'none' : '0 1px 6px rgba(0,0,0,0.5)' }}>
             {primaryRole}
-            {primaryRole && departments && departments.length > 0 && (
-              <span className="opacity-50 mx-1.5">·</span>
-            )}
-            {departments && departments.length > 0 && (
-              <span className="opacity-70">{departments.join(', ')}</span>
-            )}
           </p>
         )}
       </div>
