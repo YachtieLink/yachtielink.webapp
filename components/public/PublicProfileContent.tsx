@@ -284,17 +284,7 @@ export function PublicProfileContent({
       />
       )}
 
-      {/* ── Sticky bottom CTA for non-logged-in viewers (mobile only) ───────── */}
-      {!isLoggedIn && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-[var(--color-surface)]/80 backdrop-blur-md border-t border-[var(--color-border-subtle)] z-40 md:hidden">
-          <Link
-            href="/welcome"
-            className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
-          >
-            Build your crew profile
-          </Link>
-        </div>
-      )}
+      {/* No sticky CTA on profiles — this is the user's presentation, not our ad space */}
     </div>
   )
 }
@@ -516,12 +506,20 @@ function ProfileModeContent({
         {/* Bottom CTAs */}
         <div className="px-4 pb-8 flex flex-col gap-3 max-w-[680px] mx-auto w-full">
           {!isLoggedIn ? (
-            <Link
-              href="/login"
-              className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
-            >
-              Sign in to see how you know {displayName}
-            </Link>
+            <>
+              <Link
+                href="/signup"
+                className="w-full flex items-center justify-center rounded-xl bg-[var(--color-interactive)] px-6 py-3 text-sm font-semibold text-white hover:bg-[var(--color-interactive-hover)] transition-colors"
+              >
+                Build your crew profile — it&apos;s free
+              </Link>
+              <Link
+                href="/login"
+                className="w-full flex items-center justify-center rounded-xl border border-[var(--color-border)] px-6 py-3 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
+              >
+                Sign in to see how you know {displayName}
+              </Link>
+            </>
           ) : isOwnProfile ? (
             <Link
               href="/app/profile"
