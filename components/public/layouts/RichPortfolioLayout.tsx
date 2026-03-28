@@ -275,17 +275,17 @@ export function RichPortfolioLayout({
           {hasContact && (
             <button onClick={() => setActiveModal('contact')} className="flex gap-3">
               {user.show_email !== false && user.email && (
-                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
                   <Mail size={18} />
                 </span>
               )}
               {user.show_phone !== false && user.phone && (
-                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
                   <Phone size={18} />
                 </span>
               )}
               {user.show_whatsapp !== false && user.whatsapp && (
-                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
                   <WhatsAppIcon size={18} />
                 </span>
               )}
@@ -318,7 +318,7 @@ export function RichPortfolioLayout({
           >
             <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">My Gallery</span>
             <span className="text-xs text-[var(--color-text-tertiary)]">· {galleryPhotos.length} photos</span>
-            <span className="text-xs font-medium text-[var(--accent-500,#14b8a6)] ml-auto">View all &rarr;</span>
+            <span className="text-xs font-medium text-[var(--accent-500,#0f9b8e)] ml-auto">View all &rarr;</span>
           </button>
           <div className="flex gap-3 overflow-x-auto pb-3 snap-x snap-mandatory scrollbar-hide">
             {overflowPhotos.map((photo, i) => (
@@ -341,7 +341,7 @@ export function RichPortfolioLayout({
               className="shrink-0 snap-start rounded-2xl flex items-center justify-center bg-[var(--color-surface-raised)] hover:bg-[var(--color-border)] transition-colors cursor-pointer"
               style={{ width: 140, height: 140 }}
             >
-              <span className="text-sm font-medium text-[var(--accent-500,#14b8a6)]">See all &rarr;</span>
+              <span className="text-sm font-medium text-[var(--accent-500,#0f9b8e)]">See all &rarr;</span>
             </button>
           </div>
         </div>
@@ -401,7 +401,7 @@ export function RichPortfolioLayout({
             </Link>
             <Link
               href="/login"
-              className="w-full flex items-center justify-center text-center rounded-xl border border-[#14b8a6] px-6 py-3 text-sm font-medium text-[#14b8a6] hover:bg-[#14b8a6]/5 transition-colors"
+              className="w-full flex items-center justify-center text-center rounded-xl border border-[#0f9b8e] px-6 py-3 text-sm font-medium text-[#0f9b8e] hover:bg-[#0f9b8e]/5 transition-colors"
             >
               Sign in to see how you know<br />{displayName}
             </Link>
@@ -433,7 +433,7 @@ export function RichPortfolioLayout({
               href={`/api/cv/public-download/${handle}`}
               download
               onClick={(e) => e.stopPropagation()}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#0f9b8e)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
             >
               Download CV
             </a>
@@ -467,7 +467,7 @@ export function RichPortfolioLayout({
                   navigator.clipboard.writeText(url)
                 }
               }}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#0f9b8e)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
             >
               <Share2 size={14} />
               Share
@@ -511,7 +511,7 @@ export function RichPortfolioLayout({
                 </div>
               </div>
               <div className="flex border-t border-[var(--color-border-subtle)] divide-x divide-[var(--color-border-subtle)]">
-                <a href={`mailto:${user.email}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--color-surface-raised)] transition-colors">Email</a>
+                <a href={`mailto:${user.email}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#0f9b8e)] hover:bg-[var(--color-surface-raised)] transition-colors">Email</a>
                 <button onClick={() => { navigator.clipboard.writeText(user.email!) }} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] transition-colors">Copy</button>
               </div>
             </div>
@@ -526,8 +526,8 @@ export function RichPortfolioLayout({
                 </div>
               </div>
               <div className="flex border-t border-[var(--color-border-subtle)] divide-x divide-[var(--color-border-subtle)]">
-                <a href={`tel:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--color-surface-raised)] transition-colors">Call</a>
-                <a href={`sms:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--color-surface-raised)] transition-colors">Message</a>
+                <a href={`tel:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#0f9b8e)] hover:bg-[var(--color-surface-raised)] transition-colors">Call</a>
+                <a href={`sms:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#0f9b8e)] hover:bg-[var(--color-surface-raised)] transition-colors">Message</a>
                 <button onClick={() => { navigator.clipboard.writeText(user.phone!) }} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] transition-colors">Copy</button>
               </div>
             </div>
@@ -560,7 +560,7 @@ export function RichPortfolioLayout({
         open={activeModal === 'experience'}
         onClose={() => setActiveModal(null)}
         footer={
-          <a href={`/u/${handle}/experience`} className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-[var(--accent-500,#14b8a6)] hover:underline">
+          <a href={`/u/${handle}/experience`} className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-[var(--accent-500,#0f9b8e)] hover:underline">
             <ExternalLink size={14} />
             View full experience page
           </a>
@@ -569,7 +569,7 @@ export function RichPortfolioLayout({
         <div className="flex flex-col gap-4">
           {attachments.map((att) => (
             <div key={att.id} className="flex gap-3">
-              <div className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--accent-500,#14b8a6)]" />
+              <div className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--accent-500,#0f9b8e)]" />
               <div>
                 <p className="text-sm font-medium text-[var(--color-text-primary)]">{att.yachts?.name ?? 'Unknown Yacht'}</p>
                 {att.role_label && <p className="text-sm text-[var(--color-text-secondary)]">{att.role_label}</p>}
@@ -591,7 +591,7 @@ export function RichPortfolioLayout({
         open={activeModal === 'endorsements'}
         onClose={() => setActiveModal(null)}
         footer={
-          <a href={`/u/${handle}/endorsements`} className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-[var(--accent-500,#14b8a6)] hover:underline">
+          <a href={`/u/${handle}/endorsements`} className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-[var(--accent-500,#0f9b8e)] hover:underline">
             <ExternalLink size={14} />
             View all endorsements
           </a>
@@ -612,7 +612,7 @@ export function RichPortfolioLayout({
                   )}
                   <div>
                     {end.endorser?.handle ? (
-                      <button onClick={() => setPendingNav({ url: `/u/${end.endorser!.handle}`, label: endorserName })} className="text-sm font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#14b8a6)] text-left">
+                      <button onClick={() => setPendingNav({ url: `/u/${end.endorser!.handle}`, label: endorserName })} className="text-sm font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] text-left">
                         {endorserName}
                       </button>
                     ) : (
@@ -635,7 +635,7 @@ export function RichPortfolioLayout({
         open={activeModal === 'certifications'}
         onClose={() => setActiveModal(null)}
         footer={
-          <a href={`/u/${handle}/certifications`} className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-[var(--accent-500,#14b8a6)] hover:underline">
+          <a href={`/u/${handle}/certifications`} className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-[var(--accent-500,#0f9b8e)] hover:underline">
             <ExternalLink size={14} />
             View full certifications
           </a>
@@ -712,7 +712,7 @@ export function RichPortfolioLayout({
               </button>
               <a
                 href={pendingNav.url}
-                className="flex-1 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold text-center hover:opacity-90 transition-opacity"
+                className="flex-1 py-2.5 rounded-xl bg-[var(--accent-500,#0f9b8e)] text-white text-sm font-semibold text-center hover:opacity-90 transition-opacity"
               >
                 Continue
               </a>

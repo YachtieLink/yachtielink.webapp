@@ -378,7 +378,7 @@ export function PortfolioLayout({
             </Link>
             <Link
               href="/login"
-              className="w-full flex items-center justify-center text-center rounded-xl border border-[#14b8a6] px-6 py-3 text-sm font-medium text-[#14b8a6] hover:bg-[#14b8a6]/5 transition-colors"
+              className="w-full flex items-center justify-center text-center rounded-xl border border-[#0f9b8e] px-6 py-3 text-sm font-medium text-[#0f9b8e] hover:bg-[#0f9b8e]/5 transition-colors"
             >
               Sign in to see how you know<br />{displayName ?? handle}
             </Link>
@@ -421,7 +421,7 @@ export function PortfolioLayout({
                   navigator.clipboard.writeText(profileUrl)
                 }
               }}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#0f9b8e)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
             >
               <Share2 size={14} />
               Share
@@ -463,7 +463,7 @@ export function PortfolioLayout({
                 </div>
               </div>
               <div className="flex border-t border-[var(--color-border-subtle)] divide-x divide-[var(--color-border-subtle)]">
-                <a href={`mailto:${user.email}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--color-surface-raised)] transition-colors">Email</a>
+                <a href={`mailto:${user.email}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#0f9b8e)] hover:bg-[var(--color-surface-raised)] transition-colors">Email</a>
                 <button onClick={() => { navigator.clipboard.writeText(user.email!) }} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] transition-colors">Copy</button>
               </div>
             </div>
@@ -478,8 +478,8 @@ export function PortfolioLayout({
                 </div>
               </div>
               <div className="flex border-t border-[var(--color-border-subtle)] divide-x divide-[var(--color-border-subtle)]">
-                <a href={`tel:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--color-surface-raised)] transition-colors">Call</a>
-                <a href={`sms:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--color-surface-raised)] transition-colors">Message</a>
+                <a href={`tel:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#0f9b8e)] hover:bg-[var(--color-surface-raised)] transition-colors">Call</a>
+                <a href={`sms:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#0f9b8e)] hover:bg-[var(--color-surface-raised)] transition-colors">Message</a>
                 <button onClick={() => { navigator.clipboard.writeText(user.phone!) }} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] transition-colors">Copy</button>
               </div>
             </div>
@@ -513,7 +513,7 @@ export function PortfolioLayout({
             <a
               href={`/api/cv/public-download/${handle}`}
               download
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#0f9b8e)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
             >
               Download CV
             </a>

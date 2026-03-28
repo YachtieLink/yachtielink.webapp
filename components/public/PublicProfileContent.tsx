@@ -375,19 +375,19 @@ function ProfileModeContent({
 
                 if (seaTimeTotalDays > 0) {
                   const seaTimeStr = formatSeaTime(seaTimeTotalDays).displayLong
-                  parts.push(<span key="sea">I&apos;ve spent <button type="button" onClick={() => scrollToSection('section-experience')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">{seaTimeStr}</button> working at sea</span>)
+                  parts.push(<span key="sea">I&apos;ve spent <button type="button" onClick={() => scrollToSection('section-experience')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">{seaTimeStr}</button> working at sea</span>)
                 }
                 if (seaTimeYachtCount > 0) {
-                  parts.push(<span key="yacht"> across <button type="button" onClick={() => scrollToSection('section-experience')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">{seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}</button></span>)
+                  parts.push(<span key="yacht"> across <button type="button" onClick={() => scrollToSection('section-experience')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">{seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}</button></span>)
                 }
                 if (certifications.length > 0) {
-                  parts.push(<span key="cert">, hold <button type="button" onClick={() => scrollToSection('section-certifications')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">{certifications.length} {certifications.length === 1 ? 'certification' : 'certifications'}</button></span>)
+                  parts.push(<span key="cert">, hold <button type="button" onClick={() => scrollToSection('section-certifications')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">{certifications.length} {certifications.length === 1 ? 'certification' : 'certifications'}</button></span>)
                 }
                 if (colleagueCount > 0) {
                   parts.push(<span key="col"> and have worked with <strong className="font-semibold text-[var(--color-text-primary)]">{colleagueCount} {colleagueCount === 1 ? 'colleague' : 'colleagues'}</strong></span>)
                 }
                 if (endorsements.length > 0) {
-                  parts.push(<span key="end">, of which <button type="button" onClick={() => scrollToSection('section-endorsements')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors">{endorsements.length} endorsed</button></span>)
+                  parts.push(<span key="end">, of which <button type="button" onClick={() => scrollToSection('section-endorsements')} className="font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] transition-colors">{endorsements.length} endorsed</button></span>)
                 }
                 return <>{parts}.</>
               })()}
@@ -517,7 +517,7 @@ function ProfileModeContent({
               </Link>
               <Link
                 href="/login"
-                className="w-full flex items-center justify-center text-center rounded-xl border border-[#14b8a6] px-6 py-3 text-sm font-medium text-[#14b8a6] hover:bg-[#14b8a6]/5 transition-colors"
+                className="w-full flex items-center justify-center text-center rounded-xl border border-[#0f9b8e] px-6 py-3 text-sm font-medium text-[#0f9b8e] hover:bg-[#0f9b8e]/5 transition-colors"
               >
                 Sign in to see how you know<br />{displayName}
               </Link>
@@ -568,7 +568,7 @@ function ProfileModeContent({
                   navigator.clipboard.writeText(profileUrl)
                 }
               }}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#0f9b8e)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
             >
               <Share2 size={14} />
               Share
@@ -613,7 +613,7 @@ function ProfileModeContent({
                 </div>
               </div>
               <div className="flex border-t border-[var(--color-border-subtle)] divide-x divide-[var(--color-border-subtle)]">
-                <a href={`mailto:${user.email}?subject=${encodeURIComponent(`Hey ${firstName}`)}&body=${encodeURIComponent(`Hey ${firstName}, I saw your profile on YachtieLink.\n\n`)}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--color-surface-raised)] transition-colors">Email</a>
+                <a href={`mailto:${user.email}?subject=${encodeURIComponent(`Hey ${firstName}`)}&body=${encodeURIComponent(`Hey ${firstName}, I saw your profile on YachtieLink.\n\n`)}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#0f9b8e)] hover:bg-[var(--color-surface-raised)] transition-colors">Email</a>
                 <button onClick={() => { navigator.clipboard.writeText(user.email!) }} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] transition-colors">Copy</button>
               </div>
             </div>
@@ -628,8 +628,8 @@ function ProfileModeContent({
                 </div>
               </div>
               <div className="flex border-t border-[var(--color-border-subtle)] divide-x divide-[var(--color-border-subtle)]">
-                <a href={`tel:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--color-surface-raised)] transition-colors">Call</a>
-                <a href={`sms:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--color-surface-raised)] transition-colors">Message</a>
+                <a href={`tel:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#0f9b8e)] hover:bg-[var(--color-surface-raised)] transition-colors">Call</a>
+                <a href={`sms:${user.phone}`} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--accent-500,#0f9b8e)] hover:bg-[var(--color-surface-raised)] transition-colors">Message</a>
                 <button onClick={() => { navigator.clipboard.writeText(user.phone!) }} className="flex-1 py-2.5 text-center text-xs font-medium text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] transition-colors">Copy</button>
               </div>
             </div>
@@ -663,7 +663,7 @@ function ProfileModeContent({
             <a
               href={`/api/cv/public-download/${handle}`}
               download
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#14b8a6)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
+              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--accent-500,#0f9b8e)] text-white text-sm font-semibold hover:opacity-90 transition-opacity"
             >
               Download CV
             </a>
