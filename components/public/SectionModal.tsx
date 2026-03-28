@@ -13,7 +13,7 @@ export function SectionModal({ title, open, onClose, children }: SectionModalPro
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-stretch justify-center pt-16 px-3 pb-[max(env(safe-area-inset-bottom,12px),12px)] sm:pt-8 sm:px-4 sm:pb-4">
+    <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm flex items-stretch justify-center p-4 pb-[20vh]">
       <div className="relative w-full sm:max-w-[480px] bg-[var(--color-surface)] rounded-2xl overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--color-border-subtle)]">
