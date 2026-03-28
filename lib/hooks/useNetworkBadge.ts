@@ -4,9 +4,8 @@ import { useState, useEffect } from 'react'
 
 /**
  * Client-side hook that fetches the network badge count.
- * Runs once on mount, then refreshes every 60 seconds.
- * This keeps the badge count out of the layout's server render,
- * so the app shell (nav + sidebar) renders instantly.
+ * Runs once on mount, then refreshes every 5 minutes with random jitter
+ * to prevent thundering herd (all users polling simultaneously).
  */
 export function useNetworkBadge() {
   const [count, setCount] = useState(0)
@@ -27,7 +26,9 @@ export function useNetworkBadge() {
     }
 
     fetchCount()
-    const interval = setInterval(fetchCount, 60_000)
+    // 5 minute base interval + 0-60s random jitter to spread load
+    const jitter = Math.random() * 60_000
+    const interval = setInterval(fetchCount, 300_000 + jitter)
 
     return () => {
       mounted = false

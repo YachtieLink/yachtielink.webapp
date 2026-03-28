@@ -61,8 +61,11 @@ export async function checkRateLimit(
       remaining: Math.max(0, limit - current),
       resetAt,
     };
-  } catch {
-    // Redis unavailable — fail open for non-critical routes, fail closed for expensive ones
+  } catch (e) {
+    // Redis unavailable — fail open for non-critical routes, fail closed for expensive ones.
+    // Log so we know when Redis is having issues (silent failures mask outages).
+    console.error('[rate-limit] Redis unavailable, failOpen:', failOpen,
+      'key:', key, 'error:', e instanceof Error ? e.message : e)
     return { allowed: failOpen, remaining: failOpen ? limit : 0, resetAt };
   }
 }

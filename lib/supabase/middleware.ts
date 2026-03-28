@@ -30,6 +30,7 @@ export function createMiddlewareClient(request: NextRequest) {
             response.cookies.set(name, value, {
               ...options,
               ...(COOKIE_DOMAIN ? { domain: COOKIE_DOMAIN } : {}),
+              ...(process.env.NODE_ENV === 'production' ? { secure: true } : {}),
             })
           );
         },
