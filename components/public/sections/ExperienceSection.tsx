@@ -1,7 +1,7 @@
 import { Anchor } from 'lucide-react'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
-import { experienceSummary } from '@/lib/profile-summaries'
+import { formatSeaTime } from '@/lib/sea-time'
 import type { PublicAttachment } from '@/lib/queries/types'
 
 function formatDate(dateStr: string | null | undefined): string {
@@ -12,14 +12,23 @@ function formatDate(dateStr: string | null | undefined): string {
 interface ExperienceSectionProps {
   attachments: PublicAttachment[]
   sharedYachtIdSet: Set<string>
+  seaTimeTotalDays?: number
+  seaTimeYachtCount?: number
 }
 
-export function ExperienceSection({ attachments, sharedYachtIdSet }: ExperienceSectionProps) {
+export function ExperienceSection({ attachments, sharedYachtIdSet, seaTimeTotalDays = 0, seaTimeYachtCount = 0 }: ExperienceSectionProps) {
+  const yachtCount = seaTimeYachtCount || attachments.length
+  const summary = seaTimeTotalDays > 0
+    ? `${formatSeaTime(seaTimeTotalDays).displayShort} sea time · ${yachtCount} ${yachtCount === 1 ? 'yacht' : 'yachts'}`
+    : yachtCount > 0
+    ? `${yachtCount} ${yachtCount === 1 ? 'yacht' : 'yachts'}`
+    : 'No experience added yet'
+
   return (
     <ScrollReveal>
       <ProfileAccordion
         title="My Experience"
-        summary={experienceSummary(attachments)}
+        summary={summary}
         accentColor="teal"
         icon={<Anchor size={16} />}
       >

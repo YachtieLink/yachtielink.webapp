@@ -324,7 +324,7 @@ export function PublicProfileContent({
 
           {/* My Experience */}
           {sectionVisible(sectionVisibility, 'experience', attachments.length > 0) && (
-            <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} />
+            <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} seaTimeTotalDays={seaTimeTotalDays} seaTimeYachtCount={seaTimeYachtCount} />
           )}
 
           {/* My Endorsements */}
