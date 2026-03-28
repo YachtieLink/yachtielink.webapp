@@ -621,11 +621,15 @@ export function Wizard({ userId, initialData }: WizardProps) {
   const [handle, setHandle] = useState(initialData.handle ?? "");
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Clear redirect timer on unmount
+  // If onboarding is already complete on mount, redirect immediately
   useEffect(() => {
+    if (stepIndex === 3) {
+      redirectTimerRef.current = setTimeout(() => router.push("/app/profile"), 2200);
+    }
     return () => {
       if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const VISIBLE_STEPS = STEPS.length - 1; // exclude "done" from progress count
