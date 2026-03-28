@@ -112,13 +112,8 @@ export function PhotoLightbox({ photos, initialIndex, open, onClose, onViewAll }
         />
       </div>
 
-      {/* Bottom bar — counter + view all, positioned in thumb zone */}
-      <div className="absolute bottom-[20vh] left-0 right-0 flex items-center justify-center gap-4 px-6">
-        {photos.length > 1 && (
-          <p className="text-white/70 text-sm font-medium">
-            {index + 1} / {photos.length}
-          </p>
-        )}
+      {/* Bottom bar — view all + counter, stacked vertically in thumb zone */}
+      <div className="absolute bottom-[20vh] left-0 right-0 flex flex-col items-center gap-2 px-6">
         {onViewAll && (
           <button
             onClick={(e) => { e.stopPropagation(); onViewAll() }}
@@ -126,6 +121,11 @@ export function PhotoLightbox({ photos, initialIndex, open, onClose, onViewAll }
           >
             View all
           </button>
+        )}
+        {photos.length > 1 && (
+          <p className="text-white/50 text-xs font-medium">
+            {index + 1} / {photos.length}
+          </p>
         )}
       </div>
     </div>
