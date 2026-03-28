@@ -471,11 +471,21 @@ export function RichPortfolioLayout({
         </div>
       </SectionModal>
 
-      <SectionModal title="About" open={activeModal === 'about'} onClose={() => setActiveModal(null)}>
+      <SectionModal title="About Me" open={activeModal === 'about'} onClose={() => setActiveModal(null)}>
         <p className="text-sm text-[var(--color-text-primary)] leading-relaxed whitespace-pre-line">{aboutText}</p>
       </SectionModal>
 
-      <SectionModal title="Experience" open={activeModal === 'experience'} onClose={() => setActiveModal(null)}>
+      <SectionModal
+        title="My Experience"
+        open={activeModal === 'experience'}
+        onClose={() => setActiveModal(null)}
+        footer={
+          <a href={`/u/${handle}/experience`} className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-[var(--accent-500,#14b8a6)] hover:underline">
+            <ExternalLink size={14} />
+            View full experience page
+          </a>
+        }
+      >
         <div className="flex flex-col gap-4">
           {attachments.map((att) => (
             <div key={att.id} className="flex gap-3">
@@ -496,7 +506,17 @@ export function RichPortfolioLayout({
         </div>
       </SectionModal>
 
-      <SectionModal title="Endorsements" open={activeModal === 'endorsements'} onClose={() => setActiveModal(null)}>
+      <SectionModal
+        title="My Endorsements"
+        open={activeModal === 'endorsements'}
+        onClose={() => setActiveModal(null)}
+        footer={
+          <a href={`/u/${handle}/endorsements`} className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-[var(--accent-500,#14b8a6)] hover:underline">
+            <ExternalLink size={14} />
+            View all endorsements
+          </a>
+        }
+      >
         <div className="flex flex-col gap-0 divide-y divide-[var(--color-border-subtle)]">
           {endorsements.map((end) => {
             const endorserName = end.endorser?.display_name || end.endorser?.full_name || 'Anonymous'
@@ -530,17 +550,27 @@ export function RichPortfolioLayout({
         </div>
       </SectionModal>
 
-      <SectionModal title="Certifications" open={activeModal === 'certifications'} onClose={() => setActiveModal(null)}>
+      <SectionModal
+        title="My Certifications"
+        open={activeModal === 'certifications'}
+        onClose={() => setActiveModal(null)}
+        footer={
+          <a href={`/u/${handle}/certifications`} className="flex items-center justify-center gap-2 w-full py-2.5 text-sm font-medium text-[var(--accent-500,#14b8a6)] hover:underline">
+            <ExternalLink size={14} />
+            View full certifications
+          </a>
+        }
+      >
         <div className="flex flex-wrap gap-2">
           {certifications.map((cert) => (
-            <span key={cert.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]">
+            <span key={cert.id} className="text-sm px-3 py-1.5 rounded-full bg-transparent border border-[var(--color-border)] text-[var(--color-text-primary)]">
               {cert.certification_types?.name || cert.custom_cert_name}
             </span>
           ))}
         </div>
       </SectionModal>
 
-      <SectionModal title="Education" open={activeModal === 'education'} onClose={() => setActiveModal(null)}>
+      <SectionModal title="My Education" open={activeModal === 'education'} onClose={() => setActiveModal(null)}>
         <div className="flex flex-col gap-4">
           {education.map((edu) => (
             <div key={edu.id}>
@@ -557,18 +587,18 @@ export function RichPortfolioLayout({
         </div>
       </SectionModal>
 
-      <SectionModal title="Skills" open={activeModal === 'skills'} onClose={() => setActiveModal(null)}>
+      <SectionModal title="My Skills" open={activeModal === 'skills'} onClose={() => setActiveModal(null)}>
         <div className="flex flex-wrap gap-2">
           {skills.map((s) => (
-            <span key={s.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-primary)]">{s.name}</span>
+            <span key={s.id} className="text-sm px-3 py-1.5 rounded-full bg-transparent border border-[var(--color-border)] text-[var(--color-text-primary)]">{s.name}</span>
           ))}
         </div>
       </SectionModal>
 
-      <SectionModal title="Interests" open={activeModal === 'hobbies'} onClose={() => setActiveModal(null)}>
+      <SectionModal title="My Interests" open={activeModal === 'hobbies'} onClose={() => setActiveModal(null)}>
         <div className="flex flex-wrap gap-2">
           {hobbies.map((h) => (
-            <span key={h.id} className="text-sm px-3 py-1.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]">{h.emoji ? `${h.emoji} ${h.name}` : h.name}</span>
+            <span key={h.id} className="text-sm px-3 py-1.5 rounded-full bg-transparent border border-[var(--color-border)] text-[var(--color-text-secondary)]">{h.emoji ? `${h.emoji} ${h.name}` : h.name}</span>
           ))}
         </div>
       </SectionModal>
