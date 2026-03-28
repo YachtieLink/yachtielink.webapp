@@ -1,20 +1,16 @@
 /**
- * PublicProfileContent — Bumble-style hero photo with identity overlaid,
- * then scrollable accordion sections below.
+ * PublicProfileContent — Single-column editorial layout.
+ * Full-width hero, then centred content (max 680px).
  *
- * Section rendering is delegated to components/public/sections/ to keep this
- * file focused on layout and the desktop hero.
+ * Section rendering is delegated to components/public/sections/.
  */
 import Link from 'next/link'
-import { MapPin, ChevronLeft, Pencil, Download } from 'lucide-react'
-import { ShareButton } from './ShareButton'
+import { FileText, User, GraduationCap, Heart } from 'lucide-react'
 import { HeroSection } from './HeroSection'
+import { ContactRow } from './ContactRow'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
-import { PhotoGallery } from '@/components/profile/PhotoGallery'
-import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { formatSeaTime } from '@/lib/sea-time'
 import { countryToFlag } from '@/lib/constants/country-iso'
-import { SaveProfileButton } from '@/components/profile/SaveProfileButton'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { aboutSummary, hobbiesSummary, educationSummary } from '@/lib/profile-summaries'
 import { ExperienceSection } from './sections/ExperienceSection'
@@ -133,10 +129,10 @@ export function PublicProfileContent({
   const homeCountryFlag = user.show_home_country !== false && flag ? flag : undefined
 
   return (
-    // ── Outer: stacked on mobile, side-by-side on desktop ────────────────────
-    <div className="flex flex-col md:flex-row md:min-h-screen">
+    // ── Single-column editorial layout ──────────────────────────────────────
+    <div className="flex flex-col">
 
-      {/* ── MOBILE: Animated hero (client component, md:hidden) ────────────── */}
+      {/* ── Hero — full-width on all breakpoints ─────────────────────────── */}
       <HeroSection
         displayName={displayName}
         primaryRole={user.primary_role}
@@ -161,164 +157,32 @@ export function PublicProfileContent({
         homeCountryFlag={homeCountryFlag}
       />
 
-      {/* ── LEFT: Desktop hero photo panel (hidden on mobile) ─────────────── */}
-      <div className="relative hidden md:block md:w-2/5 md:sticky md:top-0 md:h-screen shrink-0 overflow-hidden">
+      {/* ── Content — centred single column ────────────────────────────── */}
+      <div className="flex-1">
+        <div className="flex flex-col gap-4 px-4 pt-4 pb-24 max-w-[680px] mx-auto w-full">
 
-        {/* Photo fills this panel */}
-        <div className="relative h-full w-full">
-          <PhotoGallery
-            photos={profilePhotos}
-            profilePhotoUrl={user.profile_photo_url}
-            displayName={displayName}
-            fillContainer
+          {/* Contact — tappable icon row */}
+          <ContactRow
+            email={user.email}
+            phone={user.phone}
+            whatsapp={user.whatsapp}
+            showEmail={user.show_email}
+            showPhone={user.show_phone}
+            showWhatsapp={user.show_whatsapp}
+            firstName={firstName}
           />
-        </div>
 
-        {/* Strong gradient — dark at top (for buttons) and bottom (for identity) */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="h-28 bg-gradient-to-b from-black/50 to-transparent" />
-          <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-        </div>
-
-        {/* Top bar — icon-only buttons over photo */}
-        <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top,0px),1rem)] z-10">
-          <Link
-            href="/"
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-black/25 backdrop-blur-md text-white hover:bg-black/40 transition-colors"
-            aria-label="Go back"
-          >
-            <ChevronLeft size={20} />
-          </Link>
-          <div className="flex items-center gap-2">
-            {isOwnProfile ? (
-              <Link
-                href="/app/profile"
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-black/25 backdrop-blur-md text-white hover:bg-black/40 transition-colors"
-                aria-label="Edit profile"
-              >
-                <Pencil size={16} />
-              </Link>
-            ) : isLoggedIn ? (
-              <SaveProfileButton
-                savedUserId={user.id}
-                initialSaved={!!savedStatus}
-                initialFolderId={savedStatus?.folder_id}
-              />
-            ) : null}
-            <ShareButton url={profileUrl} name={displayName} variant="compact" />
-          </div>
-        </div>
-
-        {/* Identity — overlaid at bottom of photo */}
-        <div className="absolute bottom-0 left-0 right-0 px-5 pb-6 z-10 flex flex-col gap-3">
-          {user.available_for_work && (
-            <span className="self-start flex items-center gap-1.5 bg-green-500/25 backdrop-blur-md border border-green-400/40 rounded-full px-3 py-1 text-xs font-semibold text-green-300 tracking-wide uppercase">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-              Available for work
-            </span>
-          )}
-
-          {/* Name — large, confident */}
-          <h1 className="text-white font-serif text-4xl md:text-5xl leading-[1.1] tracking-tight" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6), 0 1px 3px rgba(0,0,0,0.4)' }}>
-            {displayName}{homeCountryFlag ? <span className="ml-2 text-3xl align-middle">{homeCountryFlag}</span> : null}
-          </h1>
-
-          {(user.primary_role || (user.departments && user.departments.length > 0)) && (
-            <p className="text-white/90 text-base font-medium" style={{ textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}>
-              {user.primary_role}
-              {user.primary_role && user.departments && user.departments.length > 0 && (
-                <span className="text-white/50 mx-2">·</span>
-              )}
-              {user.departments && user.departments.length > 0 && (
-                <span className="text-white/70">{user.departments.join(', ')}</span>
-              )}
-            </p>
-          )}
-
-          {/* Hero stats: age, sea time */}
-          {heroStats.length > 0 && (
-            <p className="text-white/70 text-sm font-medium drop-shadow-sm">
-              {heroStats.join(' · ')}
-            </p>
-          )}
-
-          {user.show_location && location && (
-            <p className="text-white/60 text-sm flex items-center gap-1.5 font-medium">
-              <MapPin size={13} className="text-white/50" />{location}
-            </p>
-          )}
-
-          {user.social_links && user.social_links.length > 0 && (
-            <SocialLinksRow links={user.social_links as any} variant="light" />
-          )}
-
-          {/* Badges */}
-          <div className="flex flex-wrap gap-2">
-            {isFoundingMember && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 backdrop-blur-sm border border-amber-400/30 px-2.5 py-0.5 text-xs font-semibold text-amber-300">
-                Founding Member
-              </span>
-            )}
-            {isColleague && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-400/20 backdrop-blur-sm border border-teal-400/30 px-2.5 py-0.5 text-xs font-medium text-teal-300">
-                Colleague{sharedYachtIdSet.size > 1 ? ` · ${sharedYachtIdSet.size} yachts` : ''}
-              </span>
-            )}
-            {showMutual && firstMutual && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 px-2.5 py-0.5 text-xs font-medium text-white/70">
-                2nd connection · via {firstMutual.name}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* ── RIGHT / BOTTOM: Scrollable content ────────────────────────────── */}
-      <div className="flex-1 md:overflow-y-auto">
-        <div className="flex flex-col gap-4 px-4 pt-4 pb-24">
-
-          {/* Contact info — only shown when user has opted in */}
-          {(
-            (user.show_email && user.email) ||
-            (user.show_phone && user.phone) ||
-            (user.show_whatsapp && user.whatsapp)
-          ) && (
-            <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-1.5 border border-[var(--color-border-subtle)]">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-1">Contact</p>
-              {user.show_email && user.email && (
-                <a href={`mailto:${user.email}?subject=${encodeURIComponent(`Hey ${firstName}`)}&body=${encodeURIComponent(`Hey ${firstName}, I saw your profile on YachtieLink.\n\n`)}`} className="text-sm text-[var(--color-interactive)] hover:underline">{user.email}</a>
-              )}
-              {user.show_phone && user.phone && (
-                <a href={`tel:${user.phone}`} className="text-sm text-[var(--color-text-primary)]">{user.phone}</a>
-              )}
-              {user.show_whatsapp && user.whatsapp && (
-                <a href={`https://wa.me/${user.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Hey ${firstName}, I saw your profile on YachtieLink. `)}`} target="_blank" rel="noopener noreferrer" className="text-sm text-[var(--color-interactive)] hover:underline">
-                  WhatsApp: {user.whatsapp}
-                </a>
-              )}
-            </div>
-          )}
-
-          {/* CV — View + Download (cv_public defaults to true when null) */}
+          {/* View my CV — styled button */}
           {user.cv_public !== false && (
             (user.cv_public_source === 'uploaded' ? user.cv_storage_path : user.latest_pdf_path)
           ) && (
-            <div className="bg-[var(--color-surface)] rounded-2xl p-4 border border-[var(--color-border-subtle)] flex items-center justify-between">
-              <a
-                href={`/u/${user.handle}/cv`}
-                className="flex items-center gap-2 text-sm font-medium text-[var(--color-interactive)] hover:underline"
-              >
-                View CV
-              </a>
-              <a
-                href={`/api/cv/public-download/${user.handle}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors"
-              >
-                <Download size={16} />
-              </a>
-            </div>
+            <Link
+              href={`/u/${user.handle}/cv`}
+              className="inline-flex items-center gap-2 rounded-xl border border-[var(--color-border)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors w-fit"
+            >
+              <FileText size={16} className="text-[var(--color-text-secondary)]" />
+              View my CV
+            </Link>
           )}
 
           {/* About */}
@@ -328,21 +192,13 @@ export function PublicProfileContent({
               title="About"
               summary={aboutSummary(user.ai_summary, user.bio)}
               accentColor="teal"
+              icon={<User size={16} />}
             >
               <p className="text-sm text-[var(--color-text-primary)] leading-relaxed whitespace-pre-line">
                 {user.ai_summary || user.bio}
               </p>
             </ProfileAccordion>
             </ScrollReveal>
-          )}
-
-          {/* Sea Time Stat Line */}
-          {seaTimeTotalDays > 0 && (
-            <div className="px-1 py-2">
-              <p className="text-sm text-[var(--color-text-secondary)]">
-                {formatSeaTime(seaTimeTotalDays).displayLong} at sea · {seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}
-              </p>
-            </div>
           )}
 
           {/* Experience */}
@@ -352,7 +208,7 @@ export function PublicProfileContent({
 
           {/* Endorsements */}
           {sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) && (
-            <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} />
+            <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} />
           )}
 
           {/* Certifications */}
@@ -367,6 +223,7 @@ export function PublicProfileContent({
               title="Education"
               summary={educationSummary(education)}
               accentColor="teal"
+              icon={<GraduationCap size={16} />}
             >
               <div className="flex flex-col gap-3">
                 {education.map((edu) => (
@@ -392,6 +249,7 @@ export function PublicProfileContent({
             <ProfileAccordion
               title="Hobbies"
               summary={hobbiesSummary(hobbies)}
+              icon={<Heart size={16} />}
             >
               <div className="flex flex-wrap gap-2">
                 {hobbies.map((h) => (
@@ -432,7 +290,7 @@ export function PublicProfileContent({
         )}
 
         {/* Bottom CTAs */}
-        <div className="px-4 pb-8 flex flex-col gap-3">
+        <div className="px-4 pb-8 flex flex-col gap-3 max-w-[680px] mx-auto w-full">
           {!isLoggedIn ? (
             <>
               <Link

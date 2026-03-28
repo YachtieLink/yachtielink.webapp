@@ -185,6 +185,85 @@ export default function ProfileSettingsPage() {
         <ToggleRow label="Show home country on profile" checked={form.show_home_country} onChange={(v) => set('show_home_country', v)} />
       </div>
 
+      {/* Profile Display (Sprint 11a foundation — rendering applied in 11b) */}
+      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
+        <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Profile Display</h2>
+        <p className="text-xs text-[var(--color-text-secondary)]">These settings control how your public profile looks to visitors. More options coming soon.</p>
+
+        {/* View mode selector */}
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-medium text-[var(--color-text-primary)]">View Mode</p>
+          <div className="flex gap-2">
+            {([
+              { id: 'profile', label: 'Profile', enabled: true },
+              { id: 'portfolio', label: 'Portfolio', enabled: true },
+              { id: 'rich_portfolio', label: 'Rich Portfolio', enabled: false },
+            ] as const).map((mode) => (
+              <button
+                key={mode.id}
+                disabled={!mode.enabled}
+                onClick={() => set('profile_view_mode', mode.id)}
+                className={`flex-1 rounded-lg border p-3 text-center text-sm transition-colors ${
+                  form.profile_view_mode === mode.id
+                    ? 'border-[var(--color-interactive)] border-2 bg-[var(--color-surface)]'
+                    : !mode.enabled
+                    ? 'border-[var(--color-border)] opacity-50 cursor-not-allowed'
+                    : 'border-[var(--color-border)] hover:bg-[var(--color-surface-raised)] cursor-pointer'
+                }`}
+              >
+                <p className="font-medium text-[var(--color-text-primary)]">{mode.label}</p>
+                {!mode.enabled && <p className="text-[10px] text-[var(--color-text-tertiary)]">Pro</p>}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Scrim preset */}
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-medium text-[var(--color-text-primary)]">Hero Scrim</p>
+          <div className="flex gap-2">
+            {(['dark', 'light', 'teal', 'warm'] as const).map((preset) => (
+              <button
+                key={preset}
+                onClick={() => set('scrim_preset', preset)}
+                className={`flex-1 rounded-lg border p-2 text-center text-xs capitalize transition-colors ${
+                  form.scrim_preset === preset
+                    ? 'border-[var(--color-interactive)] border-2'
+                    : 'border-[var(--color-border)] hover:bg-[var(--color-surface-raised)]'
+                }`}
+              >
+                {preset}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Accent colour */}
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-medium text-[var(--color-text-primary)]">Accent Colour</p>
+          <div className="flex gap-2">
+            {([
+              { id: 'teal', bg: 'bg-teal-500' },
+              { id: 'coral', bg: 'bg-rose-400' },
+              { id: 'navy', bg: 'bg-blue-800' },
+              { id: 'amber', bg: 'bg-amber-500' },
+              { id: 'sand', bg: 'bg-stone-400' },
+            ] as const).map((color) => (
+              <button
+                key={color.id}
+                onClick={() => set('accent_color', color.id)}
+                className={`w-8 h-8 rounded-full ${color.bg} transition-all ${
+                  form.accent_color === color.id
+                    ? 'ring-2 ring-[var(--color-interactive)] ring-offset-2'
+                    : 'hover:scale-110'
+                }`}
+                aria-label={color.id}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Save */}
       <div className="flex gap-3">
         <Button variant="secondary" onClick={() => router.back()} className="flex-1">Cancel</Button>

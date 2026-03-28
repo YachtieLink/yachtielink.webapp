@@ -23,6 +23,9 @@ export interface ProfileSettings {
   license_info:     string
   show_dob:         boolean
   show_home_country: boolean
+  profile_view_mode: 'profile' | 'portfolio' | 'rich_portfolio'
+  scrim_preset:      'dark' | 'light' | 'teal' | 'warm'
+  accent_color:      'teal' | 'coral' | 'navy' | 'amber' | 'sand'
 }
 
 const DEFAULT_SETTINGS: ProfileSettings = {
@@ -30,9 +33,10 @@ const DEFAULT_SETTINGS: ProfileSettings = {
   show_phone: false, show_whatsapp: false, show_email: false, show_location: true,
   dob: '', home_country: '', smoke_pref: '', appearance_note: '',
   travel_docs: [], license_info: '', show_dob: false, show_home_country: false,
+  profile_view_mode: 'portfolio', scrim_preset: 'dark', accent_color: 'teal',
 }
 
-const SETTINGS_COLUMNS = 'phone, whatsapp, email, location_country, location_city, show_phone, show_whatsapp, show_email, show_location, dob, home_country, smoke_pref, appearance_note, travel_docs, license_info, show_dob, show_home_country'
+const SETTINGS_COLUMNS = 'phone, whatsapp, email, location_country, location_city, show_phone, show_whatsapp, show_email, show_location, dob, home_country, smoke_pref, appearance_note, travel_docs, license_info, show_dob, show_home_country, profile_view_mode, scrim_preset, accent_color'
 
 export function useProfileSettings() {
   const router = useRouter()
@@ -70,6 +74,9 @@ export function useProfileSettings() {
           license_info:      data.license_info       ?? '',
           show_dob:          data.show_dob           ?? false,
           show_home_country: data.show_home_country  ?? false,
+          profile_view_mode: data.profile_view_mode  ?? 'portfolio',
+          scrim_preset:      data.scrim_preset       ?? 'dark',
+          accent_color:      data.accent_color       ?? 'teal',
         })
       }
       setLoaded(true)
@@ -106,6 +113,9 @@ export function useProfileSettings() {
           license_info:      form.license_info.trim()       || null,
           show_dob:          form.show_dob,
           show_home_country: form.show_home_country,
+          profile_view_mode: form.profile_view_mode === 'rich_portfolio' ? 'portfolio' : form.profile_view_mode,
+          scrim_preset:      form.scrim_preset,
+          accent_color:      form.accent_color,
         })
         .eq('id', user.id)
 

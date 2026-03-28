@@ -22,6 +22,75 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-28 — Claude Code (Opus 4.6) — Sprint 11a Build + Review (Overnight)
+
+### Done
+
+- **Sprint 11a built:** Public Profile Rewrite — profile mode fixes + schema foundation. 24 files changed across public profile, CV, settings, middleware, queries, types, validation.
+- **Schema migration:** `20260328000001_sprint11a_profile_rewrite.sql` — added `accent_color`, `scrim_preset`, `profile_view_mode` to users table; added `focal_x`, `focal_y` to `user_photos` with CHECK constraints (0–100); CHECK constraint on `accent_color` enum.
+- **Public profile rewrite:** `PublicProfileContent` refactored from 40/60 split to single-column editorial layout (max-width 680px). `ProfileAccordion` gains `icon` prop. Section components (`CertificationsSection`, `ExperienceSection`, `GallerySection`, `SkillsSection`) gain `sectionColor` tokens. `EndorsementsSection` gates "See all" link on `endorsements.length > 3`.
+- **CV on-demand:** Removed "Regenerate PDF" pattern. `CvActions` now tracks `hasGeneratedPdf` state, flips true after successful generation. Radio for CV source gated on `cvPublic && hasGeneratedPdf && hasUploadedCv`.
+- **Display settings foundation:** `useProfileSettings` hook typed with union types (`profile_view_mode`, `scrim_preset`, `accent_color`). Settings page gains View Mode selector (profile/portfolio/rich_portfolio with Pro lock), Hero Scrim presets, Accent Colour swatches. `rich_portfolio` coerced to `portfolio` on save (Pro gate).
+- **Middleware hardening:** Subdomain logic simplified — removed legacy redirect patterns.
+- **Validation:** `lib/validation/schemas.ts` gains `displaySettingsSchema` with Zod enum for `accent_color`.
+- **Two-phase /review:** Phase 1 (Sonnet) caught dead `true` short-circuit in CvActions, missing accent_color enum constraint, weak typing in settings hook. Phase 2 (Opus) caught rich_portfolio Pro gate bypass, missing focal_x/y range constraints. All fixed.
+- **YachtieLink drift review:** CG1 (Generated PDF radio regression) and CG2 (weak typing) caught and fixed. Architecture checks clean.
+- **Test-yl:** 17 test items verified via code-path analysis (preview tools unavailable). All passed.
+- **Sprint-start validation for 11b/11c:** Both build plans validated against codebase. Key findings resolved: PublicProfileShell IS needed (server component), `sand` not `slate` for accent, redirect pattern sufficient for subdomain sub-pages.
+
+### Context
+
+- Branch: `sprint-11a/profile-rewrite-foundation` — 24 files changed, ready to commit
+- Overnight session — founder approved full chain: 11a → 11b → 11c, each with review + test + shipslog + commit (no push)
+- 11b/11c sprint-start validation complete, defaults approved by founder before bed
+
+### Next
+
+1. **Commit Sprint 11a** (no push)
+2. **Build Sprint 11b** — Portfolio mode: view mode toggle, scrim/accent rendering, mini bento gallery, lightbox, endorsement pinning
+3. **Build Sprint 11c** — Rich Portfolio mode: bento grid engine, templates, tiles, Pro gating
+4. **Morning: founder review** — present flags from overnight, merge PRs
+
+### Flags
+
+- ⚠️ Test-yl ran without preview browser tools — code-path verification only. Visual QA recommended in morning.
+- ⚠️ 11b pre-build: `sort_order = 0` convention for hero photo still unverified in data.
+- ⚠️ Photo limit `MAX_PHOTOS_PRO = 9` needs bumping to 15 in 11c.
+
+---
+
+## 2026-03-28 — Claude Code (Opus 4.6) — Build Plans 11b + 11c Written and Reviewed
+
+### Done
+
+- **Build plan 11b written:** `sprints/major/phase-1b/sprint-11/build_plan_11b.md` — Portfolio mode (free tier). 10 parts: query prerequisites, view mode toggle, portfolio layout shell, scrim preset rendering (dual-gradient), accent colour rendering, photo focal point, mini bento gallery, photo lightbox, endorsement pin/unpin, section polish. Introduces `PublicProfileShell` client wrapper to keep `PublicProfileContent` as server component.
+- **Build plan 11c written:** `sprints/major/phase-1b/sprint-11/build_plan_11c.md` — Rich Portfolio mode (Pro). 8 parts: bento grid engine (CSS Grid with `grid-template-areas`), 2 template definitions (Classic + Bold) with full mobile layouts, 11 tile components, layout assembly with density auto-detection, template selection settings, photo management enhancements (focal point picker, bump Pro limit 9→15), mobile responsive bento, Pro gating via `isProFromRecord()`.
+- **Two-phase /review executed:** Phase 1 (Sonnet) found 3 CRITICAL, 5 HIGH, 7 MEDIUM, 5 LOW. Phase 2 (Opus) confirmed 6 findings, killed 2 (Pro utility exists at `lib/stripe/pro.ts`; toggle is always 2-segment, no rebuild needed). All confirmed findings fixed in both plans.
+- **Founder flags applied (8 items on 11c):** Grid switched from numerical placement to `grid-template-areas` for debuggability. "More photos →" tile added for photo overflow (15 Pro photos, 5 bento slots). Mobile layouts fully specified with grid-template-areas strings. Photo 1 ≠ hero clarified. FocalPointPicker scoped to hero crop preview only. Pro upsell specified as inline message. Missing types file added. PublicProfileShell type check added.
+- **Founder flags applied (6 items on 11b):** Pre-build check for PublicProfileContent client/server status. Dropped dark: variants (profile always light mode). textShadow explicitly applied via style={{}} for light scrims. sort_order > 0 convention flagged for verification. Subdomain endorsements page added. PublicProfileShell added to files summary.
+
+### Context
+
+- Branch: `main` — no code written this session, build plan authoring only
+- Sprint 11a being built by another agent (overnight session). Build plans 11b and 11c ready for execution after 11a merges.
+- Key review findings that shaped the plans: `is_pinned` (not `pinned`) column, `recipient_id` (not `endorsee_id`), `getUserByHandle` doesn't return display settings fields, photos page already exists with `@dnd-kit/sortable`, `isProFromRecord()` utility exists
+
+### Next
+
+1. **Wait for Sprint 11a to complete** (other agent, overnight build)
+2. **Execute Sprint 11b** — Portfolio mode (~2-3 days)
+3. **Execute Sprint 11c** — Rich Portfolio mode (~2-3 days)
+4. **Sprint 12** — Yacht Graph Foundation
+
+### Flags
+
+- ⚠️ 11b has a pre-build check: verify whether `PublicProfileContent` is already a client component (if so, skip creating `PublicProfileShell` wrapper)
+- ⚠️ 11b pre-build: verify `sort_order = 0` convention for hero photo in `user_photos` data
+- ⚠️ Photo limit discrepancy: codebase has `MAX_PHOTOS_PRO = 9`, plans say 15. Must update both client and API.
+- ⚠️ `user_photos` vs `user_gallery` — two photo tables exist. Bento uses `user_photos` only. Both plans explicit about this but builder must not confuse them.
+
+---
+
 ## 2026-03-28 — Claude Code (Opus 4.6) — Sprint 11 Design Interview + Sprint Kickoff Prep
 
 ### Done

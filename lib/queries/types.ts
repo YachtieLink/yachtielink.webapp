@@ -36,10 +36,12 @@ export type PublicEndorsement = {
   created_at: string
   endorser_role_label: string | null
   recipient_role_label: string | null
+  is_pinned?: boolean
   endorser: {
     id: string
     display_name: string | null
     full_name: string
+    handle?: string | null
     profile_photo_url: string | null
   } | null
   yacht: {

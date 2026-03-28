@@ -2,7 +2,8 @@
 
 **Phase:** 1B
 **Priority:** P0 — the profile IS the product
-**Status:** 📋 Design approved, build plan needed
+**Status:** 🔧 In Progress
+**Started:** 2026-03-28
 **Runs after:** Sprint 10.1 complete, Sprint CV-Parse-Bugfix complete
 **Runs before:** Sprint 12 (Yacht graph)
 **Estimated effort:** TBD (significantly larger than original scope)

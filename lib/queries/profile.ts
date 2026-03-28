@@ -264,12 +264,13 @@ export async function getPublicProfileSections(userId: string) {
     supabase
       .from('endorsements')
       .select(`
-        id, content, created_at, endorser_role_label, recipient_role_label,
-        endorser:endorser_id ( id, display_name, full_name, profile_photo_url ),
+        id, content, created_at, endorser_role_label, recipient_role_label, is_pinned,
+        endorser:endorser_id ( id, display_name, full_name, handle, profile_photo_url ),
         yacht:yachts!yacht_id ( name )
       `)
       .eq('recipient_id', userId)
       .is('deleted_at', null)
+      .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false }),
   ])
   return {

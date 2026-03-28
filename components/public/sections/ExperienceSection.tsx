@@ -1,3 +1,4 @@
+import { Anchor } from 'lucide-react'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { experienceSummary } from '@/lib/profile-summaries'
@@ -20,6 +21,7 @@ export function ExperienceSection({ attachments, sharedYachtIdSet }: ExperienceS
         title="Experience"
         summary={experienceSummary(attachments)}
         accentColor="navy"
+        icon={<Anchor size={16} />}
       >
         <div className="flex flex-col gap-3">
           {attachments.map((att) => {

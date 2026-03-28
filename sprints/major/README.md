@@ -84,8 +84,8 @@ Before marking a major sprint as **ready for execution**, verify its build plan 
 
 ## Active Phases
 
-- [Phase 1A](./phase-1a/README.md) — Profile robustness (Sprint 10 + 10.1) — In Progress
-- [Phase 1B](./phase-1b/README.md) — Public polish, yacht graph & launch (Sprints 11–13) — Draft, build plans written
+- [Phase 1A](./phase-1a/README.md) — Profile robustness (Sprint 10 + 10.1) — ✅ Complete
+- [Phase 1B](./phase-1b/README.md) — Public polish, yacht graph & launch (Sprints 11–13) — 🔧 Sprint 11a In Progress
 
 ## Planned Phases (Ralph Loop Drafts — 2026-03-22)
 

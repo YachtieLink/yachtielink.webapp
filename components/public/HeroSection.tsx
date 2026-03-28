@@ -61,9 +61,9 @@ export function HeroSection({
   const borderRadius = useTransform(scrollY, [0, 200], ['0px', '16px'])
 
   return (
-    // Mobile-only animated hero (md:hidden — desktop stays in PublicProfileContent)
+    // Animated hero — renders on all breakpoints (single-column layout)
     <motion.div
-      className="relative md:hidden shrink-0 overflow-hidden"
+      className="relative shrink-0 overflow-hidden"
       style={{ height: heroHeight, marginLeft: marginInline, marginRight: marginInline, borderRadius }}
     >
       {/* Photo fills this panel */}

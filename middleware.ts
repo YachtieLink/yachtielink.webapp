@@ -40,16 +40,21 @@ export async function middleware(request: NextRequest) {
 
     const { pathname } = request.nextUrl
 
-    // Only rewrite the root path to the subdomain profile page.
-    // All other paths (e.g. /app/profile, /signup, /u/someone) redirect
-    // to the main domain so links from the profile page work correctly.
+    // Root path → rewrite to subdomain profile page
     if (pathname === '/' || pathname === '') {
       const url = request.nextUrl.clone()
       url.pathname = `/subdomain/${subdomain}`
       return withCookies(NextResponse.rewrite(url, { request }), auth.response)
     }
 
-    // Non-root paths on subdomain: redirect to main domain
+    // Profile sub-pages on subdomain → redirect to /u/{handle}/{subpage}
+    const subPageMatch = pathname.match(/^\/(endorsements|experience|certifications|gallery|cv)(\/.*)?$/)
+    if (subPageMatch) {
+      const mainUrl = new URL(`/u/${subdomain}${pathname}${request.nextUrl.search}`, 'https://yachtie.link')
+      return withCookies(NextResponse.redirect(mainUrl), auth.response)
+    }
+
+    // Other paths on subdomain: redirect to main domain
     const mainUrl = new URL(pathname + request.nextUrl.search, 'https://yachtie.link')
     return withCookies(NextResponse.redirect(mainUrl), auth.response)
   }

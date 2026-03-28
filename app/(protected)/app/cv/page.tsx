@@ -11,7 +11,7 @@ export default async function CvPage() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('id, handle, full_name, display_name, primary_role, departments, profile_photo_url, latest_pdf_path, latest_pdf_generated_at, cv_storage_path, cv_public, cv_public_source, subscription_status')
+    .select('id, handle, full_name, display_name, primary_role, departments, profile_photo_url, latest_pdf_path, cv_storage_path, cv_public, cv_public_source, subscription_status')
     .eq('id', authUser.id)
     .single()
 
@@ -26,8 +26,7 @@ export default async function CvPage() {
       <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">CV &amp; Sharing</h1>
       <CvActions
         handle={profile.handle}
-        hasPdf={!!profile.latest_pdf_path}
-        pdfGeneratedAt={profile.latest_pdf_generated_at}
+        hasGeneratedPdf={!!profile.latest_pdf_path}
         hasUploadedCv={!!profile.cv_storage_path}
         cvPublic={profile.cv_public ?? true}
         cvPublicSource={(profile.cv_public_source as 'generated' | 'uploaded') ?? 'generated'}

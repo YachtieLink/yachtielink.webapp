@@ -139,9 +139,9 @@
 
 ---
 
-### Sprint 11: CV Onboarding Rebuild (5-7 days)
+### Sprint 11: Public Profile Rewrite (3 sub-sprints: 11a/b/c)
 
-**Status:** 📋 Ready for execution
+**Status:** 🔧 In Progress (11a started 2026-03-28)
 
 **Depends on:** Sprint 10.1 complete + CV-Parse-Bugfix complete
 

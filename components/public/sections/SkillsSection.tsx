@@ -1,3 +1,4 @@
+import { Sparkles } from 'lucide-react'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { skillsSummary } from '@/lib/profile-summaries'
@@ -20,6 +21,7 @@ export function SkillsSection({ skills }: SkillsSectionProps) {
       <ProfileAccordion
         title="Extra Skills"
         summary={skillsSummary(skills)}
+        icon={<Sparkles size={16} />}
       >
         {Object.entries(grouped).map(([cat, items]) => (
           <div key={cat} className="mb-3">

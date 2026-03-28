@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { Camera } from 'lucide-react'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { ShowMoreButton } from '../ShowMoreButton'
@@ -16,6 +17,7 @@ export function GallerySection({ gallery }: GallerySectionProps) {
         title="Gallery"
         summary={gallerySummary(gallery.length)}
         accentColor="teal"
+        icon={<Camera size={16} />}
       >
         <div className="grid grid-cols-3 gap-1.5">
           {gallery.slice(0, 9).map((item) => (

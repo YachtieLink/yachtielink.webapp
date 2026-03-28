@@ -6,14 +6,13 @@ import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { ShareModal } from './ShareModal'
-import { Download, Eye, RefreshCw, Upload, Share2 } from 'lucide-react'
+import { Download, Eye, Upload, Share2 } from 'lucide-react'
 
 const QRCode = dynamic(() => import('react-qr-code').then(m => m.default), { ssr: false })
 
 interface CvActionsProps {
   handle: string
-  hasPdf: boolean
-  pdfGeneratedAt?: string | null
+  hasGeneratedPdf: boolean
   hasUploadedCv: boolean
   cvPublic: boolean
   cvPublicSource: 'generated' | 'uploaded'
@@ -34,8 +33,7 @@ const TEMPLATES: { id: Template; label: string; sublabel: string; proOnly: boole
 
 export function CvActions({
   handle,
-  hasPdf,
-  pdfGeneratedAt,
+  hasGeneratedPdf: initialHasGeneratedPdf,
   hasUploadedCv,
   cvPublic: initialCvPublic,
   cvPublicSource: initialCvPublicSource,
@@ -48,8 +46,7 @@ export function CvActions({
   const { toast } = useToast()
   const router = useRouter()
   const [generating, setGenerating] = useState(false)
-  const [pdfReady, setPdfReady] = useState(hasPdf)
-  const [generatedAt, setGeneratedAt] = useState(pdfGeneratedAt)
+  const [hasGeneratedPdf, setHasGeneratedPdf] = useState(initialHasGeneratedPdf)
   const [selectedTemplate, setSelectedTemplate] = useState<Template>('standard')
   const [showShareModal, setShowShareModal] = useState(false)
   const [cvPublic, setCvPublic] = useState(initialCvPublic)
@@ -57,7 +54,7 @@ export function CvActions({
 
   const profileUrl = `https://yachtie.link/u/${handle}`
 
-  async function generatePdf() {
+  async function downloadPdf() {
     setGenerating(true)
     try {
       const res = await fetch('/api/cv/generate-pdf', {
@@ -70,25 +67,13 @@ export function CvActions({
         throw new Error(body.error || 'Failed to generate PDF')
       }
       const { url } = await res.json()
-      setPdfReady(true)
-      setGeneratedAt(new Date().toISOString())
+      setHasGeneratedPdf(true)
       window.open(url, '_blank')
-      toast('PDF generated', 'success')
+      toast('PDF generated and downloaded', 'success')
     } catch (err) {
       toast(err instanceof Error ? err.message : 'PDF generation failed', 'error')
     } finally {
       setGenerating(false)
-    }
-  }
-
-  async function downloadPdf() {
-    try {
-      const res = await fetch('/api/cv/download-pdf')
-      if (!res.ok) throw new Error('Could not get download link')
-      const { url } = await res.json()
-      window.open(url, '_blank')
-    } catch {
-      toast('Download failed', 'error')
     }
   }
 
@@ -186,33 +171,12 @@ export function CvActions({
         </a>
 
         <div className="flex flex-col gap-3">
-          {/* Generated CV */}
-          <div className="rounded-xl border border-[var(--color-border)] p-3 flex flex-col gap-2">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-[var(--color-text-primary)]">Generated PDF</p>
-              {pdfReady && (
-                <Button variant="ghost" size="sm" onClick={downloadPdf} className="gap-1.5">
-                  <Download size={14} /> Download
-                </Button>
-              )}
-            </div>
-            {pdfReady ? (
-              <div className="flex items-center gap-2">
-                <Button variant="link" size="sm" onClick={generatePdf} loading={generating} className="gap-1.5">
-                  <RefreshCw size={12} />
-                  {generating ? 'Generating…' : 'Regenerate'}
-                </Button>
-                {generatedAt && (
-                  <span className="text-xs text-[var(--color-text-tertiary)]">
-                    · {new Date(generatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </span>
-                )}
-              </div>
-            ) : (
-              <Button variant="outline" size="sm" onClick={generatePdf} loading={generating}>
-                {generating ? 'Generating…' : 'Generate PDF'}
-              </Button>
-            )}
+          {/* Generated CV — on-demand download */}
+          <div className="rounded-xl border border-[var(--color-border)] p-3 flex items-center justify-between">
+            <p className="text-sm font-medium text-[var(--color-text-primary)]">Generated PDF</p>
+            <Button variant="ghost" size="sm" onClick={downloadPdf} loading={generating} className="gap-1.5">
+              <Download size={14} /> {generating ? 'Generating…' : 'Download'}
+            </Button>
           </div>
 
           {/* Uploaded CV */}
@@ -322,33 +286,29 @@ export function CvActions({
           </button>
         </label>
 
-        {cvPublic && (pdfReady || hasUploadedCv) && (
+        {cvPublic && hasGeneratedPdf && hasUploadedCv && (
           <div className="mt-3 flex flex-col gap-2 pl-1">
             <p className="text-xs text-[var(--color-text-secondary)] mb-1">Which CV to share?</p>
-            {pdfReady && (
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="cv-source"
-                  checked={cvPublicSource === 'generated'}
-                  onChange={() => saveCvSettings(true, 'generated')}
-                  className="accent-[var(--color-interactive)]"
-                />
-                <span className="text-sm text-[var(--color-text-primary)]">Generated PDF</span>
-              </label>
-            )}
-            {hasUploadedCv && (
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="cv-source"
-                  checked={cvPublicSource === 'uploaded'}
-                  onChange={() => saveCvSettings(true, 'uploaded')}
-                  className="accent-[var(--color-interactive)]"
-                />
-                <span className="text-sm text-[var(--color-text-primary)]">Uploaded CV</span>
-              </label>
-            )}
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="cv-source"
+                checked={cvPublicSource === 'generated'}
+                onChange={() => saveCvSettings(true, 'generated')}
+                className="accent-[var(--color-interactive)]"
+              />
+              <span className="text-sm text-[var(--color-text-primary)]">Generated PDF</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="cv-source"
+                checked={cvPublicSource === 'uploaded'}
+                onChange={() => saveCvSettings(true, 'uploaded')}
+                className="accent-[var(--color-interactive)]"
+              />
+              <span className="text-sm text-[var(--color-text-primary)]">Uploaded CV</span>
+            </label>
           </div>
         )}
       </div>

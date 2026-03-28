@@ -20,11 +20,11 @@ Phase 1B execution runs sequentially through these 4 sprints. See [PHASE1-CLOSEO
 |-------|--------|-------|--------|-------|
 | 1 | [Sprint 10.1](./major/phase-1a/sprint-10.1/README.md) | 1A | 📋 Ready | Phase 1A closeout — dark mode, animations, public layout, missing pages |
 | 2 | [CV Parse Bugfix](./major/phase-1b/sprint-cv-parse-bugfix/README.md) | 1B | 📋 Ready | Fix 37 QA bugs in 5 waves — data integrity, public profile, wizard, profile page, network |
-| 3 | [Sprint 11](./major/phase-1b/sprint-11/README.md) | 1B | 📋 Ready | CV onboarding rebuild — one-drop path + manual path fork, section colours, OG/QR polish |
+| 3 | [Sprint 11](./major/phase-1b/sprint-11/README.md) | 1B | 🔧 In Progress | Public Profile Rewrite — profile mode fixes, schema foundation, editorial layout |
 | 4 | [Sprint 12](./major/phase-1b/sprint-12/README.md) | 1B | 📋 Ready | Yacht graph foundation — yacht detail, colleagues, sea time, transfer flow |
 | 5 | [Sprint 13](./major/phase-1b/sprint-13/README.md) | 1B | 📋 Ready | Launch polish — public layout, marketing page, production ops, legal sign-off |
 
-**Next action:** Merge PRs #96 + #97 to main, then begin Sprint 10.1
+**Next action:** Sprint 11a overnight build in progress (2026-03-28)
 
 > Junior sprints in flight → see [junior/README.md](./junior/README.md)
 

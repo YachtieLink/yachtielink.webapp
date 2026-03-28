@@ -17,8 +17,10 @@ interface ProfileAccordionProps {
   defaultOpen?: boolean
   /** If true, section is completely hidden (empty + not visible) */
   hidden?: boolean
-  /** Optional section accent colour — adds left border + chevron tint */
+  /** Optional section accent colour — tints chevron + icon */
   accentColor?: SectionColor
+  /** Optional icon rendered before the heading text */
+  icon?: React.ReactNode
 }
 
 export function ProfileAccordion({
@@ -29,6 +31,7 @@ export function ProfileAccordion({
   defaultOpen = false,
   hidden = false,
   accentColor,
+  icon,
 }: ProfileAccordionProps) {
   const [open, setOpen] = useState(defaultOpen)
   const tokens = accentColor ? getSectionTokens(accentColor) : null
@@ -38,7 +41,6 @@ export function ProfileAccordion({
   return (
     <div
       className="bg-[var(--color-surface)] rounded-2xl shadow-sm overflow-hidden border border-[var(--color-border-subtle)]"
-      style={tokens ? { borderLeftWidth: 3, borderLeftColor: tokens.accent500 } : undefined}
     >
       <button
         className="w-full text-left p-4 flex items-start gap-3 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-interactive)] active:scale-[0.99] transition-transform"
@@ -47,7 +49,8 @@ export function ProfileAccordion({
       >
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-base font-serif text-[var(--color-text-primary)]">{title}</span>
+            {icon && <span className="shrink-0" style={tokens ? { color: tokens.accent500 } : undefined}>{icon}</span>}
+            <span className="text-sm font-sans font-medium uppercase tracking-wider text-[var(--color-text-primary)]">{title}</span>
             {editHref && (
               <Link
                 href={editHref}

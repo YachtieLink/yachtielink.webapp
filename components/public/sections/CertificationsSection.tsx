@@ -1,3 +1,4 @@
+import { Shield } from 'lucide-react'
 import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { certificationsSummary, countExpiringCerts } from '@/lib/profile-summaries'
@@ -31,6 +32,7 @@ export function CertificationsSection({ certifications }: CertificationsSectionP
         title="Certifications"
         summary={certificationsSummary(certifications.length, expiringCount)}
         accentColor="amber"
+        icon={<Shield size={16} />}
       >
         <div className="flex flex-col gap-2">
           {certifications.map((cert) => {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { cardHover } from '@/lib/motion'
 import { ProfileAvatar } from '@/components/ui/ProfileAvatar'
@@ -9,6 +10,7 @@ interface EndorsementCardProps {
   endorserName: string
   endorserRole?: string | null
   endorserPhoto?: string | null
+  endorserHandle?: string | null
   yachtName?: string | null
   date: string
   content: string
@@ -20,6 +22,7 @@ export function EndorsementCard({
   endorserName,
   endorserRole,
   endorserPhoto,
+  endorserHandle,
   yachtName,
   date,
   content,
@@ -37,14 +40,26 @@ export function EndorsementCard({
   })
 
   return (
-    <motion.div {...cardHover} className="rounded-2xl border border-[var(--color-border)] border-l-4 border-l-[var(--color-coral-500)] bg-[var(--color-surface)] p-4">
+    <motion.div {...cardHover} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
       {/* Endorser info */}
       <div className="flex items-center gap-3 mb-3">
-        <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
+        {endorserHandle ? (
+          <Link href={`/u/${endorserHandle}`}>
+            <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
+          </Link>
+        ) : (
+          <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
+        )}
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
-            {endorserName}
-          </p>
+          {endorserHandle ? (
+            <Link href={`/u/${endorserHandle}`} className="text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--color-interactive)] truncate block">
+              {endorserName}
+            </Link>
+          ) : (
+            <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
+              {endorserName}
+            </p>
+          )}
           {endorserRole && (
             <p className="text-xs text-[var(--color-text-secondary)] truncate">
               {endorserRole}
