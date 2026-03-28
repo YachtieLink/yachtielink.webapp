@@ -517,7 +517,7 @@ function ProfileModeContent({
               </Link>
               <Link
                 href="/login"
-                className="w-full flex items-center justify-center text-center rounded-xl border border-[var(--accent-500,#14b8a6)] px-6 py-3 text-sm font-medium text-[var(--accent-500,#14b8a6)] hover:bg-[var(--accent-500,#14b8a6)]/10 transition-colors"
+                className="w-full flex items-center justify-center text-center rounded-xl border border-[var(--color-interactive)] px-6 py-3 text-sm font-medium text-[var(--color-interactive)] hover:bg-[var(--color-interactive)]/5 transition-colors"
               >
                 Sign in to see how you know<br />{displayName}
               </Link>
