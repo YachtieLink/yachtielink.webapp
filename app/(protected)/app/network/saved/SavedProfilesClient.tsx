@@ -53,31 +53,43 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
   const [showNewFolder, setShowNewFolder] = useState(false)
 
   async function updateProfile(id: string, patch: Partial<{ notes: string | null; watching: boolean; folder_id: string | null }>) {
-    // Optimistic update
+    const previous = profiles.find((p) => p.id === id)
     setProfiles((prev) =>
       prev.map((p) => (p.id === id ? { ...p, ...patch } : p))
     )
-    const res = await fetch(`/api/saved-profiles/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(patch),
-    })
-    if (!res.ok) {
+    try {
+      const res = await fetch(`/api/saved-profiles/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patch),
+      })
+      if (!res.ok) throw new Error()
+    } catch {
+      if (previous) {
+        setProfiles((prev) =>
+          prev.map((p) => (p.id === id ? previous : p))
+        )
+      }
       toast('Update failed', 'error')
-      // TODO: rollback on failure
     }
   }
 
   async function unsave(id: string) {
     const profile = profiles.find((p) => p.id === id)
     if (!profile?.saved_user) return
+    const previousProfiles = profiles
     setProfiles((prev) => prev.filter((p) => p.id !== id))
-    const res = await fetch('/api/saved-profiles', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ saved_user_id: profile.saved_user.id }),
-    })
-    if (!res.ok) toast('Could not unsave', 'error')
+    try {
+      const res = await fetch('/api/saved-profiles', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ saved_user_id: profile.saved_user.id }),
+      })
+      if (!res.ok) throw new Error()
+    } catch {
+      setProfiles(previousProfiles)
+      toast('Could not unsave', 'error')
+    }
   }
 
   async function createFolder() {
@@ -98,12 +110,23 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
 
   async function deleteFolder(folderId: string) {
     if (!confirm('Delete this folder? Profiles will be moved to "All".')) return
+    const previousProfiles = profiles
+    const previousFolders = folders
+    const previousActiveFolder = activeFolder
     setProfiles((prev) =>
       prev.map((p) => (p.folder_id === folderId ? { ...p, folder_id: null } : p))
     )
     setFolders((prev) => prev.filter((f) => f.id !== folderId))
     if (activeFolder === folderId) setActiveFolder(null)
-    await fetch(`/api/profile-folders/${folderId}`, { method: 'DELETE' })
+    try {
+      const res = await fetch(`/api/profile-folders/${folderId}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error()
+    } catch {
+      setProfiles(previousProfiles)
+      setFolders(previousFolders)
+      setActiveFolder(previousActiveFolder)
+      toast('Could not delete folder', 'error')
+    }
   }
 
   // Apply filters

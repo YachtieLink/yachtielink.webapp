@@ -109,7 +109,7 @@ export function HeroSection({
       />
 
       {/* Top bar — icon-only buttons over photo */}
-      <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top,0px),1rem)] z-10">
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-between px-4 pt-[calc(max(env(safe-area-inset-top,0px),0.75rem)+0.5rem)] z-10">
         <button
           onClick={() => {
             const isSameOrigin = document.referrer && new URL(document.referrer).origin === window.location.origin

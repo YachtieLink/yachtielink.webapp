@@ -96,14 +96,38 @@ export default async function SubdomainPage({ params }: Props) {
     .map((a) => a.yachts?.id)
     .filter(Boolean) as string[]
 
+  let colleagueCount = 0
+  if (profileYachtIds.length > 0) {
+    const { data: colleagueRows } = await supabase
+      .from('attachments')
+      .select('user_id')
+      .in('yacht_id', profileYachtIds)
+      .is('deleted_at', null)
+      .neq('user_id', user.id)
+    if (colleagueRows) {
+      colleagueCount = new Set(colleagueRows.map((r) => r.user_id)).size
+    }
+  }
+
   let viewerRelationship = { isOwnProfile: false, sharedYachtIds: [] as string[], mutualColleagues: [] as MutualColleague[] }
   let savedStatus: { id: string; folder_id: string | null } | null = null
   let age: number | null = null
+  let viewerIsPro = false
 
   if (viewer) {
-    const result = await getViewerRelationship(viewer.id, user.id, profileYachtIds)
+    const [result, { data: viewerRow }] = await Promise.all([
+      getViewerRelationship(viewer.id, user.id, profileYachtIds),
+      supabase
+        .from('users')
+        .select('subscription_status, subscription_ends_at')
+        .eq('id', viewer.id)
+        .single(),
+    ])
     viewerRelationship = result.relationship
     savedStatus = result.savedStatus
+    if (viewerRow) {
+      viewerIsPro = isProFromRecord(viewerRow)
+    }
   }
 
   if (user.show_dob && viewer) {
@@ -144,7 +168,9 @@ export default async function SubdomainPage({ params }: Props) {
         savedStatus={savedStatus}
         seaTimeTotalDays={seaTimeTotalDays}
         seaTimeYachtCount={seaTimeYachtCount}
+        colleagueCount={colleagueCount}
         age={age}
+        viewerIsPro={viewerIsPro}
       />
     </div>
   )

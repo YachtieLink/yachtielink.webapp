@@ -92,6 +92,7 @@ export interface PublicProfileContentProps {
   seaTimeYachtCount?: number
   colleagueCount?: number
   age?: number | null
+  viewerIsPro?: boolean
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -120,6 +121,7 @@ export function PublicProfileContent({
   seaTimeYachtCount = 0,
   colleagueCount = 0,
   age,
+  viewerIsPro = false,
 }: PublicProfileContentProps) {
   // Pro fallback: rich_portfolio requires Pro subscription
   const isPro = isProFromRecord({
@@ -193,7 +195,7 @@ export function PublicProfileContent({
         showLocation={user.show_location}
         availableForWork={user.available_for_work}
         isPro={isPro}
-        viewerIsPro={false}
+        viewerIsPro={viewerIsPro}
         isOwnProfile={isOwnProfile}
         isLoggedIn={isLoggedIn}
         isColleague={isColleague}

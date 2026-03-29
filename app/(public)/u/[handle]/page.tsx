@@ -13,6 +13,7 @@ import {
 } from '@/lib/queries/profile'
 import type { ProfilePhoto, Hobby, Education, Skill, GalleryItem, MutualColleague } from '@/lib/queries/types'
 import { PublicProfileContent } from '@/components/public/PublicProfileContent'
+import { isProFromRecord } from '@/lib/stripe/pro-shared'
 
 interface Props {
   params: Promise<{ handle: string }>
@@ -96,11 +97,22 @@ export default async function PublicProfilePage({ params }: Props) {
   let viewerRelationship = { isOwnProfile: false, sharedYachtIds: [] as string[], mutualColleagues: [] as MutualColleague[] }
   let savedStatus: { id: string; folder_id: string | null } | null = null
   let age: number | null = null
+  let viewerIsPro = false
 
   if (viewer) {
-    const result = await getViewerRelationship(viewer.id, user.id, profileYachtIds)
+    const [result, { data: viewerRow }] = await Promise.all([
+      getViewerRelationship(viewer.id, user.id, profileYachtIds),
+      supabase
+        .from('users')
+        .select('subscription_status, subscription_ends_at')
+        .eq('id', viewer.id)
+        .single(),
+    ])
     viewerRelationship = result.relationship
     savedStatus = result.savedStatus
+    if (viewerRow) {
+      viewerIsPro = isProFromRecord(viewerRow)
+    }
   }
 
   // Compute age server-side if show_dob is true.
@@ -147,6 +159,7 @@ export default async function PublicProfilePage({ params }: Props) {
         seaTimeYachtCount={seaTimeYachtCount}
         colleagueCount={colleagueCount}
         age={age}
+        viewerIsPro={viewerIsPro}
       />
     </div>
   )
