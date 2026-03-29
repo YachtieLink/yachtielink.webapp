@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
-import { BackButton } from '@/components/ui/BackButton';
+import { PublicHeader } from '@/components/public/PublicHeader';
+import { PublicFooter } from '@/components/public/PublicFooter';
 
 export const metadata: Metadata = {
   title: 'Terms of Service — YachtieLink',
@@ -7,11 +8,10 @@ export const metadata: Metadata = {
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-[var(--color-surface)]">
+    <div className="min-h-screen flex flex-col bg-[var(--color-surface)]">
+    <PublicHeader />
+    <main className="flex-1">
     <div className="max-w-2xl mx-auto px-6 py-12 pb-24">
-      <div className="flex items-center gap-3 mb-6">
-        <BackButton href="/welcome" />
-      </div>
       <h1 className="font-serif text-2xl mb-2">Terms of Service</h1>
       <p className="text-sm text-[var(--color-text-secondary)] mb-8">Last updated: 16 March 2026</p>
 
@@ -171,6 +171,8 @@ export default function TermsPage() {
 
       </section>
     </div>
+    </main>
+    <PublicFooter />
     </div>
   );
 }
