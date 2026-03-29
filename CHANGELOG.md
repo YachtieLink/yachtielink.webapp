@@ -37,7 +37,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 ### Context
 
-- Branch: `junior/settings-information-architecture`. All code uncommitted, awaiting founder commit approval.
+- Branch: `junior/settings-information-architecture`. Committed, pushed, PR #114 open — awaiting founder merge.
 - Migration `contact_email` already pushed to remote DB via `supabase db push`.
 - Scrim/accent/template settings intentionally removed from UI — filed as backlog item for future rebuild with live preview.
 - `useProfileSettings` hook deleted (zero importers after settings page rewrite).

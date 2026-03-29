@@ -18,9 +18,9 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 |--------|-------|--------|-------|
 | [Sprint 11a/b/c](./sprints/major/phase-1b/sprint-11/) | 1B | ✅ Merged (PR #107) | Public Profile Rewrite — 3 view modes, bento grid, section modals |
 | [Rally 005](./sprints/rallies/rally-005-auth-resilience/) | — | ✅ Merged (PR #112) | Auth resilience — 12 fixes after production incident |
-| [Settings IA](./sprints/junior/ui-ux/settings-information-architecture/) | Junior | 🔧 Built — awaiting commit | Settings page rewrite, contact_email, CV-only fields on CV tab |
+| [Settings IA](./sprints/junior/ui-ux/settings-information-architecture/) | Junior | 📬 PR #114 open | Settings page rewrite, contact_email, CV-only fields on CV tab |
 
-**Next action:** Founder commit approval → push → PR → merge
+**Next action:** Founder merges PR #114
 
 ---
 
@@ -40,7 +40,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Commit + PR settings IA** — awaiting founder approval
+1. **Merge PR #114** (settings IA) — founder merges
 2. **Sprint 12 — Yacht Graph Foundation** (6–8 days) — yacht detail pages, colleagues explorer, sea time display
 3. **Sprint 13 — Launch Polish** (6–7 days) — public layout, marketing page, ops config, legal sign-off, go-live
 4. **Media/CRUD standardization** (junior sprint after Phase 1B — photo/gallery dedup, shared Pro gating)
@@ -66,7 +66,7 @@ All D1-D8 resolved 2026-03-25. See `sprints/PHASE1-CLOSEOUT.md` Blockers section
 
 ## Uncommitted Code
 
-Settings IA rework on branch `junior/settings-information-architecture` — 17 files changed, migration pushed. Awaiting founder commit approval.
+None. Settings IA committed and pushed — PR #114 open.
 
 ---
 
@@ -83,7 +83,7 @@ Settings IA rework on branch `junior/settings-information-architecture` — 17 f
 
 | Type | Slug | Status |
 |------|------|--------|
-| ui-ux | settings-information-architecture | 🎨 Built — awaiting commit |
+| ui-ux | settings-information-architecture | 📬 PR #114 open |
 | debug | debug-cv-parse-extraction | In Progress |
 | debug | debug-photo-upload-limit | In Progress |
 | ~~debug~~ | ~~debug-cv-regenerate-date~~ | ~~Obsolete — CV regeneration replaced by on-demand generation in Sprint 11a (2026-03-28)~~ |

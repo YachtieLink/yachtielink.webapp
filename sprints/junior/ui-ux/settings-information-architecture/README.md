@@ -1,6 +1,6 @@
 # Junior Sprint: Settings Information Architecture
 
-**Status:** 🔧 Built — awaiting commit
+**Status:** 📬 PR #114 open — awaiting merge
 **Priority:** High
 **Filed:** 2026-03-28
 **Type:** ui-ux
