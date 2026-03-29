@@ -60,6 +60,32 @@ The yacht graph is the wedge. Everything else is secondary to making that work.
 
 ---
 
+## Test Accounts
+
+Use these freely for QA, testing flows, and verifying features. No need to ask permission.
+
+### Dev / QA account
+| Email | Password | Notes |
+|-------|----------|-------|
+| `dev@yachtie.link` | `jHvzEqbR7igVr8J2UeAZQP50` | Primary dev account, created via admin API |
+
+### Seed accounts (25 total, same password)
+**Password for all seed accounts:** `TestSeed2026!`
+**Email pattern:** `test-seed-{firstname}@yachtie.link`
+**Handle pattern:** `test-seed-{firstname}`
+
+| Name | Email | Role | Notes |
+|------|-------|------|-------|
+| James Whitfield | `test-seed-james@yachtie.link` | Captain | Primary cross-user QA, has endorsements |
+| Charlotte Beaumont | `test-seed-charlotte@yachtie.link` | Chief Stewardess | Pro account, 4 endorsements, CV, gallery |
+| Olivia Chen | `test-seed-olivia@yachtie.link` | Purser | Multiple profile photos |
+
+Other seed users: Sofia, Marcus, Liam, Tyler, Elena, Mia, Zara, Hannah, David, Ryan, Kai, Pierre, Anna, Jake, Ben, Chloe, Finn, Grace, Hugo, Lucy, Sarah, Tom.
+
+Full seed data definition: `scripts/seed/seed-test-data.mjs`
+
+---
+
 ## Core Workflow
 
 ### Plan before code
