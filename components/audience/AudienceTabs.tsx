@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
 import { staggerContainer, fadeUp, cardHover, popIn } from '@/lib/motion'
 import { RequestActions } from './RequestActions'
@@ -70,11 +71,10 @@ interface ColleagueEntry {
   colleague_id: string
   shared_yachts: string[]
   profile: ColleagueProfile | null
-  sharedYachtNames: string[]
   sharedYachtDetails: Array<{ id: string; name: string }>
 }
 
-interface UserYacht {
+export interface UserYacht {
   id: string
   role_label: string
   started_at: string
@@ -425,7 +425,6 @@ function YachtsTab({ userYachts }: { userYachts: UserYacht[] }) {
     setSearching(true)
     setSearchError(false)
     try {
-      const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
       const { data, error } = await supabase.rpc('search_yachts', { p_query: q, p_limit: 6 })
       if (seq !== searchSeqRef.current) return

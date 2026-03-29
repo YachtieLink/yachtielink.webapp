@@ -253,7 +253,7 @@ export function PortfolioLayout({
                       {(end.endorser_role_label || end.yacht?.name) && (
                         <p className="text-[10px] text-[var(--color-text-secondary)] truncate">
                           {end.endorser_role_label}{end.endorser_role_label && end.yacht?.name ? ' · ' : ''}
-                          {end.yacht?.id ? (
+                          {end.yacht?.id && isLoggedIn ? (
                             <button onClick={() => setPendingNav({ url: `/app/yacht/${end.yacht!.id}`, label: end.yacht!.name ?? 'Yacht' })} className="hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
                               {end.yacht.name}
                             </button>

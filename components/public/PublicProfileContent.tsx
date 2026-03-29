@@ -440,14 +440,14 @@ function ProfileModeContent({
           {/* My Experience */}
           {sectionVisible(sectionVisibility, 'experience', attachments.length > 0) && (
             <div id="section-experience">
-              <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} seaTimeTotalDays={seaTimeTotalDays} seaTimeYachtCount={seaTimeYachtCount} onNavigate={(url, label) => setPendingNav({ url, label })} />
+              <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} seaTimeTotalDays={seaTimeTotalDays} seaTimeYachtCount={seaTimeYachtCount} onNavigate={isLoggedIn ? (url, label) => setPendingNav({ url, label }) : undefined} />
             </div>
           )}
 
           {/* My Endorsements */}
           {sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) && (
             <div id="section-endorsements">
-              <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} onNavigate={(url, label) => setPendingNav({ url, label })} />
+              <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} onNavigate={isLoggedIn ? (url, label) => setPendingNav({ url, label }) : undefined} />
             </div>
           )}
 

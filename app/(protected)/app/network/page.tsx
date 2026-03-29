@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { AudienceTabs } from '@/components/audience/AudienceTabs'
+import { AudienceTabs, type UserYacht } from '@/components/audience/AudienceTabs'
 import { PageTransition } from '@/components/ui/PageTransition'
 
 interface ColleagueRow {
@@ -108,19 +108,12 @@ export default async function NetworkPage() {
     colleague_id: row.colleague_id,
     shared_yachts: row.shared_yachts,
     profile: profileMap.get(row.colleague_id) ?? null,
-    sharedYachtNames: row.shared_yachts
-      .map((yid) => yachtMap.get(yid)?.name)
-      .filter((n): n is string => !!n),
     sharedYachtDetails: row.shared_yachts
       .map((yid) => { const y = yachtMap.get(yid); return y ? { id: y.id, name: y.name } : null })
       .filter((y): y is { id: string; name: string } => !!y),
   }))
 
-  interface UserYachtRow {
-    id: string; role_label: string; started_at: string; ended_at: string | null
-    yachts: { id: string; name: string; yacht_type: string | null; length_meters: number | null; flag_state: string | null; is_established: boolean } | null
-  }
-  const userYachts = ((userYachtsRes.data as unknown as UserYachtRow[]) ?? []).filter((a) => a.yachts)
+  const userYachts = ((userYachtsRes.data as unknown as UserYacht[]) ?? []).filter((a) => a.yachts)
 
   // Most recent yacht id for the wheel sheet CTA
   const mostRecentYachtId = colleagueRows[0]?.shared_yachts[0] ?? null
