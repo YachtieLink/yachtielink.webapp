@@ -1,273 +1,258 @@
-# Phase 1 Close-Out Plan
+# Phase 1 Close-Out — Launch Tracker
 
-**Goal:** Ship the complete Phase 1 product with a clean codebase. Four sprints, sequential with explicit dependencies.
+**Goal:** Ship YachtieLink to 20-50 invited crew for Med season soft launch (June 2026).
 
-**How to use this file:** At session start, read this checklist. Find the current sprint. Cross-reference its README for full scope. Update checkboxes as sessions complete. If blocked, check the Blockers section.
+**How to use this file:** This is the single source of truth for what's left. Work top to bottom. Check boxes as items complete. Read this at session start.
 
-**Last updated:** 2026-03-27 (restructured for new sprint sequence: 10.1 → Bugfix → 11 → 12 → 13)
-
----
-
-## Blockers (must resolve before proceeding)
-
-- [x] **D1-D8 design decisions** — Resolved 2026-03-25. All 8 answered and implemented in Waves 1-5. D1: maritime cert alias map + fuzzy match. D2: 1mo overlap tolerance. D3: country name labels. D4: libphonenumber-js. D5: ensign flags deferred post-launch. D6: transform:scale (deferred from Wave 2). D7: list-based yacht graph. D8: attachment upsert on user+yacht+role.
-- [x] **Vercel Pro upgrade** — Purchased 2026-03-25. Account: ari@yachtie.link. Wildcard SSL provisioned. Subdomain routing live.
-- [x] **Legal business address** — Deferred. Using ari@yachtie.link as GDPR contact. Must be resolved before Sprint 13 public launch.
-- [x] **DNS migration to Vercel** — Completed 2026-03-27. All MX/TXT records migrated. Custom domain `yachtie.link` on Vercel nameservers.
+**Last updated:** 2026-03-29
 
 ---
 
-## Execution Sequence
+## Current State
 
-### ✅ COMPLETED: Sessions 1-8 (Waves 1-5 + Junior Work)
+```
+Sessions 1-8   ✅ Waves 1-5 + DNS/follow-up
+Sprint 10.1-3  ✅ Phase 1A closeout, design system, page layout
+Sprint 11a-c   ✅ Public profile rewrite (bento grid, 3 view modes)
+Sprint 12      ✅ Yacht graph foundation (wiring, navigation, yachts tab)
+Sprint 13 W0+1 ✅ Public header/footer, cookie banner
+Rally 005      ✅ Auth resilience (12 fixes)
+QA fixes       ✅ Settings IA, bug sweep, mobile fixes, stale cookies
 
-**Wave 1: Data Integrity** ✅ 2026-03-25
-- Cert/attachment dedup
-- Date overlap validation
-- Canonical save pipeline
-- Collapsed dual-path code (301 LOC deleted)
-
-**Wave 2: Public Profile + Read Models** ✅ 2026-03-25
-- Hero fields (age, sea time)
-- CV 404 fix
-- Shared query extraction
-- TypeScript typing (eliminated `any[]`)
-- 5 section components created
-
-**Wave 3: Import Wizard UX** ✅ 2026-03-25
-- Languages support
-- Bio field handling
-- Phone formatting
-- Date consistency
-
-**Wave 4: Profile Page + Skills** ✅ 2026-03-26
-- Personal details card
-- Editability improvements
-- Skills chip UX
-- Hook extraction (`useProfileSettings`)
-
-**Wave 5: Network Tab + Pro Subdomain** ✅ 2026-03-26
-- Yacht-grouped colleagues
-- Endorsement helpers
-- Pro subdomain middleware
-- Cookie refresh fix (P1)
-
-**Junior/Follow-up Work** ✅ 2026-03-27
-- DNS migration to Vercel + SSL provisioning
-- Pro subdomain route hardening
-- Two-phase code review (Sonnet + Opus)
-- YachtieLink drift review
+→ NOW: Pre-launch rally + Sprint 13 completion
+→ THEN: Ghost Profiles sprint
+→ THEN: Launch QA + ops
+→ THEN: 🚀 Invite mode
+```
 
 ---
 
-## Next: Four-Sprint Phase 1B Execution
+## What's Left (in execution order)
 
-### Sprint 10.1: Phase 1A Closeout (5-4 days)
+### 1. Rally: Pre-Launch Bug Sweep + Polish
 
-**Status:** 📋 Ready for execution
+See `sprints/rallies/rally-006-prelaunch/README.md` for full spec.
 
-**Why:** Close Phase 1A cleanly so Phase 1B has a solid foundation. Finish dark mode, animations, missing pages, public layout infrastructure.
+**Bugs (must fix):**
+- [ ] Safari public profile links broken — links not clickable on Safari, shared profile is dead on iPhone. *Note: subdomain links now redirect to /u/{handle} which may have resolved this — verify and close or fix.*
+- [ ] Subdomain cookie auth — cookies not shared across subdomains, Pro subdomain feature broken. *Note: subdomain links now redirect to /u/{handle} as workaround, but root cause unresolved.*
+- [ ] Onboarding skips CV upload — auth trigger sets name from email prefix, user bypasses the CV step
+- [ ] Avatar thumbnail framing — photos crop heads. Default to upper portion for portrait, center for square.
+- [ ] CV yacht matching confidence — users can't tell if yacht matches are correct during import. Needs clear signals.
 
-**What it depends on:**
-- PRs #96 + #97 merged to main (Waves 4-5)
-- Education edit page verified working (already exists)
-- API routes verified (already exist)
+**Analytics wiring (must fix for Pro value):**
+- [ ] Wire `record_profile_event('pdf_download')` in PDF download routes
+- [ ] Wire `record_profile_event('link_share')` in share handlers
+- [ ] Delete stub `/app/billing` page (billing works via Settings)
 
-**Key deliverables:**
-- [ ] Wave 0: Public layout infrastructure (app/(public)/layout.tsx + PublicHeader + PublicFooter)
-- [ ] Wave 0: EmptyState component (card/inline variants)
-- [ ] Dark mode: ProfileAccordion, PhotoGallery, ProfileStrength, SaveProfileButton, SectionManager
-- [ ] Animation: wire 12 presets into components
-- [ ] Typography: DM Serif Display on headings (weight 400, no synthetic bold)
-- [ ] Route cleanup: delete `/app/audience`
-- [ ] API hardening: try/catch on 5 routes, Zod on 2 routes
-- [ ] Storage abstraction: verify all calls routed through `lib/storage/`
-- [ ] Tag `v1.0-phase-1a` after merge
-
-**Exit:** Phase 1A closed, public layout ready for Sprint 13
-
-**See:** `sprints/major/phase-1a/sprint-10.1/README.md`
+**UX fixes (P2 from mobile audit):**
+- [ ] Endorsement request banner not dismissable
+- [ ] Network tab bar crowded at 375px
+- [ ] "Unknown" in endorsement requests sent
+- [ ] Back button inconsistent across app + missing top margin
+- [ ] Empty share button on endorsement request page
+- [ ] Language chip not editable on profile page
 
 ---
 
-### Sprint CV-Parse-Bugfix: Fix 37 QA Bugs (5-7 days)
+### 2. Sprint 13 Completion — Launch Polish
 
-**Status:** 📋 Ready for execution
-
-**Depends on:** Sprint 10.1 complete
-
-**Why:** Waves 1-5 shipped with 37 QA bugs found in founder walkthrough (2026-03-24). Data integrity issues (stacking, duplication), missing fields (age, flag, sea time), UX gaps (wizard steps, profile editability). Must fix before Sprint 11 onboarding rebuild.
-
-**Five waves (sequential, some parallelization possible after Wave 1):**
-
-**Wave 1: Data Integrity (P0)** — Dedup + validation
-- [ ] Cert fuzzy dedup (maritime alias map + Levenshtein match)
-- [ ] Attachment dedup (upsert on user+yacht+role)
-- [ ] Skill dedup verification
-- [ ] Yacht date overlap validation (1mo tolerance)
-
-**Wave 2: Public Profile Hero + CV View (P0/P1)**
-- [ ] Create `formatDate.ts` utility (needed by Wave 3)
-- [ ] Add age, sea time, country flag to public profile hero
-- [ ] Fix CV view 404 (`cv_public` + `latest_pdf_path` after parse)
-- [ ] Make CV view responsive (transform:scale, no h-scroll)
-- [ ] Add share + download buttons
-
-**Wave 3: Import Wizard UX (P1)** — Depends on Wave 2's `formatDate.ts`
-- [ ] Languages support in Step 1
-- [ ] Bio textarea in Step 1
-- [ ] Phone formatting
-- [ ] Date display consistency
-- [ ] Editable cards (certs, education, experience)
-
-**Wave 4: Profile Page + Skills (P1)**
-- [ ] Personal Details card on profile (with visibility toggles)
-- [ ] Visa/Travel Documents visible on profile
-- [ ] Languages row editable
-- [ ] Experience section shows imported entries
-- [ ] Skills chip UX: explicit delete, add input, removable saved items
-
-**Wave 5: Network Tab Grouping (P1)**
-- [ ] Endorsements grouped by yacht (collapsed)
-- [ ] Colleagues grouped by yacht (collapsed)
-- [ ] Yacht tab added to Network
-- [ ] Bookmark/save yacht support
-
-**Exit:** 37 bugs resolved, profile populated correctly, network tab grouped, data integrity solid
-
-**See:** `sprints/major/phase-1b/sprint-cv-parse-bugfix/README.md`
-
----
-
-### Sprint 11: Public Profile Rewrite (3 sub-sprints: 11a/b/c)
-
-**Status:** 🔧 In Progress (11a started 2026-03-28)
-
-**Depends on:** Sprint 10.1 complete + CV-Parse-Bugfix complete
-
-**Why:** Collapse 6-step onboarding into a fork: one-drop CV path (1 screen, ~5-8s) vs minimal manual path (name + handle). Fast entry, no endorsement/role selection in onboarding (those are contextual later).
-
-**Key deliverables:**
-- [ ] `StepCvUpload` — drag-drop, upload + parse + auto-handle in parallel
-- [ ] Handle auto-generation via `suggest_handles` + `handle_available`
-- [ ] Refactor onboarding steps to fork on CV presence
-- [ ] Delete old steps: `/app/onboarding/role`, `/app/onboarding/yachts`, `/app/onboarding/endorsements`
-- [ ] Section colours on public profile (6 sections with `accentColor`)
-- [ ] Motion polish: staggered cards, hover effects, entrance animations
-- [ ] OG image enhancement: DM Serif, profile photo, branding
-- [ ] QR code branded + PNG download
-- [ ] Verify standalone CV flow still works
-
-**Exit:** Onboarding fast and clean, users land on populated profile, standalone CV flow verified
-
-**See:** `sprints/major/phase-1b/sprint-11/README.md`
-
----
-
-### Sprint 12: Yacht Graph Foundation (6-8 days)
-
-**Status:** 📋 Ready for execution
-
-**Depends on:** Sprint 11 complete
-
-**Why:** Make the yacht graph tangible. Yacht detail pages, colleague explorer grouped by yacht, sea time display, lightweight "wrong yacht?" correction flow. Graph is usable through links alone (no visualization).
-
-**Database foundation first, then UI:**
-- [ ] Fix `get_sea_time()` date arithmetic bug
-- [ ] Implement 4 new RPCs: `get_sea_time_detailed()`, `get_yacht_endorsement_count()`, `get_yacht_avg_tenure_days()`, `get_mutual_colleagues()`
-- [ ] Create `attachment_transfers` + `reports` tables (audit + trust foundation)
-- [ ] `transfer_attachment()` RPC + `submit_report()` RPC
-
-**UI Waves:**
-- [ ] Yacht detail page (`/app/yacht/[id]`) — current/alumni crew, mutual connections, endorsement cross-refs, stats
-- [ ] Colleague explorer (`/app/network/colleagues`) — grouped by yacht, search, endorse quick-action
-- [ ] Sea time display: profile card + breakdown page + public stat
-- [ ] Yacht search UX: crew count, match quality, duplicate detection
-- [ ] Attachment transfer: "Wrong yacht?" section + BottomSheet + impact preview
-
-**Exit:** Yacht graph navigable, sea time accurate, users can self-correct wrong entries, multi-hop navigation works (profile → yacht → crew → yacht, 3+ hops without dead ends)
-
-**See:** `sprints/major/phase-1b/sprint-12/README.md`
-
----
-
-### Sprint 13: Launch Polish + Go-Live (6-7 days)
-
-**Status:** 📋 Ready for execution
-
-**Depends on:** Sprint 12 complete
-
-**Why:** Ship to production in invite mode. Build public-facing infrastructure (layout, marketing page), configure ops, run QA, get legal sign-off.
-
-**Wave 0 (BLOCKER): Public Layout Infrastructure**
-- [ ] Create `app/(public)/layout.tsx` — wrapper for public pages
-- [ ] Create `PublicHeader` + `PublicFooter` components
-- [ ] Apply to: `/`, `/privacy`, `/terms`, `/roadmap`
+Sprint 13 Wave 0+1 (public infrastructure) is merged. Remaining:
 
 **Code work:**
-- [ ] Verify marketing page (`app/page.tsx` already built, just verify)
-- [ ] Create static roadmap page (`/app/more/roadmap`)
-- [ ] Update cookie banner text (PostHog, Sentry)
-- [ ] Verify SEO (sitemap, robots, OG tags)
+- [ ] Verify marketing landing page renders correctly
+- [ ] Update cookie banner text (mention PostHog + Sentry by name)
+- [ ] Verify SEO (sitemap excludes soft-deleted users, robots.txt blocks /app/ and /api/, OG tags on public pages)
+- [ ] Fix sitemap soft-delete leak (add `deleted_at IS NULL`)
 
 **Ops (founder):**
 - [ ] Configure Vercel env vars: PostHog, Sentry, Stripe prod, Supabase prod, Redis, Resend, OpenAI, CRON_SECRET
-- [ ] Verify Stripe production webhook
-- [ ] Test cron jobs in production
+- [ ] Configure Stripe production webhook → `/api/stripe/webhooks`
+- [ ] Test cron jobs in production (analytics-nudge, cert-expiry)
 
-**QA & Legal:**
-- [ ] Run full QA checklist: auth, Stripe, core flows, yacht graph, cross-browser, GDPR
-- [ ] Legal sign-off: business address in terms/privacy (**BLOCKER** for public mode)
-- [ ] Test `SIGNUP_MODE=invite` mode
-- [ ] Monitor Sentry for first 24h
-
-**Exit:** Marketing page live, production env configured, legal approved, invite mode working, ready for soft launch (20-50 crew)
-
-**See:** `sprints/major/phase-1b/sprint-13/README.md`
+**Legal (founder):**
+- [ ] Business address in terms/privacy pages (virtual office OK)
+- [ ] Legal sign-off on terms + privacy
 
 ---
 
-## Summary
+### 3. Ghost Profiles & Claimable Accounts
 
-```
-Sessions 1-8 ✅ Complete (Waves 1-5 + DNS/follow-up)
-     ↓
-Sprint 10.1 (Phase 1A closeout) — 4-5 days
-     ↓
-Sprint CV-Parse-Bugfix (37 bugs, 5 waves) — 5-7 days
-     ↓
-Sprint 11 (Onboarding rebuild) — 5-7 days
-     ↓
-Sprint 12 (Yacht graph) — 6-8 days
-     ↓
-Sprint 13 (Launch) — 6-7 days
-     ↓
-🚀 Phase 1 shipped to production (invite mode)
-```
+Design is complete (24 decisions resolved). Core viral loop — when a user adds a yacht, ghost profiles are created for crew they name. Those ghosts become claimable accounts when the real person signs up.
+
+- [ ] Build ghost profiles sprint (spec in `sprints/backlog/ghost-profiles-claimable-accounts.md`)
+- [ ] Verify claim flow end-to-end
+- [ ] Verify ghost → real profile data merge
 
 ---
 
-## Session Start Checklist
+### 4. Launch QA Checklist
 
-Every session, before doing anything:
+All must pass before inviting users:
 
-1. Read this file — find the current sprint in the sequence above
-2. Read `STATUS.md` — check which sprint is active and next action
-3. Read the latest `CHANGELOG.md` entry — know what happened last
-4. Read the sprint's README — full scope, dependencies, exit criteria
-5. At session end: update checkboxes here, run `/shipslog`
+**Auth:**
+- [ ] Signup with email → verify → login
+- [ ] Signup with Google OAuth → login
+- [ ] Signup with Apple OAuth → login
+- [ ] Logout → session cleared → redirect to /welcome
+- [ ] Stale cookie cleanup works (no retry loops)
+
+**Onboarding:**
+- [ ] Complete onboarding (all steps)
+- [ ] CV upload path → parse → auto-populate profile
+- [ ] Manual path (no CV) → name + handle → profile
+
+**Core Features:**
+- [ ] Add yacht (new + existing)
+- [ ] Add certification with document upload
+- [ ] Edit profile (bio, photo, contact info)
+- [ ] Request endorsement → email received with deep link
+- [ ] Follow deep link → write endorsement → appears on recipient profile
+- [ ] Endorsement invite tokens correctly scope to sender
+- [ ] View public profile at /u/:handle (logged out)
+- [ ] Share public profile link → OG preview correct
+- [ ] Generate PDF CV → download → content correct
+
+**Payments:**
+- [ ] Subscribe to Pro → Stripe Checkout → webhook → status updates
+- [ ] Cancel Pro → Stripe Portal → webhook → features revoked
+- [ ] Insights shows real data for Pro users (views, downloads, shares)
+
+**Yacht Graph:**
+- [ ] Navigate: profile → yacht → crew → profile (3+ hops, no dead ends)
+- [ ] Yacht search works from Network Yachts tab
+- [ ] Mutual colleagues show on public profiles
+
+**Security:**
+- [ ] Cannot view other user's private data via API
+- [ ] Cannot create endorsement without shared yacht
+- [ ] Rate limits trigger on abuse
+- [ ] Stripe webhook rejects invalid signatures
+
+**GDPR:**
+- [ ] Delete account → data removed → session invalidated
+- [ ] Download my data → JSON export works
+- [ ] Deleted user's endorsements anonymised on recipient profiles
+
+**Mobile (Safari iPhone):**
+- [ ] All screens render correctly
+- [ ] Bottom tab bar visible and functional
+- [ ] Touch targets ≥ 44px
+- [ ] No horizontal scroll
+- [ ] Photo upload works
+
+**Desktop (Chrome):**
+- [ ] Responsive layout at 1024px+
+- [ ] Keyboard navigation works
+
+**Metrics & Monitoring:**
+- [ ] Phase 1 metrics implemented: endorsement request rate, completion rate, organic share rate, time-to-first-endorsement
+- [ ] Abuse escalation: report flow functional, flag rate monitoring, freeze mechanism
+- [ ] PostHog receiving events (profile.created, endorsement.created)
+- [ ] Sentry receiving exceptions
+
+---
+
+### 5. Deploy
+
+- [ ] Final code review (no secrets, no console.logs, no TODOs)
+- [ ] Tag `v1.0-launch`
+- [ ] Verify production build clean
+- [ ] Test invite link flow end-to-end in production
+- [ ] Set `SIGNUP_MODE=invite`
+- [ ] Send invite links to 20-50 crew
+- [ ] Monitor Sentry 24h
+- [ ] Monitor PostHog funnel (signup → onboarding → profile completion)
+
+---
+
+## Backlog Cross-Reference
+
+All backlog items accounted for — where each one lands:
+
+### Folded into Rally 006
+- `safari-public-profile-links-broken.md` — Safari links broken *(see note: may be resolved via subdomain redirect)*
+- `subdomain-cookie-auth-audit.md` — Subdomain auth cookies
+- `onboarding-name-from-email.md` — Onboarding skips CV upload
+- `avatar-thumbnail-framing.md` — Avatar heads cut off
+- `cv-review-existing-yacht-badge.md` — Yacht matching confidence
+- `endorsement-share-button-empty.md` — Empty share button on endorsement request
+- `ux-audit-mobile-2026-03-29.md` — P1 + P2 items (7 of 22 issues)
+
+### Folded into Launch QA (Rally 007)
+- `endorsement-invite-token-qa.md` — E2E test that invite tokens correctly scope to sender
+
+### Folded into Ghost Profiles Sprint
+- `ghost-profiles-claimable-accounts.md` — Core viral loop
+
+### Post-Launch (P3 from UX audit + remaining backlog)
+- `ux-audit-mobile-2026-03-29.md` — remaining 15 P3 items (copy alignment, chip truncation, Pro badge wording, etc.)
+- `profile-photo-reposition.md` — Crop/zoom/reposition
+- `colleague-graph-explorer.md` — Full graph explorer
+- `cv-review-socials-step.md` — Social links in CV review
+- `social-links-add-prompt.md` — Prompt to add more socials
+- `inner-page-header-component.md` — Consistent sub-page headers
+- `custom-404-page.md` — Branded 404
+- `reserved-subdomain-page-uxui.md` — Reserved page polish
+- `cv-sharing-page-rework.md` — CV page layout rework
+- `crew-pass.md` — Background checks (Phase 2+)
+- `attachment-transfer.md` — "Wrong yacht?" flow (first week post-launch)
+- `watch-profile-notifications.md` — Push notifications (deferred)
+
+---
+
+## Backlog Triage
+
+### SHIP FIRST WEEK POST-LAUNCH
+
+| Item | Effort | Why |
+|------|--------|-----|
+| Endorsement Writing Assist | 1-2 days | Design complete. Helps early users write better endorsements. |
+| Attachment transfer ("Wrong yacht?") | 1-2 days | Self-correction flow for data quality |
+| Pro Upsell Consistency | 1 day | Standardize upgrade CTAs |
+
+### DEFER TO PHASE 2
+
+| Item | Why defer |
+|------|-----------|
+| Availability Toggle (Sprint 14) | Needs user volume |
+| Crew Search (Sprint 15) | Needs profiles to search |
+| AI Pack (Sprint 16) | Growth features, not MVP |
+| Attachment Confirmation (Sprint 17) | Needs yacht activity volume |
+| Profile Photo Reposition | Polish |
+| Colleague Graph Explorer (full) | Core explorer works, full version is Phase 2 |
+| CV Sharing Page Rework | Current works |
+| Saved Profiles Rework | Current works |
+| Custom 404 Page | Branding polish |
+| Watch Profile Notifications | Deferred explicitly |
+| Crew Pass | Major new product |
+
+---
+
+## Completed Sprint History
+
+<details>
+<summary>Click to expand</summary>
+
+- **Sessions 1-8** (2026-03-25 to 2026-03-27): Data integrity, public profile, import wizard, profile page, network tab, Pro subdomain, DNS migration
+- **Sprint 10.1-10.3** (2026-03-27 to 2026-03-28): Design system tokens, nav refactor, page layout, IA, DM Serif typography, animation presets, section colours
+- **Sprint 11a-c** (2026-03-28): Public profile rewrite — bento grid, 3 view modes, scroll reveal, endorsement cards
+- **Sprint 12** (2026-03-29): Yacht graph — yacht detail page, crew lists, graph navigation, yachts tab, mutual colleagues, sea time card, endorsement request pre-fill
+- **Sprint 13 W0+1** (2026-03-29): Public header/footer, cookie banner
+- **Rally 005** (2026-03-29): 12 auth fixes, stale cookie cleanup, retry loop prevention
+- **PR #114** Settings IA rework, **PR #115** Bug sweep, **PR #120** Mobile QA fixes
+
+</details>
 
 ---
 
 ## Post-Launch Queue
 
-After Sprint 13 ships, next phase begins:
-
-- Ensign flags for yacht entries (D5 — maritime flag SVGs)
-- Ghost Profiles & Claimable Accounts (24 decisions, viral loop)
-- Endorsement Writing Assist (12 decisions, no schema changes)
-- CV Actions Card Redesign
-- Profile Photo Reposition
-- Feature Pro Subdomain (junior sprint)
-- Feature CV Sharing Rework (junior sprint)
-- Feature Saved Profiles Rework (junior sprint)
+After soft launch stabilizes:
+- Ensign flags for yacht entries
+- Endorsement Writing Assist
+- Attachment transfer flow
+- Pro Upsell Consistency
+- Ghost Profile → Phase 2 growth loop
+- Dark mode
+- Saved Yachts
