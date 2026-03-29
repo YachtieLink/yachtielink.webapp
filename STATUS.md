@@ -2,13 +2,13 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-29 (Settings IA rework complete. Contact email column live. Awaiting commit approval.)
+**Last updated:** 2026-03-29 (Overnight session: bug sweep PR #115, Sprint 13 public infra PR #116, 4 junior sprints closed.)
 
 ---
 
 ## Current Phase
 
-**Phase 1B active.** Sprint 11 (Public Profile Rewrite) shipped and merged (PR #107). Rally 005 (Auth Resilience) shipped and merged (PR #112). Sprint 11d next (18 remaining profile items).
+**Phase 1B active.** Sprint 12 (Yacht Graph Foundation) in progress. Pre-launch bug sweep and Sprint 13 Wave 0+1 shipped as PRs.
 
 ---
 
@@ -16,11 +16,11 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Sprint | Phase | Status | Focus |
 |--------|-------|--------|-------|
-| [Sprint 11a/b/c](./sprints/major/phase-1b/sprint-11/) | 1B | ✅ Merged (PR #107) | Public Profile Rewrite — 3 view modes, bento grid, section modals |
-| [Rally 005](./sprints/rallies/rally-005-auth-resilience/) | — | ✅ Merged (PR #112) | Auth resilience — 12 fixes after production incident |
-| [Settings IA](./sprints/junior/ui-ux/settings-information-architecture/) | Junior | 📬 PR #114 open | Settings page rewrite, contact_email, CV-only fields on CV tab |
+| [Sprint 12](./sprints/major/phase-1b/sprint-12/) | 1B | 🔧 In Progress | Yacht Graph Foundation — yacht detail, colleague explorer, sea time |
+| Pre-launch bug sweep | — | 📬 PR #115 open | Optimistic rollback, viewerIsPro, subdomain parity, dead code cleanup |
+| Sprint 13 Wave 0+1 | 1B | 📬 PR #116 open | Public header/footer, cookie banner, SEO verified |
 
-**Next action:** Founder merges PR #114
+**Next action:** Founder merges PR #115 + #116. Sprint 12 build continues.
 
 ---
 
@@ -28,23 +28,20 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
-| Settings IA rework | 2026-03-29 | Profile settings rewrite (4 sections), contact_email column, CvDetailsCard, account page stripped to auth-only, PDF contact_email fix |
-| Rally 005 Auth Resilience | 2026-03-29 | 12 fixes: middleware try-catch, needsAuth simplification, /api/ excluded from matcher, secure cookies, polling jitter, AuthStateListener, env guard (PR #112) |
-| Sprint 11 merged | 2026-03-28 | Public Profile Rewrite: 3 view modes (Profile/Portfolio/Rich Portfolio), bento grid, section modals, ~60 QA fixes (PR #107) |
-| Sprint 10.1 polish | 2026-03-27 | Typography, education links, nav badge, saved profile cardHover (PR #103) |
-| Sprint CV-Parse-Bugfix | 2026-03-27 | 8 bugs fixed (PR #104) |
-| Skill ecosystem | 2026-03-27 | test-yl, sprint-start-yl, sprint-build-yl + auto-chain |
-| Pro subdomain routing | 2026-03-26 | Middleware rewrite for `*.yachtie.link` |
+| Pre-launch bug sweep | 2026-03-29 | SavedProfiles rollback, viewerIsPro wiring, subdomain colleagueCount, hero button margin, dead route deletion (PR #115) |
+| Sprint 13 public infra | 2026-03-29 | PublicHeader + PublicFooter components, cookie banner update, SEO verification (PR #116) |
+| Settings IA rework | 2026-03-29 | Profile settings rewrite, contact_email column, CvDetailsCard (PR #114 merged) |
+| Rally 005 Auth Resilience | 2026-03-29 | 12 fixes: middleware, cookies, polling, env guard (PR #112) |
+| Sprint 11 merged | 2026-03-28 | Public Profile Rewrite: 3 view modes, bento grid, section modals (PR #107) |
 
 ---
 
 ## Up Next (ordered)
 
-1. **Merge PR #114** (settings IA) — founder merges
-2. **Sprint 12 — Yacht Graph Foundation** (6–8 days) — yacht detail pages, colleagues explorer, sea time display
-3. **Sprint 13 — Launch Polish** (6–7 days) — public layout, marketing page, ops config, legal sign-off, go-live
-4. **Media/CRUD standardization** (junior sprint after Phase 1B — photo/gallery dedup, shared Pro gating)
-5. **Ghost Profiles & Claimable Accounts** (phase 2, 24 decisions)
+1. **Merge PR #115 + #116** — founder merges
+2. **Finish Sprint 12** — yacht detail page, colleague explorer, sea time, attachment transfer
+3. **Sprint 13 Wave 2-4** — ops config, QA, legal sign-off, deploy
+4. **🚀 Soft launch** (invite mode, 20-50 crew, target June 2026)
 
 ---
 
@@ -52,30 +49,13 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Blocker | Impact | Resolution |
 |---------|--------|------------|
-| ~~Vercel Hobby tier 10s function limit~~ | ~~Resolved 2026-03-25~~ | Upgraded to Vercel Pro ($20/mo) on YachtieLink credit card. Account: ari@yachtie.link. |
-| ~~8 design decisions (D1-D8)~~ | ~~Resolved 2026-03-25~~ | All 8 answered — see sprint README. D5 (ensign flags) deferred to post-launch. |
-| ~~Legal business address~~ | ~~Deferred~~ | Using ari@yachtie.link as GDPR contact until physical desk secured. Not blocking launch. |
-
----
-
-## Pending Decisions
-
-All D1-D8 resolved 2026-03-25. See `sprints/PHASE1-CLOSEOUT.md` Blockers section for final answers. D1 (cert dedup), D2 (date overlap), D8 (attachment dedup) implemented in Wave 1. D4 (libphonenumber-js) shipped in Wave 3. D5 (ensign flags) deferred post-launch. D6 (transform:scale) deferred from Wave 2. D7 (list-based yacht graph) queued for Wave 5.
+| Business address in privacy/terms | Legal requirement for public launch | Founder must supply (virtual office OK) |
 
 ---
 
 ## Uncommitted Code
 
-None. Settings IA committed and pushed — PR #114 open.
-
----
-
-## Draft Sprints (queued but not started)
-
-| Sprint | Phase | Focus |
-|--------|-------|-------|
-| [Sprint 12](./sprints/major/phase-1b/sprint-12/README.md) | 1B | Yacht graph, colleague network, sea time |
-| [Sprint 13](./sprints/major/phase-1b/sprint-13/README.md) | 1B | Launch polish, marketing page, production env, QA |
+Sprint 12 WIP stashed on `junior/settings-information-architecture` branch (`stash@{1}: sprint12-wip-overnight-preserve`).
 
 ---
 
@@ -83,24 +63,13 @@ None. Settings IA committed and pushed — PR #114 open.
 
 | Type | Slug | Status |
 |------|------|--------|
-| ui-ux | settings-information-architecture | 📬 PR #114 open |
-| debug | debug-cv-parse-extraction | In Progress |
-| debug | debug-photo-upload-limit | In Progress |
-| ~~debug~~ | ~~debug-cv-regenerate-date~~ | ~~Obsolete — CV regeneration replaced by on-demand generation in Sprint 11a (2026-03-28)~~ |
-| ui-ux | ui-public-profile-button-margin | In Progress |
-| feature | feature-pro-subdomain-link | ✅ Complete (2026-03-27) |
 | feature | feature-cv-sharing-rework | Planned |
 | feature | feature-saved-profiles-rework | Planned |
 
+All debug and UI/UX junior sprints closed 2026-03-29 (verified fixed or shipped in PRs #114-#115).
+
 ---
 
-## Backlog Highlights
+## Comprehensive Close-Out Spec
 
-- **Pro Upsell Consistency** — app-wide standardisation needed (filed 2026-03-28)
-- **Ghost Profiles & Claimable Accounts** — full design spec done (24 decisions), ready for sprint promotion
-- **Endorsement Writing Assist** — full design spec done (12 decisions), no schema changes
-- **CV Actions Card Redesign** — unified card layout, relative timestamps, multi-page viewer
-- **CV Import Graph-Building Vision** — 5 new proposals: yacht matching UX, cert fuzzy matching, skill/hobby autocomplete + chip redesign, education autocomplete, social links step
-- **Profile Photo Reposition** — promoted to Sprint 11 (focal point + crop adjustment)
-- ~~Safari Public Profile Links~~ — resolved (was subdomain link issue)
-- ~~Nationality Flag~~ — resolved (already implemented)
+See `sprints/PHASE1-FINAL-CLOSEOUT.md` for the complete Phase 1 close-out plan, backlog triage, launch day runbook, and agent handoff instructions.
