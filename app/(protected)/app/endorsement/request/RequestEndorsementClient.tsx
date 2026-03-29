@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
 import { BackButton } from '@/components/ui/BackButton'
@@ -25,6 +25,7 @@ interface RequestEndorsementClientProps {
   remaining: number
   limit: number
   userId: string
+  initialColleagueId?: string
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -71,6 +72,7 @@ export function RequestEndorsementClient({
   remaining: initialRemaining,
   limit,
   userId: _userId,
+  initialColleagueId,
 }: RequestEndorsementClientProps) {
   const { toast } = useToast()
 
@@ -88,6 +90,18 @@ export function RequestEndorsementClient({
   const [colleagueStates, setColleagueStates] = useState<
     Record<string, 'idle' | 'sending' | 'sent' | 'error'>
   >({})
+
+  // Pre-fill: scroll to and highlight the initial colleague
+  const colleagueRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const [highlightedColleagueId, setHighlightedColleagueId] = useState<string | null>(initialColleagueId ?? null)
+
+  useEffect(() => {
+    if (initialColleagueId && colleagueRefs.current[initialColleagueId]) {
+      colleagueRefs.current[initialColleagueId]?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      const timer = setTimeout(() => setHighlightedColleagueId(null), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [initialColleagueId])
 
   // Eagerly fetch shareable link on mount
   const fetchShareLink = useCallback(async () => {
@@ -368,10 +382,16 @@ export function RequestEndorsementClient({
           <div className="flex flex-col gap-2">
             {actionableColleagues.map((colleague) => {
               const state = colleagueStates[colleague.id] ?? 'idle'
+              const isHighlighted = highlightedColleagueId === colleague.id
               return (
                 <div
                   key={colleague.id}
-                  className="bg-[var(--color-surface)] rounded-2xl p-3 flex items-center gap-3"
+                  ref={el => { colleagueRefs.current[colleague.id] = el }}
+                  className={`rounded-2xl p-3 flex items-center gap-3 transition-colors ${
+                    isHighlighted
+                      ? 'bg-[var(--color-interactive)]/10 ring-2 ring-[var(--color-interactive)]'
+                      : 'bg-[var(--color-surface)]'
+                  }`}
                 >
                   <div className="w-9 h-9 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
                     {colleague.profile_photo_url ? (

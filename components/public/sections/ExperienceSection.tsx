@@ -38,7 +38,7 @@ export function ExperienceSection({ attachments, sharedYachtIdSet, seaTimeTotalD
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-[var(--color-text-primary)]">
                     {att.yachts?.id && onNavigate ? (
-                      <button onClick={() => onNavigate(`/yacht/${att.yachts!.id}`, att.yachts!.name ?? 'Yacht')} className="hover:text-[var(--accent-500,#0f9b8e)] text-left transition-colors">
+                      <button onClick={() => onNavigate(`/app/yacht/${att.yachts!.id}`, att.yachts!.name ?? 'Yacht')} className="hover:text-[var(--accent-500,#0f9b8e)] text-left transition-colors">
                         {att.yachts.name ?? 'Unknown Yacht'}
                       </button>
                     ) : (

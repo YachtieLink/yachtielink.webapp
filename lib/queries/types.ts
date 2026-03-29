@@ -92,6 +92,7 @@ export type GalleryItem = {
 export type MutualColleague = {
   id: string
   name: string
+  handle: string | null
   photoUrl: string | null
   throughYachtWithProfile: string
   throughYachtWithViewer: string

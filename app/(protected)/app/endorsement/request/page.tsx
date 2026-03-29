@@ -39,13 +39,13 @@ interface Attachment {
 export default async function RequestEndorsementPage({
   searchParams,
 }: {
-  searchParams: Promise<{ yacht_id?: string }>
+  searchParams: Promise<{ yacht_id?: string; colleague_id?: string }>
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/welcome')
 
-  const { yacht_id } = await searchParams
+  const { yacht_id, colleague_id } = await searchParams
 
   // If no yacht_id, show a yacht picker
   if (!yacht_id) {
@@ -207,6 +207,7 @@ export default async function RequestEndorsementPage({
       remaining={remaining}
       limit={limit}
       userId={user.id}
+      initialColleagueId={colleague_id}
     />
   )
 }

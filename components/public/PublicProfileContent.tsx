@@ -22,6 +22,7 @@ import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { formatSeaTime } from '@/lib/sea-time'
 import { countryToFlag } from '@/lib/constants/country-iso'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { MutualColleagues } from '@/components/profile/MutualColleagues'
 import { aboutSummary, hobbiesSummary, educationSummary } from '@/lib/profile-summaries'
 import { ExperienceSection } from './sections/ExperienceSection'
 import { EndorsementsSection } from './sections/EndorsementsSection'
@@ -215,6 +216,14 @@ export function PublicProfileContent({
         focalX={heroFocalX}
         focalY={heroFocalY}
       />
+
+      {/* ── Mutual Colleagues (2nd-degree social proof) ─────────────── */}
+      {isLoggedIn && !isOwnProfile && mutualColleagues.length > 0 && (
+        <MutualColleagues
+          profileFirstName={firstName}
+          mutuals={mutualColleagues}
+        />
+      )}
 
       {/* ── Content — switches based on active view mode ─────────────── */}
       {activeMode === 'rich_portfolio' ? (
@@ -431,14 +440,14 @@ function ProfileModeContent({
           {/* My Experience */}
           {sectionVisible(sectionVisibility, 'experience', attachments.length > 0) && (
             <div id="section-experience">
-              <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} seaTimeTotalDays={seaTimeTotalDays} seaTimeYachtCount={seaTimeYachtCount} onNavigate={(url, label) => setPendingNav({ url, label })} />
+              <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} seaTimeTotalDays={seaTimeTotalDays} seaTimeYachtCount={seaTimeYachtCount} onNavigate={isLoggedIn ? (url, label) => setPendingNav({ url, label }) : undefined} />
             </div>
           )}
 
           {/* My Endorsements */}
           {sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) && (
             <div id="section-endorsements">
-              <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} onNavigate={(url, label) => setPendingNav({ url, label })} />
+              <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} onNavigate={isLoggedIn ? (url, label) => setPendingNav({ url, label }) : undefined} />
             </div>
           )}
 
