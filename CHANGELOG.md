@@ -22,6 +22,48 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-29 — Claude Code (Opus 4.6) — Sprint 12 QA + Mobile Audit + Launch Planning
+
+### Done
+
+- **Merged all open PRs (#114-#119):** Settings IA, bug sweep, Sprint 13 W0+1, docs, Sprint 12 wiring, stale auth cookies — all on main in correct order.
+- **Sprint 12 QA on mobile (375px):** Full test pass as James (Free). Login, profile, network (all 4 tabs), yacht graph navigation (Colleagues → TS Artemis → Elena → public profile), mutual colleagues, settings IA, endorsement request flow.
+- **3 bugs found and fixed (PR #120):**
+  - Unicode escapes rendering as literal text in Yachts tab (`\u00b7`, `\u2013`, `\u203a` in JSX)
+  - Colleagues tab names truncated to 1-2 chars on mobile — yacht link was a flex sibling stealing space. Restructured: yacht link now stacks below role inside the name column.
+  - Nested `<a>` hydration error — yacht `<Link>` was inside profile `<Link>`. Restructured to separate link zones (avatar links to profile, name links to profile, yacht link is sibling).
+- **Full UX/UI audit (22 issues):** Catalogued every issue across profile, network, yacht, public profile, settings, and endorsement pages. Written to `sprints/backlog/ux-audit-mobile-2026-03-29.md`.
+- **Backlog audit:** Classified all 20+ backlog items as BUG/UX-FIX/FEATURE and LAUNCH-BLOCKING/POST-LAUNCH. Found 5 pre-existing launch-blocking bugs that had been filed but never promoted into sprints.
+- **Consolidated Phase 1 closeout docs:** Merged `PHASE1-CLOSEOUT.md` and `PHASE1-FINAL-CLOSEOUT.md` into one canonical launch tracker (PR #121). Deleted the duplicate. 66 checkboxes from here to launch.
+- **Created Rally 006 spec** (`sprints/rallies/rally-006-prelaunch/README.md`): 5 bugs, 3 analytics fixes, 6 UX fixes.
+- **3 new backlog items:** endorsement invite token QA, empty share button, mobile UX audit.
+- **Launch path defined:** Rally 006 → Sprint 13 completion → Ghost Profiles → Launch QA → Deploy.
+
+### Context
+
+- Main is clean. All PRs merged through #121.
+- Sprint 12 is fully shipped and QA'd on mobile.
+- Ghost Profiles confirmed as launch blocker by founder (design complete, 24 decisions resolved, ready to build).
+- Insights tab is mostly live (profile views tracking, Pro dashboard working). Two gaps: PDF download and link share events not wired.
+- Sprints 14-17 assessed and confirmed as post-launch — they need user volume to be meaningful.
+
+### Next
+
+1. **Rally 006** — pre-launch bug sweep: Safari links, subdomain cookies, onboarding CV skip, avatar framing, yacht matching, analytics wiring, 6 UX fixes
+2. **Sprint 13** — remaining ops/legal: Vercel env vars, Stripe prod webhook, business address, legal sign-off
+3. **Ghost Profiles sprint** — build claimable accounts (design complete)
+4. **Launch QA (Rally 007)** — full checklist: auth, payments, yacht graph, security, GDPR, mobile, metrics, abuse protocol
+5. **Deploy** — invite mode, 20-50 crew
+
+### Flags
+
+- ⚠️ Founder feedback: "everything is in scope" during QA — don't dismiss pre-existing bugs as out of scope. Catalogue everything seen while testing.
+- ⚠️ Founder feedback: mobile-first testing — always test at 375px, don't default to desktop viewport.
+- ⚠️ 5 launch-blocking bugs in backlog were never promoted into sprints. Rally 006 now covers them.
+- ⚠️ Preview tool limitation: fixed-position elements (bottom tab bar) don't appear in preview screenshots. Tab bar is present in DOM and visible in real browser.
+
+---
+
 ## 2026-03-29 — Claude Code (Opus 4.6) — Morning Merge + Sprint 12 Audit
 
 ### Done

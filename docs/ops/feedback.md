@@ -6,12 +6,28 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 33 rules
+**Current count:** 35 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## Everything Visible During QA Is In Scope
+
+**Rule:** When running QA or testing, catalogue every issue you see — not just issues from the current diff. Pre-existing bugs, UX issues on adjacent pages, and problems you notice while navigating are all worth recording. Never dismiss something as "not from this PR" or "out of scope" while you're already looking at the screen.
+**Origin:** 2026-03-29 — Founder corrected agent for dismissing a broken share button as "pre-existing, not in scope" during Sprint 12 QA.
+**How to apply:** During any QA pass, create backlog items for every issue found regardless of origin. If it's not worth fixing now, file it. If it is, add it to the current rally/sprint.
+
+---
+
+## Mobile First — Always Test at 375px
+
+**Rule:** Always test on mobile viewport (375x812) first. Do not default to desktop. Most users will be on their phones.
+**Origin:** 2026-03-29 — Founder had to explicitly tell agent to switch to mobile after agent started QA on desktop viewport.
+**How to apply:** When starting any QA or visual verification, set viewport to mobile (375x812) before taking the first screenshot. Desktop testing is secondary.
 
 ---
 

@@ -68,3 +68,6 @@ Any context, constraints, or open questions.
 | [Colleague Graph Explorer](./colleague-graph-explorer.md) | idea | P1 |
 | [Crew Pass](./crew-pass.md) | idea | P2 |
 | [Profile Display Settings Rework](./profile-display-settings-rework.md) | idea | P3 |
+| [UX/UI Audit — Mobile](./ux-audit-mobile-2026-03-29.md) | promoted (Rally 006) | P1-P3 |
+| [Endorsement Invite Token QA](./endorsement-invite-token-qa.md) | promoted (Launch QA) | P2 |
+| [Empty Share Button](./endorsement-share-button-empty.md) | promoted (Rally 006) | P3 |
