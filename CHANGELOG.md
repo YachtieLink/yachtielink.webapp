@@ -22,6 +22,82 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-29 — Claude Code (Opus 4.6) — Phase 1 Close-Out Planning + Overnight Bug Sweep
+
+### Done
+
+- **Phase 1 Final Close-Out Spec** (`sprints/PHASE1-FINAL-CLOSEOUT.md`): comprehensive agent-handoff document covering everything remaining before launch. Includes: Sprint 12/13 scope, pre-launch blockers, backlog triage (ship vs defer), Sprint 11d disposition, launch day runbook, and overnight build scope.
+- **Pre-launch bug sweep (PR #115):**
+  - SavedProfilesClient: added try/catch rollback on `updateProfile`, `unsave`, and `deleteFolder` (was optimistic-only with no rollback on failure)
+  - PublicProfileContent + both public pages: wired actual viewer Pro status through `viewerIsPro` prop (was hardcoded `false`)
+  - Subdomain page: added missing `colleagueCount` computation (was always 0, now matches `/u/[handle]` page)
+  - HeroSection: increased top button padding for mobile safe area (1rem → 1.25rem minimum)
+  - Deleted dead `/api/profile/display-settings/route.ts` (zero callers after Settings IA rewrite)
+- **Sprint 13 Wave 0+1 (PR #116):**
+  - Created `PublicHeader` and `PublicFooter` shared components (extracted from landing page inline markup)
+  - Applied header/footer to privacy + terms pages (replacing BackButton-only navigation)
+  - Updated cookie banner to mention PostHog + Sentry by name
+  - Verified: sitemap has deleted_at filter, robots.txt blocks /app/ and /api/, roadmap page exists
+- **Junior sprints closed (4):** debug-cv-parse-extraction (verified fixed via serverExternalPackages), debug-photo-upload-limit (verified subscription check present), settings-information-architecture (PR #114 merged), ui-public-profile-button-margin (fixed in PR #115)
+- **Sonnet code review (Phase 1):** found MEDIUM concurrent-mutation rollback race in SavedProfiles (documented as known limitation) and missing subdomain colleagueCount (fixed)
+
+### Context
+
+- Two PRs open: #115 (bug sweep, `fix/phase1-prelaunch-bug-sweep`) and #116 (Sprint 13 infra, `feat/sprint13-public-infrastructure`). Both branch off main. Independent — can merge in any order.
+- Sprint 12 WIP stashed at `stash@{1}: sprint12-wip-overnight-preserve`. Sprint 12 build by separate agent is ongoing.
+- Did NOT create `app/(public)/layout.tsx` — the `(public)` route group contains `/u/[handle]` and `/subdomain/[handle]` which have their own full-width hero layouts. A shared layout would break profile pages. Instead, pages import `PublicHeader`/`PublicFooter` directly.
+
+### Next
+
+1. **Founder merges PRs #115 + #116**
+2. **Sprint 12 completion** — yacht detail, colleague explorer, sea time, attachment transfer
+3. **Sprint 13 Wave 2-4** — ops config (founder), QA checklist, legal sign-off, deploy
+4. **Soft launch** — invite mode, 20-50 crew, target June 2026
+
+### Flags
+
+- ⚠️ Sprint 12 WIP is stashed, not committed. The Sprint 12 agent should `git stash pop stash@{1}` to resume.
+- ⚠️ SavedProfiles concurrent-mutation rollback race is a known limitation — rapid sequential mutations may produce incorrect rollback state. Acceptable for 50-user soft launch; post-launch fix = serialize mutations or re-fetch on any failure.
+- ⚠️ Business address still needed in privacy/terms pages before public launch (not blocking invite mode).
+
+---
+
+## 2026-03-29 — Claude Code (Opus 4.6) — Sprint 12 Yacht Graph Wiring (Overnight)
+
+### Done
+
+- **Sprint 12 wiring sprint**: Connected all the yacht graph code that was already on main (merged via PR #80) but not navigable.
+- **5 public profile yacht link fixes**: All `onNavigate(\`/yacht/\`)` calls now use `/app/yacht/` — yacht clicks from Charlotte's profile (and all public profiles) no longer 404.
+- **Yachts tab in Network**: 4th tab in AudienceTabs — "My Yachts" list with yacht details + inline yacht search (debounced, race-condition-safe, error-handled).
+- **Clickable yacht names**: Yacht names in Colleagues tab + Endorsements tab are now tappable links to `/app/yacht/{id}`. Colleagues tab uses non-nested links (P1-1 fix from review).
+- **SeaTimeSummary wired**: Profile page now shows sea time card with "View ▸" link to `/app/profile/sea-time`.
+- **MutualColleagues component**: New expand/collapse list on public profiles showing which of your colleagues have worked with the profile owner. Linked to their profiles via handle.
+- **Endorsement request pre-fill**: `colleague_id` query param now consumed — colleague is highlighted and scrolled to when arriving from ColleagueExplorer "Endorse" CTA.
+- **Two-phase review completed**: Sonnet + Opus. Fixed P1-1 (nested anchors), P1-2 (aspirational badge), P2-2 (race condition), P2-4 (debounce cleanup), P2-5 (error handling).
+
+### Context
+
+- Branch: `sprint12-wiring-isolated` — committed + pushed (`d822d53`). 13 files changed, 286 insertions, 23 deletions.
+- Had to use git worktree (`/tmp/yl-sprint12`) because another session kept overwriting files in the main working directory via iCloud sync.
+- Build + type-check clean in worktree. Drift-check PASS from earlier run.
+- Sprint 12 build plan updated: `sprints/major/phase-1b/sprint-12/build_plan_wiring.md`
+
+### Next
+
+1. **Founder reviews + merges** `sprint12-wiring-isolated` branch
+2. **Verify Sprint 12 migrations in Supabase** — confirm RPCs exist (`get_sea_time_detailed`, `get_yacht_endorsement_count`, etc.)
+3. **QA the full graph loop**: profile → yacht → crew → profile (3+ hops)
+4. **Sprint 13** — Launch Polish
+
+### Flags
+
+- ⚠️ Another session running on `fix/phase1-prelaunch-bug-sweep` was overwriting files — caused 3 re-applications. Code is safe on pushed branch.
+- ⚠️ P2-1: Subdomain route (`/subdomain/[handle]`) missing `colleagueCount` prop — pre-existing issue, not Sprint 12 scope.
+- ⚠️ P2-3: `initialColleagueId` scroll doesn't work for already-endorsed colleagues — edge case, noted in commit.
+- ⚠️ Sprint 12 migrations need Supabase verification — RPCs may not be applied to remote DB yet.
+
+---
+
 ## 2026-03-29 — Claude Code (Opus 4.6) — Settings Information Architecture Rework
 
 ### Done
