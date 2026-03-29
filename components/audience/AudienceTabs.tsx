@@ -468,14 +468,14 @@ function YachtsTab({ userYachts }: { userYachts: UserYacht[] }) {
                         <span className="text-[10px] bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-1.5 py-0.5 rounded-full font-medium shrink-0">Established</span>
                       )}
                     </div>
-                    <p className="text-xs text-[var(--color-text-secondary)] truncate mt-0.5">{att.role_label} \u00b7 {start}\u2013{end}</p>
+                    <p className="text-xs text-[var(--color-text-secondary)] truncate mt-0.5">{att.role_label} {'\u00b7'} {start}{'\u2013'}{end}</p>
                     {(yacht.yacht_type || yacht.length_meters || yacht.flag_state) && (
                       <p className="text-xs text-[var(--color-text-tertiary)] truncate mt-0.5">
                         {[yacht.yacht_type, yacht.length_meters ? `${yacht.length_meters}m` : null, yacht.flag_state].filter(Boolean).join(' \u00b7 ')}
                       </p>
                     )}
                   </div>
-                  <span className="text-[var(--color-text-tertiary)] text-sm shrink-0">\u203a</span>
+                  <span className="text-[var(--color-text-tertiary)] text-sm shrink-0">{'\u203a'}</span>
                 </Link>
               </motion.div>
             )
@@ -488,14 +488,14 @@ function YachtsTab({ userYachts }: { userYachts: UserYacht[] }) {
       <div className="border-t border-[var(--color-border)] pt-4">
         <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide mb-3">Find a yacht</h2>
         <label htmlFor="yacht-search" className="sr-only">Search yachts</label>
-        <input id="yacht-search" type="text" placeholder="Search by name\u2026" value={searchQuery}
+        <input id="yacht-search" type="text" placeholder="Search by name…" value={searchQuery}
           onChange={e => handleSearchChange(e.target.value)}
           className="w-full px-4 py-2.5 bg-[var(--color-surface-raised)] rounded-xl text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] border border-[var(--color-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/30"
         />
-        {searching && <p className="text-xs text-[var(--color-text-secondary)] mt-2 px-1">Searching\u2026</p>}
+        {searching && <p className="text-xs text-[var(--color-text-secondary)] mt-2 px-1">Searching…</p>}
         {searchError && !searching && <p className="text-xs text-[var(--color-error,#ef4444)] mt-2 px-1">Search failed. Please try again.</p>}
         {!searching && !searchError && searchResults.length === 0 && searchQuery.trim() && (
-          <p className="text-xs text-[var(--color-text-secondary)] mt-2 px-1">No yachts found matching \u201c{searchQuery}\u201d</p>
+          <p className="text-xs text-[var(--color-text-secondary)] mt-2 px-1">No yachts found matching &ldquo;{searchQuery}&rdquo;</p>
         )}
         {searchResults.length > 0 && (
           <div className="flex flex-col gap-2 mt-3" aria-live="polite">
@@ -505,7 +505,7 @@ function YachtsTab({ userYachts }: { userYachts: UserYacht[] }) {
                   <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">{r.name}</p>
                   {yachtMeta(r) && <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{yachtMeta(r)}</p>}
                 </div>
-                <span className="text-[var(--color-text-tertiary)] text-sm shrink-0">\u203a</span>
+                <span className="text-[var(--color-text-tertiary)] text-sm shrink-0">{'\u203a'}</span>
               </Link>
             ))}
           </div>
@@ -560,8 +560,8 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
             {...cardHover}
             className="card-soft rounded-2xl p-4 flex items-center gap-3"
           >
-            <Link href={profile.handle ? `/u/${profile.handle}` : '#'} className="flex items-center gap-3 flex-1 min-w-0">
-              <div className="w-11 h-11 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <Link href={profile.handle ? `/u/${profile.handle}` : '#'} className="w-11 h-11 rounded-full bg-[var(--color-surface-raised)] overflow-hidden shrink-0">
                 {profile.profile_photo_url ? (
                   <Image
                     src={profile.profile_photo_url}
@@ -575,24 +575,26 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
                     {name[0]?.toUpperCase()}
                   </div>
                 )}
-              </div>
+              </Link>
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">{name}</p>
-                {profile.primary_role && (
-                  <p className="text-xs text-[var(--color-text-secondary)] truncate">
-                    {profile.primary_role}
+                <Link href={profile.handle ? `/u/${profile.handle}` : '#'} className="block">
+                  <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">{name}</p>
+                  {profile.primary_role && (
+                    <p className="text-xs text-[var(--color-text-secondary)] truncate">
+                      {profile.primary_role}
+                    </p>
+                  )}
+                </Link>
+                {entry.sharedYachtDetails.length > 0 && (
+                  <p className="text-xs text-[var(--color-interactive)] truncate mt-0.5">
+                    <Link href={`/app/yacht/${entry.sharedYachtDetails[0].id}`} className="hover:underline">
+                      {entry.sharedYachtDetails[0].name}
+                    </Link>
+                    {entry.sharedYachtDetails.length > 1 && ` +${entry.sharedYachtDetails.length - 1} more`}
                   </p>
                 )}
               </div>
-            </Link>
-            {entry.sharedYachtDetails.length > 0 && (
-              <p className="text-xs text-[var(--color-interactive)] truncate -mt-1 ml-14">
-                <Link href={`/app/yacht/${entry.sharedYachtDetails[0].id}`} className="hover:underline">
-                  {entry.sharedYachtDetails[0].name}
-                </Link>
-                {entry.sharedYachtDetails.length > 1 && ` +${entry.sharedYachtDetails.length - 1} more`}
-              </p>
-            )}
+            </div>
             <Link
               href={`/app/endorsement/request?colleague_id=${entry.colleague_id}&yacht_id=${entry.shared_yachts[0] ?? ''}`}
               className="shrink-0"
