@@ -110,7 +110,7 @@ export function EndorsementCard({
             {yachtName && (
               <>
                 {yachtId && onNavigate ? (
-                  <button onClick={() => onNavigate(`/yacht/${yachtId}`, yachtName)} className="hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
+                  <button onClick={() => onNavigate(`/app/yacht/${yachtId}`, yachtName)} className="hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
                     {yachtName}
                   </button>
                 ) : yachtName}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -71,6 +71,18 @@ interface ColleagueEntry {
   shared_yachts: string[]
   profile: ColleagueProfile | null
   sharedYachtNames: string[]
+  sharedYachtDetails: Array<{ id: string; name: string }>
+}
+
+interface UserYacht {
+  id: string
+  role_label: string
+  started_at: string
+  ended_at: string | null
+  yachts: {
+    id: string; name: string; yacht_type: string | null; length_meters: number | null
+    flag_state: string | null; is_established: boolean
+  } | null
 }
 
 interface AudienceTabsProps {
@@ -80,6 +92,7 @@ interface AudienceTabsProps {
   colleagues: ColleagueEntry[]
   mostRecentYachtId: string | null
   savedCount: number
+  userYachts: UserYacht[]
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -116,8 +129,9 @@ export function AudienceTabs({
   colleagues,
   mostRecentYachtId,
   savedCount,
+  userYachts,
 }: AudienceTabsProps) {
-  const [activeTab, setActiveTab] = useState<'endorsements' | 'colleagues' | 'saved'>('endorsements')
+  const [activeTab, setActiveTab] = useState<'endorsements' | 'colleagues' | 'yachts' | 'saved'>('endorsements')
 
   const endorsementCount = Math.min(endorsementsReceived.length, 5)
   const progressPct = (endorsementCount / 5) * 100
@@ -154,7 +168,7 @@ export function AudienceTabs({
 
       {/* Segment control */}
       <div className="flex bg-[var(--color-surface-raised)] rounded-xl p-1 mb-6">
-        {(['endorsements', 'colleagues', 'saved'] as const).map((tab) => (
+        {(['endorsements', 'colleagues', 'yachts', 'saved'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -167,9 +181,11 @@ export function AudienceTabs({
             {(() => {
               const count = tab === 'endorsements' ? endorsementsReceived.length
                 : tab === 'colleagues' ? colleagues.length
+                : tab === 'yachts' ? userYachts.length
                 : savedCount
               const label = tab === 'endorsements' ? 'Endorsements'
                 : tab === 'colleagues' ? 'Colleagues'
+                : tab === 'yachts' ? 'Yachts'
                 : 'Saved'
               return (
                 <span className="flex items-center justify-center gap-1.5">
@@ -195,6 +211,8 @@ export function AudienceTabs({
         />
       ) : activeTab === 'colleagues' ? (
         <ColleaguesTab colleagues={colleagues} />
+      ) : activeTab === 'yachts' ? (
+        <YachtsTab userYachts={userYachts} />
       ) : (
         <SavedTab />
       )}
@@ -326,8 +344,15 @@ function EndorsementsTab({
                   </p>
                   <p className="text-xs text-[var(--color-text-tertiary)]">
                     {endorserName}
-                    {e.yacht ? ` · ${e.yacht.name}` : ''}
-                    {' · '}{date}
+                    {e.yacht && (
+                      <>
+                        {' \u00b7 '}
+                        <Link href={`/app/yacht/${e.yacht.id}`} className="text-[var(--color-interactive)] hover:underline">
+                          {e.yacht.name}
+                        </Link>
+                      </>
+                    )}
+                    {' \u00b7 '}{date}
                   </p>
                 </motion.div>
               )
@@ -376,6 +401,117 @@ function EndorsementsTab({
           </div>
         </section>
       )}
+    </div>
+  )
+}
+
+// ─── Yachts Tab ──────────────────────────────────────────────────────────────
+
+function YachtsTab({ userYachts }: { userYachts: UserYacht[] }) {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<Array<{ id: string; name: string; yacht_type: string | null; length_meters: number | null; flag_state: string | null; crew_count?: number }>>([])
+  const [searching, setSearching] = useState(false)
+  const [searchError, setSearchError] = useState(false)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const searchSeqRef = useRef(0)
+
+  useEffect(() => {
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [])
+
+  async function searchYachts(q: string) {
+    if (!q.trim()) { setSearchResults([]); setSearching(false); setSearchError(false); return }
+    const seq = ++searchSeqRef.current
+    setSearching(true)
+    setSearchError(false)
+    try {
+      const { createClient } = await import('@/lib/supabase/client')
+      const supabase = createClient()
+      const { data, error } = await supabase.rpc('search_yachts', { p_query: q, p_limit: 6 })
+      if (seq !== searchSeqRef.current) return
+      if (error) { setSearchError(true); setSearching(false); return }
+      const results = (data as Array<{ id: string; name: string; yacht_type: string | null; length_meters: number | null; flag_state: string | null }>) ?? []
+      if (results.length > 0) {
+        const crewCounts = await Promise.all(results.map(r => supabase.rpc('yacht_crew_count', { yacht: r.id })))
+        if (seq !== searchSeqRef.current) return
+        setSearchResults(results.map((r, i) => ({ ...r, crew_count: (crewCounts[i].data as number) ?? 0 })))
+      } else { setSearchResults([]) }
+    } catch { if (seq === searchSeqRef.current) setSearchError(true) }
+    if (seq === searchSeqRef.current) setSearching(false)
+  }
+
+  function handleSearchChange(value: string) {
+    setSearchQuery(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => searchYachts(value), 300)
+  }
+
+  function yachtMeta(y: { yacht_type: string | null; length_meters: number | null; flag_state: string | null; crew_count?: number }) {
+    return [y.yacht_type, y.length_meters ? `${y.length_meters}m` : null, y.flag_state, y.crew_count != null && y.crew_count > 0 ? `${y.crew_count} crew` : null].filter(Boolean).join(' \u00b7 ')
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {userYachts.length > 0 ? (
+        <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="flex flex-col gap-3">
+          <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide">My Yachts</h2>
+          {userYachts.map((att) => {
+            const yacht = att.yachts!
+            const start = new Date(att.started_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
+            const end = att.ended_at ? new Date(att.ended_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) : 'Present'
+            return (
+              <motion.div key={att.id} variants={fadeUp} {...cardHover}>
+                <Link href={`/app/yacht/${yacht.id}`} className="card-soft rounded-2xl p-4 flex items-center gap-3 hover:bg-[var(--color-surface-raised)] transition-colors">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">{yacht.name}</p>
+                      {yacht.is_established && (
+                        <span className="text-[10px] bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-1.5 py-0.5 rounded-full font-medium shrink-0">Established</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-[var(--color-text-secondary)] truncate mt-0.5">{att.role_label} \u00b7 {start}\u2013{end}</p>
+                    {(yacht.yacht_type || yacht.length_meters || yacht.flag_state) && (
+                      <p className="text-xs text-[var(--color-text-tertiary)] truncate mt-0.5">
+                        {[yacht.yacht_type, yacht.length_meters ? `${yacht.length_meters}m` : null, yacht.flag_state].filter(Boolean).join(' \u00b7 ')}
+                      </p>
+                    )}
+                  </div>
+                  <span className="text-[var(--color-text-tertiary)] text-sm shrink-0">\u203a</span>
+                </Link>
+              </motion.div>
+            )
+          })}
+        </motion.div>
+      ) : (
+        <EmptyState title="Add a yacht to your profile to start building your network" actionLabel="+ Add a yacht" actionHref="/app/attachment/new" />
+      )}
+
+      <div className="border-t border-[var(--color-border)] pt-4">
+        <h2 className="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide mb-3">Find a yacht</h2>
+        <label htmlFor="yacht-search" className="sr-only">Search yachts</label>
+        <input id="yacht-search" type="text" placeholder="Search by name\u2026" value={searchQuery}
+          onChange={e => handleSearchChange(e.target.value)}
+          className="w-full px-4 py-2.5 bg-[var(--color-surface-raised)] rounded-xl text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] border border-[var(--color-border)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/30"
+        />
+        {searching && <p className="text-xs text-[var(--color-text-secondary)] mt-2 px-1">Searching\u2026</p>}
+        {searchError && !searching && <p className="text-xs text-[var(--color-error,#ef4444)] mt-2 px-1">Search failed. Please try again.</p>}
+        {!searching && !searchError && searchResults.length === 0 && searchQuery.trim() && (
+          <p className="text-xs text-[var(--color-text-secondary)] mt-2 px-1">No yachts found matching \u201c{searchQuery}\u201d</p>
+        )}
+        {searchResults.length > 0 && (
+          <div className="flex flex-col gap-2 mt-3" aria-live="polite">
+            {searchResults.map((r) => (
+              <Link key={r.id} href={`/app/yacht/${r.id}`} className="card-soft rounded-xl px-4 py-3 flex items-center gap-3 hover:bg-[var(--color-surface-raised)] transition-colors">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">{r.name}</p>
+                  {yachtMeta(r) && <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{yachtMeta(r)}</p>}
+                </div>
+                <span className="text-[var(--color-text-tertiary)] text-sm shrink-0">\u203a</span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -448,17 +584,18 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
                     {profile.primary_role}
                   </p>
                 )}
-                {entry.sharedYachtNames.length > 0 && (
-                  <p className="text-xs text-[var(--color-interactive)] truncate mt-0.5">
-                    {entry.sharedYachtNames.length === 1
-                      ? entry.sharedYachtNames[0]
-                      : `${entry.sharedYachtNames[0]} +${entry.sharedYachtNames.length - 1} more`}
-                  </p>
-                )}
               </div>
             </Link>
+            {entry.sharedYachtDetails.length > 0 && (
+              <p className="text-xs text-[var(--color-interactive)] truncate -mt-1 ml-14">
+                <Link href={`/app/yacht/${entry.sharedYachtDetails[0].id}`} className="hover:underline">
+                  {entry.sharedYachtDetails[0].name}
+                </Link>
+                {entry.sharedYachtDetails.length > 1 && ` +${entry.sharedYachtDetails.length - 1} more`}
+              </p>
+            )}
             <Link
-              href={`/app/endorsement/request?colleague_id=${entry.colleague_id}&yacht_id=${entry.shared_yachts[0]}`}
+              href={`/app/endorsement/request?colleague_id=${entry.colleague_id}&yacht_id=${entry.shared_yachts[0] ?? ''}`}
               className="shrink-0"
             >
               <Button variant="outline" size="sm">Endorse</Button>

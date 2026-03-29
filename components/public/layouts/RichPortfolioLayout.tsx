@@ -426,7 +426,7 @@ export function RichPortfolioLayout({
               <div className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--accent-500,#0f9b8e)]" />
               <div>
                 {att.yachts?.id ? (
-                  <button onClick={() => setPendingNav({ url: `/yacht/${att.yachts!.id}`, label: att.yachts!.name ?? 'Yacht' })} className="text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] text-left transition-colors">
+                  <button onClick={() => setPendingNav({ url: `/app/yacht/${att.yachts!.id}`, label: att.yachts!.name ?? 'Yacht' })} className="text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] text-left transition-colors">
                     {att.yachts.name ?? 'Unknown Yacht'}
                   </button>
                 ) : (
@@ -483,7 +483,7 @@ export function RichPortfolioLayout({
                         {end.endorser_role_label}
                         {end.endorser_role_label && end.yacht?.name ? ' · ' : ''}
                         {end.yacht?.id ? (
-                          <button onClick={() => setPendingNav({ url: `/yacht/${end.yacht!.id}`, label: end.yacht!.name ?? 'Yacht' })} className="hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
+                          <button onClick={() => setPendingNav({ url: `/app/yacht/${end.yacht!.id}`, label: end.yacht!.name ?? 'Yacht' })} className="hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
                             {end.yacht.name}
                           </button>
                         ) : end.yacht?.name}

@@ -424,7 +424,7 @@ export async function getViewerRelationship(
       if (mutualColleagueIds.length > 0) {
         const { data: mutualUsers } = await supabase
           .from('users')
-          .select('id, display_name, full_name, profile_photo_url')
+          .select('id, display_name, full_name, profile_photo_url, handle')
           .in('id', mutualColleagueIds)
 
         for (const mu of mutualUsers ?? []) {
@@ -432,6 +432,7 @@ export async function getViewerRelationship(
           mutualColleagues.push({
             id: mu.id,
             name: (mu.display_name ?? mu.full_name) as string,
+            handle: (mu.handle as string | null) ?? null,
             photoUrl: mu.profile_photo_url as string | null,
             throughYachtWithProfile: colleagueToProfileYacht.get(mu.id) ?? '',
             throughYachtWithViewer: viewerSideAtt?.yachts?.name ?? '',

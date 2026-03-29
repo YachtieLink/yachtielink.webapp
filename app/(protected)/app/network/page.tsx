@@ -37,6 +37,7 @@ export default async function NetworkPage() {
     requestsSentRes,
     endorsementsGivenRes,
     savedCountRes,
+    userYachtsRes,
   ] = await Promise.all([
     supabase.rpc('get_colleagues', { p_user_id: user.id }),
     supabase
@@ -69,6 +70,13 @@ export default async function NetworkPage() {
       .from('saved_profiles')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id),
+    // User's yacht attachments (for Yachts tab)
+    supabase
+      .from('attachments')
+      .select('id, role_label, started_at, ended_at, yachts(id, name, yacht_type, length_meters, flag_state, is_established)')
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .order('started_at', { ascending: false }),
   ])
 
   const colleagueRows = (colleaguesRes.data as ColleagueRow[]) ?? []
@@ -103,7 +111,16 @@ export default async function NetworkPage() {
     sharedYachtNames: row.shared_yachts
       .map((yid) => yachtMap.get(yid)?.name)
       .filter((n): n is string => !!n),
+    sharedYachtDetails: row.shared_yachts
+      .map((yid) => { const y = yachtMap.get(yid); return y ? { id: y.id, name: y.name } : null })
+      .filter((y): y is { id: string; name: string } => !!y),
   }))
+
+  interface UserYachtRow {
+    id: string; role_label: string; started_at: string; ended_at: string | null
+    yachts: { id: string; name: string; yacht_type: string | null; length_meters: number | null; flag_state: string | null; is_established: boolean } | null
+  }
+  const userYachts = ((userYachtsRes.data as unknown as UserYachtRow[]) ?? []).filter((a) => a.yachts)
 
   // Most recent yacht id for the wheel sheet CTA
   const mostRecentYachtId = colleagueRows[0]?.shared_yachts[0] ?? null
@@ -153,6 +170,7 @@ export default async function NetworkPage() {
       colleagues={colleagues}
       mostRecentYachtId={mostRecentYachtId}
       savedCount={savedCountRes.count ?? 0}
+      userYachts={userYachts}
     />
     </PageTransition>
   )

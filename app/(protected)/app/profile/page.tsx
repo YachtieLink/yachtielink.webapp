@@ -10,6 +10,7 @@ import { ProfileStrength } from '@/components/profile/ProfileStrength'
 import { ProfileSectionGrid, type SectionItem } from '@/components/profile/ProfileSectionGrid'
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { PersonalDetailsCard } from '@/components/profile/PersonalDetailsCard'
+import { SeaTimeSummary } from '@/components/profile/SeaTimeSummary'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageTransition } from '@/components/ui/PageTransition'
 import {
@@ -237,6 +238,9 @@ export default async function ProfilePage() {
         seaTimeYachtCount={seaTimeYachtCount}
         isPro={proStatus.isPro}
       />
+
+      {/* Sea time summary card */}
+      <SeaTimeSummary totalDays={seaTimeTotalDays} yachtCount={seaTimeYachtCount} />
 
       {/* Social links */}
       {Array.isArray(profile.social_links) && (profile.social_links as any[]).length > 0 && (
