@@ -1,7 +1,8 @@
 import Link from 'next/link'
 
-/** Owner-only card for the private profile page. Shows all fields regardless of
- *  show_dob/show_home_country visibility flags (those only affect public output). */
+/** Owner-only card for the private profile page.
+ *  Shows profile-relevant personal details (age, nationality).
+ *  CV-only fields (smoking, tattoos, license, visas) are on the CV tab. */
 interface PersonalDetailsCardProps {
   dob: string | null
   homeCountry: string | null
@@ -11,70 +12,53 @@ interface PersonalDetailsCardProps {
   travelDocs: string[]
 }
 
-const SMOKE_LABELS: Record<string, string> = {
-  non_smoker: 'Non smoker',
-  smoker: 'Smoker',
-  social_smoker: 'Social smoker',
-}
-
-const APPEARANCE_LABELS: Record<string, string> = {
-  none: 'None',
-  visible: 'Visible',
-  non_visible: 'Non visible',
-  not_specified: 'Not specified',
-}
-
 function computeAge(dob: string): number {
   return Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 86400000))
 }
 
 export function PersonalDetailsCard({ dob, homeCountry, smokePref, appearanceNote, licenseInfo, travelDocs }: PersonalDetailsCardProps) {
-  const fields: { label: string; value: string }[] = []
+  const profileFields: { label: string; value: string }[] = []
 
-  if (dob) fields.push({ label: 'Age', value: `${computeAge(dob)}` })
-  if (homeCountry) fields.push({ label: 'Nationality', value: homeCountry })
-  if (smokePref) fields.push({ label: 'Smoking', value: SMOKE_LABELS[smokePref] ?? smokePref })
-  if (appearanceNote && appearanceNote !== 'not_specified') fields.push({ label: 'Tattoos', value: APPEARANCE_LABELS[appearanceNote] ?? appearanceNote })
-  if (licenseInfo) fields.push({ label: 'License', value: licenseInfo })
-  if (travelDocs.length > 0) fields.push({ label: 'Visas', value: travelDocs.join(', ') })
+  if (dob) profileFields.push({ label: 'Age', value: `${computeAge(dob)}` })
+  if (homeCountry) profileFields.push({ label: 'Nationality', value: homeCountry })
 
-  const missingCount = [dob, homeCountry, smokePref].filter(v => !v).length
+  const cvFieldCount = [smokePref, appearanceNote !== 'not_specified' ? appearanceNote : null, licenseInfo, travelDocs.length > 0 ? 'yes' : null].filter(Boolean).length
+  const missingProfileCount = [dob, homeCountry].filter(v => !v).length
 
   return (
     <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-[var(--color-text-primary)]">Personal Details</span>
         <Link href="/app/profile/settings" className="text-xs text-[var(--color-interactive)] hover:underline">
-          {fields.length > 0 ? 'Edit' : 'Add details'}
+          {profileFields.length > 0 ? 'Edit' : 'Add details'}
         </Link>
       </div>
 
-      {fields.length > 0 ? (
+      {profileFields.length > 0 && (
         <div className="flex flex-col gap-1.5">
-          {fields.map((f) => (
+          {profileFields.map((f) => (
             <div key={f.label} className="flex items-center gap-2 text-sm">
               <span className="text-[var(--color-text-tertiary)] w-20 shrink-0">{f.label}</span>
               <span className="text-[var(--color-text-primary)]">{f.value}</span>
             </div>
           ))}
         </div>
-      ) : null}
+      )}
 
-      <div className="flex flex-col gap-0.5">
-        <Link href="/app/profile/settings" className="text-xs font-medium text-[var(--color-interactive)] hover:underline">
-          Visibility settings
-        </Link>
-        <p className="text-xs text-[var(--color-text-tertiary)]">Control what&apos;s visible on your public profile</p>
-      </div>
+      {cvFieldCount > 0 && (
+        <p className="text-xs text-[var(--color-text-tertiary)]">
+          {cvFieldCount} CV detail{cvFieldCount === 1 ? '' : 's'} set —{' '}
+          <Link href="/app/cv" className="text-[var(--color-interactive)] hover:underline">
+            edit on CV tab
+          </Link>
+        </p>
+      )}
 
-      {missingCount > 0 && (
+      {missingProfileCount > 0 && (
         <Link href="/app/profile/settings" className="block">
           <div className="rounded-xl bg-amber-50 border border-amber-200 px-3 py-2">
             <p className="text-xs font-medium text-amber-900">
-              {missingCount} field{missingCount === 1 ? '' : 's'} that hirers look for {missingCount === 1 ? 'is' : 'are'} missing
-            </p>
-            <p className="text-xs text-amber-700 mt-0.5">
-              Complete your CV details
+              {missingProfileCount} field{missingProfileCount === 1 ? '' : 's'} that hirers look for {missingProfileCount === 1 ? 'is' : 'are'} missing
             </p>
           </div>
         </Link>

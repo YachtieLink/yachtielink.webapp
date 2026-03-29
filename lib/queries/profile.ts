@@ -40,7 +40,7 @@ export const getUserById = cache(async (userId: string) => {
     .select(`
       id, full_name, display_name, handle, bio, profile_photo_url,
       primary_role, departments, onboarding_complete,
-      phone, whatsapp, email, location_country, location_city,
+      phone, whatsapp, email, contact_email, location_country, location_city,
       show_phone, show_whatsapp, show_email, show_location,
       subscription_status, subscription_plan, subscription_ends_at,
       stripe_customer_id, founding_member, show_watermark, template_id,
@@ -65,7 +65,7 @@ export const getUserByHandle = cache(async (handle: string) => {
     .select(`
       id, full_name, display_name, handle, bio, profile_photo_url,
       primary_role, departments,
-      phone, whatsapp, email, location_country, location_city,
+      phone, whatsapp, email, contact_email, location_country, location_city,
       show_phone, show_whatsapp, show_email, show_location,
       founding_member, ai_summary, section_visibility, social_links,
       cv_public, cv_public_source, latest_pdf_path, cv_storage_path,

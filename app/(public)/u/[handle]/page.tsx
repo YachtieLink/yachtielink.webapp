@@ -124,7 +124,7 @@ export default async function PublicProfilePage({ params }: Props) {
     ...user,
     phone: user.show_phone ? user.phone : null,
     whatsapp: user.show_whatsapp ? user.whatsapp : null,
-    email: user.show_email ? user.email : null,
+    email: user.show_email ? (user.contact_email ?? user.email) : null,
   }
 
   return (

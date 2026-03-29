@@ -108,7 +108,7 @@ export function ProfileHeroCard({
             </p>
           )}
         </div>
-        <Link href="/app/more/account" className="shrink-0">
+        <Link href="/app/profile/settings" className="shrink-0">
           <IconButton icon={<Pencil size={16} />} label="Edit profile info" />
         </Link>
       </div>

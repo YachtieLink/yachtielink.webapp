@@ -134,28 +134,23 @@ export default function MorePage() {
         <p className="text-sm text-[var(--color-text-secondary)]">Dark mode coming soon</p>
       </div>
 
+      {/* ── Profile ────────────────────────────────── */}
+      <SectionHeader title="Profile" />
+      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
+        <SettingsRow
+          label="Edit profile & contact info"
+          href="/app/profile/settings"
+          sublabel="Name, handle, role, contact details, visibility"
+        />
+      </div>
+
       {/* ── Account ────────────────────────────────── */}
       <SectionHeader title="Account" />
       <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
         <SettingsRow
-          label="Edit name, handle & role"
+          label="Login & security"
           href="/app/more/account"
-          sublabel="Full name, display name, handle, department, role"
-        />
-        <SettingsRow
-          label="Contact info"
-          href="/app/profile/settings"
-          sublabel="Phone, WhatsApp, location · visibility toggles"
-        />
-      </div>
-
-      {/* ── Privacy ────────────────────────────────── */}
-      <SectionHeader title="Privacy" />
-      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
-        <SettingsRow
-          label="Contact visibility"
-          href="/app/profile/settings"
-          sublabel="Control what's shown on your public profile"
+          sublabel="Login email and credentials"
         />
         <SettingsRow
           label="Download my data"

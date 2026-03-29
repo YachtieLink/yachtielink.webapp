@@ -1,6 +1,6 @@
 ---
 module: profile
-updated: 2026-03-28
+updated: 2026-03-29
 status: shipped
 phase: 1B
 ---
@@ -19,8 +19,9 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 - Handle: validated via regex (`^[a-z0-9][a-z0-9-]*[a-z0-9]$`), 3-30 chars, uniqueness checked via `handle_available` RPC
 - Bio: free-text, editable at `/app/about/edit`
 - Primary role + departments: set during onboarding, editable
-- Contact info (phone, WhatsApp, email, location): working at `/app/profile/settings` with per-field show/hide toggles
-- Display settings: working — View Mode (profile/portfolio/rich_portfolio with Pro lock), Hero Scrim presets (dark/light/teal/warm), Accent Colour swatches (teal/coral/navy/amber/sand). Settings stored in users table with CHECK constraints. `rich_portfolio` coerced to `portfolio` on save for non-Pro users.
+- Contact info (phone, WhatsApp, contact_email, location): working at `/app/profile/settings` with per-field inline show/hide toggles. `contact_email` is separate from auth email — falls back to `email` if null.
+- Profile settings page: rewritten with 4 sections — Identity (name/handle/role/departments), Contact (phone/whatsapp/contact_email/location with inline toggles), Personal (DOB/home country with toggles), Layout (view mode selector). Scrim/accent/template settings removed from UI (backlog item for rebuild with live preview).
+- Display settings: View Mode (profile/portfolio/rich_portfolio with Pro lock) on settings page. Hero Scrim presets and Accent Colour swatches removed from UI — values preserved in DB but no editing UI. `rich_portfolio` coerced to `portfolio` on save for non-Pro users.
 - Section visibility: working — PATCH endpoint toggles individual sections (about, experience, endorsements, certifications, hobbies, education, skills, photos, gallery) via `section_visibility` JSONB column
 - Social links: working — up to 7 links (Instagram, LinkedIn, TikTok, YouTube, X, Facebook, website) via PATCH API
 - AI summary: working — generated via OpenAI `gpt-4o-mini` from bio + attachments + endorsements; editable after generation; `ai_summary_edited` flag prevents accidental overwrite; rate-limited to 10/hour
@@ -42,7 +43,8 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 | Profile photo upload + crop | `app/(protected)/app/profile/photo/page.tsx` |
 | Multi-photo manager | `app/(protected)/app/profile/photos/page.tsx` |
 | Work gallery manager | `app/(protected)/app/profile/gallery/page.tsx` |
-| Contact settings | `app/(protected)/app/profile/settings/page.tsx` |
+| Profile settings (identity, contact, personal, layout) | `app/(protected)/app/profile/settings/page.tsx` |
+| CV-only details card | `components/cv/CvDetailsCard.tsx` |
 | Hero card component | `components/profile/ProfileHeroCard.tsx` |
 | Strength meter | `components/profile/ProfileStrength.tsx` |
 | Section grid | `components/profile/ProfileSectionGrid.tsx` |
@@ -62,7 +64,7 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 | Saved profiles API | `app/api/saved-profiles/route.ts` |
 | Profile folders API | `app/api/profile-folders/route.ts` |
 | Validation schemas | `lib/validation/schemas.ts` |
-| Display settings API | `app/api/profile/display-settings/route.ts` |
+| Display settings API (zero callers — pending cleanup) | `app/api/profile/display-settings/route.ts` |
 | Profile summaries | `lib/profile-summaries.ts` |
 
 ## Decisions That Bind This Module
@@ -76,7 +78,8 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 ## Next Steps
 
 - [ ] Crew availability toggle with 7-day expiry (D-027)
-- [ ] Allow changing account email from settings
+- [x] Separate contact email from auth email (`contact_email` column)
+- [ ] Rebuild scrim/accent/template settings with live preview
 - [ ] Profile analytics (basic: view count) — gated to Pro tier
 - [ ] Cert expiry alerts (cron job exists at `app/api/cron/cert-expiry/`)
-- [ ] Bump MAX_PHOTOS_PRO 9 → 15 (Sprint 11c)
+- [x] Bump MAX_PHOTOS_PRO 9 → 15 (Sprint 11c — shipped PR #107)

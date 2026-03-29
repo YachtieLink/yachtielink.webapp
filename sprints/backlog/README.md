@@ -67,3 +67,4 @@ Any context, constraints, or open questions.
 | [Skill & Hobby Notes](./skill-hobby-notes.md) | idea | P3 |
 | [Colleague Graph Explorer](./colleague-graph-explorer.md) | idea | P1 |
 | [Crew Pass](./crew-pass.md) | idea | P2 |
+| [Profile Display Settings Rework](./profile-display-settings-rework.md) | idea | P3 |

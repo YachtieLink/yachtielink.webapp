@@ -4,6 +4,8 @@ Append-only. Never edit existing entries. Newest at top.
 
 When you make changes to this module, append a one-line entry with date, agent name, and what changed.
 
+**2026-03-29** — Claude Code (Opus 4.6) (Settings IA): Rewrote profile settings page with 4 sections (Identity/Contact/Personal/Layout). Added `contact_email` column + migration. Created `CvDetailsCard` for CV-only fields on CV tab. Stripped account page to auth-only. Fixed PDF generator + CV preview to use `contact_email ?? email`. Deleted dead `useProfileSettings` hook. Fixed WheelACard milestone link. Fixed PDF Pro gate to use `isProFromRecord()`.
+
 **2026-03-28** — Claude Code (Opus 4.6) (Sprint 11c): Added `profile_template` to `getUserByHandle` and `useProfileSettings`. Template picker UI in settings page (Pro only). `FocalPointPicker` component with pointer-capture drag. Focal point PATCH endpoint on `/api/user-photos/[id]`. GET photos now returns `focal_x, focal_y`. `MAX_PHOTOS_PRO` bumped 9→15 in photos page and API. `isProFromRecord()` used in settings hook (drift-check fix). Pro gate restored in settings save for `rich_portfolio`.
 
 **2026-03-28** — Claude Code (Opus 4.6) (Sprint 11b): Added `focal_x`/`focal_y` to `ProfilePhoto` type in `lib/queries/types.ts`. Added `profile_view_mode`, `scrim_preset`, `accent_color` to `getUserByHandle` select in `lib/queries/profile.ts`. These query changes feed the public profile dual-layout system.

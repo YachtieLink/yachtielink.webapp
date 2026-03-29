@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now. Updated every session by agents (and by the `/shipslog` Codex logging command).
 
-**Last updated:** 2026-03-29 (Sprint 11 merged. Production incident resolved. Rally 005 auth resilience shipped.)
+**Last updated:** 2026-03-29 (Settings IA rework complete. Contact email column live. Awaiting commit approval.)
 
 ---
 
@@ -18,9 +18,9 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 |--------|-------|--------|-------|
 | [Sprint 11a/b/c](./sprints/major/phase-1b/sprint-11/) | 1B | ✅ Merged (PR #107) | Public Profile Rewrite — 3 view modes, bento grid, section modals |
 | [Rally 005](./sprints/rallies/rally-005-auth-resilience/) | — | ✅ Merged (PR #112) | Auth resilience — 12 fixes after production incident |
-| [Sprint 11d](./sprints/major/phase-1b/sprint-11/build_plan_11d.md) | 1B | 📋 Ready | Remaining profile items — settings UI, sub-pages, endorsement pinning |
+| [Settings IA](./sprints/junior/ui-ux/settings-information-architecture/) | Junior | 📬 PR #114 open | Settings page rewrite, contact_email, CV-only fields on CV tab |
 
-**Next action:** Sprint 11d execution
+**Next action:** Founder merges PR #114
 
 ---
 
@@ -28,6 +28,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
+| Settings IA rework | 2026-03-29 | Profile settings rewrite (4 sections), contact_email column, CvDetailsCard, account page stripped to auth-only, PDF contact_email fix |
 | Rally 005 Auth Resilience | 2026-03-29 | 12 fixes: middleware try-catch, needsAuth simplification, /api/ excluded from matcher, secure cookies, polling jitter, AuthStateListener, env guard (PR #112) |
 | Sprint 11 merged | 2026-03-28 | Public Profile Rewrite: 3 view modes (Profile/Portfolio/Rich Portfolio), bento grid, section modals, ~60 QA fixes (PR #107) |
 | Sprint 10.1 polish | 2026-03-27 | Typography, education links, nav badge, saved profile cardHover (PR #103) |
@@ -39,12 +40,11 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Verify production login** — test Rally 005 fixes in production
-2. **Sprint 11d** — 18 remaining items: settings UI, sub-pages, endorsement pinning, CV rework
-4. **Sprint 12 — Yacht Graph Foundation** (6–8 days) — yacht detail pages, colleagues explorer, sea time display
-5. **Sprint 13 — Launch Polish** (6–7 days) — public layout, marketing page, ops config, legal sign-off, go-live
-6. **Media/CRUD standardization** (junior sprint after Phase 1B — photo/gallery dedup, shared Pro gating)
-7. **Ghost Profiles & Claimable Accounts** (phase 2, 24 decisions)
+1. **Merge PR #114** (settings IA) — founder merges
+2. **Sprint 12 — Yacht Graph Foundation** (6–8 days) — yacht detail pages, colleagues explorer, sea time display
+3. **Sprint 13 — Launch Polish** (6–7 days) — public layout, marketing page, ops config, legal sign-off, go-live
+4. **Media/CRUD standardization** (junior sprint after Phase 1B — photo/gallery dedup, shared Pro gating)
+5. **Ghost Profiles & Claimable Accounts** (phase 2, 24 decisions)
 
 ---
 
@@ -66,7 +66,7 @@ All D1-D8 resolved 2026-03-25. See `sprints/PHASE1-CLOSEOUT.md` Blockers section
 
 ## Uncommitted Code
 
-Sprint 11c full build (~30 files) on branch `sprint-11c/rich-portfolio` — ready to commit. Sprint 11a committed (`30f89ca`), Sprint 11b committed (`f116427`). Backlog items (untracked).
+None. Settings IA committed and pushed — PR #114 open.
 
 ---
 
@@ -74,7 +74,6 @@ Sprint 11c full build (~30 files) on branch `sprint-11c/rich-portfolio` — read
 
 | Sprint | Phase | Focus |
 |--------|-------|-------|
-| [Sprint 11](./sprints/major/phase-1b/sprint-11/README.md) | 1B | Public Profile Rewrite — 3 view modes, bento grid, photo system (split into 11a/b/c) |
 | [Sprint 12](./sprints/major/phase-1b/sprint-12/README.md) | 1B | Yacht graph, colleague network, sea time |
 | [Sprint 13](./sprints/major/phase-1b/sprint-13/README.md) | 1B | Launch polish, marketing page, production env, QA |
 
@@ -84,6 +83,7 @@ Sprint 11c full build (~30 files) on branch `sprint-11c/rich-portfolio` — read
 
 | Type | Slug | Status |
 |------|------|--------|
+| ui-ux | settings-information-architecture | 📬 PR #114 open |
 | debug | debug-cv-parse-extraction | In Progress |
 | debug | debug-photo-upload-limit | In Progress |
 | ~~debug~~ | ~~debug-cv-regenerate-date~~ | ~~Obsolete — CV regeneration replaced by on-demand generation in Sprint 11a (2026-03-28)~~ |
