@@ -61,6 +61,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - ⚠️ Founder feedback: mobile-first testing — always test at 375px, don't default to desktop viewport.
 - ⚠️ 5 launch-blocking bugs in backlog were never promoted into sprints. Rally 006 now covers them.
 - ⚠️ Preview tool limitation: fixed-position elements (bottom tab bar) don't appear in preview screenshots. Tab bar is present in DOM and visible in real browser.
+- ⚠️ P1 regression: `pb-tab-bar` padding was dropped from `<main>` in Sprint 10.3 layout rewrite — page content hidden behind bottom tab bar on mobile. Attempted fix, reverted due to preview tool confusion. Filed in `sprints/backlog/ux-audit-mobile-2026-03-29.md`. Needs fix in Rally 006.
 
 ---
 
