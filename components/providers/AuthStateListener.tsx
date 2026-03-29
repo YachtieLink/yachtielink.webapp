@@ -20,6 +20,14 @@ export function AuthStateListener() {
   const supabase = createClient()
 
   useEffect(() => {
+    // Zombie session check: if cookies exist but no valid session,
+    // clear them client-side so the browser stops retrying auth.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session && document.cookie.split(';').some(c => c.trim().startsWith('sb-'))) {
+        supabase.auth.signOut()
+      }
+    })
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event) => {
         if (event === 'SIGNED_OUT') {

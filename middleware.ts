@@ -57,6 +57,16 @@ export async function middleware(request: NextRequest) {
       console.error('[middleware] getUser() failed:', e instanceof Error ? e.message : e)
       user = null
     }
+
+    // Clear stale auth cookies when session is dead but cookies persist.
+    // Without this, every navigation retries getUser() against Supabase —
+    // each user with expired cookies becomes a DDoS agent.
+    if (!user) {
+      const staleAuthCookies = request.cookies.getAll().filter(c => c.name.startsWith('sb-'))
+      if (staleAuthCookies.length > 0) {
+        staleAuthCookies.forEach(c => auth.response.cookies.delete(c.name))
+      }
+    }
   }
 
   // ── Subdomain detection ──────────────────────────────────────────────

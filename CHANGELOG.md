@@ -22,6 +22,29 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-29 — Claude Code (Opus 4.6) — Morning Merge + Sprint 12 Audit
+
+### Done
+
+- **Merged all overnight PRs:** #115 (bug sweep), #116 (Sprint 13 public infra), #117 (docs), #118 (Sprint 12 wiring) — all on main, clean.
+- **Sprint 12 completeness audit:** comprehensive diff of build plan vs shipped code. Result: ~95% shipped. All major features complete (yacht detail page, colleague explorer, sea time, transfer flow, RPCs, yacht links, mutual colleagues). Minor gaps: yacht search match quality label polish, 375px responsive QA, build/drift check not yet run.
+- **Stash cleanup:** founder cleared 11 stale stashes from past sessions.
+
+### Context
+
+- Main is clean with all 4 overnight PRs merged. No uncommitted work.
+- Sprint 12 effectively complete — remaining items are QA/polish, not missing features.
+- Sprint 13 Waves 0+1 already shipped (header/footer/cookie banner). Waves 2-4 are ops/QA/legal (founder tasks).
+
+### Next
+
+1. Run `npm run build` + `npm run drift-check` to formally close Sprint 12
+2. QA yacht graph navigation (profile → yacht → crew → profile)
+3. Sprint 13 Waves 2-4 (ops config, QA checklist, legal sign-off, deploy)
+4. Business address in privacy/terms pages
+
+---
+
 ## 2026-03-29 — Claude Code (Opus 4.6) — Phase 1 Close-Out Planning + Overnight Bug Sweep
 
 ### Done
