@@ -8,6 +8,7 @@ import { validateBody } from '@/lib/validation/validate'
 import { generatePDFSchema } from '@/lib/validation/schemas'
 import { applyRateLimit } from '@/lib/rate-limit/helpers'
 import { handleApiError } from '@/lib/api/errors'
+import { isProFromRecord } from '@/lib/stripe/pro-shared'
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,11 +27,11 @@ export async function POST(req: NextRequest) {
     if (template !== 'standard') {
       const { data: profile } = await supabase
         .from('users')
-        .select('subscription_status')
+        .select('subscription_status, subscription_ends_at')
         .eq('id', user.id)
         .single()
 
-      if (profile?.subscription_status !== 'pro') {
+      if (!profile || !isProFromRecord(profile)) {
         return NextResponse.json(
           { error: 'Pro subscription required for premium templates' },
           { status: 403 },
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
         .select(`
           id, full_name, display_name, handle, primary_role, departments,
           bio, profile_photo_url,
-          phone, whatsapp, email, location_country, location_city,
+          phone, whatsapp, email, contact_email, location_country, location_city,
           show_phone, show_whatsapp, show_email, show_location,
           subscription_status, latest_pdf_path,
           dob, home_country, smoke_pref, appearance_note, travel_docs, license_info, languages, show_dob

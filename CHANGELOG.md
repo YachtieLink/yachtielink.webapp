@@ -22,6 +22,40 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-29 — Claude Code (Opus 4.6) — Settings Information Architecture Rework
+
+### Done
+
+- **Junior Sprint: Settings IA rework** — complete rewrite of profile settings page information architecture based on founder feedback that the settings were a "dumping ground" with no context about where data appears.
+- **Profile settings page** (`app/(protected)/app/profile/settings/page.tsx`): rewritten with 4 clearly labeled sections — Identity (name/handle/role/departments), Contact (phone/whatsapp/email/location with inline toggles), Personal (DOB/home country with toggles), Layout (view mode selector with Pro gating). Each section has Lucide icon header, PageTransition wrapper, teal background, serif title.
+- **Contact email separation**: new `contact_email` column on users table (migration `20260328100000`). Auth email stays on Account page, contact email editable on Profile settings. Fallback chain: `contact_email ?? email` in public profile, CV preview, PDF generator, subdomain pages.
+- **CvDetailsCard** (`components/cv/CvDetailsCard.tsx`): new self-contained component for CV-only fields (smoking, tattoos, license, travel docs) moved from profile settings to CV tab. Label: "These details appear on your generated CV only."
+- **Account page** (`app/(protected)/app/more/account/page.tsx`): stripped to auth-only — shows login email with hint to edit contact email on Profile.
+- **More page** restructured: "Edit profile & contact info" → `/app/profile/settings`, "Login & security" → `/app/more/account`.
+- **Review fixes**: PDF generator now uses `contact_email ?? email` (was showing auth email on CVs), PDF Pro gate uses `isProFromRecord()` (was raw string check), CV preview selects `contact_email`, WheelACard "Role set" milestone now links to `/app/profile/settings`, ToggleRow uses `<label>` for accessibility, deleted dead `useProfileSettings` hook.
+- **Schema docs**: added `contact_email` to `yl_schema.md`.
+
+### Context
+
+- Branch: `junior/settings-information-architecture`. All code uncommitted, awaiting founder commit approval.
+- Migration `contact_email` already pushed to remote DB via `supabase db push`.
+- Scrim/accent/template settings intentionally removed from UI — filed as backlog item for future rebuild with live preview.
+- `useProfileSettings` hook deleted (zero importers after settings page rewrite).
+
+### Next
+
+1. **Founder commit approval** — commit, push, create PR for this branch
+2. **Sprint 12 — Yacht Graph Foundation** — wiring sprint for colleague explorer
+3. **CV parser dedup fix** — education/certs/hobbies duplication from multiple imports
+
+### Flags
+
+- ⚠️ `contact_email` column is live in production. All read paths have fallback to `email` so existing users are unaffected.
+- ⚠️ Display settings API route (`/api/profile/display-settings/route.ts`) has zero callers now — scrim/accent/template UI was removed. Route should be cleaned up when display settings are rebuilt.
+- ⚠️ Stale uncommitted changes flag from previous session is now resolved — those were the settings IA changes.
+
+---
+
 ## 2026-03-29 — Claude Code (Opus 4.6) — Production Incident Response + Rally 005 Auth Resilience
 
 ### Done

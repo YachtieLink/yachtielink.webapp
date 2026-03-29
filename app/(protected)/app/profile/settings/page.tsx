@@ -1,29 +1,46 @@
 'use client'
 
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button, Input, Select, DatePicker } from '@/components/ui'
+import { createClient } from '@/lib/supabase/client'
+import { Button, Input, Select } from '@/components/ui'
 import { BackButton } from '@/components/ui/BackButton'
 import { SearchableSelect } from '@/components/ui/SearchableSelect'
+import { DatePicker } from '@/components/ui/DatePicker'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useToast } from '@/components/ui/Toast'
+import { PageTransition } from '@/components/ui/PageTransition'
 import { ALL_COUNTRIES, PINNED_COUNTRIES } from '@/lib/constants/countries'
-import { useProfileSettings } from '@/lib/hooks/useProfileSettings'
+import { RESERVED_HANDLES } from '@/lib/constants/reserved-handles'
+import { isProFromRecord } from '@/lib/stripe/pro-shared'
+import { User, Phone, Mail, MapPin, Calendar, Globe, LayoutGrid } from 'lucide-react'
 
-const SMOKE_OPTIONS = [
-  { value: '', label: 'Select...' },
-  { value: 'non_smoker', label: 'Non Smoker' },
-  { value: 'smoker', label: 'Smoker' },
-  { value: 'social_smoker', label: 'Social Smoker' },
+const DEPARTMENTS = [
+  'Deck', 'Interior', 'Engineering', 'Galley',
+  'Medical', 'Admin/Purser', 'Land-based',
 ]
 
-const APPEARANCE_OPTIONS = [
-  { value: '', label: 'Select...' },
-  { value: 'none', label: 'None' },
-  { value: 'visible', label: 'Visible' },
-  { value: 'non_visible', label: 'Non Visible' },
-  { value: 'not_specified', label: 'Not Specified' },
-]
+const HANDLE_RE = /^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$/
 
-const COMMON_TRAVEL_DOCS = ['B1/B2', 'Schengen', 'EU Citizen', "Seaman's Book"]
+interface Role {
+  id: string
+  name: string
+  department: string
+}
+
+function SectionHeader({ icon, title, subtitle }: { icon: React.ReactNode; title: string; subtitle: string }) {
+  return (
+    <div className="flex items-start gap-3 px-1">
+      <div className="mt-0.5 w-8 h-8 rounded-lg bg-[var(--color-interactive)]/10 flex items-center justify-center shrink-0">
+        {icon}
+      </div>
+      <div>
+        <p className="text-sm font-semibold text-[var(--color-text-primary)]">{title}</p>
+        <p className="text-xs text-[var(--color-text-secondary)]">{subtitle}</p>
+      </div>
+    </div>
+  )
+}
 
 function ToggleRow({
   label,
@@ -37,22 +54,22 @@ function ToggleRow({
   onChange: (v: boolean) => void
 }) {
   return (
-    <label className="flex items-center justify-between py-2 cursor-pointer">
+    <label className="flex items-center justify-between py-1.5 cursor-pointer">
       <div>
-        <p className="text-sm font-medium text-[var(--color-text-primary)]">{label}</p>
-        {sublabel && <p className="text-xs text-[var(--color-text-secondary)]">{sublabel}</p>}
+        <span className="text-xs font-medium text-[var(--color-text-secondary)] block">{label}</span>
+        {sublabel && <span className="text-[11px] text-[var(--color-text-tertiary)] block">{sublabel}</span>}
       </div>
       <button
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`relative w-11 h-6 rounded-full transition-colors ${
+        className={`relative w-10 h-[22px] rounded-full transition-colors ${
           checked ? 'bg-[var(--color-interactive)]' : 'bg-[var(--color-surface-raised)]'
         }`}
       >
         <span
-          className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-            checked ? 'translate-x-5' : 'translate-x-0'
+          className={`absolute top-[3px] left-[3px] w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${
+            checked ? 'translate-x-[18px]' : 'translate-x-0'
           }`}
         />
       </button>
@@ -62,239 +79,388 @@ function ToggleRow({
 
 export default function ProfileSettingsPage() {
   const router = useRouter()
-  const { form, set, save, loaded, saving, isPro } = useProfileSettings()
+  const { toast } = useToast()
+  const supabase = useMemo(() => createClient(), [])
+
+  const [loaded, setLoaded] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [userId, setUserId] = useState('')
+
+  // Identity
+  const [fullName, setFullName] = useState('')
+  const [displayName, setDisplayName] = useState('')
+  const [handle, setHandle] = useState('')
+  const [originalHandle, setOriginalHandle] = useState('')
+  const [handleStatus, setHandleStatus] = useState<'idle' | 'checking' | 'available' | 'taken' | 'invalid'>('idle')
+  const [departments, setDepartments] = useState<string[]>([])
+  const [primaryRole, setPrimaryRole] = useState('')
+  const [roles, setRoles] = useState<Role[]>([])
+  const [customRole, setCustomRole] = useState('')
+  const [useCustomRole, setUseCustomRole] = useState(false)
+
+  // Contact
+  const [phone, setPhone] = useState('')
+  const [whatsapp, setWhatsapp] = useState('')
+  const [contactEmail, setContactEmail] = useState('')
+  const [locationCountry, setLocationCountry] = useState('')
+  const [locationCity, setLocationCity] = useState('')
+
+  // Visibility
+  const [showPhone, setShowPhone] = useState(false)
+  const [showWhatsapp, setShowWhatsapp] = useState(false)
+  const [showEmail, setShowEmail] = useState(false)
+  const [showLocation, setShowLocation] = useState(false)
+
+  // Personal
+  const [dob, setDob] = useState('')
+  const [homeCountry, setHomeCountry] = useState('')
+  const [showDob, setShowDob] = useState(false)
+  const [showHomeCountry, setShowHomeCountry] = useState(false)
+
+  // View mode
+  const [profileViewMode, setProfileViewMode] = useState<'profile' | 'portfolio' | 'rich_portfolio'>('portfolio')
+  const [isPro, setIsPro] = useState(false)
+
+  useEffect(() => {
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoaded(true); return }
+      setUserId(user.id)
+
+      const [{ data: profile }, { data: roleData }] = await Promise.all([
+        supabase
+          .from('users')
+          .select(`
+            full_name, display_name, handle, departments, primary_role,
+            phone, whatsapp, email, contact_email, location_country, location_city,
+            show_phone, show_whatsapp, show_email, show_location,
+            dob, home_country, show_dob, show_home_country,
+            profile_view_mode, subscription_status, subscription_ends_at
+          `)
+          .eq('id', user.id)
+          .single(),
+        supabase
+          .from('roles')
+          .select('id, name, department')
+          .order('department')
+          .order('sort_order'),
+      ])
+
+      if (profile) {
+        setFullName(profile.full_name ?? '')
+        setDisplayName(profile.display_name ?? '')
+        setHandle(profile.handle ?? '')
+        setOriginalHandle(profile.handle ?? '')
+        setDepartments(profile.departments ?? [])
+        if (roleData && profile.primary_role) {
+          const found = roleData.find((r) => r.name === profile.primary_role)
+          if (found) setPrimaryRole(found.id)
+          else { setUseCustomRole(true); setCustomRole(profile.primary_role) }
+        }
+        setPhone(profile.phone ?? '')
+        setWhatsapp(profile.whatsapp ?? '')
+        setContactEmail(profile.contact_email ?? profile.email ?? '')
+        setLocationCountry(profile.location_country ?? '')
+        setLocationCity(profile.location_city ?? '')
+        setShowPhone(profile.show_phone ?? false)
+        setShowWhatsapp(profile.show_whatsapp ?? false)
+        setShowEmail(profile.show_email ?? false)
+        setShowLocation(profile.show_location ?? false)
+        setDob(profile.dob ?? '')
+        setHomeCountry(profile.home_country ?? '')
+        setShowDob(profile.show_dob ?? false)
+        setShowHomeCountry(profile.show_home_country ?? false)
+        setProfileViewMode(profile.profile_view_mode ?? 'portfolio')
+        setIsPro(isProFromRecord({
+          subscription_status: profile.subscription_status ?? null,
+          subscription_ends_at: profile.subscription_ends_at ?? null,
+        }))
+      }
+      if (roleData) setRoles(roleData)
+      setLoaded(true)
+    }
+    load()
+  }, [supabase])
+
+  useEffect(() => {
+    if (handle === originalHandle) { setHandleStatus('idle'); return }
+    if (!handle) { setHandleStatus('idle'); return }
+    if (!HANDLE_RE.test(handle)) { setHandleStatus('invalid'); return }
+    if (RESERVED_HANDLES.has(handle)) { setHandleStatus('taken'); return }
+
+    setHandleStatus('checking')
+    const timeout = setTimeout(async () => {
+      const { data } = await supabase
+        .from('users')
+        .select('id')
+        .eq('handle', handle)
+        .neq('id', userId)
+        .maybeSingle()
+      setHandleStatus(data ? 'taken' : 'available')
+    }, 500)
+    return () => clearTimeout(timeout)
+  }, [handle, originalHandle, userId, supabase])
+
+  function toggleDepartment(dept: string) {
+    setDepartments((prev) =>
+      prev.includes(dept) ? prev.filter((d) => d !== dept) : [...prev, dept]
+    )
+    setPrimaryRole('')
+    setCustomRole('')
+  }
+
+  const filteredRoles = roles.filter(
+    (r) => departments.includes(r.department) || r.department === 'Other'
+  )
+
+  const selectedRoleName = useCustomRole
+    ? customRole
+    : roles.find((r) => r.id === primaryRole)?.name ?? ''
+
+  async function handleSave() {
+    if (!fullName.trim()) { toast('Full name is required.', 'error'); return }
+    if (handle && handleStatus === 'taken') { toast('That handle is taken.', 'error'); return }
+    if (handle && handleStatus === 'invalid') { toast('Handle must be 3–30 characters: a-z, 0-9, hyphens.', 'error'); return }
+
+    setSaving(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { toast('Not signed in.', 'error'); return }
+
+      const { error } = await supabase
+        .from('users')
+        .update({
+          full_name:    fullName.trim(),
+          display_name: displayName.trim() || null,
+          handle:       handle || null,
+          departments:  departments.length > 0 ? departments : null,
+          primary_role: selectedRoleName || null,
+          phone:            phone.trim() || null,
+          whatsapp:         whatsapp.trim() || null,
+          contact_email:    contactEmail.trim() || null,
+          location_country: locationCountry.trim() || null,
+          location_city:    locationCity.trim() || null,
+          show_phone:    showPhone,
+          show_whatsapp: showWhatsapp,
+          show_email:    showEmail,
+          show_location: showLocation,
+          dob:               dob || null,
+          home_country:      homeCountry.trim() || null,
+          show_dob:          showDob,
+          show_home_country: showHomeCountry,
+          profile_view_mode: profileViewMode === 'rich_portfolio' && !isPro ? 'portfolio' : profileViewMode,
+        })
+        .eq('id', user.id)
+
+      if (error) { toast(error.message, 'error'); return }
+      toast('Profile updated.', 'success')
+      router.push('/app/profile')
+      router.refresh()
+    } finally {
+      setSaving(false)
+    }
+  }
 
   if (!loaded) {
     return (
-      <div className="flex flex-col gap-4">
-        <Skeleton className="h-6 w-40" />
-        {[...Array(5)].map((_, i) => (
-          <Skeleton key={i} className="h-12 w-full rounded-xl" />
+      <div className="flex flex-col gap-4 pb-24">
+        <Skeleton className="h-8 w-48" />
+        {[...Array(4)].map((_, i) => (
+          <Skeleton key={i} className="h-40 w-full rounded-2xl" />
         ))}
       </div>
     )
   }
 
+  const handleHintColor: Record<typeof handleStatus, string> = {
+    idle: '', checking: 'text-[var(--color-text-secondary)]',
+    available: 'text-green-600', taken: 'text-[var(--color-error)]', invalid: 'text-[var(--color-error)]',
+  }
+  const handleHintText: Record<typeof handleStatus, string> = {
+    idle: '', checking: 'Checking...', available: 'Available',
+    taken: 'Taken — choose another', invalid: '3–30 chars: a-z, 0-9, hyphens',
+  }
+
   return (
-    <div className="flex flex-col gap-6 pb-24">
-      <div className="flex items-center gap-3">
+    <PageTransition className="flex flex-col gap-5 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-teal-50)]">
+      {/* Header */}
+      <div className="flex items-center gap-3 pt-2">
         <BackButton href="/app/profile" />
+        <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">Edit Profile</h1>
+      </div>
+
+      {/* ── Identity ─────────────────────────────── */}
+      <SectionHeader
+        icon={<User size={16} className="text-[var(--color-interactive)]" />}
+        title="Identity"
+        subtitle="Shown on your profile, CV, and public page"
+      />
+      <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-4">
+        <Input label="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+        <Input label="Display name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} hint="How your name appears publicly. Defaults to full name." />
+
         <div>
-          <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Contact info</h1>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-            All fields are hidden on your public profile by default. Toggle to show.
-          </p>
-        </div>
-      </div>
-
-      {/* Contact Fields */}
-      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <Input label="Phone" type="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="+44 7700 900000" />
-          <ToggleRow label="Show phone on profile" checked={form.show_phone} onChange={(v) => set('show_phone', v)} />
-        </div>
-
-        <hr className="border-[var(--color-border)]" />
-
-        <div className="flex flex-col gap-1">
-          <Input label="WhatsApp number" type="tel" value={form.whatsapp} onChange={(e) => set('whatsapp', e.target.value)} placeholder="+44 7700 900000" />
-          <ToggleRow label="Show WhatsApp on profile" checked={form.show_whatsapp} onChange={(v) => set('show_whatsapp', v)} />
+          <Input label="Profile handle" value={handle} onChange={(e) => setHandle(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))} />
+          {handleStatus !== 'idle' && (
+            <p className={`text-xs mt-1 font-medium ${handleHintColor[handleStatus]}`}>
+              {handleHintText[handleStatus]}
+            </p>
+          )}
+          {handle && handleStatus !== 'invalid' && (
+            <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
+              yachtie.link/u/{handle}
+            </p>
+          )}
         </div>
 
-        <hr className="border-[var(--color-border)]" />
-
-        <div className="flex flex-col gap-1">
-          <Input label="Contact email" type="email" value={form.contact_email} onChange={(e) => set('contact_email', e.target.value)} placeholder="you@example.com" hint="This is your account email. Only shown if you enable it." disabled />
-          <ToggleRow label="Show email on profile" checked={form.show_email} onChange={(v) => set('show_email', v)} />
-        </div>
-
-        <hr className="border-[var(--color-border)]" />
-
-        <div className="flex flex-col gap-2">
-          <div className="flex gap-2">
-            <SearchableSelect label="Country" value={form.location_country} onChange={(v) => set('location_country', v)} options={ALL_COUNTRIES.map((c) => ({ value: c, label: c }))} pinnedOptions={PINNED_COUNTRIES.map((c) => ({ value: c, label: c }))} placeholder="Search countries..." clearable clearLabel="No country" className="flex-1" />
-            <Input label="City" type="text" value={form.location_city} onChange={(e) => set('location_city', e.target.value)} placeholder="City" className="flex-1" />
-          </div>
-          <ToggleRow label="Show location on profile" checked={form.show_location} onChange={(v) => set('show_location', v)} />
-        </div>
-      </div>
-
-      {/* Personal Details */}
-      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
-        <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Personal Details</h2>
-        <DatePicker label="Date of Birth" value={form.dob || null} onChange={(v) => set('dob', v ?? '')} includeDay maxYear={new Date().getFullYear() - 16} minYear={1940} />
-        <SearchableSelect label="Home Country" value={form.home_country} onChange={(v) => set('home_country', v)} options={ALL_COUNTRIES.map((c) => ({ value: c, label: c }))} pinnedOptions={PINNED_COUNTRIES.map((c) => ({ value: c, label: c }))} placeholder="Search countries..." clearable clearLabel="No country" />
-        <Select label="Smoking Preference" value={form.smoke_pref} onChange={(e) => set('smoke_pref', e.target.value)}>
-          {SMOKE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </Select>
-        <Select label="Tattoos / Piercings" value={form.appearance_note} onChange={(e) => set('appearance_note', e.target.value)}>
-          {APPEARANCE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </Select>
-        <Input label="Driving License" type="text" value={form.license_info} onChange={(e) => set('license_info', e.target.value)} placeholder="e.g. Full UK, International" />
-      </div>
-
-      {/* Visa / Travel Documents */}
-      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
-        <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Visa / Travel Documents</h2>
-        <div className="flex flex-wrap gap-2">
-          {COMMON_TRAVEL_DOCS.map((doc) => {
-            const active = form.travel_docs.includes(doc)
-            return (
+        <div>
+          <p className="text-sm font-medium text-[var(--color-text-primary)] mb-2">Department(s)</p>
+          <div className="flex flex-wrap gap-2">
+            {DEPARTMENTS.map((dept) => (
               <button
-                key={doc}
-                type="button"
-                onClick={() => set('travel_docs', active ? form.travel_docs.filter((d) => d !== doc) : [...form.travel_docs, doc])}
-                className={`px-3 py-1.5 rounded-lg text-sm border transition-colors ${active ? 'bg-[var(--color-interactive)] text-white border-[var(--color-interactive)]' : 'bg-[var(--color-surface)] text-[var(--color-text-primary)] border-[var(--color-border)]'}`}
-              >
-                {doc}
-              </button>
-            )
-          })}
-        </div>
-        {form.travel_docs.filter((d) => !COMMON_TRAVEL_DOCS.includes(d)).length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {form.travel_docs.filter((d) => !COMMON_TRAVEL_DOCS.includes(d)).map((doc) => (
-              <span key={doc} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs bg-[var(--color-interactive)] text-white">
-                {doc}
-                <button type="button" onClick={() => set('travel_docs', form.travel_docs.filter((d) => d !== doc))} className="hover:opacity-70">×</button>
-              </span>
-            ))}
-          </div>
-        )}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            const input = (e.currentTarget.elements.namedItem('other_doc') as HTMLInputElement)
-            const val = input.value.trim()
-            if (val && !form.travel_docs.includes(val)) {
-              set('travel_docs', [...form.travel_docs, val])
-              input.value = ''
-            }
-          }}
-          className="flex gap-2"
-        >
-          <Input name="other_doc" type="text" placeholder="Other document..." className="flex-1" />
-          <Button type="submit" variant="secondary" className="shrink-0">Add</Button>
-        </form>
-      </div>
-
-      {/* Visibility */}
-      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
-        <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Visibility</h2>
-        <ToggleRow label="Show age on profile" sublabel="Calculated from date of birth" checked={form.show_dob} onChange={(v) => set('show_dob', v)} />
-        <ToggleRow label="Show home country on profile" checked={form.show_home_country} onChange={(v) => set('show_home_country', v)} />
-      </div>
-
-      {/* Profile Display (Sprint 11a foundation — rendering applied in 11b) */}
-      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
-        <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Profile Display</h2>
-        <p className="text-xs text-[var(--color-text-secondary)]">These settings control how your public profile looks to visitors. More options coming soon.</p>
-
-        {/* View mode selector */}
-        <div className="flex flex-col gap-2">
-          <p className="text-sm font-medium text-[var(--color-text-primary)]">View Mode</p>
-          <div className="flex gap-2">
-            {([
-              { id: 'profile', label: 'Profile', enabled: true },
-              { id: 'portfolio', label: 'Portfolio', enabled: true },
-              { id: 'rich_portfolio', label: 'Rich Portfolio', enabled: isPro },
-            ] as const).map((mode) => (
-              <button
-                key={mode.id}
-                disabled={!mode.enabled}
-                onClick={() => set('profile_view_mode', mode.id)}
-                className={`flex-1 rounded-lg border p-3 text-center text-sm transition-colors ${
-                  form.profile_view_mode === mode.id
-                    ? 'border-[var(--color-interactive)] border-2 bg-[var(--color-surface)]'
-                    : !mode.enabled
-                    ? 'border-[var(--color-border)] opacity-50 cursor-not-allowed'
-                    : 'border-[var(--color-border)] hover:bg-[var(--color-surface-raised)] cursor-pointer'
+                key={dept}
+                onClick={() => toggleDepartment(dept)}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                  departments.includes(dept)
+                    ? 'bg-[var(--color-interactive)] text-white shadow-sm'
+                    : 'bg-[var(--color-surface-raised)] text-[var(--color-text-primary)] hover:bg-[var(--color-interactive)]/10'
                 }`}
               >
-                <p className="font-medium text-[var(--color-text-primary)]">{mode.label}</p>
-                {!mode.enabled && <p className="text-[10px] text-[var(--color-text-tertiary)]">Pro</p>}
+                {dept}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Scrim preset */}
-        <div className="flex flex-col gap-2">
-          <p className="text-sm font-medium text-[var(--color-text-primary)]">Hero Scrim</p>
-          <div className="flex gap-2">
-            {(['dark', 'light', 'teal', 'warm'] as const).map((preset) => (
-              <button
-                key={preset}
-                onClick={() => set('scrim_preset', preset)}
-                className={`flex-1 rounded-lg border p-2 text-center text-xs capitalize transition-colors ${
-                  form.scrim_preset === preset
-                    ? 'border-[var(--color-interactive)] border-2'
-                    : 'border-[var(--color-border)] hover:bg-[var(--color-surface-raised)]'
-                }`}
-              >
-                {preset}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Accent colour */}
-        <div className="flex flex-col gap-2">
-          <p className="text-sm font-medium text-[var(--color-text-primary)]">Accent Colour</p>
-          <div className="flex gap-2">
-            {([
-              { id: 'teal', bg: 'bg-teal-500' },
-              { id: 'coral', bg: 'bg-rose-400' },
-              { id: 'navy', bg: 'bg-blue-800' },
-              { id: 'amber', bg: 'bg-amber-500' },
-              { id: 'sand', bg: 'bg-stone-400' },
-            ] as const).map((color) => (
-              <button
-                key={color.id}
-                onClick={() => set('accent_color', color.id)}
-                className={`w-8 h-8 rounded-full ${color.bg} transition-all ${
-                  form.accent_color === color.id
-                    ? 'ring-2 ring-[var(--color-interactive)] ring-offset-2'
-                    : 'hover:scale-110'
-                }`}
-                aria-label={color.id}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Template selector — only visible for rich_portfolio */}
-        {form.profile_view_mode === 'rich_portfolio' && (
+        {departments.length > 0 && (
           <div className="flex flex-col gap-2">
-            <p className="text-sm font-medium text-[var(--color-text-primary)]">Portfolio Template</p>
-            <div className="flex gap-2">
-              {([
-                { id: 'classic', label: 'Classic', desc: 'Balanced, editorial' },
-                { id: 'bold', label: 'Bold', desc: 'Photo-forward, dramatic' },
-              ] as const).map((tpl) => (
-                <button
-                  key={tpl.id}
-                  onClick={() => set('profile_template', tpl.id)}
-                  className={`flex-1 rounded-lg border p-3 text-center transition-colors ${
-                    form.profile_template === tpl.id
-                      ? 'border-[var(--color-interactive)] border-2 bg-[var(--color-surface)]'
-                      : 'border-[var(--color-border)] hover:bg-[var(--color-surface-raised)] cursor-pointer'
-                  }`}
-                >
-                  <p className="text-sm font-medium text-[var(--color-text-primary)]">{tpl.label}</p>
-                  <p className="text-[10px] text-[var(--color-text-tertiary)]">{tpl.desc}</p>
+            <p className="text-sm font-medium text-[var(--color-text-primary)]">Primary role</p>
+            {!useCustomRole ? (
+              <>
+                <Select value={primaryRole} onChange={(e) => setPrimaryRole(e.target.value)}>
+                  <option value="">Select role</option>
+                  {filteredRoles.map((r) => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                </Select>
+                <button onClick={() => { setUseCustomRole(true); setPrimaryRole('') }} className="text-xs text-[var(--color-interactive)] hover:underline text-left">
+                  Not listed? Enter a custom role
                 </button>
-              ))}
-            </div>
+              </>
+            ) : (
+              <>
+                <Input label="" value={customRole} onChange={(e) => setCustomRole(e.target.value)} placeholder="Enter your role" />
+                <button onClick={() => { setUseCustomRole(false); setCustomRole('') }} className="text-xs text-[var(--color-interactive)] hover:underline text-left">
+                  Choose from list instead
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>
 
-      {/* Save */}
-      <div className="flex gap-3">
-        <Button variant="secondary" onClick={() => router.back()} className="flex-1">Cancel</Button>
-        <Button onClick={save} loading={saving} className="flex-1">Save</Button>
+      {/* ── Contact ──────────────────────────────── */}
+      <SectionHeader
+        icon={<Phone size={16} className="text-[var(--color-interactive)]" />}
+        title="Contact Details"
+        subtitle="Toggles control your public profile. CV always includes contact info."
+      />
+      <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
+          <Input label="Phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+44 7700 900000" />
+          <ToggleRow label="Show on profile" checked={showPhone} onChange={setShowPhone} />
+        </div>
+
+        <hr className="border-[var(--color-border)]" />
+
+        <div className="flex flex-col gap-1">
+          <Input label="WhatsApp" type="tel" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="+44 7700 900000" />
+          <ToggleRow label="Show on profile" checked={showWhatsapp} onChange={setShowWhatsapp} />
+        </div>
+
+        <hr className="border-[var(--color-border)]" />
+
+        <div className="flex flex-col gap-1">
+          <Input label="Contact email" type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="you@example.com" hint="Shown on your profile and CV. Your login email is in Account settings." />
+          <ToggleRow label="Show on profile" checked={showEmail} onChange={setShowEmail} />
+        </div>
+
+        <hr className="border-[var(--color-border)]" />
+
+        <div className="flex flex-col gap-1">
+          <div className="flex gap-2">
+            <SearchableSelect label="Country" value={locationCountry} onChange={setLocationCountry} options={ALL_COUNTRIES.map((c) => ({ value: c, label: c }))} pinnedOptions={PINNED_COUNTRIES.map((c) => ({ value: c, label: c }))} placeholder="Search countries..." clearable clearLabel="No country" className="flex-1" />
+            <Input label="City" type="text" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} placeholder="City" className="flex-1" />
+          </div>
+          <ToggleRow label="Show on profile" checked={showLocation} onChange={setShowLocation} />
+        </div>
       </div>
-    </div>
+
+      {/* ── Personal ─────────────────────────────── */}
+      <SectionHeader
+        icon={<Calendar size={16} className="text-[var(--color-interactive)]" />}
+        title="Personal Details"
+        subtitle="Shown on your profile and CV"
+      />
+      <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
+          <DatePicker label="Date of Birth" value={dob || null} onChange={(v) => setDob(v ?? '')} includeDay maxYear={new Date().getFullYear() - 16} minYear={1940} />
+          <ToggleRow label="Show age on profile" sublabel="Calculated from date of birth" checked={showDob} onChange={setShowDob} />
+        </div>
+
+        <hr className="border-[var(--color-border)]" />
+
+        <div className="flex flex-col gap-1">
+          <SearchableSelect label="Home Country" value={homeCountry} onChange={setHomeCountry} options={ALL_COUNTRIES.map((c) => ({ value: c, label: c }))} pinnedOptions={PINNED_COUNTRIES.map((c) => ({ value: c, label: c }))} placeholder="Search countries..." clearable clearLabel="No country" />
+          <ToggleRow label="Show home country on profile" checked={showHomeCountry} onChange={setShowHomeCountry} />
+        </div>
+      </div>
+
+      {/* ── Layout ───────────────────────────────── */}
+      <SectionHeader
+        icon={<LayoutGrid size={16} className="text-[var(--color-interactive)]" />}
+        title="Profile Layout"
+        subtitle="How visitors see your public profile"
+      />
+      <div className="bg-[var(--color-surface)] rounded-2xl p-4">
+        <div className="flex gap-2">
+          {([
+            { id: 'profile', label: 'Profile', desc: 'Clean, editorial', enabled: true },
+            { id: 'portfolio', label: 'Portfolio', desc: 'Card-based sections', enabled: true },
+            { id: 'rich_portfolio', label: 'Rich Portfolio', desc: 'Bento grid layout', enabled: isPro },
+          ] as const).map((mode) => (
+            <button
+              key={mode.id}
+              disabled={!mode.enabled}
+              onClick={() => setProfileViewMode(mode.id)}
+              className={`flex-1 rounded-xl border p-3 text-center transition-all ${
+                profileViewMode === mode.id
+                  ? 'border-[var(--color-interactive)] border-2 bg-[var(--color-interactive)]/5 shadow-sm'
+                  : !mode.enabled
+                  ? 'border-[var(--color-border)] opacity-40 cursor-not-allowed'
+                  : 'border-[var(--color-border)] hover:border-[var(--color-interactive)]/40 hover:bg-[var(--color-surface-raised)] cursor-pointer'
+              }`}
+            >
+              <p className="text-sm font-semibold text-[var(--color-text-primary)]">{mode.label}</p>
+              <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">{mode.desc}</p>
+              {!mode.enabled && <p className="text-[10px] font-medium text-[var(--color-interactive)] mt-1">Pro</p>}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Save ─────────────────────────────────── */}
+      <div className="flex gap-3 pt-2">
+        <Button variant="secondary" onClick={() => router.back()} className="flex-1">Cancel</Button>
+        <Button
+          onClick={handleSave}
+          loading={saving}
+          disabled={handleStatus === 'taken' || handleStatus === 'invalid' || handleStatus === 'checking'}
+          className="flex-1"
+        >
+          Save
+        </Button>
+      </div>
+    </PageTransition>
   )
 }

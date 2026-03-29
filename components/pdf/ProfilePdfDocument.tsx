@@ -14,6 +14,7 @@ interface UserProfile {
   phone?: string | null
   whatsapp?: string | null
   email?: string | null
+  contact_email?: string | null
   location_country?: string | null
   location_city?: string | null
   show_phone?: boolean
@@ -557,10 +558,10 @@ export function ProfilePdfDocument({
   }
 
   const hasVisibleContact =
-    (user.show_phone && user.phone) ||
-    (user.show_whatsapp && user.whatsapp) ||
-    (user.show_email && user.email) ||
-    (user.show_location && (user.location_city || user.location_country))
+    user.phone ||
+    user.whatsapp ||
+    (user.contact_email || user.email) ||
+    (user.location_city || user.location_country)
 
   return (
     <Document>
@@ -600,16 +601,16 @@ export function ProfilePdfDocument({
         {hasVisibleContact && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Contact</Text>
-            {user.show_email && user.email && (
-              <Text style={styles.contactRow}>{user.email}</Text>
+            {(user.contact_email || user.email) && (
+              <Text style={styles.contactRow}>{user.contact_email ?? user.email}</Text>
             )}
-            {user.show_phone && user.phone && (
+            {user.phone && (
               <Text style={styles.contactRow}>{user.phone}</Text>
             )}
-            {user.show_whatsapp && user.whatsapp && (
+            {user.whatsapp && (
               <Text style={styles.contactRow}>WhatsApp: {user.whatsapp}</Text>
             )}
-            {user.show_location && (user.location_city || user.location_country) && (
+            {(user.location_city || user.location_country) && (
               <Text style={styles.contactRow}>
                 {[user.location_city, user.location_country].filter(Boolean).join(', ')}
               </Text>
@@ -718,10 +719,10 @@ function ClassicNavyPdf({ user, attachments, certifications, endorsements, educa
   const displayName = user.display_name ?? user.full_name
   const s = navyStyles
   const hasVisibleContact =
-    (user.show_phone && user.phone) ||
-    (user.show_whatsapp && user.whatsapp) ||
-    (user.show_email && user.email) ||
-    (user.show_location && (user.location_city || user.location_country))
+    user.phone ||
+    user.whatsapp ||
+    (user.contact_email || user.email) ||
+    (user.location_city || user.location_country)
 
   return (
     <Document>
@@ -760,10 +761,10 @@ function ClassicNavyPdf({ user, attachments, certifications, endorsements, educa
             <View style={s.section}>
               <Text style={s.sectionTitle}>Contact</Text>
               <View style={s.divider} />
-              {user.show_email && user.email && <Text style={s.contactRow}>{user.email}</Text>}
-              {user.show_phone && user.phone && <Text style={s.contactRow}>{user.phone}</Text>}
-              {user.show_whatsapp && user.whatsapp && <Text style={s.contactRow}>WhatsApp: {user.whatsapp}</Text>}
-              {user.show_location && (user.location_city || user.location_country) && (
+              {(user.contact_email || user.email) && <Text style={s.contactRow}>{user.contact_email ?? user.email}</Text>}
+              {user.phone && <Text style={s.contactRow}>{user.phone}</Text>}
+              {user.whatsapp && <Text style={s.contactRow}>WhatsApp: {user.whatsapp}</Text>}
+              {(user.location_city || user.location_country) && (
                 <Text style={s.contactRow}>{[user.location_city, user.location_country].filter(Boolean).join(', ')}</Text>
               )}
             </View>
@@ -853,10 +854,10 @@ function ModernMinimalPdf({ user, attachments, certifications, endorsements, edu
   const displayName = user.display_name ?? user.full_name
   const s = minimalStyles
   const hasVisibleContact =
-    (user.show_phone && user.phone) ||
-    (user.show_whatsapp && user.whatsapp) ||
-    (user.show_email && user.email) ||
-    (user.show_location && (user.location_city || user.location_country))
+    user.phone ||
+    user.whatsapp ||
+    (user.contact_email || user.email) ||
+    (user.location_city || user.location_country)
 
   return (
     <Document>
@@ -895,10 +896,10 @@ function ModernMinimalPdf({ user, attachments, certifications, endorsements, edu
           {hasVisibleContact && (
             <View style={s.section}>
               <Text style={s.sectionTitle}>Contact</Text>
-              {user.show_email && user.email && <Text style={s.contactRow}>{user.email}</Text>}
-              {user.show_phone && user.phone && <Text style={s.contactRow}>{user.phone}</Text>}
-              {user.show_whatsapp && user.whatsapp && <Text style={s.contactRow}>WhatsApp: {user.whatsapp}</Text>}
-              {user.show_location && (user.location_city || user.location_country) && (
+              {(user.contact_email || user.email) && <Text style={s.contactRow}>{user.contact_email ?? user.email}</Text>}
+              {user.phone && <Text style={s.contactRow}>{user.phone}</Text>}
+              {user.whatsapp && <Text style={s.contactRow}>WhatsApp: {user.whatsapp}</Text>}
+              {(user.location_city || user.location_country) && (
                 <Text style={s.contactRow}>{[user.location_city, user.location_country].filter(Boolean).join(', ')}</Text>
               )}
             </View>

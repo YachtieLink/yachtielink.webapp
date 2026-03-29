@@ -59,6 +59,7 @@ create table public.users (
   
   -- Identity (free layer)
   email text unique not null,
+  contact_email text, -- CV/profile contact email; falls back to email if null
   full_name text not null,
   display_name text, -- Optional preferred name
   bio text, -- Max 500 chars

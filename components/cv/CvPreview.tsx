@@ -29,9 +29,9 @@ export function CvPreview({ mode, user, attachments, certifications, endorsement
   if (user.dob && user.show_dob === true) headerParts.push(`${calculateAge(user.dob)} years old`)
 
   const contactParts: string[] = []
-  if (user.show_email && user.email) contactParts.push(user.email)
-  if (user.show_phone && user.phone) contactParts.push(user.phone)
-  if (user.show_location && (user.location_city || user.location_country)) {
+  if (user.contact_email || user.email) contactParts.push(user.contact_email ?? user.email)
+  if (user.phone) contactParts.push(user.phone)
+  if (user.location_city || user.location_country) {
     contactParts.push([user.location_city, user.location_country].filter(Boolean).join(', '))
   }
 

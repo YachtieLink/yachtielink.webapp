@@ -17,7 +17,7 @@ interface WheelACardProps {
 }
 
 const MILESTONE_CONFIG = [
-  { key: 'roleSet'  as const, label: 'Role set',                    href: '/app/more/account' },
+  { key: 'roleSet'  as const, label: 'Role set',                    href: '/app/profile/settings' },
   { key: 'hasYacht' as const, label: 'At least one yacht added',    href: '/app/profile' },
   { key: 'bioSet'   as const, label: 'Bio written',                 href: '/app/about/edit' },
   { key: 'hasCert'  as const, label: 'At least one certification',  href: '/app/certification/new' },

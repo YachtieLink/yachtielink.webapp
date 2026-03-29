@@ -12,7 +12,7 @@ export default async function CvPreviewPage() {
   const [profileRes, attRes, certRes, endRes, eduRes, skillsRes, hobbiesRes] = await Promise.all([
     supabase.from('users').select(`
       id, full_name, display_name, handle, primary_role, departments, bio, profile_photo_url,
-      phone, whatsapp, email, location_country, location_city,
+      phone, whatsapp, email, contact_email, location_country, location_city,
       show_phone, show_whatsapp, show_email, show_location,
       dob, home_country, smoke_pref, appearance_note, travel_docs, license_info, languages, show_dob
     `).eq('id', user.id).single(),
