@@ -236,7 +236,7 @@ export function PortfolioLayout({
                   </p>
                   <div className="flex items-center gap-2 mt-2">
                     {end.endorser?.profile_photo_url ? (
-                      <img src={end.endorser.profile_photo_url} alt={endorserName} className="w-6 h-6 rounded-full object-cover" />
+                      <img src={end.endorser.profile_photo_url} alt={endorserName} className="w-6 h-6 rounded-full object-cover object-top" />
                     ) : (
                       <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">
                         {endorserName.charAt(0)}

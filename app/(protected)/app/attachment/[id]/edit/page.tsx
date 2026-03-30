@@ -6,7 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { Button, Input, DatePicker, Select } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { TransferSheet } from '@/components/attachment/TransferSheet'
@@ -141,15 +141,12 @@ export default function AttachmentEditPage() {
                 <p className="text-sm text-[var(--color-text-secondary)]">Attachment not found.</p>
               </div>
             ) : (
-              <div className="min-h-screen bg-[var(--color-surface)] pt-8 pb-24">
-                <div className="mb-6">
-                  <BackButton href="/app/profile" />
-                </div>
-
-                <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)] mb-1">Edit attachment</h1>
-                <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-                  {attachment.yachts?.name ?? 'Yacht'}
-                </p>
+              <div className="min-h-screen bg-[var(--color-surface)] pb-24">
+                <PageHeader
+                  backHref="/app/profile"
+                  title="Edit attachment"
+                  subtitle={attachment.yachts?.name ?? 'Yacht'}
+                />
 
                 <div className="flex flex-col gap-4">
                   <div>

@@ -31,5 +31,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Could not generate download link' }, { status: 500 })
   }
 
+  // Track download event (fire and forget — never block the user action)
+  void serviceClient.rpc('record_profile_event', {
+    p_user_id: user.id,
+    p_event_type: 'pdf_download',
+  })
+
   return NextResponse.json({ url: signedUrl.signedUrl })
 }

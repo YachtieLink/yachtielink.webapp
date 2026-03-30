@@ -9,6 +9,7 @@ import { staggerContainer, fadeUp, cardHover, popIn } from '@/lib/motion'
 import { RequestActions } from './RequestActions'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Button } from '@/components/ui/Button'
+import { EndorsementBanner } from '@/components/endorsement/EndorsementBanner'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -50,6 +51,8 @@ interface RequestSent {
   token: string
   recipient_email: string | null
   recipient_phone: string | null
+  recipient_user_id: string | null
+  recipient: { display_name: string | null; full_name: string | null } | null
   status: string
   expires_at: string
   cancelled_at: string | null
@@ -91,8 +94,8 @@ interface AudienceTabsProps {
   requestsSent: RequestSent[]
   colleagues: ColleagueEntry[]
   mostRecentYachtId: string | null
-  savedCount: number
   userYachts: UserYacht[]
+  mostRecentEndorsementDate: string | null
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -128,47 +131,23 @@ export function AudienceTabs({
   requestsSent,
   colleagues,
   mostRecentYachtId,
-  savedCount,
   userYachts,
+  mostRecentEndorsementDate,
 }: AudienceTabsProps) {
-  const [activeTab, setActiveTab] = useState<'endorsements' | 'colleagues' | 'yachts' | 'saved'>('endorsements')
-
-  const endorsementCount = Math.min(endorsementsReceived.length, 5)
-  const progressPct = (endorsementCount / 5) * 100
+  const [activeTab, setActiveTab] = useState<'endorsements' | 'colleagues' | 'yachts'>('endorsements')
 
   return (
     <div className="min-h-screen bg-[var(--color-navy-50)] -mx-4 px-4 md:-mx-6 md:px-6 pt-8 pb-24">
 
-      {/* Request endorsements CTA */}
-      <Link
-        href="/app/endorsement/request"
-        className="block w-full bg-[var(--color-interactive)] rounded-2xl p-4 mb-6 hover:bg-[var(--color-interactive-hover)] transition-colors"
-      >
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-semibold text-white">Request endorsements</p>
-          <svg className="h-5 w-5 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-          </svg>
-        </div>
-        <p className="text-xs text-white/70">
-          Ask colleagues to endorse your work via email, WhatsApp, or a shareable link.
-        </p>
-        {endorsementCount < 5 && (
-          <div className="mt-3">
-            <div className="w-full h-1.5 rounded-full bg-white/20 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-white/70 transition-all"
-                style={{ width: `${progressPct}%` }}
-              />
-            </div>
-            <p className="text-xs text-white/60 mt-1">{endorsementCount}/5 endorsements</p>
-          </div>
-        )}
-      </Link>
+      {/* Endorsement engagement banner */}
+      <EndorsementBanner
+        endorsementCount={endorsementsReceived.length}
+        mostRecentEndorsementDate={mostRecentEndorsementDate}
+      />
 
       {/* Segment control */}
       <div className="flex bg-[var(--color-surface-raised)] rounded-xl p-1 mb-6">
-        {(['endorsements', 'colleagues', 'yachts', 'saved'] as const).map((tab) => (
+        {(['endorsements', 'colleagues', 'yachts'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -181,12 +160,10 @@ export function AudienceTabs({
             {(() => {
               const count = tab === 'endorsements' ? endorsementsReceived.length
                 : tab === 'colleagues' ? colleagues.length
-                : tab === 'yachts' ? userYachts.length
-                : savedCount
+                : userYachts.length
               const label = tab === 'endorsements' ? 'Endorsements'
                 : tab === 'colleagues' ? 'Colleagues'
-                : tab === 'yachts' ? 'Yachts'
-                : 'Saved'
+                : 'Yachts'
               return (
                 <span className="flex items-center justify-center gap-1.5">
                   {label}
@@ -211,10 +188,8 @@ export function AudienceTabs({
         />
       ) : activeTab === 'colleagues' ? (
         <ColleaguesTab colleagues={colleagues} />
-      ) : activeTab === 'yachts' ? (
-        <YachtsTab userYachts={userYachts} />
       ) : (
-        <SavedTab />
+        <YachtsTab userYachts={userYachts} />
       )}
     </div>
   )
@@ -256,7 +231,7 @@ function ReceivedRequestCard({ req }: { req: RequestReceived }) {
               alt={name}
               width={36}
               height={36}
-              className="object-cover w-full h-full"
+              className="object-cover object-top w-full h-full"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-sm font-semibold text-[var(--color-text-secondary)]">
@@ -338,7 +313,7 @@ function EndorsementsTab({
                 year: 'numeric',
               })
               return (
-                <motion.div key={e.id} variants={fadeUp} {...cardHover} className="card-soft rounded-2xl p-4 border-l-2 border-[var(--color-interactive)]">
+                <motion.div key={e.id} variants={fadeUp} {...cardHover} className="card-soft rounded-2xl p-4">
                   <p className="text-sm text-[var(--color-text-primary)] leading-relaxed mb-2">
                     &ldquo;{excerpt(e.content)}&rdquo;
                   </p>
@@ -369,7 +344,7 @@ function EndorsementsTab({
           </h2>
           <div className="flex flex-col gap-3">
             {requestsSent.map((req) => {
-              const recipient = req.recipient_email ?? req.recipient_phone ?? 'Unknown'
+              const recipient = req.recipient?.display_name ?? req.recipient?.full_name ?? req.recipient_email ?? req.recipient_phone ?? 'Pending'
               return (
                 <div key={req.id} className="card-soft rounded-2xl p-4">
                   <div className="flex items-start justify-between gap-3">
@@ -429,12 +404,8 @@ function YachtsTab({ userYachts }: { userYachts: UserYacht[] }) {
       const { data, error } = await supabase.rpc('search_yachts', { p_query: q, p_limit: 6 })
       if (seq !== searchSeqRef.current) return
       if (error) { setSearchError(true); setSearching(false); return }
-      const results = (data as Array<{ id: string; name: string; yacht_type: string | null; length_meters: number | null; flag_state: string | null }>) ?? []
-      if (results.length > 0) {
-        const crewCounts = await Promise.all(results.map(r => supabase.rpc('yacht_crew_count', { yacht: r.id })))
-        if (seq !== searchSeqRef.current) return
-        setSearchResults(results.map((r, i) => ({ ...r, crew_count: (crewCounts[i].data as number) ?? 0 })))
-      } else { setSearchResults([]) }
+      const results = (data as Array<{ id: string; name: string; yacht_type: string | null; length_meters: number | null; flag_state: string | null; crew_count: number }>) ?? []
+      setSearchResults(results)
     } catch { if (seq === searchSeqRef.current) setSearchError(true) }
     if (seq === searchSeqRef.current) setSearching(false)
   }
@@ -515,24 +486,6 @@ function YachtsTab({ userYachts }: { userYachts: UserYacht[] }) {
   )
 }
 
-// ─── Saved Tab ────────────────────────────────────────────────────────────────
-
-function SavedTab() {
-  return (
-    <Link
-      href="/app/network/saved"
-      className="card-soft rounded-2xl p-4 flex items-center gap-3 hover:bg-[var(--color-surface-raised)] transition-colors"
-    >
-      <span className="text-2xl">🔖</span>
-      <div className="flex-1">
-        <p className="text-sm font-medium text-[var(--color-text-primary)]">Saved Profiles</p>
-        <p className="text-xs text-[var(--color-text-secondary)]">View and organise your saved profiles</p>
-      </div>
-      <span className="text-[var(--color-text-secondary)]">›</span>
-    </Link>
-  )
-}
-
 // ─── Colleagues Tab ───────────────────────────────────────────────────────────
 
 function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
@@ -568,7 +521,7 @@ function ColleaguesTab({ colleagues }: { colleagues: ColleagueEntry[] }) {
                     alt={name}
                     width={44}
                     height={44}
-                    className="object-cover w-full h-full"
+                    className="object-cover object-top w-full h-full"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-base font-semibold text-[var(--color-text-secondary)]">

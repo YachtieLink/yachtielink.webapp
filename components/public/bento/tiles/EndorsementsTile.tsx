@@ -74,7 +74,7 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
             alt={endorserName}
             width={32}
             height={32}
-            className="rounded-full object-cover"
+            className="rounded-full object-cover object-top"
           />
         ) : (
           <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-500">

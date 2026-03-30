@@ -1,8 +1,10 @@
 -- Sprint 11b: Allow endorsement recipients to update is_pinned
--- The existing RLS policy only allows endorsers (auth.uid() = endorser_id) to update.
--- Recipients need to toggle is_pinned on their own endorsements.
+-- Made idempotent for safe re-runs
 
-create policy "endorsements: recipient pin"
-  on public.endorsements for update
-  using (auth.uid() = recipient_id)
-  with check (auth.uid() = recipient_id);
+DO $$ BEGIN
+  CREATE POLICY "endorsements: recipient pin"
+    ON public.endorsements FOR UPDATE
+    USING (auth.uid() = recipient_id)
+    WITH CHECK (auth.uid() = recipient_id);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;

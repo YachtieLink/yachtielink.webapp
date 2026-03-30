@@ -17,6 +17,44 @@ Add entries to this file in reverse chronological order. Use this format:
 
 ---
 
+### 2026-03-30 — Mobile-first page layout patterns (Rally 006)
+
+**Decision:** Established comprehensive page layout patterns during the CV upload/import redesign. Key principles:
+1. **Thumb zone centering** — Action pages center content vertically with `min-h-[calc(100dvh-10rem)] justify-center` so the primary button sits in the natural thumb resting area on mobile.
+2. **Section color wayfinding** — Every page uses the color of its navigation tab section (CV=amber, Profile=teal, Network=navy, Insights=coral, More=sand) for subtle accents. Users subconsciously know where they are.
+3. **Same-page state transitions** — When a page changes state (empty→uploaded→processing), the layout evolves in place rather than jumping to a different screen. Same container, same heading position, same visual patterns.
+4. **Compact lists with expand-on-tap** — For 4+ items that need review, show compact rows (2-line per item) instead of full cards. Tap to expand inline. No modals. The user stays oriented.
+5. **Copy that sells** — Action pages lead with the pain point the user recognises, then the speed/value. "No more retyping your career" not "Upload your CV to populate your profile."
+6. **Positive framing** — Missing data is an opportunity, not a failure. "New to YachtieLink" not "We couldn't find a match."
+
+**Rejected:** Full-card layouts for yacht matching (too overwhelming at 8 yachts), modals for inline editing (loses context on mobile), neutral grey pages (no wayfinding signal).
+
+**Why:** Founder drove the session live. The CV import flow is the first impression — onboarding UX must be fast, beautiful, and immediately impressive. These patterns now apply app-wide.
+
+**Reference:** Full specification in `patterns/page-layout.md`.
+
+---
+
+### 2026-03-30 — LLM model selection for CV parsing (Rally 006)
+
+**Decision:** Use `gpt-5.4-mini` for the full CV parse (experience, certs, skills) and `gpt-5-mini` for the personal parse (name, bio, languages). Hard cap at gpt-5.4-mini — if output is wrong, fix the prompt, don't upgrade the model.
+
+**Rejected:** `gpt-4o` (5x more expensive, slower at 15.5s vs 4.4s), `gpt-5-mini` for full parse (2.5x slower at 40s, timed out on dense CVs), raw model upgrades without prompt improvement.
+
+**Why:** gpt-5.4-mini is 3.5x faster than gpt-4o at less than half the cost. Dense 8-yacht CV parsed in 13.3s. Cost per CV: ~$0.02. Prompt quality matters more than model power — documented in `docs/yl_llm_strategy.md`.
+
+---
+
+### 2026-03-30 — Yacht search prefix handling (Rally 006)
+
+**Decision:** Strip vessel type prefixes (M/Y, S/Y, MY, SY, Motor Yacht, Sailing Yacht, etc.) before trigram comparison in `search_yachts()` RPC. Use prefix as a separate type filter signal — M/Y query vs S/Y yacht gets a -0.3 penalty.
+
+**Rejected:** Including prefixes in trigram comparison (inflates similarity — "M/Y WTR" matched "M/Y Go" at 0.36 due to shared "M/Y"), stripping prefixes from stored names (destroys identity — "M/Y Excellence V" and "S/Y Excellence V" are legally different vessels).
+
+**Why:** Smart search, dumb storage. The intelligence is in the search function, not the stored data. Yacht proper names are never modified.
+
+---
+
 ### 2026-03-17 — DM Serif Display for headlines
 
 **Decision:** Added DM Serif Display as the display/headline font alongside DM Sans.

@@ -51,6 +51,8 @@ export function CvUploadClient({ userId }: CvUploadClientProps) {
       return
     }
 
+    // Clear any cached wizard state so a fresh parse runs on the new file
+    try { sessionStorage.removeItem(`cv-wizard-${result.storagePath}`) } catch { /* SSR guard */ }
     setUploaded({ name: file.name, size: file.size, path: result.storagePath })
   }, [userId, toast])
 
@@ -79,76 +81,116 @@ export function CvUploadClient({ userId }: CvUploadClientProps) {
     if (file) processFile(file)
   }
 
-  // Post-upload: two-button split
+  // Post-upload: same page layout, upload zone becomes file confirmation
   if (uploaded) {
     return (
-      <div className="p-4 flex flex-col gap-4">
-        <div className="flex items-center gap-3 bg-[var(--color-surface)] rounded-xl p-4 border border-green-200">
-          <span className="text-green-600 text-lg">✓</span>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-[var(--color-text-primary)]">CV uploaded successfully</p>
-            <p className="text-xs text-[var(--color-text-tertiary)] truncate">{uploaded.name} · {formatFileSize(uploaded.size)}</p>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Button onClick={handleBuildProfile} className="w-full" size="lg">
-            Build my profile from this CV
-          </Button>
-          <p className="text-xs text-[var(--color-text-tertiary)] text-center">
-            We&apos;ll read your CV and walk you through it section by section.
+      <div className="p-4 flex flex-col gap-5 min-h-[calc(100dvh-10rem)] justify-center">
+        {/* Same header — updated copy */}
+        <div>
+          <h1 className="text-xl font-serif font-semibold text-[var(--color-text-primary)]">
+            CV ready
+          </h1>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1.5 leading-relaxed">
+            We&apos;ve got your CV. Now let us read it and build your profile — yachts, certifications, skills, everything extracted in under 30 seconds.
           </p>
         </div>
 
-        <button
-          onClick={handleJustUpload}
-          disabled={justUploading}
-          className="text-sm text-[var(--color-interactive)] hover:underline text-center"
-        >
-          {justUploading ? 'Saving...' : "Just upload, don't change my profile"}
-        </button>
+        {/* File confirmation — replaces the upload zone, amber-tinted to match CV section */}
+        <div className="flex items-center gap-3 rounded-2xl p-4 border-2 border-dashed border-[var(--color-amber-300)] bg-[var(--color-amber-50)]/40">
+          <div className="h-8 w-8 rounded-full bg-[var(--color-amber-100)] flex items-center justify-center flex-shrink-0">
+            <svg className="h-4 w-4 text-[var(--color-amber-700)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{uploaded.name}</p>
+            <p className="text-xs text-[var(--color-text-tertiary)]">{formatFileSize(uploaded.size)}</p>
+          </div>
+          <button
+            onClick={() => setUploaded(null)}
+            className="text-xs text-[var(--color-interactive)] hover:opacity-80 transition-opacity flex-shrink-0"
+          >
+            Change
+          </button>
+        </div>
 
-        <p className="mt-4 text-xs text-[var(--color-text-tertiary)] text-center">
-          Prefer to enter your details manually?{' '}
-          <a href="/app/profile" className="text-[var(--color-interactive)] hover:text-[var(--color-interactive-hover)]">
-            Edit profile
+        {/* Primary CTA */}
+        <Button onClick={handleBuildProfile} className="w-full" size="lg">
+          Build my profile from this CV
+        </Button>
+
+        {/* Same "What we do" section — now acts as reassurance + alternatives */}
+        <div className="flex flex-col gap-3">
+          <p className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Other options</p>
+          <button
+            onClick={handleJustUpload}
+            disabled={justUploading}
+            className="flex items-start gap-3 text-left"
+          >
+            <div className="h-5 w-5 rounded-full bg-[var(--color-surface-raised)] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg className="h-3 w-3 text-[var(--color-text-tertiary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+              </svg>
+            </div>
+            <p className="text-xs text-[var(--color-text-secondary)]">
+              <span className="font-medium text-[var(--color-text-primary)]">{justUploading ? 'Saving…' : 'Just store this CV.'}</span>{' '}
+              Save it to your profile without importing — useful if your profile is already set up.
+            </p>
+          </button>
+          <a href="/app/profile" className="flex items-start gap-3">
+            <div className="h-5 w-5 rounded-full bg-[var(--color-surface-raised)] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg className="h-3 w-3 text-[var(--color-text-tertiary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+              </svg>
+            </div>
+            <p className="text-xs text-[var(--color-text-secondary)]">
+              <span className="font-medium text-[var(--color-text-primary)]">Enter details manually.</span>{' '}
+              Skip the import and build your profile yourself.
+            </p>
           </a>
+        </div>
+
+        {/* Privacy note */}
+        <p className="text-[11px] text-[var(--color-text-tertiary)] text-center">
+          Your CV is stored securely. You control who can see it.
         </p>
       </div>
     )
   }
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">
-        Upload CV
-      </h1>
-      <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-        Upload your CV to automatically populate your profile. We accept PDF and DOCX files up to 10 MB.
-      </p>
+    <div className="p-4 flex flex-col gap-5 min-h-[calc(100dvh-10rem)] justify-center">
+      {/* Header — sell the feature */}
+      <div>
+        <h1 className="text-xl font-serif font-semibold text-[var(--color-text-primary)]">
+          Import your CV
+        </h1>
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1.5 leading-relaxed">
+          No more retyping your career into another platform. Upload your CV and your entire profile is built in under 30 seconds — yachts, roles, certifications, skills, all of it.
+        </p>
+      </div>
 
+      {/* Upload zone — amber/sand tinted to match CV section color */}
       {uploading ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-[var(--color-border)] bg-[var(--color-surface-raised)] p-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--color-text-tertiary)] border-t-[var(--color-interactive)]" />
+        <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-[var(--color-amber-200)] bg-[var(--color-amber-50)]/40 p-10">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--color-amber-200)] border-t-[var(--color-amber-500)]" />
           <p className="text-sm font-medium text-[var(--color-text-primary)]">Uploading…</p>
-          <p className="text-xs text-[var(--color-text-tertiary)]">This may take a few seconds</p>
         </div>
       ) : (
         <label
           onDragOver={(e) => { e.preventDefault(); setDragOver(true) }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}
-          className={`flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-12 cursor-pointer transition-colors ${
+          className={`flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed p-10 cursor-pointer transition-colors ${
             dragOver
-              ? 'border-[var(--color-interactive)] bg-[var(--color-surface-overlay)]'
-              : 'border-[var(--color-border)] bg-[var(--color-surface-raised)] hover:border-[var(--color-interactive-muted)]'
+              ? 'border-[var(--color-amber-500)] bg-[var(--color-amber-50)]'
+              : 'border-[var(--color-amber-200)] bg-[var(--color-amber-50)]/30 hover:bg-[var(--color-amber-50)]/60 hover:border-[var(--color-amber-300)]'
           }`}
         >
-          <svg className="h-10 w-10 text-[var(--color-text-tertiary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <svg className="h-8 w-8 text-[var(--color-amber-500)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
           </svg>
-          <p className="text-sm font-medium text-[var(--color-text-primary)]">Drag & drop your CV here</p>
-          <p className="text-xs text-[var(--color-text-tertiary)]">or tap to browse files</p>
+          <p className="text-sm font-medium text-[var(--color-text-primary)]">Tap to upload your CV</p>
           <p className="text-xs text-[var(--color-text-tertiary)]">PDF or DOCX · Max 10 MB</p>
           <input
             type="file"
@@ -159,10 +201,48 @@ export function CvUploadClient({ userId }: CvUploadClientProps) {
         </label>
       )}
 
-      <p className="mt-4 text-xs text-[var(--color-text-tertiary)] text-center">
-        Prefer to enter your details manually?{' '}
+      {/* How it works — tell the story of what happens behind the scenes */}
+      <div className="flex flex-col gap-3">
+        <p className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">What we do for you</p>
+        <div className="flex items-start gap-3">
+          <div className="h-5 w-5 rounded-full bg-[var(--color-amber-100)] flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span className="text-[10px] font-bold text-[var(--color-amber-700)]">1</span>
+          </div>
+          <p className="text-xs text-[var(--color-text-secondary)]">
+            <span className="font-medium text-[var(--color-text-primary)]">Read your career.</span>{' '}
+            We extract every yacht, role, certification, skill, and qualification — so you don&apos;t have to type it all again.
+          </p>
+        </div>
+        <div className="flex items-start gap-3">
+          <div className="h-5 w-5 rounded-full bg-[var(--color-amber-100)] flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span className="text-[10px] font-bold text-[var(--color-amber-700)]">2</span>
+          </div>
+          <p className="text-xs text-[var(--color-text-secondary)]">
+            <span className="font-medium text-[var(--color-text-primary)]">Connect your yachts.</span>{' '}
+            We match each vessel against our database. If your yacht isn&apos;t listed yet, we&apos;ll add it — and your crew mates will be able to find it too.
+          </p>
+        </div>
+        <div className="flex items-start gap-3">
+          <div className="h-5 w-5 rounded-full bg-[var(--color-amber-100)] flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span className="text-[10px] font-bold text-[var(--color-amber-700)]">3</span>
+          </div>
+          <p className="text-xs text-[var(--color-text-secondary)]">
+            <span className="font-medium text-[var(--color-text-primary)]">You stay in control.</span>{' '}
+            Review everything we found before it&apos;s saved. Edit, skip, or adjust — nothing changes without your say-so.
+          </p>
+        </div>
+      </div>
+
+      {/* Privacy note */}
+      <p className="text-[11px] text-[var(--color-text-tertiary)] text-center">
+        Your CV is stored securely. You control who can see it.
+      </p>
+
+      {/* Manual entry fallback */}
+      <p className="text-xs text-[var(--color-text-tertiary)] text-center">
+        Don&apos;t have your CV handy?{' '}
         <a href="/app/profile" className="text-[var(--color-interactive)] hover:text-[var(--color-interactive-hover)]">
-          Edit profile
+          Enter your details manually
         </a>
       </p>
     </div>

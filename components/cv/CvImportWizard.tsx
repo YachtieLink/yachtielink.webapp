@@ -322,16 +322,26 @@ export function CvImportWizard({
   // Don't show while fast parse is still in flight (it might succeed)
   if (parseError && !parsed && !parsedPersonal && !parsePersonalLoading) {
     return (
-      <div className="flex flex-col gap-4 items-center text-center py-8">
-        <p className="text-sm text-[var(--color-text-secondary)]">
-          We couldn&apos;t read your CV automatically. You can fill in your details from your profile settings, or try uploading a different file.
-        </p>
-        <div className="flex gap-3 w-full">
-          <Button variant="secondary" onClick={() => router.push('/app/profile')} className="flex-1">
-            Go to profile
-          </Button>
-          <Button onClick={() => router.push('/app/cv/upload')} className="flex-1">
+      <div className="flex flex-col gap-5 items-center text-center py-8 px-4">
+        <div className="h-12 w-12 rounded-full bg-[var(--color-amber-50)] flex items-center justify-center">
+          <svg className="h-6 w-6 text-[var(--color-amber-500)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-[var(--color-text-primary)]">
+            We&apos;re having trouble reading this CV
+          </p>
+          <p className="text-xs text-[var(--color-text-secondary)] mt-2 leading-relaxed">
+            This sometimes happens when our systems are busy. You can try again now, come back later from your CV tab, or enter your details manually in the meantime.
+          </p>
+        </div>
+        <div className="flex flex-col gap-2 w-full">
+          <Button onClick={() => router.push('/app/cv/upload')} className="w-full">
             Try again
+          </Button>
+          <Button variant="secondary" onClick={() => router.push('/app/profile')} className="w-full">
+            Enter details manually
           </Button>
         </div>
       </div>
@@ -417,6 +427,7 @@ export function CvImportWizard({
 
           {step === 2 && (!parseLoading || parseRateLimited) && (
             <StepExperience
+              userId={userId}
               yachts={parsed?.employment_yacht ?? []}
               landJobs={parsed?.employment_land ?? []}
               parseLoading={false}

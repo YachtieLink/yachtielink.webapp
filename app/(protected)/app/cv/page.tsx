@@ -28,6 +28,7 @@ export default async function CvPage() {
       <CvDetailsCard />
       <CvActions
         handle={profile.handle}
+        userId={profile.id}
         hasGeneratedPdf={!!profile.latest_pdf_path}
         hasUploadedCv={!!profile.cv_storage_path}
         cvPublic={profile.cv_public ?? true}

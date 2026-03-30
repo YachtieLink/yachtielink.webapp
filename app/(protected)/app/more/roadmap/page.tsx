@@ -1,4 +1,4 @@
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { PageTransition } from '@/components/ui/PageTransition'
 
 export const metadata = { title: 'Feature Roadmap — YachtieLink' }
@@ -105,10 +105,7 @@ export default function RoadmapPage() {
 
   return (
     <PageTransition className="flex flex-col gap-4 pb-24">
-      <BackButton href="/app/more" />
-      <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">
-        Feature Roadmap
-      </h1>
+      <PageHeader backHref="/app/more" title="Feature Roadmap" />
       <p className="text-sm text-[var(--color-text-secondary)]">
         See what we&apos;re building and what&apos;s coming next.
         Have an idea?{' '}

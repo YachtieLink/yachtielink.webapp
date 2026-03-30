@@ -59,7 +59,7 @@ export function ReservedPage({ handle, hasUser }: ReservedPageProps) {
         {/* CTAs */}
         <div className="w-full flex flex-col gap-3">
           <a
-            href="https://yachtie.link/signup?returnTo=/app/billing"
+            href="https://yachtie.link/signup?returnTo=/app/settings/plan"
             className="w-full py-3 rounded-xl bg-[var(--color-interactive)] text-white text-sm font-semibold text-center hover:bg-[var(--color-interactive-hover)] transition-colors"
           >
             Activate with Pro

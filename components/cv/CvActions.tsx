@@ -12,6 +12,8 @@ const QRCode = dynamic(() => import('react-qr-code').then(m => m.default), { ssr
 
 interface CvActionsProps {
   handle: string
+  /** Profile owner's user ID — threaded to ShareModal for analytics */
+  userId: string
   hasGeneratedPdf: boolean
   hasUploadedCv: boolean
   cvPublic: boolean
@@ -33,6 +35,7 @@ const TEMPLATES: { id: Template; label: string; sublabel: string; proOnly: boole
 
 export function CvActions({
   handle,
+  userId,
   hasGeneratedPdf: initialHasGeneratedPdf,
   hasUploadedCv,
   cvPublic: initialCvPublic,
@@ -148,6 +151,7 @@ export function CvActions({
       {showShareModal && (
         <ShareModal
           handle={handle}
+          userId={userId}
           displayName={displayName}
           primaryRole={primaryRole}
           departments={departments}
@@ -214,7 +218,7 @@ export function CvActions({
                 key={t.id}
                 onClick={() => {
                   if (locked) {
-                    router.push('/app/insights')
+                    router.push('/app/settings/plan')
                     toast('Upgrade to Pro for premium templates', 'info')
                     return
                   }
@@ -250,7 +254,7 @@ export function CvActions({
             <Button
               variant="link"
               size="sm"
-              onClick={() => router.push('/app/insights')}
+              onClick={() => router.push('/app/settings/plan')}
               className="mt-1 text-xs text-center"
             >
               Upgrade to Pro for premium templates

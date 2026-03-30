@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-03-29 (Sprint 12 QA'd, mobile audit complete, launch path defined.)
+**Last updated:** 2026-03-30 (Rally 006 build complete — 63 files, 7 agents. CV import redesign. LLM swap to gpt-5.4-mini. Uncommitted, awaiting founder approval.)
 
 ---
 
@@ -16,10 +16,10 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Sprint | Phase | Status | Focus |
 |--------|-------|--------|-------|
-| Rally 006 | — | 📋 Ready | Pre-launch bug sweep: 5 bugs, 3 analytics fixes, 6 UX fixes |
+| Rally 006 | — | 🔧 Built (uncommitted) | 63 files, 7 agents. CV import redesign, yacht matching, plan page, analytics, endorsement banner, PageHeader audit. Needs re-test + commit. |
 | Sprint 13 | 1B | 🔧 Partial (W0+1 merged) | Remaining: SEO, cookie banner, ops config, legal |
 
-**Next action:** Execute Rally 006.
+**Next action:** Re-test CV import flow, then commit + push Rally 006.
 
 ---
 
@@ -39,7 +39,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Rally 006** — Safari links, subdomain cookies, onboarding CV skip, avatar framing, yacht matching, analytics wiring, 6 UX fixes
+1. **Rally 006 commit** — code built, needs final CV import re-test then commit + push + PR
 2. **Sprint 13 completion** — SEO/sitemap fix, cookie banner text, ops config (founder), legal sign-off (founder)
 3. **Ghost Profiles sprint** — claimable accounts, viral loop (design complete, 24 decisions resolved)
 4. **Rally 007 — Launch QA** — full checklist (auth, payments, yacht graph, security, GDPR, mobile, metrics, abuse protocol)
@@ -60,10 +60,10 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Uncommitted Code
 
-None. Main is clean.
+**Rally 006** — 63 files on `docs/shipslog-sprint12-qa` branch. CV import redesign, yacht matching, plan page, analytics, endorsement banner, PageHeader audit, LLM swap to gpt-5.4-mini, 5 DB migrations pushed. Awaiting founder approval to commit + push.
 
 ---
 
 ## Comprehensive Close-Out Spec
 
-See `sprints/PHASE1-CLOSEOUT.md` for the canonical launch tracker — 66 checkboxes from here to launch. See `sprints/rallies/rally-006-prelaunch/README.md` for Rally 006 spec.
+See `sprints/PHASE1-CLOSEOUT.md` for the launch tracker. See `sprints/rallies/rally-006-prelaunch/BUILD-SPEC.md` for the approved Rally 006 build spec (18 items, full decision rationale).

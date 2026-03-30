@@ -230,6 +230,7 @@ export default async function ProfilePage() {
       <ProfileHeroCard
         displayName={displayName}
         handle={profile.handle}
+        userId={profile.id}
         primaryRole={profile.primary_role}
         departments={departments}
         profilePhotoUrl={profile.profile_photo_url}
@@ -250,15 +251,21 @@ export default async function ProfilePage() {
       )}
 
       {/* Languages */}
-      {Array.isArray(profile.languages) && (profile.languages as any[]).length > 0 && (
-        <Link href="/app/languages/edit">
-          <div className="bg-[var(--color-surface)] rounded-2xl px-4 py-3">
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              {(profile.languages as any[]).map((l: any) => l?.language ? `${l.language} (${l.proficiency})` : String(l)).join(' · ')}
-            </p>
-          </div>
+      <div className="bg-[var(--color-surface)] rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
+        {Array.isArray(profile.languages) && (profile.languages as any[]).length > 0 ? (
+          <p className="text-sm text-[var(--color-text-secondary)] flex-1">
+            {(profile.languages as any[]).map((l: any) => l?.language ? `${l.language} (${l.proficiency})` : String(l)).join(' · ')}
+          </p>
+        ) : (
+          <p className="text-sm text-[var(--color-text-tertiary)] flex-1">No languages added yet</p>
+        )}
+        <Link
+          href="/app/languages/edit"
+          className="text-xs font-medium text-[var(--color-interactive)] hover:underline shrink-0"
+        >
+          {Array.isArray(profile.languages) && (profile.languages as any[]).length > 0 ? 'Edit' : 'Add languages'}
         </Link>
-      )}
+      </div>
 
       {/* Personal Details Card */}
       <PersonalDetailsCard

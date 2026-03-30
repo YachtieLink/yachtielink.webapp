@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { useToast } from '@/components/ui/Toast'
@@ -99,10 +99,7 @@ export default function HobbiesEditPage() {
             transition={{ duration: 0.15 }}
             className="flex flex-col gap-4 pb-24"
           >
-            <div className="flex items-center gap-3">
-              <BackButton href="/app/profile" />
-              <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Hobbies</h1>
-            </div>
+            <PageHeader backHref="/app/profile" title="Hobbies" />
 
             <p className="text-sm text-[var(--color-text-secondary)]">What do you do off the water? Add up to 10 hobbies.</p>
 

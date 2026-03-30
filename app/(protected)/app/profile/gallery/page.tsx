@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { uploadGalleryItem } from '@/lib/storage/upload'
@@ -85,10 +85,7 @@ export default function WorkGalleryPage() {
 
   return (
     <div className="flex flex-col gap-4 pb-24">
-      <div className="flex items-center gap-3">
-        <BackButton href="/app/profile" />
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Work Gallery</h1>
-      </div>
+      <PageHeader backHref="/app/profile" title="Work Gallery" />
 
       <p className="text-sm text-[var(--color-text-secondary)]">Showcase your work — engine rooms, table settings, deck work, interiors. Free: up to 3 photos · Pro: up to 15.</p>
 

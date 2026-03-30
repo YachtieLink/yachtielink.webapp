@@ -22,6 +22,94 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-30 — Claude Code (Opus 4.6) — Rally 006 Build + CV Import Redesign
+
+### Done
+
+- **Rally 006 full build — 3 waves, 7 parallel agents, 63 files changed:**
+  - Wave 0: `pb-tab-bar` safe-area fix, onboarding wizard skip logic fix, avatar `object-top` default, `search_yachts()` multi-signal migration
+  - Wave 1 (4 agents): CV yacht matching UI (YachtMatchCard + StepExperience), Plan management page (`/app/settings/plan`), Analytics wiring (`profile_view`/`pdf_download`/`link_share`), Endorsement banner (3-phase engagement system)
+  - Wave 2 (3 agents): Network IA (Saved → More, 3 tabs), PageHeader component (25 inner pages refactored), Share fallback + editable fields + pro upsell links
+- **Billing stub deleted:** `/app/billing` removed, all links repointed to `/app/settings/plan`
+- **Two-phase code review (Sonnet + Opus) + YachtieLink drift review:** All passed
+- **CV import UX redesign (interactive with founder):**
+  - Upload page: mobile-first centered layout, "sell the feature" copy, amber section color wayfinding, "What we do for you" steps
+  - Success state: same-page transition (evolves, doesn't jump), file confirmation replaces upload zone
+  - Career list: compact rows (yacht name + specs + role + dates + status badge), expand-on-tap inline, sticky confirm button with counts, amber blocks confirm until resolved
+  - Error state: warm messaging ("We're having trouble reading this CV"), amber-tinted icon, clear fallback options
+- **LLM model swap:** `gpt-4o` → `gpt-5.4-mini` for both parse routes. 3.5x faster, 2.2x cheaper. `max_tokens` → `max_completion_tokens` for GPT-5 series. `docs/yl_llm_strategy.md` created.
+- **Parser prompt improvements:** Length disambiguation ("not crew count"), language ≠ skill, visa ≠ certification rules
+- **Yacht search prefix handling:** New `strip_yacht_prefix()` + `yacht_prefix_type()` Postgres functions. Bare-name comparison prevents "M/Y WTR" falsely matching "M/Y Go". Prefix mismatch (M/Y vs S/Y) applies -0.3 penalty. Green match threshold upgraded to multi-signal (name + builder/length/crew confirmation).
+- **Design system documented:** `docs/design-system/patterns/page-layout.md` — thumb zones, section color wayfinding, state transitions, compact lists, copy standards, positive framing. 3 design decisions logged.
+- **Backlog items:** `non-yachting-experience.md` upgraded to pre-launch blocker, `saved-yachts.md` already existed, camera CV capture discussed (needs backlog item)
+- **5 new migrations pushed:** `search_yachts_multi_signal`, `search_yachts_prefix_strip`, `search_yachts_bare_sim_fix` + 2 repair migrations
+
+### Context
+
+- Rally 006 code is built but **uncommitted**. Needs founder approval to commit + push.
+- CV import flow tested with real CVs (Finn Murphy 2-yacht, Krista Graham 8-yacht dense). gpt-5.4-mini handles both well (4.4s and 13.3s respectively).
+- Personal parse still uses gpt-5.4-mini (switched from gpt-5-mini which timed out on dense CVs at 15s limit).
+- The career list compact redesign is functional but needs more testing — the picker `onSelect` flow (Bug #5) was fixed but not re-verified with the new compact UI.
+- Amber threshold bumped from 0.3 to 0.45 (client-side) + prefix-aware search (DB-side) to prevent false matches.
+
+### Next
+
+1. **Re-test CV import full flow** — drop CV, verify compact career list, test expand/edit, test amber verify, test confirm-all
+2. **Tick timing on loading screen** — vary delays between progress ticks so it feels natural (discussed, not implemented)
+3. **Step 1 personal details** — add option to update phone/details from CV (founder noted this gap)
+4. **Commit + push Rally 006** — after founder approval
+5. **Sprint 13 completion** — SEO/sitemap soft-delete fix, cookie banner text (PostHog + Sentry), ops config, legal sign-off
+6. **Ghost Profiles → Launch QA → Deploy**
+
+### Flags
+
+- ⚠️ Founder: "Section color wayfinding" — pages must use their nav tab's section color for subtle accents. CV=amber, Network=navy, Profile=teal, Insights=coral. Documented in `patterns/page-layout.md` and memory.
+- ⚠️ Founder: "Don't mention AI" — CV parser copy says "we read/extract", never "our AI". Error states say "our systems are busy" not "AI is down".
+- ⚠️ Founder: "Sell the feature, don't just describe it" — action pages lead with the pain point, then the speed. "No more retyping" not "Upload to populate".
+- ⚠️ Founder: Non-yachting experience is a **pre-launch blocker** for some users. Backlog item upgraded.
+- ⚠️ Camera CV capture (photo of physical CV → OCR → parse) backlogged: `sprints/backlog/camera-cv-capture.md`
+- ⚠️ Provider fallback for OpenAI downtime discussed — graceful error state implemented, provider fallback (Gemini/Claude) backlogged.
+
+---
+
+## 2026-03-29 — Claude Code (Opus 4.6) — Rally 006 Grill-Me + Kickoff
+
+### Done
+
+- **Rally 006 grill-me (22 questions resolved):** Full design session with founder covering every item in the rally. Key decisions: yacht matching full spec (not minimal), smart search / dumb storage, endorsement engagement system with gamification tiers + staleness nudge, plan management page at `/app/settings/plan`, Network IA change (Saved → More), `PageHeader` component (merged with back button audit), editable field affordance audit.
+- **Build spec written:** `sprints/rallies/rally-006-prelaunch/BUILD-SPEC.md` — 18 items with full decision rationale.
+- **Codebase validation (sprint-start-yl):** Sonnet subagent validated every build spec item against current codebase. Key findings: no `getStartingStep()` (simpler fix), multiple roll-your-own avatars (wider scope), `search_yachts()` missing builder return (needs migration), no YachtCard/YachtPicker exists (build from scratch), Stripe fully wired (4 price IDs).
+- **P1 surfaced:** `pb-tab-bar` regression not in rally spec — added to build plan.
+- **2 backlog items created:** `saved-yachts.md` (proper spec with shared SaveButton pattern), `subdomain-route-upgrade.md`.
+- **Backlog index updated** with new items.
+- **Execution plan:** 4-wave strategy — Wave 0 foundations (Opus), Wave 1 four parallel agents, Wave 2 three parallel agents, Wave 3 integration.
+
+### Context
+
+- No code written this session — pure design and validation.
+- Rally 006 scope expanded from original 13 items to 18 (added: plan page, colleague names, pro upsell links, inner page header audit, `pb-tab-bar` fix).
+- 2 items closed without code (subdomain working, Safari links working).
+- Colleague display names (#16) may already be functional — validation showed correct `display_name ?? full_name` logic. Needs visual verification.
+- Founder will do a separate comprehensive UX run-through covering: settings preview UX, pro upsell visual consistency, visibility toggle clarity.
+
+### Next
+
+1. **Rally 006 Wave 0** — migration for `search_yachts()`, `pb-tab-bar` fix, onboarding wizard fix, avatar `object-top` + migrate roll-your-own renders
+2. **Rally 006 Waves 1-3** — parallel agent execution per build spec
+3. **Sprint 13 completion** — separate scope (SEO, sitemap, cookie banner, ops)
+4. **Ghost Profiles sprint** — after Rally 006
+5. **Launch QA → Deploy**
+
+### Flags
+
+- ⚠️ Founder correction: "Smart search, dumb storage" — never normalize stored yacht names. Prefixes (M/Y, S/Y) are identity signal, not noise.
+- ⚠️ Founder correction: "Stop inventing a new way to do the same thing for every component" — drove editable field affordance audit and PageHeader standardisation.
+- ⚠️ Founder correction: don't just think about code. Subdomain is a product feature — verify the full visit flow, SEO, analytics, copy UX, not just cookie auth.
+- ⚠️ P1 `pb-tab-bar` regression was missing from Rally 006 spec. Now added.
+- ⚠️ `PHASE1-CLOSEOUT.md` is a working launch tracker — useful for tracking checkboxes, but BUILD-SPEC.md is the source of truth for Rally 006 decisions and scope.
+
+---
+
 ## 2026-03-29 — Claude Code (Opus 4.6) — Sprint 12 QA + Mobile Audit + Launch Planning
 
 ### Done

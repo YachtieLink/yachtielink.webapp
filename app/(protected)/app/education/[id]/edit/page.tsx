@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { DatePicker } from '@/components/ui/DatePicker'
@@ -129,15 +129,12 @@ export default function EducationEditPage() {
           >
             {notFound ? (
               <>
-                <BackButton href="/app/profile" />
+                <PageHeader backHref="/app/profile" title="Edit Education" />
                 <p className="text-sm text-[var(--color-text-secondary)]">Education record not found.</p>
               </>
             ) : (
               <>
-                <div className="flex items-center gap-3">
-                  <BackButton href="/app/profile" />
-                  <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Edit Education</h1>
-                </div>
+                <PageHeader backHref="/app/profile" title="Edit Education" />
 
                 <form onSubmit={save} className="flex flex-col gap-4">
                   <Input

@@ -231,15 +231,20 @@ export async function saveConfirmedImport(
     try {
       let yachtId: string | null = null
 
-      // Search existing yacht
-      const { data: matches } = await supabase.rpc('search_yachts', {
-        p_query: yacht.yacht_name,
-        p_limit: 3,
-      })
+      // Use pre-matched yacht ID if the user confirmed it in StepExperience
+      if (yacht.matched_yacht_id) {
+        yachtId = yacht.matched_yacht_id
+      } else {
+        // Fallback: search by name (legacy path + non-wizard saves)
+        const { data: matches } = await supabase.rpc('search_yachts', {
+          p_query: yacht.yacht_name,
+          p_limit: 3,
+        })
 
-      if (matches && matches.length > 0) {
-        const best = matches[0] as { id: string; sim: number }
-        if (best.sim > 0.3) yachtId = best.id
+        if (matches && matches.length > 0) {
+          const best = matches[0] as { id: string; sim: number }
+          if (best.sim > 0.3) yachtId = best.id
+        }
       }
 
       if (!yachtId) {

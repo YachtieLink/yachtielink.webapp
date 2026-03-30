@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -153,10 +153,7 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
   if (profiles.length === 0) {
     return (
       <>
-        <div className="flex items-center gap-3">
-          <BackButton href="/app/network" />
-          <h1 className="font-semibold text-lg text-[var(--color-text-primary)]">Saved Profiles</h1>
-        </div>
+        <PageHeader backHref="/app/more" title="Saved Profiles" />
         <EmptyState
           icon="🔖"
           title="No saved profiles yet"
@@ -168,11 +165,7 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
 
   return (
     <>
-      <div className="flex items-center gap-3">
-        <BackButton href="/app/network" />
-        <h1 className="font-semibold text-lg text-[var(--color-text-primary)]">Saved Profiles</h1>
-        <span className="text-sm text-[var(--color-text-secondary)]">({profiles.length})</span>
-      </div>
+      <PageHeader backHref="/app/more" title="Saved Profiles" count={profiles.length} />
 
       {/* Folder filter pills */}
       <div className="flex gap-2 overflow-x-auto pb-1">

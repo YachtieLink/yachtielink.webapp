@@ -7,7 +7,7 @@ import { X } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PageTransition } from '@/components/ui/PageTransition'
@@ -115,10 +115,7 @@ export default function LanguagesEditPage() {
             transition={{ duration: 0.15 }}
             className="flex flex-col gap-4 pb-24"
           >
-            <div className="flex items-center gap-3">
-              <BackButton href="/app/profile" />
-              <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Languages</h1>
-            </div>
+            <PageHeader backHref="/app/profile" title="Languages" />
 
             <p className="text-sm text-[var(--color-text-secondary)]">
               Add up to 10 languages to your profile.

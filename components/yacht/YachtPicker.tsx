@@ -1,11 +1,15 @@
 'use client'
 
+import Image from 'next/image'
 import { useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { FLAG_STATES, sizeFromLength } from '@/lib/storage/yacht'
+import type { YachtSearchResult } from '@/lib/cv/types'
+
+// ── Public types ──────────────────────────────────────────────
 
 export interface YachtOption {
   id: string
@@ -13,34 +17,110 @@ export interface YachtOption {
   yacht_type: string | null
   length_meters: number | null
   flag_state: string | null
+  builder?: string | null
+  cover_photo_url?: string | null
   crew_count?: number
+  current_crew_count?: number
   is_established?: boolean
 }
 
 interface Props {
   userId: string
   onSelect: (yacht: YachtOption) => void
+  /** Pre-fill search query on mount */
+  initialQuery?: string
+  /** Pre-fill builder on create form */
+  initialBuilder?: string
+  /** Pre-fill length on create form */
+  initialLength?: number
+  /** Pre-fill yacht type on create form */
+  initialType?: 'Motor Yacht' | 'Sailing Yacht'
+  /** Pre-fill flag state on create form */
+  initialFlag?: string
+  /** Start in 'create' mode instead of 'search' */
+  initialMode?: 'search' | 'create'
 }
+
+// ── Modal wrapper ─────────────────────────────────────────────
+
+export interface YachtPickerModalProps {
+  isOpen: boolean
+  onClose: () => void
+  onSelect: (yacht: YachtOption) => void
+  userId: string
+  initialQuery?: string
+  initialBuilder?: string
+  initialLength?: number
+  initialType?: 'Motor Yacht' | 'Sailing Yacht'
+  initialFlag?: string
+  /** Start in 'create' mode instead of 'search' */
+  initialMode?: 'search' | 'create'
+}
+
+export function YachtPickerModal({
+  isOpen,
+  onClose,
+  onSelect,
+  userId,
+  initialQuery,
+  initialBuilder,
+  initialLength,
+  initialType,
+  initialFlag,
+  initialMode,
+}: YachtPickerModalProps) {
+  function handleSelect(yacht: YachtOption) {
+    onSelect(yacht)
+    onClose()
+  }
+
+  return (
+    <BottomSheet open={isOpen} onClose={onClose} title={initialMode === 'create' ? 'Add new yacht' : 'Find your yacht'}>
+      <YachtPicker
+        userId={userId}
+        onSelect={handleSelect}
+        initialQuery={initialQuery}
+        initialBuilder={initialBuilder}
+        initialLength={initialLength}
+        initialType={initialType}
+        initialFlag={initialFlag}
+        initialMode={initialMode}
+      />
+    </BottomSheet>
+  )
+}
+
+// ── Constants ─────────────────────────────────────────────────
 
 type Mode = 'search' | 'create'
 
 const DUPE_THRESHOLD = 0.45
 
-export function YachtPicker({ userId, onSelect }: Props) {
+// ── Main picker ───────────────────────────────────────────────
+
+export function YachtPicker({ userId, onSelect, initialQuery, initialBuilder, initialLength, initialType, initialFlag, initialMode }: Props) {
   const supabase = createClient()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // ── search state ──────────────────────────────────────
-  const [mode, setMode] = useState<Mode>('search')
-  const [query, setQuery] = useState('')
+  const [mode, setMode] = useState<Mode>(initialMode ?? 'search')
+  const [query, setQuery] = useState(initialQuery ?? '')
   const [results, setResults] = useState<YachtOption[]>([])
   const [searching, setSearching] = useState(false)
+  // Run initial search if a query was provided
+  const hasRunInitialSearch = useRef(false)
+  if (!hasRunInitialSearch.current && initialQuery) {
+    hasRunInitialSearch.current = true
+    // defer to avoid state-during-render
+    setTimeout(() => searchYachts(initialQuery), 0)
+  }
 
   // ── create form state ─────────────────────────────────
-  const [newName, setNewName] = useState('')
-  const [newType, setNewType] = useState<'Motor Yacht' | 'Sailing Yacht'>('Motor Yacht')
-  const [newLength, setNewLength] = useState('')
-  const [newFlag, setNewFlag] = useState('')
+  const [newName, setNewName] = useState(initialQuery ?? '')
+  const [newBuilder, setNewBuilder] = useState(initialBuilder ?? '')
+  const [newType, setNewType] = useState<'Motor Yacht' | 'Sailing Yacht'>(initialType ?? 'Motor Yacht')
+  const [newLength, setNewLength] = useState(initialLength ? String(initialLength) : '')
+  const [newFlag, setNewFlag] = useState(initialFlag ?? '')
   const [newYear, setNewYear] = useState('')
   const [saving, setSaving] = useState(false)
   const [createError, setCreateError] = useState('')
@@ -53,35 +133,37 @@ export function YachtPicker({ userId, onSelect }: Props) {
   async function searchYachts(q: string) {
     if (!q.trim()) { setResults([]); setSearching(false); return }
     setSearching(true)
+    // New RPC returns builder, cover_photo_url, crew_count, current_crew_count directly
     const { data } = await supabase.rpc('search_yachts', { p_query: q, p_limit: 8 })
-    const baseResults = (data as YachtOption[]) ?? []
+    const raw = (data as (YachtSearchResult & { is_established?: boolean })[]) ?? []
 
-    // Enrich with crew counts + established status
-    if (baseResults.length > 0) {
-      const ids = baseResults.map(r => r.id)
+    // Fetch is_established separately (not part of the search_yachts RPC)
+    if (raw.length > 0) {
+      const ids = raw.map(r => r.id)
       const { data: yachtDetails } = await supabase
         .from('yachts')
         .select('id, is_established')
         .in('id', ids)
 
-      const detailMap = new Map((yachtDetails ?? []).map(
-        (y: { id: string; is_established: boolean }) => [y.id, y]
-      ))
-
-      // Fetch crew counts in parallel
-      const crewCounts = await Promise.all(
-        baseResults.map(r => supabase.rpc('yacht_crew_count', { yacht: r.id }))
+      const detailMap = new Map(
+        (yachtDetails ?? []).map((y: { id: string; is_established: boolean }) => [y.id, y])
       )
 
-      const enriched = baseResults.map((r, i) => ({
-        ...r,
-        crew_count: (crewCounts[i].data as number) ?? 0,
+      const enriched: YachtOption[] = raw.map(r => ({
+        id: r.id,
+        name: r.name,
+        yacht_type: r.yacht_type,
+        length_meters: r.length_meters,
+        flag_state: r.flag_state,
+        builder: r.builder,
+        cover_photo_url: r.cover_photo_url,
+        crew_count: r.crew_count,
+        current_crew_count: r.current_crew_count,
         is_established: detailMap.get(r.id)?.is_established ?? false,
       }))
-
       setResults(enriched)
     } else {
-      setResults(baseResults)
+      setResults([])
     }
     setSearching(false)
   }
@@ -98,13 +180,17 @@ export function YachtPicker({ userId, onSelect }: Props) {
     setCreateError('')
 
     if (!skipDupeCheck) {
-      // Run fuzzy search against the name the user typed
       const { data } = await supabase.rpc('search_yachts', {
         p_query: newName.trim(),
         p_limit: 3,
       })
-      const candidates = ((data as (YachtOption & { sim: number })[]) ?? [])
+      const candidates = ((data as (YachtSearchResult)[]) ?? [])
         .filter((r) => r.sim >= DUPE_THRESHOLD)
+        .map((r): YachtOption => ({
+          id: r.id, name: r.name, yacht_type: r.yacht_type, length_meters: r.length_meters,
+          flag_state: r.flag_state, builder: r.builder, cover_photo_url: r.cover_photo_url,
+          crew_count: r.crew_count, current_crew_count: r.current_crew_count,
+        }))
 
       if (candidates.length > 0) {
         setDupeCandidates(candidates)
@@ -113,8 +199,6 @@ export function YachtPicker({ userId, onSelect }: Props) {
       }
     }
 
-    // Log the near-miss decision (create_new chosen, no candidates above threshold)
-    // or proceed directly if skipDupeCheck
     await doCreate()
   }
 
@@ -132,9 +216,10 @@ export function YachtPicker({ userId, onSelect }: Props) {
         ...(lengthVal ? { length_meters: lengthVal } : {}),
         ...(newFlag ? { flag_state: newFlag } : {}),
         ...(newYear ? { year_built: parseInt(newYear) } : {}),
+        ...(newBuilder.trim() ? { builder: newBuilder.trim() } : {}),
         created_by: userId,
       })
-      .select('id, name, yacht_type, length_meters, flag_state')
+      .select('id, name, yacht_type, length_meters, flag_state, builder')
       .single()
 
     setSaving(false)
@@ -147,7 +232,6 @@ export function YachtPicker({ userId, onSelect }: Props) {
 
   async function handleDupeUseExisting(candidate: YachtOption) {
     setDupeSheetOpen(false)
-    // Log near-miss: used_existing
     await supabase.from('yacht_near_miss_log').insert({
       search_term: newName.trim(),
       candidate_ids: dupeCandidates.map((c) => c.id),
@@ -160,7 +244,6 @@ export function YachtPicker({ userId, onSelect }: Props) {
 
   async function handleDupeCreateNew() {
     setDupeSheetOpen(false)
-    // Log near-miss: created_new
     await supabase.from('yacht_near_miss_log').insert({
       search_term: newName.trim(),
       candidate_ids: dupeCandidates.map((c) => c.id),
@@ -174,10 +257,15 @@ export function YachtPicker({ userId, onSelect }: Props) {
   // ── helpers ───────────────────────────────────────────
   function yachtMeta(y: YachtOption) {
     const parts = [
+      y.builder,
       y.yacht_type,
       y.length_meters ? `${y.length_meters}m` : null,
       y.flag_state,
-      y.crew_count != null && y.crew_count > 0 ? `${y.crew_count} crew` : null,
+      y.current_crew_count != null && y.current_crew_count > 0
+        ? `${y.current_crew_count} on board now`
+        : y.crew_count != null && y.crew_count > 0
+        ? `${y.crew_count} crew`
+        : null,
     ]
     return parts.filter(Boolean).join(' · ')
   }
@@ -224,25 +312,49 @@ export function YachtPicker({ userId, onSelect }: Props) {
               .
             </p>
           )}
-          {results.map((r) => (
-            <button
-              key={r.id}
-              onClick={() => onSelect(r)}
-              className="w-full text-left px-4 py-3 rounded-xl bg-[var(--color-surface-raised)] hover:bg-[var(--color-border)] transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <p className="font-medium text-sm text-[var(--color-text-primary)]">{r.name}</p>
-                {r.is_established && (
-                  <span className="text-[10px] bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-1.5 py-0.5 rounded-full font-medium">
-                    Established
-                  </span>
-                )}
-              </div>
-              {yachtMeta(r) && (
-                <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{yachtMeta(r)}</p>
-              )}
-            </button>
-          ))}
+          {results.map((r) => {
+            const meta = yachtMeta(r)
+            return (
+              <button
+                key={r.id}
+                onClick={() => onSelect(r)}
+                className="w-full text-left rounded-xl bg-[var(--color-surface-raised)] hover:bg-[var(--color-border)] active:scale-[0.99] transition-all overflow-hidden"
+              >
+                <div className="flex items-stretch gap-0">
+                  {/* Thumbnail */}
+                  {r.cover_photo_url && (
+                    <div className="relative w-16 h-16 flex-shrink-0">
+                      <Image
+                        src={r.cover_photo_url}
+                        alt={r.name}
+                        fill
+                        className="object-cover object-center"
+                        sizes="64px"
+                      />
+                    </div>
+                  )}
+                  {/* Info */}
+                  <div className="flex-1 min-w-0 px-3 py-3">
+                    <div className="flex items-center gap-2">
+                      <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">
+                        {r.name}
+                      </p>
+                      {r.is_established && (
+                        <span className="flex-shrink-0 text-[10px] bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-1.5 py-0.5 rounded-full font-medium">
+                          Established
+                        </span>
+                      )}
+                    </div>
+                    {meta && (
+                      <p className="text-xs text-[var(--color-text-secondary)] mt-0.5 truncate">
+                        {meta}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </button>
+            )
+          })}
         </div>
       ) : (
         <div className="flex flex-col gap-4">
@@ -255,6 +367,17 @@ export function YachtPicker({ userId, onSelect }: Props) {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               autoFocus
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
+              Builder
+            </label>
+            <Input
+              placeholder="e.g. Lurssen, Feadship"
+              value={newBuilder}
+              onChange={(e) => setNewBuilder(e.target.value)}
             />
           </div>
 
@@ -354,29 +477,52 @@ export function YachtPicker({ userId, onSelect }: Props) {
             <button
               key={c.id}
               onClick={() => handleDupeUseExisting(c)}
-              className="w-full text-left px-4 py-3 rounded-xl bg-[var(--color-surface-raised)] hover:bg-[var(--color-border)] transition-colors"
+              className="w-full text-left rounded-xl bg-[var(--color-surface-raised)] hover:bg-[var(--color-border)] active:scale-[0.99] transition-all overflow-hidden"
             >
-              <div className="flex items-center gap-2">
-                <p className="font-medium text-sm text-[var(--color-text-primary)]">{c.name}</p>
-                {c.is_established && (
-                  <span className="text-[10px] bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-1.5 py-0.5 rounded-full font-medium">
-                    Established
-                  </span>
+              <div className="flex items-stretch gap-0">
+                {c.cover_photo_url && (
+                  <div className="relative w-14 h-14 flex-shrink-0">
+                    <Image
+                      src={c.cover_photo_url}
+                      alt={c.name}
+                      fill
+                      className="object-cover object-center"
+                      sizes="56px"
+                    />
+                  </div>
                 )}
+                <div className="flex-1 min-w-0 px-3 py-3">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">
+                      {c.name}
+                    </p>
+                    {c.is_established && (
+                      <span className="flex-shrink-0 text-[10px] bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-1.5 py-0.5 rounded-full font-medium">
+                        Established
+                      </span>
+                    )}
+                  </div>
+                  {yachtMeta(c) && (
+                    <p className="text-xs text-[var(--color-text-secondary)] mt-0.5 truncate">
+                      {yachtMeta(c)}
+                    </p>
+                  )}
+                  <p className="text-xs text-[var(--color-interactive)] mt-1 font-medium">
+                    Use this yacht →
+                  </p>
+                </div>
               </div>
-              {yachtMeta(c) && (
-                <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">{yachtMeta(c)}</p>
-              )}
-              <p className="text-xs text-[var(--color-interactive)] mt-1 font-medium">Use this yacht →</p>
             </button>
           ))}
         </div>
-        <button
+        <Button
           onClick={handleDupeCreateNew}
-          className="w-full text-center text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] py-2 transition-colors"
+          variant="secondary"
+          size="lg"
+          className="w-full"
         >
-          No, "{newName}" is a different vessel — create new
-        </button>
+          No, &ldquo;{newName}&rdquo; is a different vessel — create new
+        </Button>
       </BottomSheet>
     </>
   )

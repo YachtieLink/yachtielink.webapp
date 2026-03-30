@@ -5,10 +5,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { PageTransition } from '@/components/ui/PageTransition'
-import { ManagePortalButton } from '@/components/insights/ManagePortalButton'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/skeleton'
+import { isProFromRecord } from '@/lib/stripe/pro-shared'
 
 function SettingsRow({
   label,
@@ -76,7 +76,6 @@ export default function MorePage() {
   const [isPro, setIsPro] = useState<boolean | null>(null)
   const [subPlan, setSubPlan] = useState<string | null>(null)
   const [subEndsAt, setSubEndsAt] = useState<string | null>(null)
-  const [hasStripeCustomer, setHasStripeCustomer] = useState(false)
 
   // Fetch subscription status
   useEffect(() => {
@@ -85,17 +84,13 @@ export default function MorePage() {
       if (!user) return
       const { data } = await supabase
         .from('users')
-        .select('subscription_status, subscription_plan, subscription_ends_at, stripe_customer_id')
+        .select('subscription_status, subscription_plan, subscription_ends_at')
         .eq('id', user.id)
         .single()
       if (!data) return
-      const active =
-        data.subscription_status === 'pro' &&
-        (!data.subscription_ends_at || new Date(data.subscription_ends_at) > new Date())
-      setIsPro(active)
+      setIsPro(isProFromRecord(data))
       setSubPlan(data.subscription_plan)
       setSubEndsAt(data.subscription_ends_at)
-      setHasStripeCustomer(!!data.stripe_customer_id)
     }
     fetchSub()
   }, [supabase])
@@ -144,6 +139,12 @@ export default function MorePage() {
         />
       </div>
 
+      {/* ── Saved ──────────────────────────────────── */}
+      <SectionHeader title="Saved" />
+      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
+        <SettingsRow href="/app/network/saved" label="Saved Profiles" sublabel="View your saved profiles" />
+      </div>
+
       {/* ── Account ────────────────────────────────── */}
       <SectionHeader title="Account" />
       <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
@@ -173,30 +174,24 @@ export default function MorePage() {
             <Skeleton className="h-4 w-1/2" />
             <Skeleton className="h-3 w-1/3" />
           </div>
-        ) : isPro ? (
-          <div className="px-5 py-4">
-            <p className="text-sm text-[var(--color-text-primary)]">
-              Current plan: <span className="font-semibold">Crew Pro · {subPlan === 'annual' ? 'Annual' : 'Monthly'}</span>
-            </p>
-            {subEndsAt && (
-              <p className="text-xs text-[var(--color-text-secondary)] mt-0.5">
-                Renews {new Date(subEndsAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-              </p>
-            )}
-            {hasStripeCustomer && (
-              <div className="mt-3">
-                <ManagePortalButton />
-              </div>
-            )}
-          </div>
         ) : (
           <Link
-            href="/app/insights"
+            href="/app/settings/plan"
             className="flex items-center justify-between px-5 py-4 hover:bg-[var(--color-surface-raised)]/30 transition-colors"
           >
             <div>
-              <p className="text-sm text-[var(--color-text-primary)]">Current plan: Free</p>
-              <p className="text-xs text-[var(--color-text-secondary)]">Upgrade to Crew Pro</p>
+              <p className="text-sm text-[var(--color-text-primary)]">
+                {isPro
+                  ? `Crew Pro · ${subPlan === 'annual' ? 'Annual' : 'Monthly'}`
+                  : 'Current plan: Free'}
+              </p>
+              <p className="text-xs text-[var(--color-text-secondary)]">
+                {isPro
+                  ? subEndsAt
+                    ? `Renews ${new Date(subEndsAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
+                    : 'Manage subscription'
+                  : 'Upgrade to Crew Pro'}
+              </p>
             </div>
             <span className="text-[var(--color-text-secondary)] text-lg">›</span>
           </Link>

@@ -1,16 +1,27 @@
 'use client'
 
 import { useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 interface ShareButtonProps {
   url: string
   name: string
+  /** Profile owner's user ID — used to record the link_share analytics event */
+  userId: string
   /** 'default' = teal pill for inline use, 'compact' = frosted glass for overlays */
   variant?: 'default' | 'compact'
 }
 
-export function ShareButton({ url, name, variant = 'default' }: ShareButtonProps) {
+export function ShareButton({ url, name, userId, variant = 'default' }: ShareButtonProps) {
   const [copied, setCopied] = useState(false)
+
+  function trackShare() {
+    const supabase = createClient()
+    void supabase.rpc('record_profile_event', {
+      p_user_id: userId,
+      p_event_type: 'link_share',
+    })
+  }
 
   async function handleShare() {
     if (navigator.share) {
@@ -20,6 +31,7 @@ export function ShareButton({ url, name, variant = 'default' }: ShareButtonProps
           text: `Check out ${name}'s profile on YachtieLink`,
           url,
         })
+        trackShare()
         return
       } catch {
         /* user cancelled */
@@ -30,6 +42,7 @@ export function ShareButton({ url, name, variant = 'default' }: ShareButtonProps
       await navigator.clipboard.writeText(url)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
+      trackShare()
     } catch {
       // ignore
     }

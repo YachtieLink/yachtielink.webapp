@@ -16,13 +16,13 @@ async function callAiWithRetry(openai: OpenAI, text: string, maxRetries = 1): Pr
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 30000)
+    const timeout = setTimeout(() => controller.abort(), 55000)
 
     try {
       const completion = await openai.chat.completions.create(
         {
-          model: 'gpt-4o-mini',
-          max_tokens: 8000,
+          model: 'gpt-5.4-mini',
+          max_completion_tokens: 8000,
           response_format: { type: 'json_object' },
           messages: [
             { role: 'system', content: CV_EXTRACTION_PROMPT },

@@ -6,12 +6,60 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 35 rules
+**Current count:** 41 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## Section Color Wayfinding
+
+**Rule:** Every page must subtly use the color of its navigation tab section for accents — upload zones, badges, step indicators, icons. CV=amber, Network=navy, Profile=teal, Insights=coral, More=sand. This creates subconscious wayfinding — users know where they are by the colour temperature.
+**Origin:** 2026-03-30 — Founder established during CV upload page redesign. "As a rule the colouring we should try use for pages is what page it belongs to in the navigation tab."
+**How to apply:** Check `lib/section-colors.ts` for the section mapping. Use `getSectionTokens()` or `getSectionClasses()`. Apply to accents, not primary buttons or text. Full spec in `docs/design-system/patterns/page-layout.md`.
+
+---
+
+## Don't Mention AI in User-Facing Copy
+
+**Rule:** Never refer to AI, machine learning, or models in user-facing copy. Say "we read", "we extract", "our systems" — not "our AI reads" or "AI-powered". Error states say "our systems are busy" not "AI is down".
+**Origin:** 2026-03-30 — Founder explicitly stated "I don't like mentioning AI if possible" during CV upload copy review.
+**How to apply:** Grep for "AI", "artificial intelligence", "machine learning", "GPT", "model" in any user-facing text. Replace with human-sounding alternatives.
+
+---
+
+## Sell the Feature, Don't Describe It
+
+**Rule:** Action pages (upload, onboarding, upgrade) must lead with the pain point the user recognises, then the speed/value. Never use generic descriptions.
+**Origin:** 2026-03-30 — Founder drove copy direction during CV upload redesign. "Really sell it, tell them what we do behind the scenes to save them the effort."
+**How to apply:** Bad: "Upload your CV to automatically populate your profile." Good: "No more retyping your career into another platform. Your entire profile built in under 30 seconds." See `docs/design-system/patterns/page-layout.md` → Copy That Sells.
+
+---
+
+## Smart Search, Dumb Storage
+
+**Rule:** Never normalize, strip, or transform stored data to make search easier. Yacht prefixes (M/Y, S/Y), numeral formats (V vs 5), and other identifiers are real signal — two yachts can share a base name but differ by prefix. Put the intelligence in the search layer, not the storage layer.
+**Origin:** 2026-03-29 — Founder rejected yacht name normalization proposal during Rally 006 grill-me. "S/Y Excellence 5 and M/Y Excellence 5 can be registered in the same flag state legally."
+**How to apply:** When building search, match fuzzy on queries without modifying stored values. Return candidates and let the user disambiguate using rich context (builder, length, photo, crew count).
+
+---
+
+## Don't Invent Per-Component Patterns
+
+**Rule:** When building UI interactions, check what pattern exists elsewhere in the app first. Use the same pattern. If no pattern exists, create one and apply it everywhere — don't build a one-off. Consistency is a baseline expectation, not a nice-to-have.
+**Origin:** 2026-03-29 — Founder: "I'm sick of inventing a new way to do the same thing for every component — make it consistent, this is basic UI/UX frontend stuff." Triggered by proposing a unique edit affordance for language chips.
+**How to apply:** Before proposing any UI interaction, audit where the same interaction exists elsewhere. Propose a shared component or pattern, not a per-component solution.
+
+---
+
+## Think Beyond Code
+
+**Rule:** When reviewing a feature, don't just think about whether the code works. Consider the full product experience: visit flow, SEO, analytics, OG sharing, copy/UX, error states, onboarding implications. A feature isn't "working" just because the code runs.
+**Origin:** 2026-03-29 — Founder pushed back when agent only asked about subdomain cookie auth. "Just because we're in Claude Code doesn't mean you only code. What else is required for that step?"
+**How to apply:** For any feature verification, enumerate all product dimensions (not just technical ones) before declaring it done.
 
 ---
 

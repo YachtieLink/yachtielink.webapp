@@ -39,6 +39,7 @@ design-system/
 │   ├── public-profile.md       The shareable page, split layout, CTAs
 │   └── endorsement.md          Trust flow, deep links, coworker verification
 ├── patterns/                Component patterns from the actual codebase
+│   ├── page-layout.md           ★ Mobile-first layout, section colors, thumb zones, state transitions, copy standards
 │   ├── cards.md                 4 card variants with code examples
 │   ├── forms.md                 Edit page layout, inputs, save buttons
 │   ├── lists.md                 Accordions, bullet lists, tags, empty states
@@ -63,6 +64,9 @@ design-system/
 | How do the shadcn/ui components map to our brand? | `style-guide.md` → shadcn/ui section |
 | Where does this page sit in the app? | `flows/app-navigation.md` |
 | What screen comes before/after this one? | `flows/{relevant-flow}.md` |
+| How should I lay out this page for mobile? | `patterns/page-layout.md` |
+| How do I use section colors for wayfinding? | `patterns/page-layout.md` → Section Color Wayfinding |
+| How should the page transition between states? | `patterns/page-layout.md` → Page Transitions |
 | What card/form/list pattern should I use? | `patterns/{relevant-pattern}.md` |
 | Has this been tried before? | `decisions/README.md` |
 | What does the app actually look like right now? | `reference/screenshots/` |

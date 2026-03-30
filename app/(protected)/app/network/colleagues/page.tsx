@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { ColleagueExplorer } from '@/components/network/ColleagueExplorer'
 
@@ -58,11 +58,8 @@ export default async function ColleaguesPage() {
 
   if (colleagueRows.length === 0) {
     return (
-      <PageTransition className="flex flex-col gap-4">
-        <BackButton href="/app/network" />
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">
-          Your Network
-        </h1>
+      <PageTransition className="flex flex-col gap-4 pb-24">
+        <PageHeader backHref="/app/network" title="Your Network" />
         <div className="text-center py-12">
           <p className="text-4xl mb-3">🤝</p>
           <p className="text-sm text-[var(--color-text-secondary)] mb-4">
@@ -175,11 +172,8 @@ export default async function ColleaguesPage() {
   const totalEndorsements = endorsements.length
 
   return (
-    <PageTransition className="flex flex-col gap-4">
-      <BackButton href="/app/network" />
-      <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">
-        Your Network
-      </h1>
+    <PageTransition className="flex flex-col gap-4 pb-24">
+      <PageHeader backHref="/app/network" title="Your Network" />
 
       <ColleagueExplorer
         yachtGroups={yachtGroups}
