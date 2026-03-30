@@ -39,6 +39,8 @@ export interface YachtMatchCardProps {
   onOpenPicker: () => void
   /** Update parsed specs inline (blue state editing) */
   onUpdateSpecs?: (name: string, builder: string | null, length: number | null) => void
+  /** Update employment details inline */
+  onUpdateEmployment?: (role: string, startDate: string | null, endDate: string | null) => void
 }
 
 // ── Helpers ───────────────────────────────────────────────────
@@ -143,6 +145,7 @@ export function YachtMatchCard(props: YachtMatchCardProps) {
     onCreateNew,
     onOpenPicker,
     onUpdateSpecs = () => {},
+    onUpdateEmployment = () => {},
   } = props
 
   const [expanded, setExpanded] = useState(false)
@@ -219,8 +222,12 @@ export function YachtMatchCard(props: YachtMatchCardProps) {
               parsedName={parsedName}
               parsedBuilder={parsedBuilder}
               parsedLength={parsedLength}
+              role={role}
+              startDate={startDate}
+              endDate={endDate}
               onRemove={onReject}
               onUpdateSpecs={onUpdateSpecs}
+              onUpdateEmployment={onUpdateEmployment}
             />
           )}
         </div>
@@ -351,24 +358,57 @@ function BlueExpanded({
   parsedName,
   parsedBuilder,
   parsedLength,
+  role: initialRole,
+  startDate: initialStart,
+  endDate: initialEnd,
   onRemove,
   onUpdateSpecs,
+  onUpdateEmployment,
 }: {
   parsedName: string
   parsedBuilder: string | null
   parsedLength: number | null
+  role: string
+  startDate: string | null
+  endDate: string | null
   onRemove: () => void
   onUpdateSpecs: (name: string, builder: string | null, length: number | null) => void
+  onUpdateEmployment: (role: string, startDate: string | null, endDate: string | null) => void
 }) {
   const [name, setName] = useState(parsedName)
   const [builder, setBuilder] = useState(parsedBuilder ?? '')
-  const [length, setLength] = useState(parsedLength ? String(parsedLength) : '')
+  const [metres, setMetres] = useState(parsedLength ? String(parsedLength) : '')
+  const [feet, setFeet] = useState(parsedLength ? String(Math.round(parsedLength / 0.3048)) : '')
+  const [yachtType, setYachtType] = useState<'Motor Yacht' | 'Sailing Yacht'>('Motor Yacht')
+  const [role, setRole] = useState(initialRole)
+  const [startDate, setStartDate] = useState(initialStart ?? '')
+  const [endDate, setEndDate] = useState(initialEnd ?? '')
 
-  function handleBlur() {
+  function handleMetresChange(val: string) {
+    setMetres(val)
+    if (val) setFeet(String(Math.round(parseFloat(val) / 0.3048)))
+    else setFeet('')
+  }
+
+  function handleFeetChange(val: string) {
+    setFeet(val)
+    if (val) setMetres(String(Math.round(parseFloat(val) * 0.3048)))
+    else setMetres('')
+  }
+
+  function handleSpecsBlur() {
     onUpdateSpecs(
       name.trim() || parsedName,
       builder.trim() || null,
-      length ? parseFloat(length) : null,
+      metres ? parseFloat(metres) : null,
+    )
+  }
+
+  function handleEmploymentBlur() {
+    onUpdateEmployment(
+      role.trim() || initialRole,
+      startDate.trim() || null,
+      endDate.trim() || null,
     )
   }
 
@@ -380,33 +420,111 @@ function BlueExpanded({
 
       {/* Editable specs inline */}
       <div className="flex flex-col gap-2">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onBlur={handleBlur}
-          className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-          placeholder="Yacht name"
-        />
-        <div className="flex gap-2">
+        {/* Type + Name on one row */}
+        <div>
+          <label className="block text-[10px] font-medium text-[var(--color-text-tertiary)] mb-1 uppercase tracking-wider">Vessel</label>
+          <div className="flex gap-2">
+            <select
+              value={yachtType}
+              onChange={(e) => setYachtType(e.target.value as typeof yachtType)}
+              className="w-20 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
+            >
+              <option value="Motor Yacht">M/Y</option>
+              <option value="Sailing Yacht">S/Y</option>
+              <option value="Research Vessel">R/V</option>
+              <option value="Fishing Vessel">F/V</option>
+              <option value="Expedition Vessel">E/V</option>
+              <option value="Support Vessel">SV</option>
+            </select>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={handleSpecsBlur}
+              className="flex-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
+              placeholder="e.g. Lady M"
+            />
+          </div>
+        </div>
+        <div className="flex gap-2 items-end">
+          <div className="flex-1">
+            <label className="block text-[10px] font-medium text-[var(--color-text-tertiary)] mb-1 uppercase tracking-wider">Builder</label>
+            <input
+              type="text"
+              value={builder}
+              onChange={(e) => setBuilder(e.target.value)}
+              onBlur={handleSpecsBlur}
+              className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
+              placeholder="e.g. Feadship"
+            />
+          </div>
+          <div className="flex gap-1.5 flex-shrink-0">
+            <div>
+              <label className="block text-[10px] font-medium text-[var(--color-text-tertiary)] mb-1 uppercase tracking-wider text-right">m</label>
+              <input
+                type="number"
+                value={metres}
+                onChange={(e) => handleMetresChange(e.target.value)}
+                onBlur={handleSpecsBlur}
+                className="w-16 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-2 text-sm text-[var(--color-text-primary)] text-right focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
+                placeholder="45"
+                min="1"
+                max="500"
+              />
+            </div>
+            <div>
+              <label className="block text-[10px] font-medium text-[var(--color-text-tertiary)] mb-1 uppercase tracking-wider text-right">ft</label>
+              <input
+                type="number"
+                value={feet}
+                onChange={(e) => handleFeetChange(e.target.value)}
+                onBlur={handleSpecsBlur}
+                className="w-16 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-2 text-sm text-[var(--color-text-primary)] text-right focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
+                placeholder="148"
+                min="1"
+                max="1640"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Employment details */}
+      <div className="flex flex-col gap-2">
+        <div>
+          <label className="block text-[10px] font-medium text-[var(--color-text-tertiary)] mb-1 uppercase tracking-wider">Role</label>
           <input
             type="text"
-            value={builder}
-            onChange={(e) => setBuilder(e.target.value)}
-            onBlur={handleBlur}
-            className="flex-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            placeholder="Builder"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            onBlur={handleEmploymentBlur}
+            className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
+            placeholder="e.g. Sole Chef"
           />
-          <input
-            type="number"
-            value={length}
-            onChange={(e) => setLength(e.target.value)}
-            onBlur={handleBlur}
-            className="w-20 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-            placeholder="Length"
-            min="1"
-            max="500"
-          />
+        </div>
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <label className="block text-[10px] font-medium text-[var(--color-text-tertiary)] mb-1 uppercase tracking-wider">Start</label>
+            <input
+              type="text"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              onBlur={handleEmploymentBlur}
+              className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
+              placeholder="YYYY-MM"
+            />
+          </div>
+          <div className="flex-1">
+            <label className="block text-[10px] font-medium text-[var(--color-text-tertiary)] mb-1 uppercase tracking-wider">End</label>
+            <input
+              type="text"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              onBlur={handleEmploymentBlur}
+              className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
+              placeholder="YYYY-MM or Present"
+            />
+          </div>
         </div>
       </div>
 

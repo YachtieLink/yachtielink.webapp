@@ -280,6 +280,14 @@ function YachtCardWrapper({
               length_meters: length,
             })
           }}
+          onUpdateEmployment={(role, startDate, endDate) => {
+            onConfirmedUpdate({
+              ...confirmed,
+              role,
+              start_date: startDate,
+              end_date: endDate,
+            })
+          }}
         />
 
       </div>
@@ -337,6 +345,9 @@ export function StepExperience({
 }: StepExperienceProps) {
   const supabase = createClient()
   const searchFiredRef = useRef(false)
+
+  // ── State ────────────────────────────────────────────────
+  const [addPickerOpen, setAddPickerOpen] = useState(false)
 
   // ── Initial card state ─────────────────────────────────
   const [cards, setCards] = useState<YachtCardState[]>(() => {
@@ -535,11 +546,11 @@ export function StepExperience({
       <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-3">
         <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Your Experience</h2>
         <p className="text-sm text-[var(--color-text-secondary)]">
-          We didn&apos;t find yacht experience on your CV — no worries! You can add yachts anytime
-          from your profile.
+          We didn&apos;t find yacht experience on this CV — that&apos;s completely fine. You might be just
+          starting out, or your experience is listed differently. You can add yachts anytime from your profile.
         </p>
         <Button onClick={() => onConfirm([])} className="w-full">
-          Next
+          Continue
         </Button>
       </div>
     )
@@ -565,24 +576,100 @@ export function StepExperience({
       ? confirmParts.join(' · ')
       : 'Confirm all'
 
-  // Career summary line
-  const mostRecentRole = cards.find((c) => c.override.status !== 'skipped')?.confirmed.role ?? ''
-  const earliestStart = cards
+  // Career summary — calculate total sea time and role category
+  const activeCards = cards.filter((c) => c.override.status !== 'skipped')
+  const roles = activeCards.map((c) => c.confirmed.role.toLowerCase())
+  const earliestStart = activeCards
     .map((c) => c.confirmed.start_date)
     .filter(Boolean)
     .sort()[0]
   const earliestYear = earliestStart ? earliestStart.split('-')[0] : null
 
+  // Calculate total months at sea
+  let totalMonths = 0
+  for (const card of activeCards) {
+    const s = card.confirmed.start_date
+    const e = card.confirmed.end_date
+    if (!s) continue
+    const startParts = s.split('-').map(Number)
+    const startM = (startParts[0] ?? 0) * 12 + (startParts[1] ?? 1)
+    let endM: number
+    if (!e || e === 'Current' || e === 'Present') {
+      const now = new Date()
+      endM = now.getFullYear() * 12 + (now.getMonth() + 1)
+    } else {
+      const endParts = e.split('-').map(Number)
+      endM = (endParts[0] ?? 0) * 12 + (endParts[1] ?? 1)
+    }
+    totalMonths += Math.max(0, endM - startM)
+  }
+  const totalYears = Math.floor(totalMonths / 12)
+  const remainingMonths = totalMonths % 12
+  const timeStr = totalYears > 0
+    ? remainingMonths > 0
+      ? `${totalYears} year${totalYears === 1 ? '' : 's'} ${remainingMonths} month${remainingMonths === 1 ? '' : 's'}`
+      : `${totalYears} year${totalYears === 1 ? '' : 's'}`
+    : `${remainingMonths} month${remainingMonths === 1 ? '' : 's'}`
+
+  // Detect role category from common keywords
+  function getRoleCategory(): string | null {
+    const allRoles = roles.join(' ')
+    if (/chef|cook|culinary|galley/i.test(allRoles)) return 'chef'
+    if (/engineer|mechanic|technical/i.test(allRoles)) return 'engineering'
+    if (/steward|stew|interior|housekeeper/i.test(allRoles)) return 'interior'
+    if (/deck|bosun|mate|officer|captain/i.test(allRoles)) return 'deck'
+    return null
+  }
+  const roleCategory = getRoleCategory()
+  const uniqueRoles = new Set(roles)
+  const roleSuffix = roleCategory
+    ? uniqueRoles.size <= 1
+      ? null // genuinely all the same role title, don't say "various"
+      : `in various ${roleCategory} roles`
+    : null
+
+  // Build summary parts for the stat cards
+  const singleYacht = activeCards.length === 1
+  const yachtCountStr = singleYacht ? activeCards[0].confirmed.yacht_name : `${activeCards.length}`
+
   return (
     <div className="flex flex-col gap-2">
-      {/* Header — career summary */}
+      {/* Header */}
       <div className="mb-1">
         <h2 className="text-lg font-serif font-semibold text-[var(--color-text-primary)]">Your Career</h2>
-        <p className="text-sm text-[var(--color-text-secondary)] mt-0.5">
-          {cards.length} yacht{cards.length === 1 ? '' : 's'}
-          {mostRecentRole ? ` · ${mostRecentRole}` : ''}
-          {earliestYear ? ` · ${earliestYear} — Present` : ''}
-        </p>
+      </div>
+
+      {/* Stat cards — label pinned top, value fills remaining space centered */}
+      <div className="flex gap-2 mb-1">
+        {/* Yachts */}
+        <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
+          <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Yachts</p>
+          <div className="flex-1 flex items-center">
+            <p className="text-lg font-bold text-[var(--color-text-primary)] leading-tight">{yachtCountStr}</p>
+          </div>
+        </div>
+        {/* Time at sea */}
+        {totalMonths > 0 && (
+          <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
+            <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Sea service</p>
+            <div className="flex-1 flex items-center">
+              <p className="text-base font-bold text-[var(--color-text-primary)] leading-snug text-center">
+                {totalYears > 0 && <>{totalYears} year{totalYears === 1 ? '' : 's'}</>}
+                {totalYears > 0 && remainingMonths > 0 && <br />}
+                {remainingMonths > 0 && <>{remainingMonths} month{remainingMonths === 1 ? '' : 's'}</>}
+              </p>
+            </div>
+          </div>
+        )}
+        {/* Since year */}
+        {earliestYear && (
+          <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
+            <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Since</p>
+            <div className="flex-1 flex items-center">
+              <p className="text-lg font-bold text-[var(--color-text-primary)] leading-tight">{earliestYear}</p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Duplicate match warning */}
@@ -609,6 +696,81 @@ export function StepExperience({
           />
         </div>
       ))}
+
+      {/* Add a yacht — for missing entries or second stints */}
+      <button
+        type="button"
+        onClick={() => setAddPickerOpen(true)}
+        className="w-full py-3 rounded-2xl border-2 border-dashed border-[var(--color-amber-200)] text-sm font-medium text-[var(--color-amber-700)] hover:bg-[var(--color-amber-50)] transition-colors"
+      >
+        + Add a yacht
+      </button>
+
+      {/* Picker for manually adding a yacht */}
+      <YachtPickerModal
+        isOpen={addPickerOpen}
+        onClose={() => setAddPickerOpen(false)}
+        onSelect={(picked) => {
+          // Add a new card for this yacht
+          const newConfirmed: ConfirmedYacht = {
+            yacht_name: picked.name,
+            yacht_type: picked.yacht_type,
+            length_meters: picked.length_meters,
+            flag_state: picked.flag_state,
+            builder: picked.builder ?? null,
+            role: '',
+            start_date: null,
+            end_date: null,
+            employment_type: null,
+            yacht_program: null,
+            description: null,
+            cruising_area: null,
+            matched_yacht_id: picked.id,
+          }
+          const newCard: YachtCardState = {
+            yacht: {
+              yacht_name: picked.name,
+              yacht_type: picked.yacht_type,
+              length_meters: picked.length_meters,
+              flag_state: picked.flag_state,
+              builder: picked.builder ?? null,
+              role: '',
+              start_date: null,
+              end_date: null,
+              employment_type: null,
+              yacht_program: null,
+              description: null,
+              cruising_area: null,
+              crew_count: null,
+              guest_count: null,
+              former_names: null,
+            } as ParsedYachtEmployment,
+            match: {
+              state: 'green' as MatchState,
+              topMatch: {
+                id: picked.id,
+                name: picked.name,
+                yacht_type: picked.yacht_type,
+                length_meters: picked.length_meters,
+                flag_state: picked.flag_state,
+                builder: picked.builder ?? null,
+                cover_photo_url: picked.cover_photo_url ?? null,
+                crew_count: picked.crew_count ?? 0,
+                current_crew_count: picked.current_crew_count ?? 0,
+                sim: 1,
+              },
+              candidates: [],
+              loading: false,
+            },
+            override: { status: 'confirmed' as CardStatus, confirmedYachtId: picked.id },
+            confirmed: newConfirmed,
+          }
+          setCards((prev) => [...prev, newCard])
+          setAddPickerOpen(false)
+        }}
+        userId={userId}
+        initialMode="search"
+      />
 
       {/* Non-yacht roles — gentle mention */}
       {landJobs.length > 0 && (

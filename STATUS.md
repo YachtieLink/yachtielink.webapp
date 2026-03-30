@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-03-30 (Rally 006 build complete — 63 files, 7 agents. CV import redesign. LLM swap to gpt-5.4-mini. Uncommitted, awaiting founder approval.)
+**Last updated:** 2026-03-30 (Rally 006 built + polished. 4 commits pushed. CV import redesign, yacht matching, plan page, analytics, design system docs. Remaining: builder autocomplete, date pickers, tick timing.)
 
 ---
 
@@ -60,7 +60,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Uncommitted Code
 
-**Rally 006** — 63 files on `docs/shipslog-sprint12-qa` branch. CV import redesign, yacht matching, plan page, analytics, endorsement banner, PageHeader audit, LLM swap to gpt-5.4-mini, 5 DB migrations pushed. Awaiting founder approval to commit + push.
+**Rally 006** — 4 commits pushed on `docs/shipslog-sprint12-qa`. CV import redesign, career list UX, yacht matching, plan page, analytics, endorsement banner, PageHeader audit, LLM swap, design system docs. Remaining polish: builder autocomplete, date pickers, progress tick timing.
 
 ---
 

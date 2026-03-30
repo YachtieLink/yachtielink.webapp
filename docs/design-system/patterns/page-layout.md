@@ -197,6 +197,90 @@ The user should never feel like they did something wrong or that the app failed.
 
 ---
 
+## Stat Summary Cards
+
+When showing a career or data summary at the top of a page, use stat cards — three equal-width cards in a row with label on top and value below:
+
+```tsx
+<div className="flex gap-2 mb-1">
+  <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
+    <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Label</p>
+    <div className="flex-1 flex items-center">
+      <p className="text-lg font-bold text-[var(--color-text-primary)] leading-tight">Value</p>
+    </div>
+  </div>
+  ...
+</div>
+```
+
+**Rules:**
+- Label pinned to top, value vertically centered in remaining space
+- If one card wraps (e.g. "3 years / 8 months"), the others auto-center their single-line values
+- Use section color for the card background tint
+- Keep values large and bold — these are the "wow" numbers
+
+**Example:** CV career summary uses YACHTS / SEA SERVICE / SINCE.
+
+---
+
+## Inline Editable Forms
+
+When the user needs to correct parsed or imported data, show editable fields **inline within the expanded row**, not in a modal or separate page.
+
+### Field Layout Rules
+
+- **Full-width fields** for text that varies in length: yacht name, role
+- **Side-by-side fields** for related pairs: builder + length, start + end date, metres + feet
+- **Dropdowns** for known quantities: vessel type (M/Y, S/Y, R/V, F/V, E/V, SV), flag state, builder (with autocomplete from DB)
+- **Dual-unit fields** for measurements: show both metres and feet side by side, editing one auto-converts the other
+- **Labels** are `text-[10px] uppercase tracking-wider` above each field — never inline placeholders as the only identifier
+
+### Vessel Type + Name Pattern
+
+For yacht names, show a dropdown for the vessel prefix alongside the name field:
+
+```
+VESSEL
+[M/Y ▾] [Lady M            ]
+```
+
+The dropdown contains: M/Y, S/Y, R/V, F/V, E/V, SV. This ensures every yacht has a proper type designation.
+
+### Metres + Feet Pattern
+
+Show both units side by side with compact labels. Right-align the numbers. Editing either auto-converts the other:
+
+```
+BUILDER           M      FT
+[Feadship    ]  [45]   [148]
+```
+
+---
+
+## "Add More" Actions
+
+When a parsed/imported list might be incomplete, add an "add" button below the list styled as a dashed-border amber zone:
+
+```tsx
+<button className="w-full py-3 rounded-2xl border-2 border-dashed border-[var(--color-amber-200)] text-sm font-medium text-[var(--color-amber-700)] hover:bg-[var(--color-amber-50)]">
+  + Add a yacht
+</button>
+```
+
+This opens a picker/search — the user can find existing items or create new ones. The new item is added to the list as another row.
+
+---
+
+## Data Collection Mindset
+
+Every user interaction is an opportunity to improve the database. When users input data (builders, yacht names, flag states), capture it cleanly:
+
+- **Builder autocomplete** — suggest existing builders from the DB, but always allow free text for new ones
+- **Yacht matching** — new yachts get added to the DB, enriching it for the next user
+- **Normalisation at display, not storage** — store exactly what the user types, normalize only in search/display layers
+
+---
+
 ## Accessibility Minimums
 
 - Tap targets: minimum 44px height on mobile
