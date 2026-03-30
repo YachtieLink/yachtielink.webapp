@@ -26,9 +26,10 @@ Yacht crew frequently have overlapping employment dates — relief work, seasona
 - Merge overlapping date ranges before summing total months
 - Union of all date ranges, not sum of individual durations
 
-### CV Import
-- Detect overlapping dates and show a gentle note: "These dates overlap — that's common for relief work. Your total sea service is calculated correctly."
-- Don't block — overlaps are normal in yachting
+### CV Import — Smart Overlap Detection
+- **Short overlap (< 4 weeks):** Normal for relief/handover. Show gentle note: "These dates overlap slightly — common during crew transitions."
+- **Long overlap (> 4 weeks):** Likely a parse error. Flag prominently: "These two yachts overlap by 3 months — check the dates are correct." Highlight both entries with an amber warning and make the date fields easy to edit.
+- Don't block either way — let the user decide. But make long overlaps very visible so parse errors get caught before import.
 
 ### Profile Display
 - Show all entries chronologically regardless of overlap
