@@ -22,6 +22,31 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-30 — Claude Code (Opus 4.6) — Rally 006 Polish + Design System Update
+
+### Done
+
+- **CV career list polish:** Stat summary cards (YACHTS / SEA SERVICE / SINCE), vessel type dropdown (M/Y, S/Y, R/V, F/V, E/V, SV), dual metres+feet fields with auto-convert, role + date editing inline, "+ Add a yacht" button, "various chef roles" detection, 1-yacht special summary
+- **Design system docs updated:** `patterns/page-layout.md` expanded with stat cards, inline editable forms, vessel type pattern, metres/feet pattern, "add more" actions, data collection mindset
+- **CLAUDE.md updated:** Added "Design & Frontend — Required Reading" section wiring agents to design docs, section colors, and key founder rules
+- **Rate limit reverted** from temp 100 back to 10 (was bumped for testing)
+- **Backlog:** cv-parse-pro-upsell.md (rate limit as Pro upsell touchpoint)
+
+### Context
+
+- Two commits pushed this session. First was the main Rally 006 build (119 files). Second is this polish pass.
+- Builder autocomplete from DB, date pickers (text + calendar), and progress tick timing still TODO.
+
+### Next
+
+1. **Builder autocomplete** — query existing builders from DB, offer suggestions
+2. **Date picker** — `type="month"` for mobile-native month/year spinner alongside text input
+3. **Progress tick timing** — vary delays between loading ticks for natural feel
+4. **Step 1 personal details** — offer to update phone/details from CV
+5. **Final QA pass** then commit + PR for merge
+
+---
+
 ## 2026-03-30 — Claude Code (Opus 4.6) — Rally 006 Build + CV Import Redesign
 
 ### Done

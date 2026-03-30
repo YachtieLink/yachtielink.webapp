@@ -24,6 +24,27 @@ BUILD → type-check → drift-check → /review → /yachtielink-review → /te
 - ALWAYS run `/shipslog` before commit (even if QA was done manually)
 - If the founder says "commit and push", run `/shipslog` first, then commit
 
+## Design & Frontend — Required Reading
+
+When building or modifying **anything the user sees**, read these before writing code:
+
+1. **`docs/design-system/patterns/page-layout.md`** — Mobile-first layout, thumb zones, section color wayfinding, state transitions, compact lists, stat cards, inline editable forms, copy standards. **This is the most important design doc.**
+2. **`docs/design-system/philosophy.md`** — The "why" behind design choices. Five principles.
+3. **`docs/design-system/style-guide.md`** — Colours, typography, components, CSS tokens.
+4. **`docs/design-system/decisions/README.md`** — Every design choice and rejection. Check before proposing something that may have been tried.
+5. **`lib/section-colors.ts`** — Section color mapping (CV=amber, Network=navy, Profile=teal, Insights=coral, More=sand).
+6. **`docs/yl_llm_strategy.md`** — LLM model choices, pricing, prompt engineering standards.
+
+**Key rules (from founder):**
+- Section color wayfinding — every page uses its nav tab's color for accents
+- Never mention AI in user-facing copy
+- Sell the feature, don't describe it — lead with the pain point, then the speed/value
+- Positive framing — missing data is an opportunity, not a failure
+- Compact lists with expand-on-tap for 4+ items
+- Same-page state transitions — pages evolve, they don't jump
+
+---
+
 ## Idea Capture — Feature Conversations
 
 When the founder talks about features, improvements, or things to build — **do not start coding**. These are ideas to capture, not tasks to execute immediately.
