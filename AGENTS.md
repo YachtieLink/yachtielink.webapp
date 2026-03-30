@@ -46,6 +46,14 @@ Most tasks need 1–3 disciplines. A new feature page might need frontend + back
 
 **Any task involving UI:** Load the design system (`docs/design-system/README.md`). Always read `philosophy.md` first, then drill into what you need: `style-guide.md` for tokens, `flows/` for where the page sits, `patterns/` for existing components, `decisions/` for rejected approaches, `inspirations.md` if making aesthetic choices. The design system README has a reading order and a quick-reference table.
 
+**★ Critical — `patterns/page-layout.md` is mandatory reading for any UI work.** It contains the mobile-first layout patterns, section color wayfinding rules, state transition patterns, compact list patterns, stat card patterns, inline editable form patterns, and copy standards. These were established with the founder during Rally 006 and are non-negotiable. Key rules:
+- Every page uses its nav tab's section color for accents (`lib/section-colors.ts`: CV=amber, Network=navy, Profile=teal, Insights=coral, More=sand)
+- Never mention AI in user-facing copy
+- Sell the feature — lead with the pain point, then the speed/value
+- Compact rows with expand-on-tap for lists of 4+ items
+- Pages evolve between states, they don't jump to different layouts
+- For LLM usage: see `docs/yl_llm_strategy.md` — prompt quality over model power, gpt-5.4-mini is the hard cap
+
 The founder can override: "also load performance" or "skip design."
 
 For historical context on completed sprints 1–7, see `docs/yl_build_plan.md`. For schema, features, or other reference material, see the Docs Reference table below.
