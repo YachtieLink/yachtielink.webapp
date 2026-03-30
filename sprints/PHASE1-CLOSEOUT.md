@@ -4,7 +4,7 @@
 
 **How to use this file:** This is the single source of truth for what's left. Work top to bottom. Check boxes as items complete. Read this at session start.
 
-**Last updated:** 2026-03-29
+**Last updated:** 2026-03-30
 
 ---
 
@@ -34,24 +34,35 @@ QA fixes       ✅ Settings IA, bug sweep, mobile fixes, stale cookies
 See `sprints/rallies/rally-006-prelaunch/README.md` for full spec.
 
 **Bugs (must fix):**
-- [ ] Safari public profile links broken — links not clickable on Safari, shared profile is dead on iPhone. *Note: subdomain links now redirect to /u/{handle} which may have resolved this — verify and close or fix.*
-- [ ] Subdomain cookie auth — cookies not shared across subdomains, Pro subdomain feature broken. *Note: subdomain links now redirect to /u/{handle} as workaround, but root cause unresolved.*
-- [ ] Onboarding skips CV upload — auth trigger sets name from email prefix, user bypasses the CV step
-- [ ] Avatar thumbnail framing — photos crop heads. Default to upper portion for portrait, center for square.
-- [ ] CV yacht matching confidence — users can't tell if yacht matches are correct during import. Needs clear signals.
+- [x] Safari public profile links broken — verified working (2026-03-30)
+- [x] Subdomain cookie auth — verified working, links redirect to /u/{handle} (2026-03-30)
+- [x] Onboarding skips CV upload — fixed Wizard skip logic (2026-03-30)
+- [x] Avatar thumbnail framing — `object-top` default applied (2026-03-30)
+- [x] CV yacht matching confidence — full redesign: compact career list, green/amber/blue states, multi-signal matching, prefix-aware search, inline editing, stat cards (2026-03-30)
 
 **Analytics wiring (must fix for Pro value):**
-- [ ] Wire `record_profile_event('pdf_download')` in PDF download routes
-- [ ] Wire `record_profile_event('link_share')` in share handlers
-- [ ] Delete stub `/app/billing` page (billing works via Settings)
+- [x] Wire `record_profile_event('pdf_download')` in PDF download routes (2026-03-30)
+- [x] Wire `record_profile_event('link_share')` in share handlers (2026-03-30)
+- [x] Delete stub `/app/billing` page — replaced with `/app/settings/plan` (2026-03-30)
 
 **UX fixes (P2 from mobile audit):**
-- [ ] Endorsement request banner not dismissable
-- [ ] Network tab bar crowded at 375px
-- [ ] "Unknown" in endorsement requests sent
-- [ ] Back button inconsistent across app + missing top margin
-- [ ] Empty share button on endorsement request page
-- [ ] Language chip not editable on profile page
+- [x] Endorsement request banner not dismissable — replaced with 3-phase EndorsementBanner (2026-03-30)
+- [x] Network tab bar crowded at 375px — moved Saved to More, 3 tabs (2026-03-30)
+- [x] "Unknown" in endorsement requests sent — shows name/email/phone (2026-03-30)
+- [x] Back button inconsistent across app — PageHeader component, 25 pages (2026-03-30)
+- [x] Empty share button on endorsement request page — visible label + clipboard fallback (2026-03-30)
+- [x] Language chip not editable on profile page — edit affordance + empty state (2026-03-30)
+
+**Additional Rally 006 deliverables (2026-03-30):**
+- [x] Plan management page at `/app/settings/plan` (free + pro states)
+- [x] LLM swap: gpt-4o → gpt-5.4-mini (3.5x faster, 2.2x cheaper)
+- [x] CV upload page redesign (mobile-first, amber section color, "sell the feature" copy)
+- [x] CV career list redesign (compact rows, expand-on-tap, stat summary cards)
+- [x] Yacht search prefix-aware comparison (5 DB migrations)
+- [x] Design system documented (`patterns/page-layout.md`, CLAUDE.md + AGENTS.md wired)
+- [ ] Builder autocomplete from DB (remaining)
+- [ ] Date pickers — text + calendar on mobile (remaining)
+- [ ] Progress tick timing — vary delays for natural feel (remaining)
 
 ---
 
