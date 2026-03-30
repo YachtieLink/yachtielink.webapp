@@ -31,3 +31,6 @@ export { IconButton } from "./IconButton";
 export { DatePicker } from "./DatePicker";
 export { SectionBadge } from "./SectionBadge";
 export { ProfileAvatar } from "./ProfileAvatar";
+
+/* Rally 006 — shared page header */
+export { PageHeader } from "./PageHeader";

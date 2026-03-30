@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button, Input, Select } from '@/components/ui'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { SearchableSelect } from '@/components/ui/SearchableSelect'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -283,11 +283,7 @@ export default function ProfileSettingsPage() {
 
   return (
     <PageTransition className="flex flex-col gap-5 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-teal-50)]">
-      {/* Header */}
-      <div className="flex items-center gap-3 pt-2">
-        <BackButton href="/app/profile" />
-        <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">Edit Profile</h1>
-      </div>
+      <PageHeader backHref="/app/profile" title="Edit Profile" />
 
       {/* ── Identity ─────────────────────────────── */}
       <SectionHeader

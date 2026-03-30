@@ -138,6 +138,23 @@ export interface ConfirmedYacht {
   yacht_program: string | null
   description: string | null
   cruising_area: string | null
+  /** ID of the matched yacht in the DB (set when user confirms a green/amber match).
+   *  If present, save-parsed-cv-data will use it directly and skip re-searching. */
+  matched_yacht_id?: string | null
+}
+
+// ── Yacht search result (from search_yachts RPC) ─────────────
+export interface YachtSearchResult {
+  id: string
+  name: string
+  yacht_type: string | null
+  length_meters: number | null
+  flag_state: string | null
+  builder: string | null
+  cover_photo_url: string | null
+  crew_count: number
+  current_crew_count: number
+  sim: number
 }
 
 export interface ConfirmedCert {

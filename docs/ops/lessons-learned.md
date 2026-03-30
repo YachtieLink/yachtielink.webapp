@@ -6,12 +6,32 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 73 lessons
+**Current count:** 75 lessons
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## GPT-5 Series Uses max_completion_tokens Not max_tokens
+
+**What happened:** Swapped CV parse routes from gpt-4o to gpt-5-mini. Parse failed with 400 error: "Unsupported parameter: 'max_tokens' is not supported with this model."
+**Root cause:** OpenAI GPT-5 series models require `max_completion_tokens` instead of `max_tokens`. This is a breaking change from GPT-4 series.
+**Fix applied:** Changed `max_tokens: 8000` → `max_completion_tokens: 8000` in both parse routes.
+**Lesson:** When swapping OpenAI models across generations (4→5), check the API parameter compatibility. Don't assume parameter names are stable.
+**Sprint:** Rally 006 | **Caught by:** Claude Code (Opus 4.6) | **Date:** 2026-03-30
+
+---
+
+## Yacht Name Prefix Inflates Trigram Similarity
+
+**What happened:** "M/Y WTR" matched "M/Y Go" at 0.36 similarity — high enough to show as an amber "Did you mean?" suggestion. These yachts have nothing in common.
+**Root cause:** PostgreSQL trigram similarity compares the full string. The shared "M/Y " prefix (4 chars) inflates the score disproportionately for short yacht names.
+**Fix applied:** Created `strip_yacht_prefix()` function to compare bare names. "WTR" vs "Go" scores ~0 instead of 0.36. Prefix used as separate type filter (M/Y vs S/Y mismatch = -0.3 penalty).
+**Lesson:** When using trigram similarity on data with common prefixes (yacht names, company names with Ltd/Inc), strip the prefix before comparison or the noise will dominate short strings.
+**Sprint:** Rally 006 | **Caught by:** Founder (live QA) | **Date:** 2026-03-30
 
 ---
 

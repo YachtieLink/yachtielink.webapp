@@ -32,6 +32,7 @@ export default async function PublicCvPage({ params }: Props) {
             <ShareButton
               url={`${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/u/${handle}/cv`}
               name={user.display_name ?? user.full_name ?? handle}
+              userId={user.id}
               variant="compact"
             />
             {(user.latest_pdf_path || user.cv_storage_path) && (
@@ -78,6 +79,7 @@ export default async function PublicCvPage({ params }: Props) {
           <ShareButton
             url={`${process.env.NEXT_PUBLIC_SITE_URL ?? ''}/u/${handle}/cv`}
             name={user.display_name ?? user.full_name ?? handle}
+            userId={user.id}
             variant="compact"
           />
           {(user.latest_pdf_path || user.cv_storage_path) && (

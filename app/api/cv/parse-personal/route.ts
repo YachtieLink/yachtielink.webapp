@@ -52,8 +52,8 @@ export async function POST(req: NextRequest) {
   try {
     const completion = await openai.chat.completions.create(
       {
-        model: 'gpt-4o-mini',
-        max_tokens: 2000,
+        model: 'gpt-5.4-mini',
+        max_completion_tokens: 2000,
         response_format: { type: 'json_object' },
         messages: [
           { role: 'system', content: CV_PERSONAL_PROMPT },

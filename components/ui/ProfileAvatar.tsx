@@ -53,7 +53,7 @@ export function ProfileAvatar({
       <img
         src={src}
         alt={name}
-        className={cn("rounded-full object-cover", sizeClass, className)}
+        className={cn("rounded-full object-cover object-top", sizeClass, className)}
       />
     );
   }

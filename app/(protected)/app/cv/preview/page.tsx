@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { CvPreview } from '@/components/cv/CvPreview'
 import { PageTransition } from '@/components/ui/PageTransition'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 export default async function CvPreviewPage() {
   const supabase = await createClient()
@@ -28,10 +28,7 @@ export default async function CvPreviewPage() {
 
   return (
     <PageTransition className="flex flex-col gap-4 pb-24">
-      <div className="flex items-center gap-3">
-        <BackButton href="/app/cv" />
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">CV Preview</h1>
-      </div>
+      <PageHeader backHref="/app/cv" title="CV Preview" />
       <CvPreview
         mode="owner"
         user={profileRes.data}

@@ -10,7 +10,7 @@ export async function GET(
 
   const { data: user } = await serviceClient
     .from('users')
-    .select('cv_public, cv_public_source, latest_pdf_path, cv_storage_path')
+    .select('id, cv_public, cv_public_source, latest_pdf_path, cv_storage_path')
     .eq('handle', handle)
     .single()
 
@@ -25,6 +25,12 @@ export async function GET(
   const bucket = user.cv_public_source === 'uploaded' ? 'cv-uploads' : 'pdf-exports'
   const { data } = await serviceClient.storage.from(bucket).createSignedUrl(path, 60)
   if (!data?.signedUrl) return NextResponse.json({ error: 'Could not generate link' }, { status: 500 })
+
+  // Track download event for profile owner (fire and forget — route is unauthenticated, use service client)
+  void serviceClient.rpc('record_profile_event', {
+    p_user_id: user.id,
+    p_event_type: 'pdf_download',
+  })
 
   return NextResponse.redirect(data.signedUrl)
 }

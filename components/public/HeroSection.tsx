@@ -137,7 +137,7 @@ export function HeroSection({
               initialFolderId={savedStatus?.folder_id}
             />
           ) : null}
-          <ShareButton url={profileUrl} name={displayName} variant="compact" />
+          <ShareButton url={profileUrl} name={displayName} userId={savedUserId} variant="compact" />
         </div>
       </div>
 
@@ -182,7 +182,7 @@ export function HeroSection({
           {isPro && (
             isLoggedIn && !viewerIsPro && !isOwnProfile ? (
               <Link
-                href="/app/billing"
+                href="/app/settings/plan"
                 className="inline-flex items-center gap-0.5 rounded-full bg-amber-400/20 backdrop-blur-sm border border-amber-400/30 px-2 py-0.5 text-[10px] font-medium text-amber-300 hover:bg-amber-400/30 transition-colors"
                 style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}
               >

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { WriteEndorsementForm } from '@/components/endorsement/WriteEndorsementForm'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/Button'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { useToast } from '@/components/ui/Toast'
 
 interface ExistingEndorsement {
@@ -63,11 +63,8 @@ export function EditEndorsementClient({
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-      <div className="flex items-center gap-3 mb-6">
-        <BackButton href="/app/network" />
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Edit endorsement</h1>
-      </div>
+    <div className="min-h-screen bg-[var(--color-surface)] px-4 pb-24">
+      <PageHeader backHref="/app/network" title="Edit endorsement" />
 
       <WriteEndorsementForm
         recipientId={recipientId}

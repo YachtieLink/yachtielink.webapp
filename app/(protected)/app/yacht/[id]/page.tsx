@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { createClient } from '@/lib/supabase/server'
 import { CrewCard } from '@/components/yacht/CrewCard'
 import { YachtEndorsements } from '@/components/yacht/YachtEndorsements'
@@ -227,26 +227,16 @@ export default async function YachtDetailPage({ params }: PageProps) {
       </div>
 
       <div className="px-4 pt-5">
-        {/* Back */}
-        <div className="mb-4">
-          <BackButton href="/app/profile" />
-        </div>
-
-        {/* Header */}
-        <div className="flex items-start justify-between mb-1">
-          <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">{yacht.name}</h1>
-          {yacht.is_established && (
-            <span className="shrink-0 ml-3 mt-1 text-xs bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-2 py-0.5 rounded-full font-medium">
+        <PageHeader
+          backHref="/app/profile"
+          title={yacht.name}
+          subtitle={metaParts.length > 0 ? metaParts.join(' · ') : undefined}
+          actions={yacht.is_established ? (
+            <span className="shrink-0 text-xs bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-2 py-0.5 rounded-full font-medium">
               Established
             </span>
-          )}
-        </div>
-
-        {metaParts.length > 0 && (
-          <p className="text-sm text-[var(--color-text-secondary)] mb-4">
-            {metaParts.join(' · ')}
-          </p>
-        )}
+          ) : undefined}
+        />
 
         {/* Stats row */}
         <dl className={useGrid

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { DatePicker } from '@/components/ui/DatePicker'
@@ -56,10 +56,7 @@ export default function EducationNewPage() {
 
   return (
     <div className="flex flex-col gap-4 pb-24">
-      <div className="flex items-center gap-3">
-        <BackButton href="/app/profile" />
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Add Education</h1>
-      </div>
+      <PageHeader backHref="/app/profile" title="Add Education" />
 
       <form onSubmit={save} className="flex flex-col gap-4">
         <Input

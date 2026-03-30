@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { uploadCertDocument } from '@/lib/storage/upload'
 import { Button, Input, DatePicker } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
+import { PageHeader } from '@/components/ui/PageHeader'
 import {
   Wrench, UtensilsCrossed, Stethoscope, Compass,
   Scale, LifeBuoy, Waves, Plus, ChevronLeft, ChevronRight,
@@ -151,10 +152,11 @@ export default function CertNewPage() {
   if (step === 'category') {
     return (
       <div className="flex flex-col gap-4 pb-24">
-        <div>
-          <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Add certification</h1>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">Choose a category to start.</p>
-        </div>
+        <PageHeader
+          backHref="/app/profile"
+          title="Add certification"
+          subtitle="Choose a category to start."
+        />
         <div className="grid grid-cols-2 gap-2">
           {categories.map((cat) => {
             const Icon = CATEGORY_ICONS[cat] ?? Compass

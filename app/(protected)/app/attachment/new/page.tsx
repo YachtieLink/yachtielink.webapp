@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { YachtPicker, type YachtOption } from '@/components/yacht/YachtPicker'
 import { Button, Input, DatePicker } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 type Step = 'yacht' | 'role' | 'dates'
 
@@ -94,14 +94,12 @@ export default function AttachmentNewPage() {
   // ── step: yacht ─────────────────────────────────────────────────
   if (step === 'yacht') {
     return (
-      <div className="min-h-screen bg-[var(--color-surface)] pt-8 pb-24">
-        <div className="mb-6">
-          <BackButton href="/app/profile" />
-        </div>
-        <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Add a yacht</h1>
-        <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-          Find the vessel in our database or add it if it&apos;s not there yet.
-        </p>
+      <div className="min-h-screen bg-[var(--color-surface)] pb-24">
+        <PageHeader
+          backHref="/app/profile"
+          title="Add a yacht"
+          subtitle="Find the vessel in our database or add it if it's not there yet."
+        />
         {userId && (
           <YachtPicker
             userId={userId}

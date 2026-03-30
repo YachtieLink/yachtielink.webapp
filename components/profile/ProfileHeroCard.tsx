@@ -8,10 +8,13 @@ import { Button, IconButton } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { countryToFlag } from '@/lib/constants/country-iso'
 import { formatSeaTime } from '@/lib/sea-time'
+import { createClient } from '@/lib/supabase/client'
 
 interface ProfileHeroCardProps {
   displayName: string
   handle: string | null
+  /** Profile owner's user ID — used to record link_share analytics events */
+  userId: string
   primaryRole: string | null
   departments: string[]
   profilePhotoUrl: string | null
@@ -24,6 +27,7 @@ interface ProfileHeroCardProps {
 export function ProfileHeroCard({
   displayName,
   handle,
+  userId,
   primaryRole,
   departments,
   profilePhotoUrl,
@@ -39,12 +43,21 @@ export function ProfileHeroCard({
   const profileUrl = handle ? `yachtie.link/u/${handle}` : null
   const proUrl = handle ? `${handle}.yachtie.link` : null
 
+  function trackShare() {
+    const supabase = createClient()
+    void supabase.rpc('record_profile_event', {
+      p_user_id: userId,
+      p_event_type: 'link_share',
+    })
+  }
+
   async function copyUrl() {
     if (!handle) return
     await navigator.clipboard.writeText(`https://yachtie.link/u/${handle}`)
     setCopied(true)
     toast('Profile link copied!', 'success')
     setTimeout(() => setCopied(false), 2000)
+    trackShare()
   }
 
   async function copyProUrl() {
@@ -61,12 +74,14 @@ export function ProfileHeroCard({
     if (navigator.share) {
       try {
         await navigator.share({ title: `${displayName} on YachtieLink`, url })
+        trackShare()
       } catch {
         // User cancelled share — ignore
       }
     } else {
       await navigator.clipboard.writeText(url)
       toast('Profile link copied!', 'success')
+      trackShare()
     }
   }
 
@@ -129,7 +144,7 @@ export function ProfileHeroCard({
           {/* Pro subdomain link */}
           {proUrl && (
             <div className="flex items-center gap-2">
-              <Link href="/app/billing" className="shrink-0 w-8 flex items-center justify-center">
+              <Link href="/app/settings/plan" className="shrink-0 w-8 flex items-center justify-center">
                 <span className="text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded bg-[var(--color-teal-100)] text-[var(--color-teal-700)] hover:bg-[var(--color-teal-200)] transition-colors cursor-pointer">
                   Pro
                 </span>
@@ -150,7 +165,7 @@ export function ProfileHeroCard({
               </button>
               {!isPro && (
                 <Link
-                  href="/app/billing"
+                  href="/app/settings/plan"
                   className="shrink-0 text-[10px] font-medium text-[var(--color-interactive)] hover:underline"
                 >
                   Upgrade

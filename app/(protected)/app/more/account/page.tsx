@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export default function AccountPage() {
@@ -32,15 +32,11 @@ export default function AccountPage() {
 
   return (
     <div className="flex flex-col gap-6 pb-24">
-      <div className="flex items-center gap-3">
-        <BackButton href="/app/more" />
-        <div>
-          <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Account</h1>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-            Login credentials and security.
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        backHref="/app/more"
+        title="Account"
+        subtitle="Login credentials and security."
+      />
 
       <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
         <div>

@@ -39,9 +39,8 @@ const MAX_CV_SIZE = 10 * 1024 * 1024;
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getStartingStep(data: WizardProps["initialData"]): number {
-  if (data.handle) return 3; // already has handle → done
-  if (data.full_name) return 2; // has name but no handle → handle step
-  return 0; // start at cv-upload
+  if (data.handle) return 3; // already has handle → done (onboarding was completed)
+  return 0; // always start at cv-upload — even if full_name is set from email prefix
 }
 
 // ─── Progress Bar ─────────────────────────────────────────────────────────────

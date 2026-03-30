@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { BackButton } from '@/components/ui/BackButton';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 
@@ -39,11 +39,8 @@ export default function DeleteAccountPage() {
   }
 
   return (
-    <div className="flex flex-col max-w-sm mx-auto px-4 py-8 pb-24">
-      <div className="flex items-center gap-3 mb-6">
-        <BackButton href="/app/more" />
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Delete Your Account</h1>
-      </div>
+    <div className="flex flex-col max-w-sm mx-auto px-4 pb-24">
+      <PageHeader backHref="/app/more" title="Delete Your Account" />
       <p className="text-sm text-[var(--color-text-secondary)] mb-6 leading-relaxed">
         This will permanently delete your account and all associated data.
       </p>

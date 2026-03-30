@@ -6,12 +6,15 @@ import dynamic from 'next/dynamic'
 import { X, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
+import { createClient } from '@/lib/supabase/client'
 
 const QRCode = dynamic(() => import('react-qr-code').then((m) => m.default), { ssr: false })
 
 interface ShareModalProps {
   handle: string
   displayName: string
+  /** Profile owner's user ID — used to record the link_share analytics event */
+  userId: string
   primaryRole?: string | null
   departments?: string[] | null
   profilePhotoUrl?: string | null
@@ -21,6 +24,7 @@ interface ShareModalProps {
 export function ShareModal({
   handle,
   displayName,
+  userId,
   primaryRole,
   departments,
   profilePhotoUrl,
@@ -29,6 +33,14 @@ export function ShareModal({
   const { toast } = useToast()
   const profileUrl = `https://yachtie.link/u/${handle}`
   const subtitle = [primaryRole, departments?.join(' · ')].filter(Boolean).join(' · ')
+
+  function trackShare() {
+    const supabase = createClient()
+    void supabase.rpc('record_profile_event', {
+      p_user_id: userId,
+      p_event_type: 'link_share',
+    })
+  }
 
   // Lock body scroll while modal is open
   useEffect(() => {
@@ -49,6 +61,7 @@ export function ShareModal({
     if (navigator.share) {
       try {
         await navigator.share({ url: profileUrl, title: `${displayName} on YachtieLink` })
+        trackShare()
         return
       } catch {
         // User cancelled or share failed — fall through to clipboard
@@ -57,6 +70,7 @@ export function ShareModal({
     try {
       await navigator.clipboard.writeText(profileUrl)
       toast('Link copied', 'success')
+      trackShare()
     } catch {
       toast('Could not copy link', 'error')
     }

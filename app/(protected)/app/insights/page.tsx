@@ -180,23 +180,14 @@ export default async function InsightsPage({ searchParams }: Props) {
           <TeaserCard title="Premium Templates"     subtitle="2 additional PDF styles (Classic Navy, Modern Minimal)" />
           <TeaserCard title="Cert Document Manager" subtitle="Expiry tracking + email reminders" />
 
-          {!profileComplete ? (
-            <div className="card-soft rounded-2xl p-4 text-center">
-              <p className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">
-                Finish setting up your profile first
+          <UpgradeCTA foundingSlotsLeft={foundingSlotsLeft} />
+
+          {!profileComplete && (
+            <div className="card-soft rounded-2xl p-3 text-center">
+              <p className="text-xs text-[var(--color-text-secondary)]">
+                Tip: <Link href="/app/profile" className="text-[var(--color-interactive)] font-medium">complete your profile</Link> ({completedCount}/5 steps) to get the most out of Pro analytics.
               </p>
-              <p className="text-xs text-[var(--color-text-secondary)] mb-4">
-                Complete your profile ({completedCount}/5 steps done) before upgrading — you&apos;ll get more out of Pro analytics with an active profile.
-              </p>
-              <Link
-                href="/app/profile"
-                className="inline-block px-5 py-2.5 rounded-xl bg-[var(--color-teal-700)] text-white text-sm font-semibold"
-              >
-                Complete profile
-              </Link>
             </div>
-          ) : (
-            <UpgradeCTA foundingSlotsLeft={foundingSlotsLeft} />
           )}
         </>
       )}

@@ -464,7 +464,7 @@ export function RichPortfolioLayout({
               <div key={end.id} className="py-4 first:pt-0 last:pb-0">
                 <div className="flex items-center gap-2.5 mb-2.5">
                   {end.endorser?.profile_photo_url ? (
-                    <img src={end.endorser.profile_photo_url} alt="" className="w-8 h-8 rounded-full object-cover" />
+                    <img src={end.endorser.profile_photo_url} alt="" className="w-8 h-8 rounded-full object-cover object-top" />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-500">
                       {endorserName.charAt(0)}

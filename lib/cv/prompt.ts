@@ -13,7 +13,7 @@ export const CV_EXTRACTION_PROMPT = `You are extracting structured data from a y
     "home_country": "string|null — nationality/home country, ISO name",
     "smoke_pref": "non_smoker|smoker|social_smoker|null",
     "appearance_note": "none|visible|non_visible|not_specified|null — tattoos/piercings",
-    "travel_docs": ["string"] — visas, seaman's books, travel documents,
+    "travel_docs": ["string"] — ONLY travel visas (B1/B2, Schengen, C1/D), seaman's books, and passports. Do NOT include maritime certifications here (STCW, ENG1, Powerboat, MCA, RYA, SRC, VHF, GMDSS, etc.) — those belong in the certifications array,
     "license_info": "string|null — driving license details"
   },
   "languages": [
@@ -93,6 +93,9 @@ Rules:
 - Only extract references that have both a name AND at least one contact method (phone or email)
 - If a language is listed without proficiency, infer from context (native for nationality language, fluent otherwise)
 - Role names should match yachting conventions (Captain, Chief Stewardess, Bosun, Deckhand, etc.)
+- length_meters is the LOA (length overall) of the VESSEL, typically written as "90m", "78m", "45m M/Y", or "295ft". It is NOT crew count, guest count, cabin count, or any other number. Superyachts are typically 24m-180m. If uncertain, use null rather than guessing. Do not confuse crew size (e.g. "27 crew") with vessel length.
+- Languages belong ONLY in the languages array, never in skills. "Spanish (conversational)", "French", "Mandarin" are languages, not skills. Skills are professional abilities like "Silver service", "Welding", "Wine pairing".
+- Visas are travel/work permits (e.g. B1/B2, Schengen, C1/D). Certifications like STCW, ENG1, Powerboat Level 2, Food Safety are NOT visas — they go in certifications only.
 - Return valid JSON only — no markdown, no code fences, no explanation`;
 
 export const CV_PERSONAL_PROMPT = `You are extracting personal details and languages from a yacht crew CV. The text below may span MULTIPLE PAGES — scan the ENTIRE document for personal details and languages, not just the first page. Return ONLY valid JSON matching this schema. Use null for missing values, empty arrays for missing lists.
@@ -110,7 +113,7 @@ export const CV_PERSONAL_PROMPT = `You are extracting personal details and langu
     "home_country": "string|null — nationality/home country, ISO name",
     "smoke_pref": "non_smoker|smoker|social_smoker|null",
     "appearance_note": "none|visible|non_visible|not_specified|null — tattoos/piercings",
-    "travel_docs": ["string"] — visas, seaman's books, travel documents,
+    "travel_docs": ["string"] — ONLY travel visas (B1/B2, Schengen, C1/D), seaman's books, and passports. Do NOT include maritime certifications here (STCW, ENG1, Powerboat, MCA, RYA, SRC, VHF, GMDSS, etc.) — those belong in the certifications array,
     "license_info": "string|null — driving license details"
   },
   "languages": [

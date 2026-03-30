@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Ship } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { formatSeaTime } from '@/lib/profile-summaries'
 
@@ -21,20 +21,19 @@ export default async function AttachmentListPage() {
   const items = attachments ?? []
 
   return (
-    <PageTransition className="flex flex-col gap-4 pb-24 pt-8">
-      <BackButton href="/app/profile" />
-
-      <div className="flex items-center justify-between">
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">
-          Experience
-        </h1>
-        <Link
-          href="/app/attachment/new"
-          className="text-sm font-medium text-[var(--color-interactive)] hover:underline"
-        >
-          + Add yacht
-        </Link>
-      </div>
+    <PageTransition className="flex flex-col gap-4 pb-24">
+      <PageHeader
+        backHref="/app/profile"
+        title="Experience"
+        actions={
+          <Link
+            href="/app/attachment/new"
+            className="text-sm font-medium text-[var(--color-interactive)] hover:underline"
+          >
+            + Add yacht
+          </Link>
+        }
+      />
 
       {items.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-12 text-center">

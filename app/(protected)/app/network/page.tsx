@@ -36,8 +36,8 @@ export default async function NetworkPage() {
     requestsReceivedRes,
     requestsSentRes,
     endorsementsGivenRes,
-    savedCountRes,
     userYachtsRes,
+    mostRecentEndorsementRes,
   ] = await Promise.all([
     supabase.rpc('get_colleagues', { p_user_id: user.id }),
     supabase
@@ -58,7 +58,7 @@ export default async function NetworkPage() {
       .order('created_at', { ascending: false }),
     supabase
       .from('endorsement_requests')
-      .select('id, token, recipient_email, recipient_phone, status, expires_at, cancelled_at, yacht:yachts!yacht_id(name)')
+      .select('id, token, recipient_email, recipient_phone, recipient_user_id, status, expires_at, cancelled_at, yacht:yachts!yacht_id(name), recipient:users!recipient_user_id(display_name, full_name)')
       .eq('requester_id', user.id)
       .order('created_at', { ascending: false }),
     supabase
@@ -66,10 +66,6 @@ export default async function NetworkPage() {
       .select('recipient_id, yacht_id')
       .eq('endorser_id', user.id)
       .is('deleted_at', null),
-    supabase
-      .from('saved_profiles')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id),
     // User's yacht attachments (for Yachts tab)
     supabase
       .from('attachments')
@@ -77,6 +73,15 @@ export default async function NetworkPage() {
       .eq('user_id', user.id)
       .is('deleted_at', null)
       .order('started_at', { ascending: false }),
+    // Most recent endorsement date (for EndorsementBanner staleness check)
+    supabase
+      .from('endorsements')
+      .select('created_at')
+      .eq('recipient_id', user.id)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
   ])
 
   const colleagueRows = (colleaguesRes.data as ColleagueRow[]) ?? []
@@ -143,6 +148,8 @@ export default async function NetworkPage() {
     token: string
     recipient_email: string | null
     recipient_phone: string | null
+    recipient_user_id: string | null
+    recipient: { display_name: string | null; full_name: string | null } | null
     status: string
     expires_at: string
     cancelled_at: string | null
@@ -153,6 +160,9 @@ export default async function NetworkPage() {
   const requestsReceived = (requestsReceivedRes.data as unknown as RequestReceived[]) ?? []
   const requestsSent = (requestsSentRes.data as unknown as RequestSent[]) ?? []
 
+  const mostRecentEndorsementDate =
+    (mostRecentEndorsementRes.data as { created_at: string } | null)?.created_at ?? null
+
   return (
     <PageTransition className="flex flex-col gap-4">
       <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">Network</h1>
@@ -162,8 +172,8 @@ export default async function NetworkPage() {
       requestsSent={requestsSent}
       colleagues={colleagues}
       mostRecentYachtId={mostRecentYachtId}
-      savedCount={savedCountRes.count ?? 0}
       userYachts={userYachts}
+      mostRecentEndorsementDate={mostRecentEndorsementDate}
     />
     </PageTransition>
   )

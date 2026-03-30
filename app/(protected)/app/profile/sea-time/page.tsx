@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { SeaTimeBreakdown } from '@/components/profile/SeaTimeBreakdown'
 import { PageTransition } from '@/components/ui/PageTransition'
 import Link from 'next/link'
@@ -28,11 +28,8 @@ export default async function SeaTimePage() {
   const totalDays = seaTimeEntries.reduce((sum, e) => sum + e.days, 0)
 
   return (
-    <PageTransition className="flex flex-col gap-4">
-      <BackButton href="/app/profile" />
-      <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">
-        Sea Time
-      </h1>
+    <PageTransition className="flex flex-col gap-4 pb-24">
+      <PageHeader backHref="/app/profile" title="Sea Time" />
 
       {seaTimeEntries.length > 0 ? (
         <SeaTimeBreakdown entries={seaTimeEntries} totalDays={totalDays} />

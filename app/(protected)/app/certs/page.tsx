@@ -51,7 +51,7 @@ export default async function CertsPage() {
             Upgrade to Pro for expiry tracking and email reminders.
           </p>
           <Link
-            href="/app/insights"
+            href="/app/settings/plan"
             className="text-xs font-semibold text-amber-800 dark:text-amber-300 underline flex-shrink-0"
           >
             Upgrade

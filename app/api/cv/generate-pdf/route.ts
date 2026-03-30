@@ -148,6 +148,12 @@ export async function POST(req: NextRequest) {
       .from('pdf-exports')
       .createSignedUrl(pdfPath, 3600)
 
+    // Track profile view event on PDF generation (fire and forget)
+    void serviceClient.rpc('record_profile_event', {
+      p_user_id: user.id,
+      p_event_type: 'profile_view',
+    })
+
     return NextResponse.json({ ok: true, url: signedUrl?.signedUrl })
   } catch (err) {
     return handleApiError(err)

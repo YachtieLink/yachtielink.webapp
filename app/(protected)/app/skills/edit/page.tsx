@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
@@ -121,10 +121,7 @@ export default function SkillsEditPage() {
             transition={{ duration: 0.15 }}
             className="flex flex-col gap-4 pb-24"
           >
-            <div className="flex items-center gap-3">
-              <BackButton href="/app/profile" />
-              <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Extra Skills</h1>
-            </div>
+            <PageHeader backHref="/app/profile" title="Extra Skills" />
 
             <p className="text-sm text-[var(--color-text-secondary)]">
               These appear on your public profile under Extra Skills. Add up to 20.

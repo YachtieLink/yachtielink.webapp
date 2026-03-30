@@ -71,3 +71,8 @@ Any context, constraints, or open questions.
 | [UX/UI Audit — Mobile](./ux-audit-mobile-2026-03-29.md) | promoted (Rally 006) | P1-P3 |
 | [Endorsement Invite Token QA](./endorsement-invite-token-qa.md) | promoted (Launch QA) | P2 |
 | [Empty Share Button](./endorsement-share-button-empty.md) | promoted (Rally 006) | P3 |
+| [Saved Yachts](./saved-yachts.md) | idea | P2 |
+| [Subdomain Route Upgrade](./subdomain-route-upgrade.md) | idea | P3 |
+| [Non-Yachting Experience](./non-yachting-experience.md) | fleshed-out | **P1 (pre-launch blocker)** |
+| [Yacht Profile Sharing](./yacht-profile-sharing.md) | idea | P2 |
+| [Camera CV Capture](./camera-cv-capture.md) | idea | P2 |

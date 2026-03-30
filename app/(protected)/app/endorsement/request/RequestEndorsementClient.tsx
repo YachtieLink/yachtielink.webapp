@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import Image from 'next/image'
 import { Button } from '@/components/ui/Button'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import { Input } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 
@@ -291,13 +291,8 @@ export function RequestEndorsementClient({
   )
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-      <div className="flex items-center gap-3 mb-6">
-        <BackButton href="/app/network" />
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">
-          Request endorsements
-        </h1>
-      </div>
+    <div className="min-h-screen bg-[var(--color-surface)] px-4 pb-24">
+      <PageHeader backHref="/app/network" title="Request endorsements" />
 
       {/* Yacht card */}
       <div className="bg-[var(--color-surface-raised)] rounded-2xl px-4 py-3 mb-6 flex items-center gap-3">
@@ -356,15 +351,17 @@ export function RequestEndorsementClient({
           </Button>
 
           <Button
-            variant="icon"
+            variant="secondary"
             onClick={nativeShare}
             disabled={!shareLink}
             aria-label="Share via..."
-            className="shrink-0 h-9 w-9 bg-[var(--color-surface-raised)] hover:bg-[var(--color-surface-overlay)]"
+            size="sm"
+            className="shrink-0 gap-1.5 bg-[var(--color-surface-raised)] hover:bg-[var(--color-surface-overlay)]"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.935-2.186 2.25 2.25 0 0 0-3.935 2.186Z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935 2.186Zm0-12.814a2.25 2.25 0 1 0 3.935-2.186 2.25 2.25 0 0 0-3.935 2.186Z" />
             </svg>
+            <span className="text-xs">Share</span>
           </Button>
         </div>
 

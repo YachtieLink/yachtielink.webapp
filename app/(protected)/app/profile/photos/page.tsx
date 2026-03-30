@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { BackButton } from '@/components/ui/BackButton'
+import { PageHeader } from '@/components/ui/PageHeader'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { uploadUserPhoto } from '@/lib/storage/upload'
@@ -256,10 +256,7 @@ export default function ProfilePhotosPage() {
 
   return (
     <div className="flex flex-col gap-4 pb-24">
-      <div className="flex items-center gap-3">
-        <BackButton href="/app/profile" />
-        <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">Photos</h1>
-      </div>
+      <PageHeader backHref="/app/profile" title="Photos" />
 
       {/* Downgrade notice — photos exist beyond free limit */}
       {!isPro && photos.length > MAX_PHOTOS_FREE && (

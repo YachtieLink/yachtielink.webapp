@@ -98,7 +98,7 @@ export function IdentityCard({
               alt={displayName}
               width={72}
               height={72}
-              className="w-18 h-18 rounded-full object-cover ring-2 ring-[var(--color-border)]"
+              className="w-18 h-18 rounded-full object-cover object-top ring-2 ring-[var(--color-border)]"
             />
           ) : (
             <div className="w-[72px] h-[72px] rounded-full bg-[var(--color-surface-raised)] flex items-center justify-center ring-2 ring-[var(--color-border)]">
