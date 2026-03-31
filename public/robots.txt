@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /app/
+Disallow: /onboarding/
+Disallow: /api/
+Disallow: /invite-only
+
+Sitemap: https://yachtie.link/sitemap.xml

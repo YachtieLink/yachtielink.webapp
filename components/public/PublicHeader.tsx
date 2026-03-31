@@ -9,7 +9,7 @@ export function PublicHeader() {
         </Link>
         <div className="flex items-center gap-3">
           <Link
-            href="/welcome"
+            href="/login"
             className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
           >
             Log in

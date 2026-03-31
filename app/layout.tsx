@@ -32,6 +32,15 @@ export const metadata: Metadata = {
     title: "YachtieLink",
     statusBarStyle: "default",
   },
+  openGraph: {
+    siteName: "YachtieLink",
+    type: "website",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary",
+    site: "@yachtielink",
+  },
 };
 
 export const viewport: Viewport = {
