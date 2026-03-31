@@ -4,7 +4,7 @@
 
 **How to use this file:** This is the single source of truth for what's left. Work top to bottom. Check boxes as items complete. Read this at session start.
 
-**Last updated:** 2026-03-31
+**Last updated:** 2026-04-01
 
 ---
 
@@ -36,7 +36,7 @@ See `sprints/rallies/rally-006-prelaunch/README.md` for full spec.
 **Bugs (must fix):**
 - [x] Safari public profile links broken — verified working (2026-03-30)
 - [x] Subdomain cookie auth — verified working, links redirect to /u/{handle} (2026-03-30)
-- [ ] CV parse onboarding — end-to-end flow incomplete. Yacht parsing works but certs, education, personal details confirmation need building + testing. Founder confirmed 2026-03-31.
+- [ ] CV parse onboarding — Steps 1, 4-5 reviewed and polished. Steps 2-3 (Experience, Qualifications) still need founder walkthrough. End-to-end save flow works.
 - [x] Avatar thumbnail framing — `object-top` default applied (2026-03-30)
 - [x] CV yacht matching confidence — full redesign: compact career list, green/amber/blue states, multi-signal matching, prefix-aware search, inline editing, stat cards (2026-03-30)
 
@@ -61,6 +61,10 @@ See `sprints/rallies/rally-006-prelaunch/README.md` for full spec.
 - [x] Yacht search prefix-aware comparison (5 DB migrations)
 - [x] Design system documented (`patterns/page-layout.md`, CLAUDE.md + AGENTS.md wired)
 - [x] Builder autocomplete from DB — yacht_builders table, 100 seed builders, FK migration, fuzzy search, BuilderInput component, resolveOrCreateBuilder helper (2026-03-31)
+- [x] CV wizard UX rework Steps 1, 4-5 — chip hierarchy, review overhaul, celebration screen fix, amber wayfinding, DatePicker reorder, roles datalist, flag-outside-input (2026-04-01)
+- [x] Code review fixes — stale closure, rate limit bucket split, Pro gate expiry check, redirect loop fix (2026-04-01)
+- [x] Migration: skills_summary + interests_summary columns on users table (2026-04-01)
+- [ ] CV wizard Steps 2-3 walkthrough — Experience and Qualifications screens still need UX pass
 - [ ] Date pickers — text + calendar on mobile (remaining)
 - [ ] Progress tick timing — vary delays for natural feel (remaining)
 
