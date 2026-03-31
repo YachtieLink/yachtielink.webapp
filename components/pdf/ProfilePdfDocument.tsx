@@ -114,6 +114,7 @@ interface ProfilePdfProps {
 const styles = StyleSheet.create({
   page: {
     padding: 40,
+    paddingBottom: 70,
     fontFamily: 'Helvetica',
     fontSize: 10,
     color: '#1a202c',
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    marginBottom: 20,
+    marginBottom: 14,
     gap: 16,
   },
   photo: {
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
   },
   section: {
-    marginBottom: 14,
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 9,
@@ -174,6 +175,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: '#e2e8f0',
     paddingBottom: 4,
+    minPresenceAhead: 40,
   },
   bio: {
     fontSize: 10,
@@ -242,18 +244,32 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   footer: {
+    position: 'absolute',
+    bottom: 16,
+    left: 40,
+    right: 40,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    marginTop: 'auto',
-    paddingTop: 16,
+  },
+  footerLeft: {
+    flexDirection: 'column',
+    gap: 2,
+  },
+  footerHandle: {
+    fontSize: 8,
+    color: '#94a3b8',
+  },
+  footerPageNum: {
+    fontSize: 8,
+    color: '#94a3b8',
   },
   qr: {
-    width: 60,
-    height: 60,
+    width: 50,
+    height: 50,
   },
   watermark: {
-    fontSize: 8,
+    fontSize: 7,
     color: '#cbd5e1',
   },
   moreEndorsements: {
@@ -325,6 +341,7 @@ const navyStyles = StyleSheet.create({
   body: {
     padding: 32,
     paddingTop: 24,
+    paddingBottom: 80,
   },
   divider: {
     height: 1,
@@ -341,6 +358,7 @@ const navyStyles = StyleSheet.create({
     letterSpacing: 1.5,
     color: '#1B3A5C',
     marginBottom: 3,
+    minPresenceAhead: 40,
   },
   bio: { fontSize: 10, lineHeight: 1.5, color: '#334155', fontFamily: 'Times-Roman' },
   contactRow: { fontSize: 9, color: '#475569', marginBottom: 2, fontFamily: 'Times-Roman' },
@@ -356,9 +374,12 @@ const navyStyles = StyleSheet.create({
   endorsementBlock: { marginBottom: 8, paddingLeft: 10, borderLeftWidth: 2, borderLeftColor: '#C5A55A' },
   endorsementText: { fontSize: 9, fontStyle: 'italic', color: '#334155', lineHeight: 1.4, fontFamily: 'Times-Italic' },
   endorsementAuthor: { fontSize: 8, color: '#64748b', marginTop: 2, fontFamily: 'Times-Roman' },
-  footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto', paddingTop: 16 },
-  qr: { width: 56, height: 56 },
-  watermark: { fontSize: 8, color: '#cbd5e1', fontFamily: 'Times-Roman' },
+  footer: { position: 'absolute', bottom: 20, left: 32, right: 32, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
+  footerLeft: { flexDirection: 'column', gap: 2 },
+  footerHandle: { fontSize: 8, color: '#94a3b8', fontFamily: 'Times-Roman' },
+  footerPageNum: { fontSize: 8, color: '#94a3b8', fontFamily: 'Times-Roman' },
+  qr: { width: 50, height: 50 },
+  watermark: { fontSize: 7, color: '#cbd5e1', fontFamily: 'Times-Roman' },
   moreEndorsements: { fontSize: 8, color: '#64748b', marginTop: 4, fontFamily: 'Times-Roman' },
 })
 
@@ -407,7 +428,7 @@ const minimalStyles = StyleSheet.create({
   nameBlock: { marginBottom: -12 },
   name: { fontSize: 18, fontFamily: 'Helvetica-Bold', color: '#ffffff' },
   role: { fontSize: 10, color: '#ccfbf1' },
-  body: { padding: 36, paddingTop: 28 },
+  body: { padding: 36, paddingTop: 28, paddingBottom: 80 },
   url: { fontSize: 8, color: '#94a3b8', marginBottom: 16 },
   section: { marginBottom: 16 },
   sectionTitle: {
@@ -420,6 +441,7 @@ const minimalStyles = StyleSheet.create({
     paddingBottom: 4,
     borderBottomWidth: 0.5,
     borderBottomColor: '#e2e8f0',
+    minPresenceAhead: 40,
   },
   bio: { fontSize: 10, lineHeight: 1.6, color: '#334155' },
   contactRow: { fontSize: 9, color: '#475569', marginBottom: 2 },
@@ -435,9 +457,12 @@ const minimalStyles = StyleSheet.create({
   endorsementBlock: { marginBottom: 10, backgroundColor: '#F8FAFC', padding: 8, borderRadius: 4 },
   endorsementText: { fontSize: 9, fontStyle: 'italic', color: '#334155', lineHeight: 1.4 },
   endorsementAuthor: { fontSize: 8, color: '#64748b', marginTop: 3 },
-  footer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 'auto', paddingTop: 16 },
-  qr: { width: 56, height: 56 },
-  watermark: { fontSize: 8, color: '#cbd5e1' },
+  footer: { position: 'absolute', bottom: 20, left: 36, right: 36, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' },
+  footerLeft: { flexDirection: 'column', gap: 2 },
+  footerHandle: { fontSize: 8, color: '#94a3b8' },
+  footerPageNum: { fontSize: 8, color: '#94a3b8' },
+  qr: { width: 50, height: 50 },
+  watermark: { fontSize: 7, color: '#cbd5e1' },
   moreEndorsements: { fontSize: 8, color: '#64748b', marginTop: 4 },
 })
 
@@ -500,7 +525,7 @@ function renderAttachmentDetails(att: Attachment, s: Record<string, any>) {
 function renderEducationSection(education: Education[] | undefined, s: Record<string, any>) {
   if (!education?.length) return null
   return (
-    <View style={s.section}>
+    <View style={s.section} wrap={false}>
       <Text style={s.sectionTitle}>Education</Text>
       {education.map((edu) => (
         <View key={edu.id} style={{ marginBottom: 4 }}>
@@ -517,7 +542,7 @@ function renderEducationSection(education: Education[] | undefined, s: Record<st
 function renderSkillsHobbiesSection(skills: Skill[] | undefined, hobbies: Hobby[] | undefined, s: Record<string, any>) {
   if (!skills?.length && !hobbies?.length) return null
   return (
-    <View style={s.section}>
+    <View style={s.section} wrap={false}>
       {skills && skills.length > 0 && (
         <>
           <Text style={s.sectionTitle}>Skills</Text>
@@ -626,7 +651,7 @@ export function ProfilePdfDocument({
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Employment History</Text>
             {attachments.map((att) => (
-              <View key={att.id} style={styles.employmentRow}>
+              <View key={att.id} style={styles.employmentRow} wrap={false}>
                 <View style={styles.bullet} />
                 <View style={styles.employmentContent}>
                   <Text>
@@ -657,7 +682,7 @@ export function ProfilePdfDocument({
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Certifications</Text>
             {certifications.map((cert) => (
-              <View key={cert.id} style={styles.certRow}>
+              <View key={cert.id} style={styles.certRow} wrap={false}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.certName}>
                     {cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'}
@@ -683,7 +708,7 @@ export function ProfilePdfDocument({
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Endorsements</Text>
             {endorsements.map((end) => (
-              <View key={end.id} style={styles.endorsementBlock}>
+              <View key={end.id} style={styles.endorsementBlock} wrap={false}>
                 <Text style={styles.endorsementText}>
                   &ldquo;{truncate(end.content, 200)}&rdquo;
                 </Text>
@@ -701,12 +726,16 @@ export function ProfilePdfDocument({
           </View>
         )}
 
-        {/* Footer: QR + watermark */}
-        <View style={styles.footer}>
+        {/* Footer: handle + page number + QR (fixed on every page) */}
+        <View style={styles.footer} fixed>
+          <View style={styles.footerLeft}>
+            <Text style={styles.footerHandle}>yachtie.link/u/{user.handle}</Text>
+            <Text style={styles.footerPageNum} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
+            {!isPro && (
+              <Text style={styles.watermark}>Created with YachtieLink</Text>
+            )}
+          </View>
           <Image src={qrDataUrl} style={styles.qr} />
-          {!isPro && (
-            <Text style={styles.watermark}>Created with YachtieLink</Text>
-          )}
         </View>
       </Page>
     </Document>
@@ -777,7 +806,7 @@ function ClassicNavyPdf({ user, attachments, certifications, endorsements, educa
               <Text style={s.sectionTitle}>Employment History</Text>
               <View style={s.divider} />
               {attachments.map((att) => (
-                <View key={att.id} style={s.employmentRow}>
+                <View key={att.id} style={s.employmentRow} wrap={false}>
                   <View style={s.bullet} />
                   <View style={s.employmentContent}>
                     <Text>
@@ -805,7 +834,7 @@ function ClassicNavyPdf({ user, attachments, certifications, endorsements, educa
               <Text style={s.sectionTitle}>Certifications</Text>
               <View style={s.divider} />
               {certifications.map((cert) => (
-                <View key={cert.id} style={s.certRow}>
+                <View key={cert.id} style={s.certRow} wrap={false}>
                   <View style={{ flex: 1 }}>
                     <Text style={s.certName}>{cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'}</Text>
                     {cert.issuing_body && <Text style={s.certExpiry}>{cert.issuing_body}</Text>}
@@ -824,7 +853,7 @@ function ClassicNavyPdf({ user, attachments, certifications, endorsements, educa
               <Text style={s.sectionTitle}>Endorsements</Text>
               <View style={s.divider} />
               {endorsements.map((end) => (
-                <View key={end.id} style={s.endorsementBlock}>
+                <View key={end.id} style={s.endorsementBlock} wrap={false}>
                   <Text style={s.endorsementText}>&ldquo;{truncate(end.content, 200)}&rdquo;</Text>
                   <Text style={s.endorsementAuthor}>
                     — {end.endorser?.display_name ?? end.endorser?.full_name ?? 'Anonymous'}
@@ -838,9 +867,13 @@ function ClassicNavyPdf({ user, attachments, certifications, endorsements, educa
             </View>
           )}
 
-          <View style={s.footer}>
+          <View style={s.footer} fixed>
+            <View style={s.footerLeft}>
+              <Text style={s.footerHandle}>yachtie.link/u/{user.handle}</Text>
+              <Text style={s.footerPageNum} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
+              {!isPro && <Text style={s.watermark}>Created with YachtieLink</Text>}
+            </View>
             <Image src={qrDataUrl} style={s.qr} />
-            {!isPro && <Text style={s.watermark}>Created with YachtieLink</Text>}
           </View>
         </View>
       </Page>
@@ -911,7 +944,7 @@ function ModernMinimalPdf({ user, attachments, certifications, endorsements, edu
             <View style={s.section}>
               <Text style={s.sectionTitle}>Employment History</Text>
               {attachments.map((att) => (
-                <View key={att.id} style={s.employmentRow}>
+                <View key={att.id} style={s.employmentRow} wrap={false}>
                   <View style={s.bullet} />
                   <View style={s.employmentContent}>
                     <Text>
@@ -938,7 +971,7 @@ function ModernMinimalPdf({ user, attachments, certifications, endorsements, edu
             <View style={s.section}>
               <Text style={s.sectionTitle}>Certifications</Text>
               {certifications.map((cert) => (
-                <View key={cert.id} style={s.certRow}>
+                <View key={cert.id} style={s.certRow} wrap={false}>
                   <View style={{ flex: 1 }}>
                     <Text style={s.certName}>{cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'}</Text>
                     {cert.issuing_body && <Text style={s.certExpiry}>{cert.issuing_body}</Text>}
@@ -956,7 +989,7 @@ function ModernMinimalPdf({ user, attachments, certifications, endorsements, edu
             <View style={s.section}>
               <Text style={s.sectionTitle}>Endorsements</Text>
               {endorsements.map((end) => (
-                <View key={end.id} style={s.endorsementBlock}>
+                <View key={end.id} style={s.endorsementBlock} wrap={false}>
                   <Text style={s.endorsementText}>&ldquo;{truncate(end.content, 200)}&rdquo;</Text>
                   <Text style={s.endorsementAuthor}>
                     — {end.endorser?.display_name ?? end.endorser?.full_name ?? 'Anonymous'}
@@ -970,9 +1003,13 @@ function ModernMinimalPdf({ user, attachments, certifications, endorsements, edu
             </View>
           )}
 
-          <View style={s.footer}>
+          <View style={s.footer} fixed>
+            <View style={s.footerLeft}>
+              <Text style={s.footerHandle}>yachtie.link/u/{user.handle}</Text>
+              <Text style={s.footerPageNum} render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
+              {!isPro && <Text style={s.watermark}>Created with YachtieLink</Text>}
+            </View>
             <Image src={qrDataUrl} style={s.qr} />
-            {!isPro && <Text style={s.watermark}>Created with YachtieLink</Text>}
           </View>
         </View>
       </Page>

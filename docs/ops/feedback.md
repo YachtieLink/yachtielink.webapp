@@ -6,12 +6,36 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 41 rules
+**Current count:** 44 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## Chips Must Be Visually Subordinate to Headings
+
+**Rule:** In chip/tag UIs, section headings must always outrank chip text visually. Chips are data items, not structural elements. Use `text-xs` for chips when headings are `text-base`. Never let chips dominate the heading — if they look bigger or bolder than the section title, the hierarchy is broken.
+**Origin:** 2026-04-01 — Founder said "chips are bigger than section heading by far — one of your auditors needs to be fired." Chips were `text-sm py-2` with solid fill, overwhelming `text-sm font-medium` headings.
+**How to apply:** Chips: `text-xs py-1 min-h-[28px]`. Headings: `text-base font-semibold`. CV-parsed chips use tinted fills (`bg-interactive/10`), not solid. Always verify visual weight after adding chips to any UI.
+
+---
+
+## Section Color Never on Body Text
+
+**Rule:** Section accent colors (amber, navy, coral, etc.) must never be used for text labels, field labels, or body copy. They fail WCAG AA contrast on white backgrounds (e.g. amber #E5A832 on white = 2.4:1, needs 4.5:1). Use `--color-text-secondary` for labels.
+**Origin:** 2026-03-31 — Founder said "this does not look good" when amber was used for field labels on the CV review card. Frontend analysis confirmed contrast failure.
+**How to apply:** Section colors are for borders, icons, progress bars, badges, spinners — never for text that needs to be readable. Labels always use `--color-text-primary` or `--color-text-secondary`.
+
+---
+
+## Primary Buttons Are Always Teal-700
+
+**Rule:** All primary action buttons across the platform use teal-700. Do not color-match buttons to the section accent. Teal-500 is too light.
+**Origin:** 2026-03-31 — Founder tested teal-500 and teal-700 side by side on the CV upload page. "500 is too light. 700 is better." Decided buttons should be consistent across the platform, not section-colored.
+**How to apply:** Use the default primary Button variant (which maps to teal-700). Never override button color to match section accent.
 
 ---
 

@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
           bio, profile_photo_url,
           phone, whatsapp, email, contact_email, location_country, location_city,
           show_phone, show_whatsapp, show_email, show_location,
-          subscription_status, latest_pdf_path,
+          subscription_status, subscription_ends_at, latest_pdf_path,
           dob, home_country, smoke_pref, appearance_note, travel_docs, license_info, languages, show_dob
         `)
         .eq('id', user.id)
@@ -108,7 +108,8 @@ export async function POST(req: NextRequest) {
         skills: (skillsRes.data as any) ?? [],
         hobbies: (hobbiesRes.data as any) ?? [],
         qrDataUrl,
-        isPro: profile?.subscription_status === 'pro',
+        isPro: isProFromRecord(profile),
+        template,
       }),
     )
 

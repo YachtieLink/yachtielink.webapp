@@ -21,14 +21,14 @@ function SectionHeader({ title, count, step, onEdit }: {
 }) {
   return (
     <div className="flex items-center justify-between">
-      <p className="text-sm font-medium text-[var(--color-text-primary)]">
-        {title} {count > 0 && <span className="text-[var(--color-text-tertiary)]">({count})</span>}
-      </p>
+      <h3 className="text-base font-semibold text-[var(--color-text-primary)]">
+        {title} {count > 0 && <span className="text-[var(--color-text-tertiary)] font-normal text-sm">({count})</span>}
+      </h3>
       {onEdit && step !== undefined && (
         <button
           type="button"
           onClick={() => onEdit(step)}
-          className="text-xs text-[var(--color-interactive)]"
+          className="text-xs text-[var(--color-interactive)] min-h-[44px] min-w-[44px] flex items-center justify-end px-1 -mr-1"
         >
           Edit
         </button>
@@ -43,7 +43,7 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
   const [saving, setSaving] = useState(false)
   const [stats, setStats] = useState<SaveStats | null>(null)
 
-  const { personal, languages, yachts, certifications, education, skills, hobbies } = importData
+  const { personal, languages, yachts, certifications, education, skills, hobbies, skillsSummary, interestsSummary } = importData
 
   const hasPersonal = !!(personal.full_name || personal.bio || personal.phone || personal.primary_role)
   const totalItems = [
@@ -78,7 +78,7 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
     ].reduce((a, b) => a + b, 0)
 
     return (
-      <div className="flex flex-col items-center gap-4 py-8 text-center">
+      <div className="flex flex-col items-center justify-start gap-4 pb-8 text-center min-h-[80vh] pt-[25vh]">
         <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
           <span className="text-2xl text-green-600">✓</span>
         </div>
@@ -95,21 +95,23 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
           {stats.hobbiesAdded > 0 && <span>· {stats.hobbiesAdded} hobb{stats.hobbiesAdded === 1 ? 'y' : 'ies'}</span>}
           {stats.languagesUpdated && <span>· Languages</span>}
         </div>
-        <Button onClick={() => { router.push('/app/profile'); router.refresh() }} className="w-full mt-4">
+        <Button onClick={() => router.push('/app/profile')} className="w-full mt-4">
           View my profile
         </Button>
       </div>
     )
   }
 
+  const dedupedHobbies = hobbies.filter(h => !skills.includes(h))
+
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Ready to import</h2>
+      <h2 className="text-lg font-serif font-semibold text-[var(--color-text-primary)]">Ready to import</h2>
       <p className="text-sm text-[var(--color-text-secondary)]">Review what we&apos;ll add to your profile:</p>
 
-      {/* Personal details */}
+      {/* Personal details — elevated card */}
       {hasPersonal && (
-        <div className="bg-[var(--color-surface)] rounded-xl p-3 border border-[var(--color-border)]">
+        <div className="bg-[var(--color-surface-raised)] rounded-2xl p-4 border border-[var(--color-amber-200)]">
           <SectionHeader title="Personal details" count={0} step={1} onEdit={onEditStep} />
           <div className="flex flex-col gap-0.5 mt-1.5">
             {personal.full_name && <p className="text-xs text-[var(--color-text-secondary)]">{personal.full_name}</p>}
@@ -122,7 +124,7 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
 
       {/* Languages */}
       {languages.length > 0 && (
-        <div className="bg-[var(--color-surface)] rounded-xl p-3 border border-[var(--color-border)]">
+        <div className="bg-[var(--color-surface)] rounded-2xl p-3 border border-[var(--color-amber-200)]">
           <SectionHeader title="Languages" count={languages.length} step={1} onEdit={onEditStep} />
           <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
             {languages.map(l => `${l.language} (${l.proficiency})`).join(', ')}
@@ -132,21 +134,27 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
 
       {/* Yachts */}
       {yachts.length > 0 && (
-        <div className="bg-[var(--color-surface)] rounded-xl p-3 border border-[var(--color-border)]">
+        <div className="bg-[var(--color-surface)] rounded-2xl p-3 border border-[var(--color-amber-200)]">
           <SectionHeader title="Experience" count={yachts.length} step={2} onEdit={onEditStep} />
           <div className="flex flex-col gap-1 mt-1.5">
-            {yachts.map((y, i) => (
-              <p key={i} className="text-xs text-[var(--color-text-secondary)]">
-                {y.yacht_name} — {y.role} · {formatDateDisplay(y.start_date) || '?'} — {formatDateDisplay(y.end_date) || 'Present'}
-              </p>
-            ))}
+            {yachts.map((y, i) => {
+              const prefix = y.yacht_type === 'Motor Yacht' ? 'M/Y' : y.yacht_type === 'Sailing Yacht' ? 'S/Y' : null
+              const name = prefix ? `${prefix} ${y.yacht_name}` : y.yacht_name
+              const start = formatDateDisplay(y.start_date)
+              const end = formatDateDisplay(y.end_date) || 'Present'
+              return (
+                <p key={i} className="text-xs text-[var(--color-text-secondary)]">
+                  {name} — {y.role}{start && end ? ` · ${start} — ${end}` : start ? ` · ${start}` : end ? ` · ${end}` : ''}
+                </p>
+              )
+            })}
           </div>
         </div>
       )}
 
       {/* Certifications */}
       {certifications.length > 0 && (
-        <div className="bg-[var(--color-surface)] rounded-xl p-3 border border-[var(--color-border)]">
+        <div className="bg-[var(--color-surface)] rounded-2xl p-3 border border-[var(--color-amber-200)]">
           <SectionHeader title="Certifications" count={certifications.length} step={3} onEdit={onEditStep} />
           <div className="flex flex-col gap-0.5 mt-1.5">
             {certifications.map((c, i) => (
@@ -160,7 +168,7 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
 
       {/* Education */}
       {education.length > 0 && (
-        <div className="bg-[var(--color-surface)] rounded-xl p-3 border border-[var(--color-border)]">
+        <div className="bg-[var(--color-surface)] rounded-2xl p-3 border border-[var(--color-amber-200)]">
           <SectionHeader title="Education" count={education.length} step={3} onEdit={onEditStep} />
           <div className="flex flex-col gap-0.5 mt-1.5">
             {education.map((e, i) => (
@@ -173,17 +181,37 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
       )}
 
       {/* Skills & Hobbies */}
-      {(skills.length > 0 || hobbies.length > 0) && (
-        <div className="bg-[var(--color-surface)] rounded-xl p-3 border border-[var(--color-border)]">
-          <SectionHeader title="Skills & Interests" count={skills.length + hobbies.length} step={4} onEdit={onEditStep} />
-          <div className="flex flex-wrap gap-1.5 mt-1.5">
-            {skills.map((s, i) => (
-              <span key={`s-${i}`} className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)]">{s}</span>
-            ))}
-            {hobbies.map((h, i) => (
-              <span key={`h-${i}`} className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-tertiary)]">{h}</span>
-            ))}
-          </div>
+      {(skills.length > 0 || dedupedHobbies.length > 0) && (
+        <div className="bg-[var(--color-surface)] rounded-2xl p-3 border border-[var(--color-amber-200)]">
+          <SectionHeader title="Skills & Interests" count={skills.length + dedupedHobbies.length} step={4} onEdit={onEditStep} />
+          {skills.length > 0 && (
+            <>
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {skills.map((s, i) => (
+                  <span key={`s-${i}`} className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-interactive)]/10 text-[var(--color-interactive)]">{s}</span>
+                ))}
+              </div>
+              {skillsSummary && (
+                <p className="text-xs text-[var(--color-text-tertiary)] mt-2 line-clamp-2 italic">{skillsSummary}</p>
+              )}
+            </>
+          )}
+          {dedupedHobbies.length > 0 && (
+            <>
+              {skills.length > 0 && <div className="h-px bg-[var(--color-amber-200)] my-2" />}
+              <div className="flex flex-wrap gap-1.5">
+                {dedupedHobbies.map((h, i) => (
+                  <span key={`h-${i}`} className="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">{h}</span>
+                ))}
+              </div>
+            </>
+          )}
+          {interestsSummary && (
+            <>
+              {(skills.length > 0 || dedupedHobbies.length > 0) && dedupedHobbies.length === 0 && <div className="h-px bg-[var(--color-amber-200)] my-2" />}
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-2 line-clamp-2 italic">{interestsSummary}</p>
+            </>
+          )}
         </div>
       )}
 
@@ -191,13 +219,17 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
         <p className="text-sm text-[var(--color-text-secondary)]">Nothing to import. You can add details from your profile.</p>
       )}
 
-      <p className="text-xs text-[var(--color-text-tertiary)]">
-        This won&apos;t change anything you&apos;ve already saved — only adds new data.
-      </p>
+      <div className="rounded-2xl bg-[var(--color-surface)] border border-[var(--color-amber-200)] px-4 py-3">
+        <p className="text-xs text-[var(--color-text-secondary)]">
+          New experience, certifications, and skills will be added. Personal details will be updated with the values you confirmed.
+        </p>
+      </div>
 
-      <Button onClick={handleImport} loading={saving} className="w-full mt-2" disabled={totalItems === 0}>
-        Import to my profile
-      </Button>
+      <div className="pt-2 mt-2 border-t border-[var(--color-border)]">
+        <Button onClick={handleImport} loading={saving} className="w-full" disabled={totalItems === 0}>
+          Import to my profile
+        </Button>
+      </div>
     </div>
   )
 }

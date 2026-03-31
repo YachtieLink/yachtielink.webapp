@@ -90,6 +90,8 @@ export interface ParsedReference {
 
 export interface ParsedSocialMedia {
   instagram: string | null
+  linkedin: string | null
+  tiktok: string | null
   website: string | null
 }
 
@@ -101,10 +103,11 @@ export interface ParsedCvData {
   certifications: ParsedCertification[]
   education: ParsedEducation[]
   skills: string[]
+  skills_summary: string | null
   hobbies: string[]
+  interests_summary: string | null
   references: ParsedReference[]
   social_media: ParsedSocialMedia
-
 }
 
 // ── Confirmed import types (wizard output → save function) ──
@@ -190,6 +193,8 @@ export interface ConfirmedImportData {
   education: ConfirmedEducation[]
   skills: string[]
   hobbies: string[]
+  skillsSummary: string | null
+  interestsSummary: string | null
   endorsementRequests: ConfirmedEndorsementRequest[]
   socialMedia: ParsedSocialMedia
 }

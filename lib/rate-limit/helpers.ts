@@ -17,7 +17,8 @@ export const RATE_LIMITS = {
   profileEdit:       { limit: 30,  window: 60,                scope: 'user' as const, failOpen: true  }, // 30/min/user
   endorsementCreate: { limit: 5,   window: 24 * 60 * 60,      scope: 'user' as const, failOpen: true  }, // 5/24h/user
   endorsementEdit:   { limit: 20,  window: 60 * 60,           scope: 'user' as const, failOpen: true  }, // 20/1h/user
-  pdfGenerate:       { limit: 10,  window: 60 * 60,           scope: 'user' as const, failOpen: false }, // 10/1h/user — expensive
+  pdfGenerate:       { limit: 50,  window: 60 * 60,           scope: 'user' as const, failOpen: false }, // 50/1h/user — generous for template previewing
+  cvDownload:        { limit: 200, window: 60 * 60,           scope: 'user' as const, failOpen: true  }, // 200/1h/user — cheap signed URL generation
   fileUpload:        { limit: 20,  window: 60 * 60,           scope: 'user' as const, failOpen: false }, // 20/1h/user — expensive
   search:            { limit: 60,  window: 60,                scope: 'user' as const, failOpen: true  }, // 60/min/user
   accountFlag:       { limit: 10,  window: 7 * 24 * 60 * 60,  scope: 'user' as const, failOpen: true  }, // 10/7days/user

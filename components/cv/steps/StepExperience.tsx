@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Button, Input, Select } from '@/components/ui'
+import { Button, Input, Select, DatePicker } from '@/components/ui'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDateDisplay } from '@/lib/cv/types'
 import { YachtMatchCard, type MatchState } from '@/components/yacht/YachtMatchCard'
@@ -122,17 +122,24 @@ function EditOverlay({
         value={confirmed.role}
         onChange={(e) => onUpdate({ ...confirmed, role: e.target.value })}
       />
-      <Input
+      <DatePicker
         label="Start"
-        value={confirmed.start_date ?? ''}
-        onChange={(e) => onUpdate({ ...confirmed, start_date: e.target.value || null })}
-        placeholder="YYYY-MM"
+        value={confirmed.start_date ?? null}
+        onChange={(v) => onUpdate({ ...confirmed, start_date: v })}
+        includeDay
+        optionalMonth
+        minYear={1970}
+        maxYear={new Date().getFullYear()}
       />
-      <Input
+      <DatePicker
         label="End"
-        value={confirmed.end_date ?? ''}
-        onChange={(e) => onUpdate({ ...confirmed, end_date: e.target.value || null })}
-        placeholder="YYYY-MM or Current"
+        value={confirmed.end_date ?? null}
+        onChange={(v) => onUpdate({ ...confirmed, end_date: v })}
+        includeDay
+        optionalMonth
+        minYear={1970}
+        maxYear={new Date().getFullYear() + 1}
+        alignRight
       />
       <Select
         label="Employment Type"
@@ -241,6 +248,7 @@ function YachtCardWrapper({
           parsedName={yacht.yacht_name}
           parsedBuilder={yacht.builder}
           parsedLength={yacht.length_meters}
+          parsedYachtType={confirmed.yacht_type}
           role={confirmed.role}
           startDate={confirmed.start_date}
           endDate={confirmed.end_date}
@@ -272,12 +280,13 @@ function YachtCardWrapper({
             setPickerOpen(true)
           }}
           onOpenPicker={() => { setPickerMode('search'); setPickerOpen(true) }}
-          onUpdateSpecs={(name, builder, length) => {
+          onUpdateSpecs={(name, builder, length, yachtType) => {
             onConfirmedUpdate({
               ...confirmed,
               yacht_name: name,
               builder,
               length_meters: length,
+              yacht_type: yachtType,
             })
           }}
           onUpdateEmployment={(role, startDate, endDate) => {

@@ -151,8 +151,10 @@ export function parsedToConfirmedImport(parsed: ParsedCvData): ConfirmedImportDa
     ),
     skills: parsed.skills ?? [],
     hobbies: parsed.hobbies ?? [],
+    skillsSummary: parsed.skills_summary ?? null,
+    interestsSummary: parsed.interests_summary ?? null,
     endorsementRequests: [],
-    socialMedia: parsed.social_media ?? { instagram: null, website: null },
+    socialMedia: parsed.social_media ?? { instagram: null, linkedin: null, tiktok: null, website: null },
   }
 }
 
@@ -199,16 +201,27 @@ export async function saveConfirmedImport(
       stats.languagesUpdated = true
     }
 
+    // Skills & interests summaries
+    if (data.skillsSummary) updates.skills_summary = data.skillsSummary
+    if (data.interestsSummary) updates.interests_summary = data.interestsSummary
+
     // Append social links
-    if (data.socialMedia?.instagram || data.socialMedia?.website) {
+    const sm = data.socialMedia
+    if (sm?.instagram || sm?.linkedin || sm?.tiktok || sm?.website) {
       const { data: currentUser } = await supabase.from('users').select('social_links').eq('id', userId).single()
       const existing = (currentUser?.social_links ?? []) as Array<{ platform: string; url: string }>
       const newLinks = [...existing]
-      if (data.socialMedia.instagram && !existing.some(l => l.platform === 'instagram')) {
-        newLinks.push({ platform: 'instagram', url: `https://instagram.com/${data.socialMedia.instagram}` })
+      if (sm.instagram && !existing.some(l => l.platform === 'instagram')) {
+        newLinks.push({ platform: 'instagram', url: sm.instagram.startsWith('http') ? sm.instagram : `https://instagram.com/${sm.instagram}` })
       }
-      if (data.socialMedia.website && !existing.some(l => l.platform === 'website')) {
-        newLinks.push({ platform: 'website', url: data.socialMedia.website })
+      if (sm.linkedin && !existing.some(l => l.platform === 'linkedin')) {
+        newLinks.push({ platform: 'linkedin', url: sm.linkedin.startsWith('http') ? sm.linkedin : `https://linkedin.com/in/${sm.linkedin}` })
+      }
+      if (sm.tiktok && !existing.some(l => l.platform === 'tiktok')) {
+        newLinks.push({ platform: 'tiktok', url: sm.tiktok.startsWith('http') ? sm.tiktok : `https://tiktok.com/@${sm.tiktok}` })
+      }
+      if (sm.website && !existing.some(l => l.platform === 'website')) {
+        newLinks.push({ platform: 'website', url: sm.website.startsWith('http') ? sm.website : `https://${sm.website}` })
       }
       if (newLinks.length > existing.length) updates.social_links = newLinks
     }

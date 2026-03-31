@@ -75,4 +75,7 @@ Any context, constraints, or open questions.
 | [Subdomain Route Upgrade](./subdomain-route-upgrade.md) | idea | P3 |
 | [Non-Yachting Experience](./non-yachting-experience.md) | fleshed-out | **P1 (pre-launch blocker)** |
 | [Yacht Profile Sharing](./yacht-profile-sharing.md) | idea | P2 |
+| [AI Bio Writing Assist](./ai-bio-writing-assist.md) | idea | P2 |
+| [Secondary Role Logic](./secondary-role-logic.md) | idea | P2 |
+| [Phone & WhatsApp Split](./phone-whatsapp-split.md) | idea | P2 |
 | [Camera CV Capture](./camera-cv-capture.md) | idea | P2 |

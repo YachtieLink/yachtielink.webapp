@@ -17,6 +17,26 @@ Add entries to this file in reverse chronological order. Use this format:
 
 ---
 
+### 2026-04-01 — Chips visually subordinate to section headings
+
+**Decision:** In chip-based UIs (skills, hobbies, tags), section headings must outrank chip text in visual hierarchy. Headings use `text-base font-semibold`, chips use `text-xs py-1 min-h-[28px]`. CV-parsed chips use tinted style (`bg-interactive/10 text-interactive`), not solid fills.
+
+**Rejected:** Chips at `text-sm py-2 min-h-[36px]` with solid teal fill (`bg-interactive text-white`). These dominated the heading visually and competed for attention.
+
+**Why:** Founder said "chips are bigger than section heading by far." Chips are data, not titles — they should scan quickly without overwhelming the structure above them.
+
+---
+
+### 2026-03-31 — No left border accent stripes on cards
+
+**Decision:** Cards use border color, background tint, and shadow for visual differentiation from the page background. Never use a coloured left-edge stripe.
+
+**Rejected:** `border-l-[3px] border-l-[var(--color-amber-400)]` left accent stripe pattern on section cards. Founder rejected immediately.
+
+**Why:** Looks cheap and out of place. Not consistent with the design language. Cards should feel clean and elevated, not decorated with a sidebar stripe.
+
+---
+
 ### 2026-03-30 — Mobile-first page layout patterns (Rally 006)
 
 **Decision:** Established comprehensive page layout patterns during the CV upload/import redesign. Key principles:
