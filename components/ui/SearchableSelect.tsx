@@ -17,6 +17,8 @@ interface SearchableSelectProps {
   clearable?: boolean
   clearLabel?: string
   className?: string
+  /** Override what shows in the input when a value is selected (defaults to the option's label) */
+  displayValue?: string
 }
 
 export function SearchableSelect({
@@ -29,6 +31,7 @@ export function SearchableSelect({
   clearable = false,
   clearLabel = 'None',
   className = '',
+  displayValue,
 }: SearchableSelectProps) {
   const id = useId()
   const [open, setOpen] = useState(false)
@@ -48,7 +51,8 @@ export function SearchableSelect({
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  const selectedLabel = options.find((o) => o.value === value)?.label
+  const selectedLabel = displayValue
+    ?? options.find((o) => o.value === value)?.label
     ?? pinnedOptions.find((o) => o.value === value)?.label
     ?? ''
 

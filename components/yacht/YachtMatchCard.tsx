@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import type { YachtSearchResult } from '@/lib/cv/types'
 import { BuilderInput } from '@/components/yacht/BuilderInput'
+import { DatePicker } from '@/components/ui'
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -22,6 +23,7 @@ export interface YachtMatchCardProps {
   parsedName: string
   parsedBuilder: string | null
   parsedLength: number | null
+  parsedYachtType: string | null
 
   /** Employment data for display */
   role: string
@@ -39,7 +41,7 @@ export interface YachtMatchCardProps {
   /** Open the manual YachtPicker sheet */
   onOpenPicker: () => void
   /** Update parsed specs inline (blue state editing) */
-  onUpdateSpecs?: (name: string, builder: string | null, length: number | null) => void
+  onUpdateSpecs?: (name: string, builder: string | null, length: number | null, yachtType: string | null) => void
   /** Update employment details inline */
   onUpdateEmployment?: (role: string, startDate: string | null, endDate: string | null) => void
 }
@@ -74,6 +76,35 @@ function crewLabel(result: YachtSearchResult): string | null {
 
 function parsedSpecs(builder: string | null, length: number | null): string {
   return [builder, length ? formatLength(length) : null].filter(Boolean).join(' · ')
+}
+
+/** Convert yacht_type to a display prefix like "M/Y" */
+const TYPE_PREFIX: Record<string, string> = {
+  'Motor Yacht': 'M/Y',
+  'Sailing Yacht': 'S/Y',
+  'Expedition Vessel': 'E/V',
+  'Fishing Vessel': 'F/V',
+  'Research Vessel': 'R/V',
+  'Support Vessel': 'SV',
+  'Catamaran': 'Cat',
+  'Gulet': 'Gulet',
+}
+
+function yachtTypePrefix(yachtType: string | null | undefined): string {
+  if (!yachtType) return 'M/Y'
+  return TYPE_PREFIX[yachtType] ?? 'M/Y'
+}
+
+/** Prefix a yacht name with its type if not already prefixed */
+function prefixedName(name: string, yachtType: string | null | undefined): string {
+  const prefix = yachtTypePrefix(yachtType)
+  // Don't double-prefix if name already starts with a known prefix
+  const knownPrefixes = ['M/Y', 'S/Y', 'E/V', 'F/V', 'R/V', 'SV', 'MY', 'SY']
+  const upper = name.trimStart().toUpperCase()
+  for (const p of knownPrefixes) {
+    if (upper.startsWith(p + ' ')) return name
+  }
+  return `${prefix} ${name}`
 }
 
 function formatDate(d: string | null): string {
@@ -138,6 +169,7 @@ export function YachtMatchCard(props: YachtMatchCardProps) {
     parsedName,
     parsedBuilder,
     parsedLength,
+    parsedYachtType,
     role,
     startDate,
     endDate,
@@ -151,16 +183,19 @@ export function YachtMatchCard(props: YachtMatchCardProps) {
 
   const [expanded, setExpanded] = useState(false)
 
-  const displayName = matchState === 'green' && yacht ? yacht.name : parsedName
+  const rawName = matchState === 'green' && yacht ? yacht.name : parsedName
+  const typeForPrefix = matchState === 'green' && yacht ? yacht.yacht_type : parsedYachtType
+  const displayName = prefixedName(rawName, typeForPrefix)
   const dateRange = [formatDate(startDate), formatDate(endDate) || 'Present'].filter(Boolean).join(' — ')
 
   // Specs line: show matched yacht specs for green, parsed specs for blue/amber
+  // yacht_type is already shown as a prefix on the name, so omit it here
   const specsSource = matchState === 'green' && yacht
-    ? [yacht.builder, yacht.length_meters ? formatLength(yacht.length_meters) : null, yacht.yacht_type].filter(Boolean).join(' · ')
+    ? [yacht.builder, yacht.length_meters ? formatLength(yacht.length_meters) : null].filter(Boolean).join(' · ')
     : [parsedBuilder, parsedLength ? formatLength(parsedLength) : null].filter(Boolean).join(' · ')
 
   return (
-    <div className="card-soft rounded-2xl overflow-hidden">
+    <div className="card-soft rounded-2xl overflow-visible">
       {/* Collapsed row — always visible */}
       <button
         type="button"
@@ -223,6 +258,7 @@ export function YachtMatchCard(props: YachtMatchCardProps) {
               parsedName={parsedName}
               parsedBuilder={parsedBuilder}
               parsedLength={parsedLength}
+              parsedYachtType={parsedYachtType}
               role={role}
               startDate={startDate}
               endDate={endDate}
@@ -365,22 +401,24 @@ function BlueExpanded({
   onRemove,
   onUpdateSpecs,
   onUpdateEmployment,
+  parsedYachtType,
 }: {
   parsedName: string
   parsedBuilder: string | null
   parsedLength: number | null
+  parsedYachtType: string | null
   role: string
   startDate: string | null
   endDate: string | null
   onRemove: () => void
-  onUpdateSpecs: (name: string, builder: string | null, length: number | null) => void
+  onUpdateSpecs: (name: string, builder: string | null, length: number | null, yachtType: string | null) => void
   onUpdateEmployment: (role: string, startDate: string | null, endDate: string | null) => void
 }) {
   const [name, setName] = useState(parsedName)
   const [builder, setBuilder] = useState(parsedBuilder ?? '')
   const [metres, setMetres] = useState(parsedLength ? String(parsedLength) : '')
   const [feet, setFeet] = useState(parsedLength ? String(Math.round(parsedLength / 0.3048)) : '')
-  const [yachtType, setYachtType] = useState<'Motor Yacht' | 'Sailing Yacht'>('Motor Yacht')
+  const [yachtType, setYachtType] = useState(parsedYachtType ?? 'Motor Yacht')
   const [role, setRole] = useState(initialRole)
   const [startDate, setStartDate] = useState(initialStart ?? '')
   const [endDate, setEndDate] = useState(initialEnd ?? '')
@@ -402,6 +440,7 @@ function BlueExpanded({
       name.trim() || parsedName,
       builder.trim() || null,
       metres ? parseFloat(metres) : null,
+      yachtType,
     )
   }
 
@@ -427,15 +466,18 @@ function BlueExpanded({
           <div className="flex gap-2">
             <select
               value={yachtType}
-              onChange={(e) => setYachtType(e.target.value as typeof yachtType)}
+              onChange={(e) => { const v = e.target.value; setYachtType(v); onUpdateSpecs(name.trim() || parsedName, builder.trim() || null, metres ? parseFloat(metres) : null, v) }}
               className="w-20 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
             >
               <option value="Motor Yacht">M/Y</option>
               <option value="Sailing Yacht">S/Y</option>
-              <option value="Research Vessel">R/V</option>
-              <option value="Fishing Vessel">F/V</option>
+              <option disabled>───</option>
               <option value="Expedition Vessel">E/V</option>
+              <option value="Fishing Vessel">F/V</option>
+              <option value="Research Vessel">R/V</option>
               <option value="Support Vessel">SV</option>
+              <option value="Catamaran">Cat</option>
+              <option value="Gulet">Gulet</option>
             </select>
             <input
               type="text"
@@ -458,32 +500,32 @@ function BlueExpanded({
               compact
             />
           </div>
-          <div className="flex gap-1.5 flex-shrink-0">
-            <div>
-              <label className="block text-[10px] font-medium text-[var(--color-text-tertiary)] mb-1 uppercase tracking-wider text-right">m</label>
+          <div className="flex gap-1.5 flex-shrink-0 items-end">
+            <div className="relative">
               <input
                 type="number"
                 value={metres}
                 onChange={(e) => handleMetresChange(e.target.value)}
                 onBlur={handleSpecsBlur}
-                className="w-16 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-2 text-sm text-[var(--color-text-primary)] text-right focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
+                className="w-[5.5rem] rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] pl-2 pr-8 py-2 text-sm text-[var(--color-text-primary)] text-right focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 placeholder="45"
                 min="1"
                 max="500"
               />
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-[var(--color-text-tertiary)] pointer-events-none select-none">m</span>
             </div>
-            <div>
-              <label className="block text-[10px] font-medium text-[var(--color-text-tertiary)] mb-1 uppercase tracking-wider text-right">ft</label>
+            <div className="relative">
               <input
                 type="number"
                 value={feet}
                 onChange={(e) => handleFeetChange(e.target.value)}
                 onBlur={handleSpecsBlur}
-                className="w-16 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-2 py-2 text-sm text-[var(--color-text-primary)] text-right focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
+                className="w-[5.5rem] rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] pl-2 pr-8 py-2 text-sm text-[var(--color-text-primary)] text-right focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 placeholder="148"
                 min="1"
                 max="1640"
               />
+              <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-[var(--color-text-tertiary)] pointer-events-none select-none">ft</span>
             </div>
           </div>
         </div>
@@ -504,25 +546,26 @@ function BlueExpanded({
         </div>
         <div className="flex gap-2">
           <div className="flex-1">
-            <label className="block text-[10px] font-medium text-[var(--color-text-tertiary)] mb-1 uppercase tracking-wider">Start</label>
-            <input
-              type="text"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              onBlur={handleEmploymentBlur}
-              className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-              placeholder="YYYY-MM"
+            <DatePicker
+              label="Start"
+              value={startDate || null}
+              onChange={(v) => { const val = v ?? ''; setStartDate(val); onUpdateEmployment(role.trim() || initialRole, val, endDate.trim() || null) }}
+              includeDay
+              optionalMonth
+              minYear={1970}
+              maxYear={new Date().getFullYear()}
             />
           </div>
           <div className="flex-1">
-            <label className="block text-[10px] font-medium text-[var(--color-text-tertiary)] mb-1 uppercase tracking-wider">End</label>
-            <input
-              type="text"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              onBlur={handleEmploymentBlur}
-              className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
-              placeholder="YYYY-MM or Present"
+            <DatePicker
+              label="End"
+              value={endDate || null}
+              onChange={(v) => { const val = v ?? ''; setEndDate(val); onUpdateEmployment(role.trim() || initialRole, startDate.trim() || null, val) }}
+              includeDay
+              optionalMonth
+              minYear={1970}
+              maxYear={new Date().getFullYear() + 1}
+              alignRight
             />
           </div>
         </div>

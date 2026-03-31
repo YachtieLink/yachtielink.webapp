@@ -385,9 +385,9 @@ function StepName({
           onKeyDown={(e) => e.key === "Enter" && handleNext()}
         />
         <Input
-          label="Display name (optional)"
+          label="Preferred name (optional)"
           placeholder={fullName.trim().split(" ")[0] || "e.g. James"}
-          hint="How you'd like to be called — defaults to your first name"
+          hint="What crew call you — defaults to your first name"
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleNext()}

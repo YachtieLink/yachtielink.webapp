@@ -33,13 +33,13 @@ function ParseProgress({ startedAt }: { startedAt: number }) {
 
   return (
     <div className="flex flex-col items-center gap-6 py-8 px-4">
-      <div className="h-10 w-10 animate-spin rounded-full border-2 border-[var(--color-text-tertiary)] border-t-[var(--color-interactive)]" />
+      <div className="h-10 w-10 animate-spin rounded-full border-2 border-[var(--color-amber-200)] border-t-[var(--color-amber-500)]" />
 
       <div className="w-full max-w-xs">
         {/* Progress bar */}
-        <div className="w-full h-1.5 bg-[var(--color-surface-raised)] rounded-full overflow-hidden mb-6">
+        <div className="w-full h-1.5 bg-[var(--color-amber-100)] rounded-full overflow-hidden mb-6">
           <motion.div
-            className="h-full bg-[var(--color-interactive)] rounded-full"
+            className="h-full bg-[var(--color-amber-500)] rounded-full"
             initial={false}
             animate={{ width: `${Math.min(((activeStep + 1) / PARSE_STEPS.length) * 100, 95)}%` }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -60,13 +60,13 @@ function ParseProgress({ startedAt }: { startedAt: number }) {
               className="flex items-center gap-2.5"
             >
               <span className="text-base w-6 text-center flex-shrink-0">
-                {i < activeStep ? '✓' : s.icon}
+                {i < activeStep ? <span className="text-[var(--color-teal-600)]">✓</span> : s.icon}
               </span>
               <span className={`text-sm ${
                 i < activeStep
-                  ? 'text-[var(--color-text-tertiary)]'
+                  ? 'text-[var(--color-text-secondary)] line-through decoration-[var(--color-text-tertiary)]'
                   : i === activeStep
-                    ? 'text-[var(--color-text-primary)] font-medium'
+                    ? 'text-[var(--color-amber-700)] font-medium'
                     : 'text-[var(--color-text-tertiary)]'
               }`}>
                 {s.label}
@@ -76,7 +76,7 @@ function ParseProgress({ startedAt }: { startedAt: number }) {
         </div>
       </div>
 
-      <p className="text-xs text-[var(--color-text-tertiary)] text-center mt-2">
+      <p className="text-xs text-[var(--color-amber-600)] text-center mt-2">
         This usually takes 30–45 seconds
       </p>
     </div>
@@ -109,6 +109,8 @@ function buildImportData(opts: {
   confirmedEducation: ConfirmedEducation[]
   skills: string[]
   hobbies: string[]
+  skillsSummary: string | null
+  interestsSummary: string | null
   existingSkills: string[]
   existingHobbies: string[]
   socialMedia: ParsedSocialMedia | undefined
@@ -124,8 +126,10 @@ function buildImportData(opts: {
     education: opts.confirmedEducation,
     skills: opts.skills.filter(s => !existingSkillsLower.has(s.toLowerCase())),
     hobbies: opts.hobbies.filter(h => !existingHobbiesLower.has(h.toLowerCase())),
+    skillsSummary: opts.skillsSummary || null,
+    interestsSummary: opts.interestsSummary || null,
     endorsementRequests: [],
-    socialMedia: opts.socialMedia ?? { instagram: null, website: null },
+    socialMedia: opts.socialMedia ?? { instagram: null, linkedin: null, tiktok: null, website: null },
   }
 }
 
@@ -174,6 +178,9 @@ export function CvImportWizard({
   const [confirmedEducation, setConfirmedEducation] = useState<ConfirmedEducation[]>([])
   const [skills, setSkills] = useState<string[]>(existingSkills)
   const [hobbies, setHobbies] = useState<string[]>(existingHobbies)
+  const [socialMedia, setSocialMedia] = useState<ParsedSocialMedia>({ instagram: null, linkedin: null, tiktok: null, website: null })
+  const [skillsSummary, setSkillsSummary] = useState<string>('')
+  const [interestsSummary, setInterestsSummary] = useState<string>('')
 
   // Fast parse — personal + languages only
   const firePersonalParse = useCallback(() => {
@@ -238,6 +245,20 @@ export function CvImportWizard({
         setSkills(newSkills)
         setHobbies(newHobbies)
 
+        // Initialise social media from parse
+        if (data.social_media) {
+          setSocialMedia(prev => ({
+            instagram: prev.instagram || data.social_media?.instagram || null,
+            linkedin: prev.linkedin || data.social_media?.linkedin || null,
+            tiktok: prev.tiktok || data.social_media?.tiktok || null,
+            website: prev.website || data.social_media?.website || null,
+          }))
+        }
+
+        // Initialise summaries from parse
+        if (data.skills_summary) setSkillsSummary(prev => prev || data.skills_summary || '')
+        if (data.interests_summary) setInterestsSummary(prev => prev || data.interests_summary || '')
+
         setParseLoading(false)
       })
       .catch(() => {
@@ -272,6 +293,26 @@ export function CvImportWizard({
         if (state.confirmedEducation) setConfirmedEducation(state.confirmedEducation)
         if (state.skills) setSkills(state.skills)
         if (state.hobbies) setHobbies(state.hobbies)
+        if (state.skillsSummary) setSkillsSummary(state.skillsSummary)
+        if (state.interestsSummary) setInterestsSummary(state.interestsSummary)
+        if (state.socialMedia) setSocialMedia(state.socialMedia)
+
+        // Initialise from parsed data if not yet in state
+        if (!state.socialMedia && state.parsed?.social_media) {
+          const sm = state.parsed.social_media
+          setSocialMedia({
+            instagram: sm.instagram || null,
+            linkedin: sm.linkedin || null,
+            tiktok: sm.tiktok || null,
+            website: sm.website || null,
+          })
+        }
+        if (!state.skillsSummary && state.parsed?.skills_summary) {
+          setSkillsSummary(state.parsed.skills_summary)
+        }
+        if (!state.interestsSummary && state.parsed?.interests_summary) {
+          setInterestsSummary(state.parsed.interests_summary)
+        }
 
         // If full parse is already cached, skip both fetches
         if (state.parsed) return
@@ -297,16 +338,17 @@ export function CvImportWizard({
       parsed, parsedPersonal, parsedLanguages,
       step, confirmedPersonal, confirmedLanguages,
       confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies,
+      skillsSummary, interestsSummary, socialMedia,
     }))
-  }, [parsed, parsedPersonal, parsedLanguages, step, confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, parsePersonalLoading, parseLoading, storagePath])
+  }, [parsed, parsedPersonal, parsedLanguages, step, confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, skillsSummary, interestsSummary, socialMedia, parsePersonalLoading, parseLoading, storagePath])
 
   const getImportData = useCallback((): ConfirmedImportData => {
     return buildImportData({
       confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts,
-      confirmedEducation, skills, hobbies, existingSkills, existingHobbies,
-      socialMedia: parsed?.social_media,
+      confirmedEducation, skills, hobbies, skillsSummary, interestsSummary, existingSkills, existingHobbies,
+      socialMedia,
     })
-  }, [confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, existingSkills, existingHobbies, parsed])
+  }, [confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, skillsSummary, interestsSummary, existingSkills, existingHobbies, socialMedia])
 
   const handleSave = useCallback(async (): Promise<SaveStats | null> => {
     try {
@@ -376,7 +418,7 @@ export function CvImportWizard({
       {/* Progress header */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
-          <p className="text-xs text-[var(--color-text-tertiary)]">Step {step} of {TOTAL_STEPS}</p>
+          <p className="text-xs text-[var(--color-amber-600)]">Step {step} of {TOTAL_STEPS}</p>
           {step > 1 && (
             <button
               type="button"
@@ -387,9 +429,9 @@ export function CvImportWizard({
             </button>
           )}
         </div>
-        <div className="w-full h-1 bg-[var(--color-surface-raised)] rounded-full overflow-hidden">
+        <div className="w-full h-1 bg-[var(--color-amber-100)] rounded-full overflow-hidden">
           <div
-            className="h-full bg-[var(--color-interactive)] transition-all duration-300"
+            className="h-full bg-[var(--color-amber-500)] transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -460,12 +502,17 @@ export function CvImportWizard({
             <StepExtras
               skills={skills}
               hobbies={hobbies}
-              socialMedia={parsed?.social_media ?? { instagram: null, website: null }}
+              skillsSummary={skillsSummary}
+              interestsSummary={interestsSummary}
+              socialMedia={socialMedia}
               existingSkills={existingSkills}
               existingHobbies={existingHobbies}
               parseLoading={false}
               onSkillsChange={setSkills}
               onHobbiesChange={setHobbies}
+              onSkillsSummaryChange={setSkillsSummary}
+              onInterestsSummaryChange={setInterestsSummary}
+              onSocialChange={setSocialMedia}
               onConfirm={() => setStep(5)}
             />
           )}

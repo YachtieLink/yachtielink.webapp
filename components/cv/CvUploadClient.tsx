@@ -115,17 +115,17 @@ export function CvUploadClient({ userId }: CvUploadClientProps) {
         </div>
 
         {/* Primary CTA */}
-        <Button onClick={handleBuildProfile} className="w-full" size="lg">
+        <Button onClick={handleBuildProfile} className="mx-auto" size="lg">
           Build my profile from this CV
         </Button>
 
         {/* Same "What we do" section — now acts as reassurance + alternatives */}
-        <div className="flex flex-col gap-3">
-          <p className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Other options</p>
+        <div className="flex flex-col gap-2 mt-5">
+          <p className="text-xs font-medium text-[var(--color-text-tertiary)]">Other options</p>
           <button
             onClick={handleJustUpload}
             disabled={justUploading}
-            className="flex items-start gap-3 text-left"
+            className="flex items-start gap-3 text-left py-3 px-3 -mx-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors"
           >
             <div className="h-5 w-5 rounded-full bg-[var(--color-surface-raised)] flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg className="h-3 w-3 text-[var(--color-text-tertiary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -137,7 +137,7 @@ export function CvUploadClient({ userId }: CvUploadClientProps) {
               Save it to your profile without importing — useful if your profile is already set up.
             </p>
           </button>
-          <a href="/app/profile" className="flex items-start gap-3">
+          <a href="/app/profile" className="flex items-start gap-3 py-3 px-3 -mx-3 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors">
             <div className="h-5 w-5 rounded-full bg-[var(--color-surface-raised)] flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg className="h-3 w-3 text-[var(--color-text-tertiary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />

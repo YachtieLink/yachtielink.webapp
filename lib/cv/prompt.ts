@@ -67,7 +67,9 @@ export const CV_EXTRACTION_PROMPT = `You are extracting structured data from a y
     }
   ],
   "skills": ["string"],
+  "skills_summary": "string|null — if the CV has a written narrative about skills/expertise (e.g. a 'Key Skills' section with paragraphs), extract it verbatim, max 1500 chars. Do NOT generate this — only extract if the CV has actual prose about their skills",
   "hobbies": ["string"],
+  "interests_summary": "string|null — if the CV has a written narrative about personal interests/hobbies (not just a list), extract it verbatim, max 750 chars. Do NOT generate this — only extract if the CV has actual prose about their interests",
   "references": [
     {
       "name": "string",
@@ -79,6 +81,8 @@ export const CV_EXTRACTION_PROMPT = `You are extracting structured data from a y
   ],
   "social_media": {
     "instagram": "string|null — handle only, no URL",
+    "linkedin": "string|null — profile URL or username",
+    "tiktok": "string|null — handle only, no URL",
     "website": "string|null"
   }
 }

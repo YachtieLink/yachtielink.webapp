@@ -6,6 +6,10 @@ When you make changes to this module, append a one-line entry with date, agent n
 
 ---
 
+**2026-04-01** — Claude Code (Opus 4.6, CV wizard Steps 4-5): ChipSelect hierarchy rework (headings > chips), chip sizing downsized to text-xs/py-1, CV chips tinted not solid, hobby chips amber-tinted for distinction. StepReview overhaul: serif title, amber wayfinding borders on review cards, tinted skill/hobby chips, M/Y/S/Y prefixes, skills/interests summary display.
+
+**2026-03-31** — Claude Code (Opus 4.6, CV wizard walkthrough): DatePicker selector reorder to Day-Month-Year; WCAG contrast fix (amber labels → text-secondary on white backgrounds); design decision logged: no left border accent stripes on cards.
+
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.2): New components — Button variants (outline/link/icon), Input, Select, Textarea, FormField, IconButton, SectionBadge, ProfileAvatar; section color system (teal/amber/coral/navy/sand unique tab colors).
 
 **2026-03-21** — Claude Code (Opus 4.6, Sprint 10.2): Token migration — all hardcoded colors → CSS custom properties; dark mode tokens: 20+ variable overrides in globals.css; full-bleed backgrounds on CV, Insights, Network pages.

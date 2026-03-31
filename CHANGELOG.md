@@ -22,6 +22,82 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-04-01 — Claude Code (Opus 4.6) — CV Import Wizard Steps 4-5 + Code Review Fixes
+
+### Done
+
+- **Step 4 (Extras) UX fixes** — chip hierarchy rework: section headings bumped to `text-base font-semibold`, chips downsized to `text-xs py-1 min-h-[28px]`, CV chips changed from solid teal to tinted (`bg-interactive/10 text-interactive`), social heading weight corrected, blurb labels changed to `text-primary`
+- **Step 5 (Review) major overhaul** — serif title, amber wayfinding borders on all cards, `rounded-2xl` consistency, M/Y / S/Y yacht name prefixes from `yacht_type`, deduped hobbies against skills, skills/interests summary display (italic, `line-clamp-2`), tinted skill/hobby chips with color distinction, elevated personal details card, disclaimer card with amber border, import button separated with border-top, 44px touch targets on edit links
+- **Celebration screen fixes** — centered at top-third viewport (`pt-[25vh]`), fixed "View my profile" redirect loop (removed `router.refresh()` race condition)
+- **Two-phase code review** — Sonnet Phase 1 surfaced 7 candidates, Opus Phase 2 confirmed 5 (P2). Fixed 3:
+  - Stale closure in `YachtMatchCard` DatePicker onChange — was reading previous date from closure, now passes value directly
+  - Rate limit bucket collision — download endpoints (`download-pdf`, `download-uploaded`) moved from `pdfGenerate` to new `cvDownload` category (200/hr, failOpen)
+  - Inline Pro gate — `cv/page.tsx` and `generate-pdf/route.ts` now use `isProFromRecord()` with expiry check instead of raw `subscription_status === 'pro'`
+- **YachtieLink drift review** — WARNING verdict (no blockers). Inline Pro gate fixed. `getCvSections` read-model duplication noted (no backlog file yet — to be captured when Steps 2-3 walkthrough complete)
+
+### Context
+
+- Founder did screen-by-screen walkthrough of Steps 4-5 of the CV import wizard. Steps 2-3 (Experience, Qualifications) not yet reviewed.
+- All changes remain uncommitted on `chore/remove-icloud-duplicates`. Three sessions of work accumulated: builder autocomplete + Step 1 wizard rework + Steps 4-5 rework + review fixes.
+- `previewTemplate` silently replaces live public CV — deferred since template preview isn't shipped yet.
+- StepPersonal merge overwrites 7+ fields without restore UI — deferred as enhancement.
+
+### Next
+
+1. **Commit + push** — all accumulated work (founder go-ahead needed)
+2. **Run migration** — `20260331000005_skills_interests_summary.sql` against production DB
+3. **CV wizard Steps 2-3 walkthrough** — Experience and Qualifications screens not yet reviewed
+4. **Fix Country SearchableSelect data bug** — Monaco "MC" not populating
+5. **Onboarding wizard parity** — new users don't get 5-step data review
+
+### Flags
+
+- ⚠️ Three sessions of uncommitted code on one branch — commit urgently needed
+- ⚠️ `previewTemplate` in CvActions replaces the user's live public CV when previewing templates — needs a `preview: true` flag in generate-pdf route before template feature goes live
+- ⚠️ Untracked migration `20260331000005_skills_interests_summary.sql` must be staged with commit or `skills_summary`/`interests_summary` writes will fail in production
+
+---
+
+## 2026-03-31 — Claude Code (Opus 4.6) — CV Import Wizard UX Rework (Step 1)
+
+### Done
+
+- **CV import wizard Step 1 "Your Details" — full UX rework** of review and edit states in `StepPersonal.tsx`: field grouping with border-t dividers, sticky Done button, Cancel in edit header, bio uncapped display, proper capitalization for smoke pref labels
+- **Flag-outside-input pattern** for nationality, country, and phone fields — flag emoji displayed outside the input box, SearchableSelect dropdowns still show flags in options for scanning
+- **DatePicker selector reorder** — was Month-Year-Day, now Day-Month-Year to match `DD MMM YYYY` display output, consistent site-wide (DOB in StepPersonal, profile settings, attachment pages)
+- **Wizard chrome polish** — amber color scheme on parse loading screen (spinner, progress bar, step text), amber progress header on wizard steps, teal checkmarks for completed steps
+- **Upload confirmation page tweaks** — button auto-width centered (not full-width), teal-700 primary, "Other options" sentence case with generous tap targets, spacing improvements
+- **New `lib/constants/roles.ts`** — comprehensive yacht crew roles list (Captain through Cook/Stewardess combos) with datalist picker in edit form
+- **Contextual help text** — "Captains and crew agents often filter by these" for smoking/tattoos/driving, "Where are you based right now?" for location
+- **"Display name" → "Preferred name"** in onboarding wizard and profile settings, with updated hint copy
+- **Three backlog items captured** — `ai-bio-writing-assist.md` (AI-assisted bio writing), `secondary-role-logic.md` (dual role vs open-to-either, flagged as needing significant design work), `phone-whatsapp-split.md` (separate phone/WhatsApp fields, defaults to same, overridable)
+- **Design decision logged** — "No left border accent stripes on cards" added to `docs/design-system/decisions/README.md`
+- **SearchableSelect `displayValue` prop** — allows selected display to differ from dropdown label, eliminating double-flag issue (flag outside box + flag in selected text)
+- **Contrast fix** — amber labels on review fields failed WCAG AA (2.4:1 on white), changed to `--color-text-secondary`
+
+### Context
+
+- Founder is doing a screen-by-screen walkthrough of the CV import wizard (`/app/cv/upload` → `/app/cv/review`). Step 1 edit+review states are done. Steps 2-5 still need the same treatment.
+- Two distinct user flows identified: onboarding wizard (new users, no data review) vs CV import wizard (existing users, 5-step review). Onboarding gives new users a worse experience — noted but not yet addressed.
+- Country SearchableSelect has a data matching bug — "MC" (Monaco) doesn't populate. Likely the stored value is ISO code "MC" but SearchableSelect options use full country name "Monaco" as values. Not yet fixed.
+- Builder autocomplete from earlier session still uncommitted on `chore/remove-icloud-duplicates`.
+- All changes this session are also uncommitted.
+
+### Next
+
+1. **Continue CV import wizard walkthrough** — Steps 2-5 (employment, certifications, education, yacht experience) need the same design/UX pass
+2. **Fix Country SearchableSelect data bug** — Monaco "MC" not matching
+3. **Commit + push builder autocomplete** — awaiting founder go-ahead
+4. **Onboarding wizard parity** — new users should get data review like CV import users
+5. **Sprint 13 completion** — SEO, cookie banner, ops config, legal
+
+### Flags
+
+- ⚠️ Multiple sessions of uncommitted code accumulating — builder autocomplete + this CV wizard rework. Needs commit soon.
+- ⚠️ Amber text on white backgrounds fails WCAG AA contrast — caught and fixed this session. Section colors must NOT be used on body text labels.
+
+---
+
 ## 2026-03-31 — Claude Code (Opus 4.6) — Builder Autocomplete from DB
 
 ### Done

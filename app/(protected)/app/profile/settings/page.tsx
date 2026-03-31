@@ -293,7 +293,7 @@ export default function ProfileSettingsPage() {
       />
       <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-4">
         <Input label="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
-        <Input label="Display name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} hint="How your name appears publicly. Defaults to full name." />
+        <Input label="Preferred name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} hint="What crew call you. Defaults to your full name." />
 
         <div>
           <Input label="Profile handle" value={handle} onChange={(e) => setHandle(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))} />

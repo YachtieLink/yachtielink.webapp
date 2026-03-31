@@ -18,11 +18,15 @@ interface DatePickerProps {
   label?: string
   placeholder?: string
   includeDay?: boolean
+  /** When true, month is optional — user can select just a year and get "YYYY" */
+  optionalMonth?: boolean
   minYear?: number
   maxYear?: number
   disabled?: boolean
   hint?: string
   error?: string
+  /** Align dropdown to the right edge instead of left */
+  alignRight?: boolean
 }
 
 function parseValue(value: string | null): { year: number | null; month: number | null; day: number | null } {
@@ -37,14 +41,16 @@ function parseValue(value: string | null): { year: number | null; month: number 
 function formatDisplay(value: string | null, includeDay: boolean): string {
   if (!value) return ''
   const { year, month, day } = parseValue(value)
-  if (!year || !month) return ''
+  if (!year) return ''
+  if (!month) return `${year}`
   const monthLabel = MONTHS[month - 1]
   if (includeDay && day) return `${day} ${monthLabel} ${year}`
   return `${monthLabel} ${year}`
 }
 
-function buildValue(year: number | null, month: number | null, day: number | null, includeDay: boolean): string | null {
-  if (!year || !month) return null
+function buildValue(year: number | null, month: number | null, day: number | null, includeDay: boolean, optionalMonth: boolean): string | null {
+  if (!year) return null
+  if (!month) return optionalMonth ? `${year}` : null
   const m = String(month).padStart(2, '0')
   if (includeDay && day) {
     const d = String(day).padStart(2, '0')
@@ -63,11 +69,13 @@ export function DatePicker({
   label,
   placeholder = 'Select date',
   includeDay = false,
+  optionalMonth = false,
   minYear,
   maxYear,
   disabled = false,
   hint,
   error,
+  alignRight = false,
 }: DatePickerProps) {
   const reactId = useId()
   const [open, setOpen] = useState(false)
@@ -115,21 +123,23 @@ export function DatePicker({
 
   function handleMonthSelect(month: number) {
     setSelMonth(month)
-    const newVal = buildValue(selYear, month, selDay, includeDay)
+    const newVal = buildValue(selYear, month, selDay, includeDay, optionalMonth)
     if (newVal) onChange(newVal)
     if (!includeDay && selYear) setOpen(false)
   }
 
   function handleYearSelect(year: number) {
     setSelYear(year)
-    const newVal = buildValue(year, selMonth, selDay, includeDay)
+    const newVal = buildValue(year, selMonth, selDay, includeDay, optionalMonth)
     if (newVal) onChange(newVal)
-    if (!includeDay && selMonth) setOpen(false)
+    // If month is optional and not yet selected, close after year selection
+    if (optionalMonth && !selMonth && !includeDay) setOpen(false)
+    else if (!includeDay && selMonth) setOpen(false)
   }
 
   function handleDaySelect(day: number) {
     setSelDay(day)
-    const newVal = buildValue(selYear, selMonth, day, includeDay)
+    const newVal = buildValue(selYear, selMonth, day, includeDay, optionalMonth)
     if (newVal) {
       onChange(newVal)
       setOpen(false)
@@ -184,18 +194,45 @@ export function DatePicker({
 
       {open && (
         <div className="relative z-50">
-          <div className="absolute top-1 left-0 right-0 bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-lg p-4 flex flex-col gap-3">
+          <div className={`absolute top-1 ${alignRight ? 'right-0' : 'left-0'} min-w-[280px] bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-lg p-4 flex flex-col gap-3`}>
             {/* Month + Year row */}
             <div className={`grid gap-3 ${includeDay ? 'grid-cols-3' : 'grid-cols-2'}`}>
+              {/* Day (optional) — first to match DD/MM/YYYY display */}
+              {includeDay && (
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-[var(--color-text-secondary)]">Day</span>
+                  <select
+                    value={selDay ?? ''}
+                    onChange={(e) => handleDaySelect(Number(e.target.value))}
+                    className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
+                  >
+                    <option value="" disabled>Day</option>
+                    {days.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               {/* Month */}
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-medium text-[var(--color-text-secondary)]">Month</span>
                 <select
                   value={selMonth ?? ''}
-                  onChange={(e) => handleMonthSelect(Number(e.target.value))}
+                  onChange={(e) => {
+                    const val = e.target.value
+                    if (val === '') {
+                      // User cleared month (optionalMonth mode)
+                      setSelMonth(null)
+                      const newVal = buildValue(selYear, null, null, includeDay, optionalMonth)
+                      if (newVal) onChange(newVal)
+                    } else {
+                      handleMonthSelect(Number(val))
+                    }
+                  }}
                   className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
                 >
-                  <option value="" disabled>Month</option>
+                  <option value="" disabled={!optionalMonth}>{optionalMonth ? '—' : 'Month'}</option>
                   {MONTH_FULL.map((m, i) => (
                     <option key={m} value={i + 1}>{m}</option>
                   ))}
@@ -216,23 +253,6 @@ export function DatePicker({
                   ))}
                 </select>
               </div>
-
-              {/* Day (optional) */}
-              {includeDay && (
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-[var(--color-text-secondary)]">Day</span>
-                  <select
-                    value={selDay ?? ''}
-                    onChange={(e) => handleDaySelect(Number(e.target.value))}
-                    className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
-                  >
-                    <option value="" disabled>Day</option>
-                    {days.map((d) => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
             </div>
 
             {/* Clear button */}

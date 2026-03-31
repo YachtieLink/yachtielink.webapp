@@ -13,29 +13,23 @@ export async function GET(req: NextRequest) {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('latest_pdf_path')
+    .select('cv_storage_path')
     .eq('id', user.id)
     .single()
 
-  if (!profile?.latest_pdf_path) {
-    return NextResponse.json({ error: 'No PDF generated yet' }, { status: 404 })
+  if (!profile?.cv_storage_path) {
+    return NextResponse.json({ error: 'No uploaded CV found' }, { status: 404 })
   }
 
   const serviceClient = createServiceClient()
 
   const { data: signedUrl } = await serviceClient.storage
-    .from('pdf-exports')
-    .createSignedUrl(profile.latest_pdf_path, 3600)
+    .from('cv-uploads')
+    .createSignedUrl(profile.cv_storage_path, 3600)
 
   if (!signedUrl?.signedUrl) {
     return NextResponse.json({ error: 'Could not generate download link' }, { status: 500 })
   }
-
-  // Track download event (fire and forget — never block the user action)
-  void serviceClient.rpc('record_profile_event', {
-    p_user_id: user.id,
-    p_event_type: 'pdf_download',
-  })
 
   return NextResponse.json({ url: signedUrl.signedUrl })
 }
