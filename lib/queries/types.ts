@@ -121,7 +121,8 @@ export type CvAttachment = {
     yacht_type: string | null
     length_meters: number | null
     flag_state: string | null
-    builder: string | null
+    builder_id: string | null
+    yacht_builders: { name: string } | null
   } | null
 }
 

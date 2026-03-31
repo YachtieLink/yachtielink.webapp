@@ -83,7 +83,7 @@ export function CvPreview({ mode, user, attachments, certifications, endorsement
             {attachments.map((att: any) => {
               const specs = [
                 att.yachts?.length_meters ? `${att.yachts.length_meters}m` : null,
-                att.yachts?.builder,
+                att.yachts?.yacht_builders?.name,
                 att.yacht_program ? humanize(att.yacht_program) : null,
               ].filter(Boolean).join(' · ')
               return (

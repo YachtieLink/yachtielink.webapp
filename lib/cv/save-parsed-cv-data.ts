@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import type { ParsedCvData, ConfirmedImportData, SaveStats } from '@/lib/cv/types'
+import { resolveOrCreateBuilder } from '@/lib/yacht/resolve-builder'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -227,6 +228,9 @@ export async function saveConfirmedImport(
     .eq('user_id', userId)
     .is('deleted_at', null)
 
+  // Cache resolved builder IDs to avoid redundant lookups + race conditions
+  const builderCache = new Map<string, string>()
+
   for (const yacht of data.yachts) {
     try {
       let yachtId: string | null = null
@@ -248,12 +252,27 @@ export async function saveConfirmedImport(
       }
 
       if (!yachtId) {
+        // Resolve builder name to yacht_builders FK (cached per import batch)
+        let builderId: string | null = null
+        if (yacht.builder) {
+          const builderKey = yacht.builder.trim().toLowerCase()
+          if (builderCache.has(builderKey)) {
+            builderId = builderCache.get(builderKey)!
+          } else {
+            const resolved = await resolveOrCreateBuilder(yacht.builder, supabase, userId)
+            if (resolved) {
+              builderId = resolved.id
+              builderCache.set(builderKey, builderId)
+            }
+          }
+        }
+
         const { data: newYacht, error: yachtErr } = await supabase.from('yachts').insert({
           name: yacht.yacht_name,
           yacht_type: yacht.yacht_type,
           length_meters: yacht.length_meters,
           flag_state: yacht.flag_state,
-          builder: yacht.builder,
+          builder_id: builderId,
           created_by: userId,
         }).select('id').single()
         if (yachtErr || !newYacht) continue

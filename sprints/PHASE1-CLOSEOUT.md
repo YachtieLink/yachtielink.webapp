@@ -4,7 +4,7 @@
 
 **How to use this file:** This is the single source of truth for what's left. Work top to bottom. Check boxes as items complete. Read this at session start.
 
-**Last updated:** 2026-03-30
+**Last updated:** 2026-03-31
 
 ---
 
@@ -36,7 +36,7 @@ See `sprints/rallies/rally-006-prelaunch/README.md` for full spec.
 **Bugs (must fix):**
 - [x] Safari public profile links broken — verified working (2026-03-30)
 - [x] Subdomain cookie auth — verified working, links redirect to /u/{handle} (2026-03-30)
-- [x] Onboarding skips CV upload — fixed Wizard skip logic (2026-03-30)
+- [ ] CV parse onboarding — end-to-end flow incomplete. Yacht parsing works but certs, education, personal details confirmation need building + testing. Founder confirmed 2026-03-31.
 - [x] Avatar thumbnail framing — `object-top` default applied (2026-03-30)
 - [x] CV yacht matching confidence — full redesign: compact career list, green/amber/blue states, multi-signal matching, prefix-aware search, inline editing, stat cards (2026-03-30)
 
@@ -60,7 +60,7 @@ See `sprints/rallies/rally-006-prelaunch/README.md` for full spec.
 - [x] CV career list redesign (compact rows, expand-on-tap, stat summary cards)
 - [x] Yacht search prefix-aware comparison (5 DB migrations)
 - [x] Design system documented (`patterns/page-layout.md`, CLAUDE.md + AGENTS.md wired)
-- [ ] Builder autocomplete from DB (remaining)
+- [x] Builder autocomplete from DB — yacht_builders table, 100 seed builders, FK migration, fuzzy search, BuilderInput component, resolveOrCreateBuilder helper (2026-03-31)
 - [ ] Date pickers — text + calendar on mobile (remaining)
 - [ ] Progress tick timing — vary delays for natural feel (remaining)
 

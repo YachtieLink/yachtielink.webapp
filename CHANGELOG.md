@@ -22,6 +22,69 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
 
+## 2026-03-31 — Claude Code (Opus 4.6) — Builder Autocomplete from DB
+
+### Done
+
+- **Builder autocomplete feature complete:** Canonical `yacht_builders` table with 100 seeded builders, FK relationship replacing `yachts.builder` text column, fuzzy matching via `pg_trgm` + prefix boost, shared `BuilderInput` autocomplete component
+- **4 Supabase migrations:** `yacht_builders` table + RLS + seed (000001), `builder_id` FK + backfill + drop old column (000002), `search_yachts` RPC join rewrite (000003), `search_builders` sim score return (000004)
+- **`resolveOrCreateBuilder` helper:** Fuzzy match at sim ≥ 0.4 threshold, auto-create with title-case normalization (Mc prefix, van/der/von particles), race condition handling via 23505 retry. Returns `{ id, name }` for canonical name display.
+- **BuilderInput component:** Debounced (300ms) autocomplete with keyboard nav, click-outside detection, compact mode for inline editing. Used in YachtPicker create form and YachtMatchCard blue-state editor.
+- **CV import path updated:** `save-parsed-cv-data.ts` resolves builders via same helper with per-batch dedup cache. All query consumers (`profile.ts`, `cv/preview/page.tsx`, `generate-pdf/route.ts`, `CvPreview.tsx`, `ProfilePdfDocument.tsx`) updated to join through `yacht_builders(name)`.
+- **Seed script updated:** `seed-test-data.mjs` creates builder rows and references by `builder_id`.
+- **Two-phase code review passed:** Sonnet Phase 1 surfaced 8 candidates, Opus Phase 2 confirmed 3 (canonical name display, onBlur double-fire, dynamic import). All fixed.
+- **YachtieLink drift review:** WARNING verdict — no blocking drift, hotspot files noted but justified.
+- **QA passed:** All 8 test items verified in Chrome (autocomplete suggestions, selection, yacht creation with FK resolution, CV preview, public profile, console errors).
+
+### Context
+
+- Builder autocomplete is the last major code item for Rally 006. Date pickers and progress tick timing remain.
+- **CV parse onboarding flow is incomplete** — only yacht parsing works end-to-end. The remaining steps (certs, education, personal details confirmation) need to be built and tested through the full flow. This was previously marked as done in PHASE1-CLOSEOUT but the founder confirmed it's not finished.
+- Code is uncommitted on `chore/remove-icloud-duplicates` branch. 14 modified files + 6 new files.
+
+### Next
+
+1. **Commit + push builder autocomplete** — awaiting founder go-ahead
+2. **CV parse onboarding — end-to-end completion** — finish the full flow beyond yacht parsing (certs, education, personal details). Founder priority.
+3. **Merge PR #125** (founder) — iCloud duplicate cleanup
+4. **Date picker + progress tick timing** — remaining Rally 006 items
+5. **Sprint 13 completion** — SEO, cookie banner, ops config, legal
+
+### Flags
+
+- ⚠️ CV parse onboarding was marked complete in PHASE1-CLOSEOUT but founder says it's not — only yacht step works. Updated closeout to reflect this.
+- ⚠️ Builder autocomplete code is uncommitted — needs founder approval to commit + push.
+
+---
+
+## 2026-03-30 — Claude Code (Opus 4.6) — Repo Migration + Housekeeping
+
+### Done
+
+- **Repo moved out of iCloud** to `~/Developer/yachtielink.webapp` — symlink left at old iCloud path for backward compatibility
+- **Deleted 19 iCloud conflict duplicates** — `" 2"` copies of components, lib files, and session logs that iCloud sync created. All were junk copies tracked by git.
+- **PR #125 created** for the cleanup (`chore/remove-icloud-duplicates`)
+- **Confirmed `docs/shipslog-sprint12-qa` branch already merged** into main — no orphaned commits
+
+### Context
+
+- Rally 006 (PRs #122–124) fully merged to main. STATUS.md was stale — updated to reflect this.
+- Working tree is clean on `main`. Ready for next sprint or rally.
+
+### Next
+
+1. **Merge PR #125** (founder) — iCloud duplicate cleanup
+2. **Sprint 13 completion** — SEO/sitemap, cookie banner, ops config, legal sign-off
+3. **Ghost Profiles sprint** — claimable accounts, viral loop
+4. **Rally 007 — Launch QA** — full pre-launch checklist
+5. **Deploy** — invite mode, 20-50 crew, 24h monitoring
+
+### Flags
+
+- ⚠️ Repo is now at `~/Developer/yachtielink.webapp` with a symlink from the old iCloud path. VPS agent pulls from GitHub so unaffected.
+
+---
+
 ## 2026-03-30 — Claude Code (Opus 4.6) — Rally 006 Polish + Design System Update
 
 ### Done
