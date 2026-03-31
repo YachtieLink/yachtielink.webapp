@@ -45,7 +45,7 @@ interface Attachment {
     yacht_type?: string | null
     length_meters?: number | null
     flag_state?: string | null
-    builder?: string | null
+    yacht_builders?: { name: string } | null
   } | null
 }
 
@@ -483,7 +483,7 @@ function renderHeaderSubline(user: UserProfile): string {
 function renderAttachmentDetails(att: Attachment, s: Record<string, any>) {
   const specs = [
     att.yachts?.length_meters ? `${att.yachts.length_meters}m` : null,
-    att.yachts?.builder,
+    att.yachts?.yacht_builders?.name,
     att.yacht_program ? humanize(att.yacht_program) : null,
     att.yachts?.flag_state,
   ].filter(Boolean).join(' · ')

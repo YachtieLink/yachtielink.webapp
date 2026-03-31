@@ -47,17 +47,31 @@ const MIME_BY_EXT = {
 // ── Test Data Definitions ────────────────────────────────────────────────────
 
 const YACHTS = [
-  { name: 'TS Artemis', yacht_type: 'Motor Yacht', length_meters: 65, flag_state: 'Cayman Islands', builder: 'Lürssen' },
-  { name: 'TS Blue Horizon', yacht_type: 'Motor Yacht', length_meters: 52, flag_state: 'Marshall Islands', builder: 'Benetti' },
-  { name: 'TS Celestia', yacht_type: 'Sailing Yacht', length_meters: 43, flag_state: 'Malta', builder: 'Oyster' },
-  { name: 'TS Driftwood', yacht_type: 'Motor Yacht', length_meters: 78, flag_state: 'Bermuda', builder: 'Feadship' },
-  { name: 'TS Eclipse Star', yacht_type: 'Motor Yacht', length_meters: 90, flag_state: 'Cayman Islands', builder: 'Oceanco' },
-  { name: 'TS Falcon III', yacht_type: 'Sailing Yacht', length_meters: 38, flag_state: 'UK', builder: 'Baltic Yachts' },
-  { name: 'TS Golden Reef', yacht_type: 'Motor Yacht', length_meters: 55, flag_state: 'Marshall Islands', builder: 'Amels' },
-  { name: 'TS Harbour Light', yacht_type: 'Motor Yacht', length_meters: 48, flag_state: 'Malta', builder: 'Sanlorenzo' },
-  { name: 'TS Iris', yacht_type: 'Motor Yacht', length_meters: 70, flag_state: 'Cayman Islands', builder: 'Heesen' },
-  { name: 'TS Jade Wave', yacht_type: 'Sailing Yacht', length_meters: 34, flag_state: 'Netherlands', builder: 'Perini Navi' },
+  { name: 'TS Artemis', yacht_type: 'Motor Yacht', length_meters: 65, flag_state: 'Cayman Islands' },
+  { name: 'TS Blue Horizon', yacht_type: 'Motor Yacht', length_meters: 52, flag_state: 'Marshall Islands' },
+  { name: 'TS Celestia', yacht_type: 'Sailing Yacht', length_meters: 43, flag_state: 'Malta' },
+  { name: 'TS Driftwood', yacht_type: 'Motor Yacht', length_meters: 78, flag_state: 'Bermuda' },
+  { name: 'TS Eclipse Star', yacht_type: 'Motor Yacht', length_meters: 90, flag_state: 'Cayman Islands' },
+  { name: 'TS Falcon III', yacht_type: 'Sailing Yacht', length_meters: 38, flag_state: 'UK' },
+  { name: 'TS Golden Reef', yacht_type: 'Motor Yacht', length_meters: 55, flag_state: 'Marshall Islands' },
+  { name: 'TS Harbour Light', yacht_type: 'Motor Yacht', length_meters: 48, flag_state: 'Malta' },
+  { name: 'TS Iris', yacht_type: 'Motor Yacht', length_meters: 70, flag_state: 'Cayman Islands' },
+  { name: 'TS Jade Wave', yacht_type: 'Sailing Yacht', length_meters: 34, flag_state: 'Netherlands' },
 ]
+
+// Maps yacht name → builder name (resolved to builder_id at seed time via yacht_builders table)
+const YACHT_BUILDERS_MAP = {
+  'TS Artemis':      'Lürssen',
+  'TS Blue Horizon': 'Benetti',
+  'TS Celestia':     'Oyster',
+  'TS Driftwood':    'Feadship',
+  'TS Eclipse Star': 'Oceanco',
+  'TS Falcon III':   'Baltic Yachts',
+  'TS Golden Reef':  'Amels',
+  'TS Harbour Light':'Sanlorenzo',
+  'TS Iris':         'Heesen',
+  'TS Jade Wave':    'Perini Navi',
+}
 
 const USERS = [
   // Deck department
@@ -532,6 +546,15 @@ async function main() {
 
   // 2. Create yachts
   console.log('\nCreating 10 test yachts...')
+
+  // Fetch builder IDs from yacht_builders table (seeded by migrations)
+  const builderNames = [...new Set(Object.values(YACHT_BUILDERS_MAP))]
+  const { data: builders } = await supabase
+    .from('yacht_builders')
+    .select('id, name')
+    .in('name', builderNames)
+  const builderIdMap = new Map((builders ?? []).map(b => [b.name, b.id]))
+
   const yachtIds = []
   for (const y of YACHTS) {
     // Check if already exists
@@ -542,12 +565,15 @@ async function main() {
       continue
     }
 
+    const builderName = YACHT_BUILDERS_MAP[y.name]
+    const builderId = builderName ? (builderIdMap.get(builderName) ?? null) : null
+
     const { data, error } = await supabase.from('yachts').insert({
       name: y.name,
       yacht_type: y.yacht_type,
       length_meters: y.length_meters,
       flag_state: y.flag_state,
-      builder: y.builder,
+      builder_id: builderId,
       size_category: y.length_meters >= 70 ? 'superyacht' : y.length_meters >= 50 ? 'large' : y.length_meters >= 35 ? 'medium' : 'small',
       is_established: true,
       established_at: new Date().toISOString(),

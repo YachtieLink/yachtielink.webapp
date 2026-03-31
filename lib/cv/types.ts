@@ -130,7 +130,8 @@ export interface ConfirmedYacht {
   yacht_type: string | null
   length_meters: number | null
   flag_state: string | null
-  builder: string | null
+  builder: string | null       // keep for display/input
+  builder_id?: string | null    // resolved yacht_builders FK
   role: string
   start_date: string | null
   end_date: string | null

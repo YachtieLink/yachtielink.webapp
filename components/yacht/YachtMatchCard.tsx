@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useState } from 'react'
 import type { YachtSearchResult } from '@/lib/cv/types'
+import { BuilderInput } from '@/components/yacht/BuilderInput'
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -449,13 +450,12 @@ function BlueExpanded({
         <div className="flex gap-2 items-end">
           <div className="flex-1">
             <label className="block text-[10px] font-medium text-[var(--color-text-tertiary)] mb-1 uppercase tracking-wider">Builder</label>
-            <input
-              type="text"
+            <BuilderInput
               value={builder}
-              onChange={(e) => setBuilder(e.target.value)}
+              onChange={(val) => setBuilder(val)}
               onBlur={handleSpecsBlur}
-              className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]"
               placeholder="e.g. Feadship"
+              compact
             />
           </div>
           <div className="flex gap-1.5 flex-shrink-0">

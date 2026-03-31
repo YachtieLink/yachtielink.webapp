@@ -6,12 +6,43 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 75 lessons
+**Current count:** 78 lessons
+<!-- Note: was 76, added 2 entries on 2026-03-31 (PostgreSQL return type change, prefix boost length gate) -->
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## Cannot Change Return Type of Existing PostgreSQL Function with CREATE OR REPLACE
+
+**What happened:** Adding a `sim real` column to the `search_builders` RPC return type caused `SQLSTATE 42P13` — Postgres doesn't allow `CREATE OR REPLACE FUNCTION` to change the return type of an existing function.
+**Root cause:** PostgreSQL treats the return type as part of the function signature for replacement. Adding/removing return columns requires dropping and recreating.
+**Fix applied:** Added `DROP FUNCTION IF EXISTS public.search_builders(text, int)` before the `CREATE OR REPLACE` in migration 000004.
+**Lesson:** When modifying an RPC's return type in Supabase, always `DROP FUNCTION IF EXISTS` with the full signature before `CREATE OR REPLACE`. This is safe because migrations run sequentially.
+**Sprint:** Rally 006 — Builder Autocomplete | **Caught by:** Claude Code (Opus 4.6) | **Date:** 2026-03-31
+
+---
+
+## Prefix Boost in Trigram Search Can Be Too Aggressive for Short Inputs
+
+**What happened:** The `search_builders` RPC boosted prefix matches to sim ≥ 0.8, but a 2-character query like "ab" would match "Absolute" with 0.80 similarity — far too confident for such a short input.
+**Root cause:** The prefix boost didn't gate on input length. Any prefix match, even 1-2 characters, got boosted to 0.8.
+**Fix applied:** Added `length(q_norm) >= 3` condition to the prefix boost: `when yb.name_normalized like q_norm || '%' and length(q_norm) >= 3 then greatest(similarity(yb.name_normalized, q_norm), 0.8)`.
+**Lesson:** Prefix boosts in fuzzy search need a minimum query length gate. Short prefixes match too many things to warrant high confidence scores.
+**Sprint:** Rally 006 — Builder Autocomplete | **Caught by:** Claude Code (Opus 4.6) | **Date:** 2026-03-31
+
+---
+
+## Never Put a Git Repo in iCloud Drive
+
+**What happened:** 19 iCloud sync conflict files (`" 2"` copies) appeared in the repo and got tracked by git. Components, lib files, and session logs all had duplicates.
+**Root cause:** iCloud Drive syncs files across devices using its own conflict resolution. When two processes touch the same file (or iCloud re-downloads a file), it creates a `filename 2.ext` copy. Git doesn't know these are junk.
+**Fix applied:** Moved repo to `~/Developer/yachtielink.webapp`, left symlink at old iCloud path, deleted all 19 duplicates.
+**Lesson:** Git repos must live on local disk, never in a cloud-synced folder (iCloud, Dropbox, OneDrive). Use GitHub for sync. If the repo must be accessible from an old path, use a symlink.
+**Sprint:** Ad-hoc | **Caught by:** Claude Code (Opus 4.6) | **Date:** 2026-03-30
 
 ---
 

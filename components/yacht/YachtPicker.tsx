@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/Input'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { FLAG_STATES, sizeFromLength } from '@/lib/storage/yacht'
 import type { YachtSearchResult } from '@/lib/cv/types'
+import { BuilderInput } from '@/components/yacht/BuilderInput'
+import { resolveOrCreateBuilder } from '@/lib/yacht/resolve-builder'
 
 // ── Public types ──────────────────────────────────────────────
 
@@ -207,6 +209,20 @@ export function YachtPicker({ userId, onSelect, initialQuery, initialBuilder, in
     const lengthVal = newLength ? parseFloat(newLength) : null
     const sizeCategory = lengthVal ? sizeFromLength(lengthVal) : 'medium'
 
+    let builderId: string | null = null
+    let canonicalBuilder: string | null = null
+    if (newBuilder.trim()) {
+      try {
+        const resolved = await resolveOrCreateBuilder(newBuilder.trim(), supabase, userId)
+        if (resolved) {
+          builderId = resolved.id
+          canonicalBuilder = resolved.name
+        }
+      } catch {
+        // Builder resolution failed — create yacht without builder link rather than blocking
+      }
+    }
+
     const { data: yacht, error } = await supabase
       .from('yachts')
       .insert({
@@ -216,10 +232,10 @@ export function YachtPicker({ userId, onSelect, initialQuery, initialBuilder, in
         ...(lengthVal ? { length_meters: lengthVal } : {}),
         ...(newFlag ? { flag_state: newFlag } : {}),
         ...(newYear ? { year_built: parseInt(newYear) } : {}),
-        ...(newBuilder.trim() ? { builder: newBuilder.trim() } : {}),
+        ...(builderId ? { builder_id: builderId } : {}),
         created_by: userId,
       })
-      .select('id, name, yacht_type, length_meters, flag_state, builder')
+      .select('id, name, yacht_type, length_meters, flag_state')
       .single()
 
     setSaving(false)
@@ -227,7 +243,10 @@ export function YachtPicker({ userId, onSelect, initialQuery, initialBuilder, in
       setCreateError('Something went wrong. Please try again.')
       return
     }
-    onSelect(yacht as YachtOption)
+    onSelect({
+      ...yacht,
+      builder: canonicalBuilder || newBuilder.trim() || null,
+    } as YachtOption)
   }
 
   async function handleDupeUseExisting(candidate: YachtOption) {
@@ -374,10 +393,10 @@ export function YachtPicker({ userId, onSelect, initialQuery, initialBuilder, in
             <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-1">
               Builder
             </label>
-            <Input
-              placeholder="e.g. Lurssen, Feadship"
+            <BuilderInput
               value={newBuilder}
-              onChange={(e) => setNewBuilder(e.target.value)}
+              onChange={(val) => setNewBuilder(val)}
+              placeholder="e.g. Lürssen, Feadship"
             />
           </div>
 

@@ -294,7 +294,7 @@ export async function getCvSections(userId: string) {
       .from('attachments')
       .select(`
         id, role_label, started_at, ended_at, employment_type, yacht_program, description, cruising_area,
-        yachts ( id, name, yacht_type, length_meters, flag_state, builder )
+        yachts ( id, name, yacht_type, length_meters, flag_state, builder_id, yacht_builders ( name ) )
       `)
       .eq('user_id', userId)
       .is('deleted_at', null)
