@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { formatSeaTime } from '@/lib/sea-time'
+import { prefixedYachtName } from '@/lib/yacht-prefix'
 
 interface SeaTimeEntry {
   yacht_id: string
@@ -14,9 +15,10 @@ interface SeaTimeEntry {
 interface SeaTimeBreakdownProps {
   entries: SeaTimeEntry[]
   totalDays: number
+  yachtTypeMap?: Map<string, string | null>
 }
 
-export function SeaTimeBreakdown({ entries, totalDays }: SeaTimeBreakdownProps) {
+export function SeaTimeBreakdown({ entries, totalDays, yachtTypeMap }: SeaTimeBreakdownProps) {
   const total = formatSeaTime(totalDays)
 
   return (
@@ -40,7 +42,7 @@ export function SeaTimeBreakdown({ entries, totalDays }: SeaTimeBreakdownProps) 
                   href={`/app/yacht/${entry.yacht_id}`}
                   className="text-sm font-semibold text-[var(--color-text-primary)] hover:text-[var(--color-interactive)] transition-colors"
                 >
-                  {entry.yacht_name}
+                  {prefixedYachtName(entry.yacht_name, yachtTypeMap?.get(entry.yacht_id))}
                 </Link>
                 {entry.is_current && (
                   <span className="text-xs bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-2 py-0.5 rounded-full font-medium shrink-0 ml-2">

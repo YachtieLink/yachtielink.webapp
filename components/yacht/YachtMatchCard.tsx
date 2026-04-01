@@ -5,6 +5,7 @@ import { useState } from 'react'
 import type { YachtSearchResult } from '@/lib/cv/types'
 import { BuilderInput } from '@/components/yacht/BuilderInput'
 import { DatePicker } from '@/components/ui'
+import { prefixedYachtName, yachtTypePrefix } from '@/lib/yacht-prefix'
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -78,34 +79,7 @@ function parsedSpecs(builder: string | null, length: number | null): string {
   return [builder, length ? formatLength(length) : null].filter(Boolean).join(' · ')
 }
 
-/** Convert yacht_type to a display prefix like "M/Y" */
-const TYPE_PREFIX: Record<string, string> = {
-  'Motor Yacht': 'M/Y',
-  'Sailing Yacht': 'S/Y',
-  'Expedition Vessel': 'E/V',
-  'Fishing Vessel': 'F/V',
-  'Research Vessel': 'R/V',
-  'Support Vessel': 'SV',
-  'Catamaran': 'Cat',
-  'Gulet': 'Gulet',
-}
-
-function yachtTypePrefix(yachtType: string | null | undefined): string {
-  if (!yachtType) return 'M/Y'
-  return TYPE_PREFIX[yachtType] ?? 'M/Y'
-}
-
-/** Prefix a yacht name with its type if not already prefixed */
-function prefixedName(name: string, yachtType: string | null | undefined): string {
-  const prefix = yachtTypePrefix(yachtType)
-  // Don't double-prefix if name already starts with a known prefix
-  const knownPrefixes = ['M/Y', 'S/Y', 'E/V', 'F/V', 'R/V', 'SV', 'MY', 'SY']
-  const upper = name.trimStart().toUpperCase()
-  for (const p of knownPrefixes) {
-    if (upper.startsWith(p + ' ')) return name
-  }
-  return `${prefix} ${name}`
-}
+// Yacht prefix utilities imported from @/lib/yacht-prefix
 
 function formatDate(d: string | null): string {
   if (!d) return ''
@@ -185,7 +159,7 @@ export function YachtMatchCard(props: YachtMatchCardProps) {
 
   const rawName = matchState === 'green' && yacht ? yacht.name : parsedName
   const typeForPrefix = matchState === 'green' && yacht ? yacht.yacht_type : parsedYachtType
-  const displayName = prefixedName(rawName, typeForPrefix)
+  const displayName = prefixedYachtName(rawName, typeForPrefix)
   const dateRange = [formatDate(startDate), formatDate(endDate) || 'Present'].filter(Boolean).join(' — ')
 
   // Specs line: show matched yacht specs for green, parsed specs for blue/amber

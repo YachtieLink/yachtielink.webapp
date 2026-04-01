@@ -1,29 +1,30 @@
-## Review: fix/rally-006-datepicker-tick (yl-wt-3)
+## Review: feat/quick-wins-404-flag (yl-wt-3)
 
-**Verdict: PASS**
+**Verdict: PASS** (blockers resolved on re-review)
 
-### Findings
-- **DatePicker text mode:** Clean implementation. `parseTextDate` is a pure function handling 7 format patterns. Text commits on blur/Enter, inline error with helpful format hints, mode toggle ("Type date" / "Use picker") for switching.
-- **inputMode="text" deviation:** Worker correctly deviated from spec's `inputMode="numeric"` — the component accepts month names like "Mar 2020", which requires letter input. Good call.
-- **Mobile detection:** `useEffect` + `window.innerWidth < 768` causes brief dropdown flash before hydration flips to text mode. Acceptable tradeoff — no layout shift, instantaneous flip.
-- **ProgressWheel staggerMs:** Additive prop, default 0, no change to existing callers. Clean implementation via conditional `style` prop.
-- **EndorsementBanner delays:** 100ms collapsed, 200ms expanded — subtle and organic. Lets container animation complete before bar fills.
-- **Consumer compatibility:** StepExperience, StepPersonal, and settings page untouched — all use the same `onChange(value)` contract, which is preserved.
-- **Drift warning:** DatePicker 286→475 LOC. Justified — single cohesive component, `parseTextDate` is a pure function that could be extracted later but doesn't need to be now.
-- **Drift verdict:** PASS (1 advisory warning, acknowledged)
-- **QA results:** No browser QA possible in worktree. Logic verified by code review. Text parsing covers ISO, US, and natural formats. Edge cases (invalid dates, partial input) handled.
+### /yl-review results
+- Type-check: PASS (0 errors)
+- Drift-check: PASS (0 new warnings)
+- Sonnet scan: completed — no remaining blockers
+- Opus deep review: completed — no remaining blockers
+- YL drift patterns: WARNING (raw color tokens in 404, read model drift — non-blocking)
+- QA: Skipped — migration not applied
+
+### Blocker Resolution
+1. **`not-found.tsx` try/catch** — FIXED. `getUser()` wrapped in try/catch, `user` defaults to `null`. 404 no longer 500s on Supabase failure.
+2. **`CountryFlag.tsx` onError** — FIXED. `onError` handler hides the image on CDN failure. No broken image icon.
+
+### Remaining Warnings (non-blocking)
+1. Read model drift: `getUserById` missing `show_nationality_flag`
+2. Raw color tokens in 404 (`--color-teal-50`, `--color-teal-100`)
+3. Flag toggle UX when no home country set
+4. Dual-toggle sublabel should communicate precedence
+5. Regenerate Supabase types after migration
 
 ### Lane compliance
 - [x] All changed files within allowed list
 - [x] No shared doc edits
 - [x] No scope creep
 
-### Blockers
-None.
-
-### Warnings
-1. DatePicker 475 LOC — monitor if it grows further. `parseTextDate` is a clean extraction candidate if needed.
-2. Mobile flash on text mode default — cosmetic, no functional impact.
-
 ### Recommendation
-Merge as-is.
+Ready to merge. Warnings are follow-up items.
