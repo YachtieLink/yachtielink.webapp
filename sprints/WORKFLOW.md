@@ -452,7 +452,7 @@ A clean review is a valid outcome.
    - **Flags** — anything that needs founder attention, risks, or deferred decisions
 2. Update sibling docs as applicable (check cross-reference nudges in each doc):
    - `sessions/YYYY-MM-DD-<slug>.md` — finalize working notes
-   - `docs/modules/<module>.md` + `.activity.md` — if you touched any module's code
+   - `docs/modules/<module>.md` — if you touched any module's code (consolidated: state + activity + decisions)
    - `docs/ops/lessons-learned.md` — if you hit a non-obvious gotcha
    - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
    - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint

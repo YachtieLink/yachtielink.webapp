@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-01 (CV wizard Steps 4-5 UX rework + two-phase code review complete. All changes uncommitted on `chore/remove-icloud-duplicates`. Three sessions accumulated — commit needed urgently.)
+**Last updated:** 2026-04-01 (Rally 008 doc & skill redesign complete. 3-tier context loading, module consolidation, 5 new skills. Sprint 13 polish merged. CV wizard Steps 2-3 + Ghost Profiles Wave 1 PRs awaiting merge.)
 
 ---
 
@@ -16,10 +16,11 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Sprint | Phase | Status | Focus |
 |--------|-------|--------|-------|
-| Rally 006 | 1B | 🔧 In Progress | Builder autocomplete done. CV wizard Steps 1, 4-5 reviewed. Steps 2-3 pending. |
-| Sprint 13 | 1B | 🔧 Partial (W0+1 merged) | Remaining: SEO, cookie banner, ops config, legal |
+| Rally 006 | 1B | 🔧 Nearly Done | CV wizard Steps 2-3 done (PR #132, unmerged). Steps 1, 4-5 done on `chore/remove-icloud-duplicates` (uncommitted). Date pickers + tick timing remain. |
+| Sprint 13 | 1B | 🔧 Code Complete | SEO/sitemap/OG/cookie/robots merged (PR #130). Ops + legal blocked on founder. |
+| Ghost Profiles W1 | 1B | 🔧 In Review | 3 migrations, non-auth endorsement flow, claim flow (PR #133). Reviewer pending. |
 
-**Next action:** Commit + push accumulated work (founder go-ahead needed). Run migration `20260331000005`. Then continue CV wizard walkthrough (Steps 2-3).
+**Next action:** Merge PR #132 (CV Steps 2-3). Review and merge PR #133 (Ghost Profiles) after reviewer verdict. Close Rally 006 (date pickers + tick timing). Run migration `20260331000005`.
 
 ---
 
@@ -27,25 +28,22 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
-| CV wizard Steps 4-5 UX + code review fixes | 2026-04-01 | Chip hierarchy, review overhaul, celebration screen fix, stale closure fix, rate limit split, Pro gate fix |
-| CV wizard Step 1 UX rework | 2026-03-31 | StepPersonal review/edit states, DatePicker reorder, amber chrome, roles.ts, flag-outside-input |
+| Rally 008 — Doc & skill redesign | 2026-04-01 | 3-tier context loading, CHANGELOG index, 11 module docs consolidated (33→11 files), 5 new yl-skills, 7 archived. ~88% token savings at session start. |
+| Sprint 13 launch polish | 2026-04-01 | Sitemap onboarding filter, robots.txt, cookie banner copy, login link fix, OG/Twitter fallback (PR #130, merged) |
 | Builder autocomplete from DB | 2026-03-31 | yacht_builders table, 4 migrations, BuilderInput component, all consumers updated |
-| Rally 006 — CV import + platform polish | 2026-03-30 | CV import redesign, yacht matching, plan page, analytics, endorsement banner (PRs #122–124) |
-| Sprint 12 QA + mobile fixes | 2026-03-29 | Unicode fixes, colleague card layout, nested link fix (PR #120) |
-| Phase 1 closeout consolidation | 2026-03-29 | Single canonical launch tracker, Rally 006 spec (PR #121) |
 
 ---
 
 ## Up Next (ordered)
 
-1. **Commit + push** — three sessions of accumulated work (founder go-ahead needed)
-2. **Run migration** — `20260331000005_skills_interests_summary.sql` against production DB
-3. **CV wizard Steps 2-3 walkthrough** — Experience and Qualifications screens need UX pass
-4. **Fix Country SearchableSelect data bug** — Monaco "MC" not populating
-5. **Merge PR #125** — iCloud duplicate cleanup (founder)
-6. **Onboarding wizard parity** — new users don't get 5-step data review like CV import users
-7. **Sprint 13 completion** — SEO/sitemap fix, cookie banner text, ops config (founder), legal sign-off (founder)
-8. **Ghost Profiles sprint** — claimable accounts, viral loop (design complete, 24 decisions resolved)
+1. **Merge PR #132** — CV wizard Steps 2-3 (no blockers)
+2. **Review + merge PR #133** — Ghost Profiles Wave 1 (reviewer verdict pending)
+3. **Run migration** — `20260331000005_skills_interests_summary.sql` + 3 ghost profile migrations against production DB
+4. **Close Rally 006** — date pickers (text+calendar on mobile) + progress tick timing
+5. **Commit backlog triage** — consolidate duplicate save-yachts files
+6. **Fix Country SearchableSelect data bug** — Monaco "MC" not populating
+7. **Two small bugs** — BUG-01 onboarding name trigger (S), BUG-03 colleague dedup (S)
+8. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
 9. **Rally 007 — Launch QA** — full checklist
 10. **Deploy** — invite mode, 20-50 crew, 24h monitoring
 
@@ -62,17 +60,18 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ---
 
-## Uncommitted Code
+## Open PRs
 
-**Three sessions accumulated on `chore/remove-icloud-duplicates`:**
+| PR | Branch | Status | Notes |
+|----|--------|--------|-------|
+| #132 | feat/cv-wizard-steps-2-5 | Ready to merge | 2 files, UI only |
+| #133 | feat/ghost-profiles | Reviewer pending | 17 files, 3 migrations, needs careful review |
 
-1. **Builder autocomplete** — 14 modified + 6 new files. 4 migrations, BuilderInput component, resolveOrCreateBuilder helper, all query consumers updated. Reviewed + QA passed.
-2. **CV wizard Step 1 UX rework** — StepPersonal.tsx major rework, DatePicker.tsx reorder, amber chrome, roles.ts, Wizard.tsx + settings "preferred name" rename.
-3. **CV wizard Steps 4-5 UX rework + review fixes** — ChipSelect hierarchy, StepExtras headings, StepReview overhaul, celebration screen fix, YachtMatchCard stale closure fix, rate limit bucket split, Pro gate fix, CvActions restructure.
+**Still uncommitted on `chore/remove-icloud-duplicates`:** Builder autocomplete + CV wizard Steps 1, 4-5 + review fixes (3 prior sessions). Commit still needed — separate from worktree PRs.
 
-**Untracked migration:** `20260331000005_skills_interests_summary.sql` — must be staged with commit.
+**Untracked migration:** `20260331000005_skills_interests_summary.sql` — must be staged with that commit.
 
-**PR #125** — iCloud duplicate cleanup. Awaiting merge.
+**Backlog triage doc** (`sprints/backlog/TRIAGE-2026-04-01.md`) — held, uncommitted, ready to commit next session.
 
 ---
 

@@ -17,10 +17,169 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 **Also update when writing here:**
 - `sessions/YYYY-MM-DD-<slug>.md` — working notes (create at session start if not yet created)
-- `docs/modules/<module>.md` + `.activity.md` — if you touched any module's code
+- `docs/modules/<module>.md` — if you touched any module's code (consolidated: state + activity + decisions)
 - `docs/ops/lessons-learned.md` — if you hit a non-obvious gotcha
 - `docs/ops/feedback.md` — if the founder corrected your approach (append-only)
 - `sprints/major/README.md` or `sprints/junior/README.md` — if you opened/closed a sprint
+
+## Index
+
+| Date | Sprint | Summary |
+|------|--------|---------|
+| 2026-04-01 | Rally 008 | Doc & skill system redesign — 11 module docs collapsed (33→11 files), CHANGELOG index, 5 new yl-skills, 7 archived |
+| 2026-04-01 | Worktree session | First parallel worktree: Lanes 1-3, backlog triage, Rally 006 status |
+| 2026-04-01 | Rally 006 / Sprint 13 | CV Steps 4-5 UX, code review fixes, Pro gate, rate limit buckets |
+| 2026-03-31 | Rally 006 | CV import wizard Step 1 UX rework, flag-outside-input, DatePicker fix |
+| 2026-03-31 | Rally 006 | Builder autocomplete from DB, `yacht_builders` table, 4 migrations |
+| 2026-03-30 | Sprint 13 / Rally 006 | Repo moved out of iCloud, 19 conflict duplicates deleted, PR #125 |
+| 2026-03-30 | Rally 006 | CV career list polish, stat cards, vessel type dropdown, design docs |
+| 2026-03-30 | Rally 006 | Full build: 3 waves, 7 agents, CV import redesign, LLM swap to gpt-5.4-mini |
+| 2026-03-29 | Rally 006 | Grill-me session, BUILD-SPEC.md 18 items, codebase validation |
+| 2026-03-29 | Sprint 12 / Rally 006 | Sprint 12 QA mobile, 3 bugs fixed, 22-issue UX audit, launch path |
+| 2026-03-29 | Sprint 12 | Morning merge of PRs #115-#118, Sprint 12 completeness audit |
+| 2026-03-29 | Sprint 12 / Sprint 13 | Phase 1 close-out spec, pre-launch bug sweep PR #115, Sprint 13 W0+1 |
+| 2026-03-29 | Sprint 12 | Yacht graph wiring: yacht links, SeaTimeSummary, MutualColleagues, PR #118 |
+| 2026-03-29 | Sprint 11d | Settings IA rework, `contact_email` column, CvDetailsCard, PR #114 |
+| 2026-03-29 | Rally 005 | Production auth incident response, Rally 005 hardening PR #112 (12 fixes) |
+| 2026-03-28 | Sprint 11a/b/c | Full QA, ~60 fixes across 3 view modes, ContactModal, PR #107 |
+| 2026-03-28 | Sprint 11c | Rich Portfolio bento grid, 2 templates, 12 tile components (overnight) |
+| 2026-03-28 | Sprint 11b | Portfolio mode, photo lightbox, endorsement pinning (overnight) |
+| 2026-03-28 | Sprint 11a | Public profile rewrite foundation, schema migration (overnight) |
+| 2026-03-28 | Sprint 11 | Build plans 11b + 11c written and two-phase reviewed |
+| 2026-03-28 | Sprint 11 | Design interview (34 questions), Sprint 11 spec, bento research |
+| 2026-03-27 | Sprint CV-Parse-Bugfix | 8 bugs fixed PR #104, 3 skills built, Sprint 10.1 polish PR #103 |
+| 2026-03-27 | Sprint 10.1 | Wave 4+5 QA, subdomain cookie audit, remaining polish staged |
+| 2026-03-27 | Sprint 10.1 | PR #100 sprint restructure merged, stale wave5 commit recovered |
+| 2026-03-26 | Sprint 10.1 | Wave 5 QA, middleware P1 cookie fix, canonical Pro gate, PR #97 |
+| 2026-03-26 | Sprint 10.1 | Wave 4 reverts, cherry-pick fix, Wave 4 QA walkthrough, PR #96 |
+| 2026-03-26 | Sprint 10.1 | Wave 5: Network tab + endorsement cleanup (entry body only) |
+| 2026-03-26 | Sprint 10.1 | Wave 4: PersonalDetailsCard, skills chips, `useProfileSettings` hook |
+| 2026-03-25 | Sprint CV-Parse-Bugfix | Waves 1+2: CV consolidation −301 LOC, shared read models, profile sections |
+| 2026-03-25 | Process | Drift-check script, canonical-owners docs, smoke checklist, /shipslog rename |
+| 2026-03-24 | Process | Infrastructure cost analysis, break-even model, Vercel Pro decision |
+| 2026-03-24 | Process | /log skill upgrade: subagent audit + drift prevention |
+| 2026-03-24 | Sprint CV-Parse-Bugfix | Founder QA: 37 bugs documented, bugfix sprint planned |
+| 2026-03-24 | Sprint CV-Parse-Bugfix | StrictMode double-fire fix, rate limit 429 UX, backlog item |
+| 2026-03-23 | Sprint 11 / Design | Ghost Profiles design (24 decisions), /grill-me + /log skills created |
+| 2026-03-23 | Sprint CV-Parse | Two-pass CV parse, Vercel timeout fix, content filter diagnosis |
+| 2026-03-23 | Sprint CV-Parse | Waves 2-7: full build, import wizard, PDF templates, review + ship |
+| 2026-03-23 | Sprint CV-Parse | Wave 2: edit pages 2a-2d, spec restructure, column renames |
+| 2026-03-23 | Sprint CV-Parse | Spec review + UX overhaul with founder, batch-confirm model |
+| 2026-03-23 | Sprint CV-Parse | Full spec written, 8 spec files, 7 waves |
+| 2026-03-22 | Rally 003 | All 10 fix sprints shipped, /review skill, CV parse sprint planning |
+| 2026-03-22 | Rally 003 | Sprints 2-4: RLS, endorsement deep-link, account deletion, Opus tuning |
+| 2026-03-22 | Rally 003 | Full codebase bug audit (52 confirmed), Sprint 1 security fixes |
+| 2026-03-22 | Sprint 11 | Backlog system created, bug-reporter proposal, `sprints/backlog/` |
+| 2026-03-22 | Sprint 11.1-11.3 | Sprints 11.1-11.3 + WORKFLOW.md: SearchableSelect, saved profiles rework |
+| 2026-03-22 | Sprint 11 | Sprint 11 QA, 3 bugs found, Sprint 11.1 built and shipped PR #55 |
+| 2026-03-22 | Sprint planning | Ralph Loop: 17 sprint plans + 7 build specs, Phases 1C-4 |
+| 2026-03-21 | Sprint 10.2-10.3 | Design system components, full page layout + IA polish (15 parts) |
+| 2026-03-21 | Sprint 10.1 | EmptyState, saved profiles, education edit, animation + typography pass |
+| 2026-03-18 | Project structure | Sprints/rallies/disciplines/design system overhaul, AGENTS.md rewrite |
+| 2026-03-18 | Sprint 10 | Phase 1A post-implementation audit, client fetch error handling (6 files) |
+| 2026-03-18 | Sprint 10 | Phase 1A Profile Robustness: 7 tables, 14 routes, public profile rewrite |
+| 2026-03-17 | Sprint 11 planning | Feature roadmap build plan written (4 tables, 5 routes, 12 components) |
+| 2026-03-17 | Sprint 10.1 | UI/UX refresh Phase 1, DM Serif Display, Framer Motion, Salty mascot spec |
+| 2026-03-17 | Sprint 10.1 | Nav perf: staleTimes, prefetch, useNetworkBadge, public profile CTAs |
+| 2026-03-17 | Sprint 8 launch prep | Pre-merge audit, PostHog/Sentry/Redis env setup, privacy page GDPR |
+| 2026-03-17 | Sprint 10.1 | Nav perf + public profile CTA improvements (duplicate entry) |
+| 2026-03-17 | Sprint 8 | Redis swap from @vercel/kv to ioredis, launch env setup |
+| 2026-03-17 | Sprint 8-9 | Phase 1A cleanup: 11 specs, 12 Sonnet agents, PWA, OG images, SidebarNav |
+| 2026-03-16 | Sprint 8 | Post-Sprint 8 QA, dev/QA Supabase account, rate limiter fail-open fix |
+| 2026-03-15 | Sprint 8 | proxy.ts migration (Next.js 16 middleware rename) |
+| 2026-03-15 | Sprint 8 | Launch prep: Sentry, PostHog, Zod, rate limiting, GDPR, legal pages |
+| 2026-03-15 | Sprint 8 planning | Build plan update: Sprint 8 + 8.1 + 8.2, features doc status updates |
+| 2026-03-15 | Sprint 7 | Stripe founding annual price, end-to-end test, webhook fix |
+| 2026-03-15 | Sprint 7 | Endorsement virality: shareable links, WhatsApp share, mini-onboard |
+| 2026-03-15 | Sprint 7 addendum | Founding member pricing €4.99/mo, Stripe go-live, webhook configured |
+| 2026-03-15 | Sprint 7 | Stripe SDK, checkout/portal/webhook, Insights tab, Pro PDF templates |
+| 2026-03-15 | Design | Brand palette teal/sand, DM Sans, shadcn/ui, style guide v1.0 |
+| 2026-03-15 | Sprint 8 planning | AI feature registry (21 features AI-01 to AI-21), Priority field added |
+| 2026-03-15 | Sprint 6 | Public profile page, CV upload + parse, PDF generation, QR code |
+| 2026-03-14 | Sprint 5 polish | Migration 016, duplicate guard, requester attachment prefill, PR #28 |
+| 2026-03-14 | Sprint 5 | Endorsement loop: request flow, /r/[token] deep link, AudienceTabs |
+| 2026-03-14 | Sprint 4 | Yacht graph: YachtPicker, attachment CRUD, yacht detail, colleague graph |
+| 2026-03-14 | Sprint 3 | Sprint 3 close: Vercel env fix, GRANT EXECUTE migration, Sprint 4 planning |
+| 2026-03-14 | Sprint 3 | Profile: photo upload, certs, settings, about, IdentityCard, WheelACard |
+| 2026-03-13 | Sprint 2 | Sprint 2 close: endorsement request email API wired |
+| 2026-03-13 | Sprint 2 | Onboarding role step UX: single-select dept, cross-dept roles migration |
+| 2026-03-13 | Sprint 2 | Email infrastructure: Resend two-pipeline, DNS verified |
+| 2026-03-13 | Sprint 1 | Full Sprint 1: 7 migrations, RLS, auth, app shell, base components, PR merged |
+| 2026-03-13 | Planning | Feature clarification (33 questions), yl_features.md v2.0, build plan v2.0 |
+| 2026-03-10 | Project setup | yl_features.md created, AGENTS.md restructured, branch staleness resolved |
+| 2026-03-09 | Planning | 5yr plan, yl_build_plan.md canonical Phase 1A sprint plan created |
+| 2026-03-08 | Planning | Planning set rewritten: yacht graph wedge, Phase 1A/1B/1C split |
+| 2026-03-08 | Project setup | Consolidated docs, CLAUDE.md + CHANGELOG.md created, project structure |
+
+## 2026-04-01 — Claude Code (Opus 4.6) — Rally 008: Documentation & Skill System Redesign
+
+### Done
+
+- **Rally 008 completed (all 3 phases)** — full redesign of documentation structure and skill system
+- **Phase 1 — Doc Structure:** AGENTS.md rewritten with Documentation Registry, 3-tier context loading, decision routing table. CHANGELOG index added (75 entries). Backlog formalized with 6 triage categories (58 items indexed).
+- **Phase 2 — File Consolidation:** All 11 module docs consolidated (3→1). 22 satellite files deleted (.activity.md × 11, .decisions.md × 11). Cross-references updated in CLAUDE.md, WORKFLOW.md, worktree docs.
+- **Phase 3 — Skill Rewrites:** 5 new yl-prefixed skills written (yl-review, yl-shipslog, yl-sprint, yl-worktree, yl-overnight). 7 old skills archived. CLAUDE.md mandatory chain updated to `BUILD → /yl-review → /yl-shipslog → WAIT → commit`.
+- **16 design decisions resolved** via /grill-me interview — documented in `sprints/rallies/rally-008-doc-skill-redesign/README.md`
+- **Token savings:** Session start ~25K → ~3K tokens (88%), post-build review chain 4 skill loads → 1 (75%)
+
+### Context
+
+- Rally triggered by audit finding 85K lines of docs, 10-file shipslog, 3 decision systems, 4-skill review chain, ~25K token session start cost.
+- All decisions are in the rally README (not yl_decisions.json — these are dev process decisions, not product decisions).
+- 3-tier context loading: Tier 1 = always-load (~3K tokens: AGENTS.md + STATUS.md + CHANGELOG index), Tier 2 = task-triggered (module docs, sprint specs, feedback.md), Tier 3 = deep reference (grep only: lessons-learned, yl_decisions.json, archived CHANGELOG).
+- New skills read structure from AGENTS.md Documentation Registry, not hardcoded paths. Skills survive doc restructures.
+- Founder correction captured: don't claim fixes passed without re-verifying (feedback.md updated).
+
+### Next
+
+1. **Commit Rally 008 work** — founder permission needed (large change set across docs + skills)
+2. **Test new skills in real session** — first real /yl-shipslog just ran; /yl-review and /yl-sprint untested
+3. **Resume normal sprint work** — merge PRs #132, #133, close Rally 006
+4. **Monitor for drift** — first few sessions with new system will surface any gaps
+
+### Flags
+
+- ⚠️ Root CLAUDE.md chain updated; worktree CLAUDE.md copies (master/reviewer/worker) may still reference old skill names — verify
+- ⚠️ Two .activity.md files show as modified in git status (endorsements, infrastructure) — may need explicit deletion
+- ⚠️ `sprints/PHASE1-CLOSEOUT.md` and `worktrees/sessions/2026-04-01-first-worktree-push.md` also modified — ensure these are intentional
+
+---
+
+## 2026-04-01 — Claude Code (Opus 4.6) — First Worktree Push Session (Master)
+
+### Done
+
+- **First parallel worktree session** — 3 lanes running concurrently from main, master orchestrating
+- **Lane 2 (Sprint 13 Polish) — merged (PR #130):** sitemap `onboarding_complete` filter, `robots.txt` created, cookie banner copy simplified, PublicHeader login link fix, OG/Twitter fallback metadata
+- **Lane 1 (CV Wizard Steps 2-3) — PR #132:** StepExperience amber loading/empty states + stat card wrapper; StepQualifications full two-state rework (review/edit) matching StepPersonal pattern
+- **Lane 3 (Ghost Profiles Wave 1) — PR #133:** 3 migrations, ghost_profiles table + RLS, non-auth endorsement flow, claim flow, modified /r/[token] three-option layout. 17 files, 1600 insertions. Reviewer verdict pending.
+- **Worker 2 reassigned to backlog triage** — 58 items categorized into 6 groups, 5 sprint proposals, 5 rally candidates, 10 items confirmed shipped, 15 deferred to Phase 2+
+- **Rally 006 status confirmed** — ~90% complete. Steps 2-3 (Lane 1) closes the biggest remaining item. Date pickers and progress tick timing are the only two remaining items.
+
+### Context
+
+- Worktree model: master (Opus) on main, workers in yl-wt-1/2/3. File ownership enforced per lane. Merge order: smallest first, rebase survivors.
+- Lane 2 merged fast (5min build, eyeball review, no formal /review needed for 5 files). Lane 1 skipped reviewer (2 UI files). Lane 3 with reviewer overnight.
+- Cookie banner: spec said add vendor names, worker removed them instead — founder agreed removal was better (not a GDPR requirement).
+- Backlog triage output in `sprints/backlog/TRIAGE-2026-04-01.md` (uncommitted, held for next session).
+
+### Next
+
+1. **Review Lane 3 (Ghost Profiles)** — reviewer verdict pending, discuss in morning
+2. **Merge Lane 1 (CV Steps 2-3)** — PR #132, no reviewer needed
+3. **Merge Lane 3** — PR #133 after reviewer pass, rebase onto main after Lane 1 merge
+4. **Rally 006 close-out** — date pickers + progress tick timing are the last two items
+5. **Commit `chore/remove-icloud-duplicates`** — 3 prior sessions of work (builder autocomplete + CV Steps 1, 4-5 + review fixes) still uncommitted
+6. **Commit backlog triage** — consolidate duplicate save-yachts files
+7. **Two small bugs from triage** — BUG-01 onboarding name trigger (S), BUG-03 colleague dedup (S)
+
+### Flags
+
+- ⚠️ Lane 3 has 3 migrations — verify timestamp ordering before merge. Ghost endorsements show `endorser: null` in existing queries until GhostEndorserBadge wired in.
+- ⚠️ `claim_ghost_profile` sets `onboarding_complete = true` to bypass wizard — intentional but noted
+- ⚠️ Backlog triage flagged colleague graph explorer as P1 but never built — founder decision needed on whether it's launch-blocking
+
+---
 
 ## 2026-04-01 — Claude Code (Opus 4.6) — CV Import Wizard Steps 4-5 + Code Review Fixes
 

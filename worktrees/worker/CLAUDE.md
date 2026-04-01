@@ -27,19 +27,44 @@ If no lane file exists for your worktree, stop and ask the founder to check with
 
 ## Sprint Chain (Modified for Workers)
 
-Workers build and self-check. The **reviewer** handles /review, /yachtielink-review, and /test-yl. The **master** handles shipslog and commit.
+Workers build, self-validate thoroughly, then report. The **reviewer** handles deep /review, /yachtielink-review, and /test-yl. The **master** handles merge sequencing. The **logger** (if active) handles doc updates.
 
 ```
-BUILD → type-check → drift-check → REPORT → STOP
+BUILD → type-check → drift-check → self-review → REPORT → STOP
 ```
+
+### Self-validation (you do all of these before reporting done)
+
+1. **Type-check:** `npx tsc --noEmit` — fix all errors you introduced
+2. **Drift-check:** `npm run drift-check` (if it exists) — fix any drift you caused
+3. **Self-review your diff:** Run `git diff` and read every line. Check for:
+   - Dead code, console.logs, debug artifacts
+   - Missing error states / loading states / empty states
+   - Hardcoded values that should be constants
+   - Missing null checks
+   - Accessibility issues (missing aria labels, keyboard nav)
+   - Mobile viewport issues (if touching UI)
+4. **Verify imports:** No unused imports, no circular dependencies
+5. **Test manually if possible:** If the change is UI, describe what you'd expect to see
+
+This self-review catches 80% of what the Opus reviewer would flag. The reviewer then focuses on the deep stuff — architecture, contracts, edge cases, cross-module impact.
 
 **Do NOT run /review, /yachtielink-review, or /test-yl** — the dedicated reviewer session handles these.
 
 **Do NOT commit or push** — the master handles merge sequencing.
 
+**Do NOT edit shared docs** — CHANGELOG.md, STATUS.md, sprint trackers, docs/ops/*. The logger or master handles these.
+
 ## When You're Done
 
-Fill out a report using the template in `worktrees/worker/report-template.md` and save it in your lane file (append to the bottom) or tell the founder verbally. The master needs this to merge safely.
+Fill out a report using the template in `worktrees/worker/report-template.md` and save it to `worktrees/lanes/lane-{N}-report.md`. The master needs this to merge safely.
+
+### If you finish early
+
+Tell the founder you're done. The master may assign you:
+- A bonus task from the backlog
+- A review assist (read another lane's diff, flag concerns)
+- Nothing (stand by for rebase after merge)
 
 ## If You Get Stuck
 

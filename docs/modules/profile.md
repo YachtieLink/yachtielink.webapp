@@ -67,13 +67,13 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 | Display settings API (zero callers — pending cleanup) | `app/api/profile/display-settings/route.ts` |
 | Profile summaries | `lib/profile-summaries.ts` |
 
-## Decisions That Bind This Module
+## Decisions
 
-- **D-007** — Identity is free infrastructure; presentation is paid and cosmetic only
-- **D-013** — No auto-summary language: UI must never auto-summarise endorsement density
-- **D-025** — Contextual profile visibility: direct link shows full profile including contact details
-- **D-027** — Crew availability toggle with expiry (planned, not yet implemented)
-- **D-036** — Phase 1A build target includes profile
+**2026-03-29** — D-038: Auth email and contact email are separate. `contact_email` column on users table for CV/profile display; auth `email` used only for login. All public-facing read paths use `contact_email ?? email` fallback. Scrim/accent/template settings removed from UI — existing DB values preserved, to be rebuilt with live preview in a future sprint. CV-only fields (smoking, tattoos, license, travel docs) live on the CV tab, not profile settings. — Ari + Claude Code
+
+**2026-03-08** — D-036: Current build target is Phase 1A — profile, CV import, yacht entities, employment attachments, colleague graph, endorsements, public profile, PDF snapshot, paid presentation upgrades. Recruiter access and later features deferred. — Ari
+
+**2025-11-20** — D-007: Identity is free infrastructure; presentation is paid and cosmetic only. Paid scope is cosmetic presentation only — templates, polish, watermark removal. — Ari
 
 ## Next Steps
 
@@ -83,3 +83,21 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 - [ ] Profile analytics (basic: view count) — gated to Pro tier
 - [ ] Cert expiry alerts (cron job exists at `app/api/cron/cert-expiry/`)
 - [x] Bump MAX_PHOTOS_PRO 9 → 15 (Sprint 11c — shipped PR #107)
+
+## Recent Activity
+
+**2026-03-29** — Settings IA: Rewrote profile settings page (4 sections). Added `contact_email` column + migration. Created `CvDetailsCard` for CV-only fields. Stripped account page to auth-only. Fixed PDF generator + CV preview to use `contact_email ?? email`. Deleted dead `useProfileSettings` hook. Fixed WheelACard milestone link. Fixed PDF Pro gate to use `isProFromRecord()`.
+**2026-03-28** — Sprint 11c: Added `profile_template` to `getUserByHandle`. Template picker UI (Pro only). `FocalPointPicker` with pointer-capture drag. Focal point PATCH endpoint on `/api/user-photos/[id]`. `MAX_PHOTOS_PRO` bumped 9→15. `isProFromRecord()` extracted to `lib/stripe/pro.ts`. Pro gate restored in settings save for `rich_portfolio`.
+**2026-03-28** — Sprint 11b: Added `focal_x`/`focal_y` to `ProfilePhoto` type. Added `profile_view_mode`, `scrim_preset`, `accent_color` to `getUserByHandle` select. These query changes feed the public profile dual-layout system.
+**2026-03-28** — Sprint 11a: `PublicProfileContent` refactored to single-column 680px layout. `ProfileAccordion` gains `icon` prop. Section components gain `sectionColor` tokens. Display settings foundation with View Mode/Scrim/Accent selectors. Schema migration adds `accent_color`, `scrim_preset`, `profile_view_mode`, `focal_x`/`focal_y`. `CvActions` adds `hasGeneratedPdf` tracking.
+**2026-03-27** — CV-Parse-Bugfix: Country flag in public profile hero via `countryToFlag()`. Visibility settings link on PersonalDetailsCard. ParseProgress `initial={false}` fix. CV view share/download buttons, overflow-x-hidden, cv_public guard. Cert/education inline editing in StepQualifications with stale-index decrement fix.
+**2026-03-27** — Sprint 10.1: Typography pass — `font-serif` on ProfileAccordion titles and page h1s. Added `itemLinks` prop to ProfileSectionGrid for education edit links. Added `popIn` animation to nav notification badges. Added `cardHover` to SavedProfileCard.
+**2026-03-26** — Wave 5 QA: Wired `isPro` to ProfileHeroCard via `getProStatus`. Fixed `isProFromRecord` extraction into `lib/stripe/pro.ts`. Fixed non-Pro copy toast UX. Created `/app/billing` placeholder. Corrected Pro benefits list.
+**2026-03-26** — Phase 1 Wave 4: Added `PersonalDetailsCard` to profile page. Added chip preview in `ProfileSectionGrid` for skills/hobbies. Extracted `useProfileSettings` hook (445 → 185 LOC page + 115 LOC hook).
+**2026-03-25** — Phase 1 Wave 2: Extended `lib/queries/profile.ts` with shared query helpers; added `lib/queries/types.ts` with 12 typed interfaces; updated `lib/profile-summaries.ts` with `resolveYachtId` helper for null/array FK yacht references.
+**2026-03-24** — QA Rally: Fixed StrictMode double-fire in CvImportWizard (hasFiredRef guard). Added 429 rate limit banner. Documented 37 bugs from founder QA walkthrough.
+**2026-03-23** — CV Parse Sprint: Profile settings — 8 new fields (DOB, home country, smoke pref, appearance, travel docs, license, show_dob, show_home_country). Languages edit page (CRUD, max 10). Profile page: flag emoji + sea time in hero, languages row, CV completeness prompt.
+**2026-03-21** — Sprint 10.3: Profile page redesign — hero card, strength card, 2-col section grid, empty states with icons, teal-50 full-bleed background. Custom month/year DatePicker. Hobbies emoji auto-suggest. Photo drag-to-reorder with @dnd-kit. Section color system.
+**2026-03-18** — Phase 1A Profile Robustness: DB migration with 7 new tables. 6 new core components (ProfileAccordion, PhotoGallery, SocialLinksRow, ProfileStrength, SaveProfileButton, SectionManager). 14 new API routes. 6 new edit pages. Full profile page rewrite. `lib/profile-summaries.ts` server-side helpers.
+**2026-03-17** — Phase 1A Cleanup: OG images use `/api/og?handle=`. Founding member badge + available-for-work status on public profile. Framer-motion animations (stagger-in, BottomSheet spring, IdentityCard QR panel). Parallel query performance with React.cache() and Promise.all. Floating profile CTA tiered logic.
+**2026-03-14** — Sprint 3: Built profile page with IdentityCard, WheelACard, AboutSection, YachtsSection, CertsSection, EndorsementsSection. Photo upload with react-image-crop. Storage buckets for profile-photos and cert-documents with full RLS.

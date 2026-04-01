@@ -19,9 +19,9 @@ Sprint 13 W0+1 ✅ Public header/footer, cookie banner
 Rally 005      ✅ Auth resilience (12 fixes)
 QA fixes       ✅ Settings IA, bug sweep, mobile fixes, stale cookies
 
-→ NOW: Pre-launch rally + Sprint 13 completion
-→ THEN: Ghost Profiles sprint
-→ THEN: Launch QA + ops
+→ NOW: Rally 006 nearly done (date pickers + tick timing). Sprint 13 code complete (PR #130 merged). Ghost Profiles W1 in review (PR #133).
+→ THEN: Merge PRs #132 + #133, run migrations, close Rally 006
+→ THEN: Launch QA (Rally 007) + ops config + legal
 → THEN: 🚀 Invite mode
 ```
 
@@ -36,7 +36,7 @@ See `sprints/rallies/rally-006-prelaunch/README.md` for full spec.
 **Bugs (must fix):**
 - [x] Safari public profile links broken — verified working (2026-03-30)
 - [x] Subdomain cookie auth — verified working, links redirect to /u/{handle} (2026-03-30)
-- [ ] CV parse onboarding — Steps 1, 4-5 reviewed and polished. Steps 2-3 (Experience, Qualifications) still need founder walkthrough. End-to-end save flow works.
+- [x] CV parse onboarding — All 5 steps reviewed and polished. Steps 1, 4-5 done in prior sessions. Steps 2-3 done via worktree Lane 1 (PR #132, 2026-04-01).
 - [x] Avatar thumbnail framing — `object-top` default applied (2026-03-30)
 - [x] CV yacht matching confidence — full redesign: compact career list, green/amber/blue states, multi-signal matching, prefix-aware search, inline editing, stat cards (2026-03-30)
 
@@ -64,7 +64,7 @@ See `sprints/rallies/rally-006-prelaunch/README.md` for full spec.
 - [x] CV wizard UX rework Steps 1, 4-5 — chip hierarchy, review overhaul, celebration screen fix, amber wayfinding, DatePicker reorder, roles datalist, flag-outside-input (2026-04-01)
 - [x] Code review fixes — stale closure, rate limit bucket split, Pro gate expiry check, redirect loop fix (2026-04-01)
 - [x] Migration: skills_summary + interests_summary columns on users table (2026-04-01)
-- [ ] CV wizard Steps 2-3 walkthrough — Experience and Qualifications screens still need UX pass
+- [x] CV wizard Steps 2-3 UX rework — StepExperience amber states, StepQualifications two-state rework (PR #132, 2026-04-01)
 - [ ] Date pickers — text + calendar on mobile (remaining)
 - [ ] Progress tick timing — vary delays for natural feel (remaining)
 
@@ -75,10 +75,10 @@ See `sprints/rallies/rally-006-prelaunch/README.md` for full spec.
 Sprint 13 Wave 0+1 (public infrastructure) is merged. Remaining:
 
 **Code work:**
-- [ ] Verify marketing landing page renders correctly
-- [ ] Update cookie banner text (mention PostHog + Sentry by name)
-- [ ] Verify SEO (sitemap excludes soft-deleted users, robots.txt blocks /app/ and /api/, OG tags on public pages)
-- [ ] Fix sitemap soft-delete leak (add `deleted_at IS NULL`)
+- [x] Verify marketing landing page renders correctly (PR #130, 2026-04-01)
+- [x] Cookie banner copy simplified — removed vendor names, founder approved (PR #130, 2026-04-01)
+- [x] SEO verified — sitemap filters incomplete profiles + soft-deleted, robots.txt blocks /app/ /onboarding/ /api/ /invite-only, OG/Twitter fallback metadata added (PR #130, 2026-04-01)
+- [x] Sitemap soft-delete filter already present on main; added `onboarding_complete` filter (PR #130, 2026-04-01)
 
 **Ops (founder):**
 - [ ] Configure Vercel env vars: PostHog, Sentry, Stripe prod, Supabase prod, Redis, Resend, OpenAI, CRON_SECRET
@@ -95,9 +95,11 @@ Sprint 13 Wave 0+1 (public infrastructure) is merged. Remaining:
 
 Design is complete (24 decisions resolved). Core viral loop — when a user adds a yacht, ghost profiles are created for crew they name. Those ghosts become claimable accounts when the real person signs up.
 
-- [ ] Build ghost profiles sprint (spec in `sprints/backlog/ghost-profiles-claimable-accounts.md`)
-- [ ] Verify claim flow end-to-end
-- [ ] Verify ghost → real profile data merge
+- [ ] Ghost Profiles Wave 1 built — ghost_profiles table + RLS, 3 migrations, non-auth endorsement flow, claim flow, /endorse/[token] + /claim/[id] pages (PR #133, 2026-04-01, reviewer pending — check box when merged)
+- [ ] Verify claim flow end-to-end (after PR #133 merge + migration run)
+- [ ] Verify ghost → real profile data merge (after PR #133 merge + migration run)
+- [ ] Wire GhostEndorserBadge into profile views (ghost endorsements show endorser: null until this is done)
+- [ ] Wave 2: phone OTP claim, signup shortcut onboarding bypass
 
 ---
 

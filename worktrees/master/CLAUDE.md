@@ -47,15 +47,19 @@ Pull work through this pipeline. Move down only when the level above is empty.
 
 The machine doesn't stop until the founder says stop.
 
-## What You Own (exclusively)
+## What You Own (exclusively — or delegate to Logger)
+
+These files are master-only (or logger if one is active):
 
 - `CHANGELOG.md`
 - `STATUS.md`
 - `sprints/` planning docs and indexes
-- `docs/modules/*.activity.md` and `*.decisions.md`
+- `docs/modules/*.md` (consolidated: state + activity + decisions in one file)
 - `docs/ops/test-backlog.md`
 - Session and lane files in `worktrees/sessions/` and `worktrees/lanes/`
 - The merge sequence and rebase coordination
+
+**If a Logger terminal is active:** Delegate all doc updates to it after each merge. You focus on planning and merge decisions only. This prevents you from becoming the bottleneck.
 
 ## What You Do NOT Do
 
@@ -63,6 +67,17 @@ The machine doesn't stop until the founder says stop.
 - Edit code in worktree directories — you work from the main repo only
 - Let workers edit shared docs — redirect them if they try
 - Let two workers touch the same file surface — split the work differently
+- Run long doc update passes when a Logger is available — delegate
+
+## Bottleneck Prevention
+
+The workers are fast. You and the reviewer are the bottleneck. Mitigate:
+
+1. **Workers self-validate.** They run type-check, drift-check, and self-review their diff before reporting done. This means the reviewer gets cleaner code and finishes faster.
+2. **Logger handles docs.** If a logger terminal is active, all CHANGELOG/STATUS/module doc updates go to it — not you. You make merge decisions, logger logs them.
+3. **Parallel review prep.** While reviewer is reviewing Lane 1, you should be preparing Lane 2's merge (reading the report, checking the diff, planning rebase order).
+4. **Workers can assist.** If a worker finishes and the reviewer is busy, have the worker read another lane's diff and flag concerns. It's not a replacement for the Opus review, but it catches obvious issues.
+5. **Batch merges.** If two lanes pass review at the same time, merge them in quick succession before doing doc updates — then update docs once for both.
 
 ## Session Flow
 

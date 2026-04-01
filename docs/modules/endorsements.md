@@ -65,16 +65,65 @@ One-line: Endorsement requests, endorsement creation with coworker gating and co
 | AI moderation | `lib/ai/moderation.ts` |
 | Rate limit config | `lib/rate-limit/helpers.ts` |
 
-## Decisions That Bind This Module
+## Decisions
 
-- **D-002** — No star ratings or open free-text reviews (endorsements are structured + free-text, not reviews)
-- **D-005** — Retraction visibility: retractions never visible in UI; backend only
-- **D-009** — Endorsement gating rule: endorsements require shared yacht attachment
-- **D-010** — Endorsement structure: structured metadata + free-text; one per engagement per yacht; editing and deletion allowed but tracked
-- **D-011** — Absence of endorsements is neutral: zero endorsements is not a negative signal
-- **D-013** — No auto-summary language: forbidden to auto-summarise endorsement density
-- **D-019** — Endorsement signals (thumbs up/down): display only in Phase 1, feeds trust weight in Phase 2+ (not yet implemented)
-- **D-020** — No caps on endorsements received
+**2026-03-23** — Ghost Profiles: ghost endorsements bypass the `are_coworkers_on_yacht` gate. The endorsement request token is the trust mechanism — the real user vouched for the relationship by sending the request. Ghost endorsements get a subtle visual distinction (no profile link, softer presentation) and upgrade to full weight when ghost claims account with matching yacht attachment. — Ari
+
+**2026-03-23** — Ghost Profiles: separate `ghost_profiles` table, not `users`. The `users.id` FK to `auth.users(id) ON DELETE CASCADE` makes ghost rows in `users` impossible without fake auth records. Dual nullable endorser columns on `endorsements` (`endorser_id` + `ghost_endorser_id`) with CHECK constraint ensuring exactly one is set. Endorsements migrate on claim. — Ari
+
+**2026-03-23** — Endorsement Writing Assist: never persist AI-generated endorsement text. Always generate on demand. Storing drafts creates a library of generic recycled snippets — the value is fresh, context-specific generation each time. Exception: ghost pre-generated suggestions on `endorsement_requests` (approved as lower-signal quick interactions). — Ari
+
+**2026-01-28** — D-020: No caps on endorsements received. Senior crew with long careers can plausibly receive many endorsements; only endorsements given may ever be constrained. — Ari
+
+**2026-01-28** — D-019: Endorsement signals (thumbs up/down) available to users with overlapping attachment. Display-only in Phase 1; feeds trust weight in Phase 2+. Signals alone never remove an endorsement. — Ari
+
+**2026-01-27** — D-013: Forbidden — any UI that auto-summarises endorsement density ("well endorsed", "lightly endorsed", etc.). Auto-summaries collapse nuance and violate the absence-is-neutral principle. — Ari
+
+**2026-01-27** — D-011: Zero endorsements is not a negative signal. The system never labels absence as meaningful. Only contradicted endorsements create negative weight. — Ari
+
+**2026-01-10** — D-010: One endorsement per engagement per yacht. Structure + free-text. Editing allowed, deletion tracked. Prevents inflation while enabling nuance. — Ari
+
+**2026-01-05** — D-009: Endorsements require shared yacht attachment. Contacts alone do not permit endorsements. Endorsements must be grounded in verifiable shared experience. — Ari
+
+**2025-12-10** — D-005: Endorsement retractions are never visible in UI. Backend only. Visible retractions create scarlet letter effects. Retraction frequency affects endorser weighting in backend. — Ari
+
+**2025-11-15** — D-003: Never monetise influence over trust outcomes. If trust can be bought, trust is worthless. — Ari
+
+**2025-11-15** — D-002: No star ratings or open free-text reviews. Star ratings create false precision; free-text reviews create coercion dynamics and legal exposure. — Ari
+
+**2025-11-15** — D-001: Crew are privileged in trust conflicts. Crew are the mobile, vulnerable party — asymmetric protection prevents the system from becoming a tool for employer control. — Ari
+
+## Recent Activity
+
+**2026-04-01** — Ghost Profiles W1 Lane 3: Ghost endorsement flow — endorser_id nullable, ghost_endorser_id FK, `claim_ghost_profile()` SECURITY DEFINER RPC, non-auth guest endorsement route with IP rate limiting + content moderation, `/endorse/[token]` guest form, `/r/[token]` three-option layout for unauthed users. PR #133.
+
+**2026-03-21** — Sprint 10.1 Wave 1 F: Added try/catch + handleApiError on endorsement-requests routes; Zod validation on DELETE `/api/saved-profiles`.
+
+**2026-03-18** — Post-Phase1A fixes: Fixed mutual endorser count bug in `PublicProfileContent.tsx` — was returning all endorsements when any shared yacht existed; now correctly counts only endorsers whose user ID is in the mutual colleague set.
+
+**2026-03-17** — Phase 1A Cleanup Spec 10: Network badge for pending endorsement requests — `getPendingRequestCount` (React.cache), BottomTabBar red dot indicator, app layout fetches count server-side.
+
+**2026-03-17** — Phase 1A Cleanup Spec 11: Applied `sanitizeHtml()` on user-supplied values in email template API routes; content moderation applied to `POST /api/endorsements` and `PUT /api/endorsements/[id]`.
+
+**2026-03-15** — Sprint 7: Endorsement virality — migration `20260315000019` with `is_shareable` column, phone index, extended `link_pending_requests_to_new_user()` trigger for phone/WhatsApp matching, UPDATE trigger on users, unique index for shareable links.
+
+**2026-03-15** — Sprint 7: New POST `/api/endorsement-requests/share-link` — reusable shareable links (idempotent, one per requester+yacht).
+
+**2026-03-15** — Sprint 7: `RequestEndorsementClient.tsx` full rewrite — share section (WhatsApp, Copy Link, native Share) at top, colleague cards with one-tap Request buttons, email/phone input with auto-detect, rate limit display.
+
+**2026-03-15** — Sprint 7: `DeepLinkFlow.tsx` — added `mini-onboard` step for new/incomplete users (name, role, yacht dates), auto-prefill dates from requester's attachment, post-endorsement redirect to `/onboarding` for incomplete users.
+
+**2026-03-15** — Sprint 7: `WriteEndorsementForm.tsx` — post-endorsement upsell CTA ("Want endorsements too? Request yours →").
+
+**2026-03-15** — Sprint 8: Zod validation applied to `api/endorsements/route.ts`, `api/endorsements/[id]/route.ts`, `api/endorsement-requests/route.ts`; rate limiting applied to all endorsement routes.
+
+**2026-03-15** — Sprint 8: PostHog events — `endorsement.created`, `endorsement.deleted`, `endorsement.requested` wired to endorsement API routes.
+
+**2026-03-15** — Sprint 8: AI content moderation (OpenAI `omni-moderation-latest`) applied to POST/PUT endorsement routes; `moderation.flagged` PostHog event on block; non-blocking on API failure.
+
+**2026-03-14** — Sprint 5 polish: Migration 016 — updated `get_endorsement_request_by_token` RPC to include `requesterAttachment` for prefill; partial unique index prevents duplicate pending requests.
+
+**2026-03-14** — Sprint 5 polish: Added decline action on `app/api/endorsement-requests/[id]/route.ts` — checked against `recipient_user_id` not `requester_id`.
 
 ## Next Steps
 

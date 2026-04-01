@@ -43,10 +43,11 @@ One-line: Five-step wizard (name, handle, role, yacht, endorsement invites) that
 | Deep link mini-onboard | `components/endorsement/DeepLinkFlow.tsx` |
 | Validation schemas | `lib/validation/schemas.ts` |
 
-## Decisions That Bind This Module
+## Decisions
 
-- **D-021** — CV import for onboarding: upload PDF/DOCX to auto-populate via LLM extraction; not verification; cost target <0.05 EUR/parse; fallback to manual entry
-- **D-036** — Phase 1A includes profile, CV import, yacht entities, employment attachments
+**2026-03-08** — D-036: CV import included in Phase 1A build target. Part of the core launch slice. — Ari
+
+**2026-01-31** — D-021: Users can upload existing CV (PDF/DOCX) to auto-populate profile fields via LLM extraction. Part of free identity layer. Extracted data is still self-reported, not verification. Implementation: Claude API, cost target <€0.05/parse. — Ari
 
 ## Next Steps
 
@@ -54,3 +55,16 @@ One-line: Five-step wizard (name, handle, role, yacht, endorsement invites) that
 - [ ] Profile photo upload step in onboarding (currently only available post-onboarding)
 - [ ] Bio writing step or prompt in onboarding
 - [ ] Analytics: track onboarding completion rate and drop-off per step
+
+## Recent Activity
+
+**2026-03-25** — Phase 1 Close-Out Wave 3: Import wizard UX — phone formatting (libphonenumber-js/min), bio textarea in StepPersonal, `formatDateDisplay()` across all steps, inline add-language, editable review cards with edit-from-review navigation, `buildImportData()` factory replacing duplicate ConfirmedImportData construction. Onboarding Wizard.tsx unchanged (already on canonical save pipeline).
+**2026-03-21** — Sprint 10.3: Dark mode sidelined; Sprint 11 flagged as next sprint covering auth pages and welcome page redesign.
+**2026-03-17** — Phase 1A Cleanup Spec 01: Fixed legal page links in welcome page — `/legal/terms` → `/terms`, `/legal/privacy` → `/privacy`.
+**2026-03-15** — Sprint 7: `DeepLinkFlow.tsx` — added `mini-onboard` step for new/incomplete users writing endorsements (name, role, yacht dates); post-endorsement redirect to `/onboarding` for incomplete users.
+**2026-03-15** — Sprint 8: `SIGNUP_MODE` env var — `invite` gates `/welcome` and `/signup`; `/invite-only` static landing page created for pre-launch mode.
+**2026-03-14** — Sprint 3 close: Diagnosed onboarding handle step bug — `handle_available` RPC missing `GRANT EXECUTE` to `anon`/`authenticated` roles, silently returning null. Migration `20260314000010_grant_rpc_execute.sql` applied as fix.
+**2026-03-13** — Onboarding role step UX — department selection changed from multi-select to single-select; specialist roles moved behind collapsible "Other" toggle. Migration adds `Deck/Stew` and `Stew/Deck` roles.
+**2026-03-13** — Sprint 1: Built `app/(auth)/welcome/page.tsx` — landing/auth method selection (email only; Google/Apple as placeholders); onboarding wizard built as part of Sprint 2 scope.
+**2026-03-13** — Feature spec: email verification required for email/password accounts; department multi-select (7 departments); full seeded role list by department with "Other" tracking; CV import deferred to native app contacts import.
+**2026-03-10** — Codex GUI: Restructured `AGENTS.md` — documented Sprint 2 onboarding flow: name → handle → department/role → yacht → endorsement requests → done.
