@@ -1,6 +1,6 @@
 ---
 module: profile
-updated: 2026-03-29
+updated: 2026-04-01
 status: shipped
 phase: 1B
 ---
@@ -86,6 +86,7 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 
 ## Recent Activity
 
+**2026-04-01** — Lane 4 (PR #135): Country ISO resolution — new `lib/constants/country-normalize.ts` normalizer converts ISO alpha-2/alpha-3 + common abbreviations to canonical country name. Wired into CV parse save path and settings load path. CV prompt clarified. Added Gibraltar/Cayman/BVI to ALL_COUNTRIES. Fixed 5 retired ISO codes (Russia SU→RU, Serbia YU→RS, Benin DY→BJ, Burkina Faso HV→BF, Timor-Leste TP→TL).
 **2026-03-29** — Settings IA: Rewrote profile settings page (4 sections). Added `contact_email` column + migration. Created `CvDetailsCard` for CV-only fields. Stripped account page to auth-only. Fixed PDF generator + CV preview to use `contact_email ?? email`. Deleted dead `useProfileSettings` hook. Fixed WheelACard milestone link. Fixed PDF Pro gate to use `isProFromRecord()`.
 **2026-03-28** — Sprint 11c: Added `profile_template` to `getUserByHandle`. Template picker UI (Pro only). `FocalPointPicker` with pointer-capture drag. Focal point PATCH endpoint on `/api/user-photos/[id]`. `MAX_PHOTOS_PRO` bumped 9→15. `isProFromRecord()` extracted to `lib/stripe/pro.ts`. Pro gate restored in settings save for `rich_portfolio`.
 **2026-03-28** — Sprint 11b: Added `focal_x`/`focal_y` to `ProfilePhoto` type. Added `profile_view_mode`, `scrim_preset`, `accent_color` to `getUserByHandle` select. These query changes feed the public profile dual-layout system.

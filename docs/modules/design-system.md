@@ -1,6 +1,6 @@
 ---
 module: design-system
-updated: 2026-03-21
+updated: 2026-04-01
 status: shipped
 phase: 1A
 ---
@@ -167,6 +167,7 @@ Dialog, Badge, Separator, Avatar, Tabs, Tooltip, Sheet, Skeleton, DropdownMenu
 
 ## Recent Activity
 
+**2026-04-01** — Lane 3 (PR #138): DatePicker gains text+calendar hybrid mode — `parseTextDate()` handles 7 format patterns (ISO, US, natural), defaults to text on mobile, inline error with format hints, mode toggle. ProgressWheel gains `staggerMs` prop (default 0, backward compat) for organic tick animations. EndorsementBanner progress bars get 100ms/200ms stagger delays.
 **2026-04-01** — CV wizard Steps 4-5: ChipSelect hierarchy rework (headings > chips), chip sizing downsized to text-xs/py-1, CV chips tinted not solid, hobby chips amber-tinted for distinction; StepReview overhaul with serif title, amber wayfinding borders, tinted skill/hobby chips, M/Y/S/Y prefixes.
 **2026-03-31** — CV wizard walkthrough: DatePicker selector reorder to Day-Month-Year; WCAG contrast fix (amber labels → text-secondary on white backgrounds); decision logged: no left border accent stripes on cards.
 **2026-03-21** — Sprint 10.3: Typography standardized — 28px bold tracking-tight titles, section headers unified; `card-soft` glass treatment on tinted background pages; spacing fixes, toast position uses CSS vars.

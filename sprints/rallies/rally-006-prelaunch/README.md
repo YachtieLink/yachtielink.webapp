@@ -1,6 +1,6 @@
 # Rally 006 — Pre-Launch Bug Sweep + Polish
 
-**Status:** Ready for execution
+**Status:** ✅ Complete (2026-04-01)
 **Priority:** P0 — blocks launch
 **Effort:** 2-3 days
 **Depends on:** All current PRs merged (done)

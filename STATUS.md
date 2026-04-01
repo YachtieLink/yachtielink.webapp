@@ -2,13 +2,13 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-01 (3 sessions today: Rally 008 doc redesign, worktree infra overhaul, then `/yl-worktree` skill + logger + bottleneck fixes. PRs #132 + #133 still need rebasing + merge.)
+**Last updated:** 2026-04-01 (4 sessions today: Rally 008 doc redesign, worktree infra overhaul, /yl-worktree skill + logger + bottleneck fixes, then 4-lane bugfix worktree closing Rally 006. PRs #135–138 merged.)
 
 ---
 
 ## Current Phase
 
-**Phase 1B — final stretch.** All sprints (10-12) complete. Sprint 13 partially shipped. Rally 006 in progress (builder autocomplete done, CV wizard walkthrough partially done). Ghost Profiles + QA between here and launch.
+**Phase 1B — final stretch.** All sprints (10-13) and Rally 006 complete. Ghost Profiles merged. QA rally + deploy between here and launch.
 
 ---
 
@@ -16,11 +16,9 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Sprint | Phase | Status | Focus |
 |--------|-------|--------|-------|
-| Rally 006 | 1B | 🔧 Nearly Done | CV wizard Steps 2-3 done (PR #132, unmerged). Steps 1, 4-5 done on `chore/remove-icloud-duplicates` (uncommitted). Date pickers + tick timing remain. |
 | Sprint 13 | 1B | 🔧 Code Complete | SEO/sitemap/OG/cookie/robots merged (PR #130). Ops + legal blocked on founder. |
-| Ghost Profiles W1 | 1B | ✅ Reviewer Passed | 3 migrations, non-auth endorsement flow, claim flow (PR #133). Needs rebase + merge. |
 
-**Next action:** Rebase PRs #132 + #133 onto main (Rally 008 changed main), merge both, run migrations. Close Rally 006 (date pickers + tick timing).
+**Next action:** Rally 007 — Launch QA full checklist, then deploy in invite mode.
 
 ---
 
@@ -28,26 +26,20 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
+| Bugfix sweep + Rally 006 close | 2026-04-01 | 4 lanes: onboarding name trigger, colleague display names, country ISO resolution, DatePicker text+calendar + tick stagger (PRs #135–138). Rally 006 closed. |
 | /yl-worktree skill + bottleneck fixes | 2026-04-01 | /yl-worktree orchestrator skill, logger role, worker self-validation, model/effort matrix, master bottleneck prevention |
 | Worktree infra overhaul | 2026-04-01 | Docs-as-protocol, auto-bootstrap snippets, dual output, re-review mode, Codex W4, session location unified |
 | Rally 008 — Doc & skill redesign | 2026-04-01 | 3-tier context loading, CHANGELOG index, 11 module docs consolidated (33→11 files), 5 new yl-skills, 7 archived. ~88% token savings at session start. |
 | Sprint 13 launch polish | 2026-04-01 | Sitemap onboarding filter, robots.txt, cookie banner copy, login link fix, OG/Twitter fallback (PR #130, merged) |
-| Builder autocomplete from DB | 2026-03-31 | yacht_builders table, 4 migrations, BuilderInput component, all consumers updated |
 
 ---
 
 ## Up Next (ordered)
 
-1. **Rebase + merge PR #132** — CV wizard Steps 2-3 (needs rebase onto post-Rally-008 main)
-2. **Rebase + merge PR #133** — Ghost Profiles Wave 1 (reviewer passed, needs rebase)
-3. **Run migration** — `20260331000005_skills_interests_summary.sql` + 3 ghost profile migrations against production DB
-4. **Close Rally 006** — date pickers (text+calendar on mobile) + progress tick timing
-5. **Commit backlog triage** — consolidate duplicate save-yachts files
-6. **Fix Country SearchableSelect data bug** — Monaco "MC" not populating
-7. **Two small bugs** — BUG-01 onboarding name trigger (S), BUG-03 colleague dedup (S)
-8. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
-9. **Rally 007 — Launch QA** — full checklist
-10. **Deploy** — invite mode, 20-50 crew, 24h monitoring
+1. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
+2. **Rally 007 — Launch QA** — full checklist
+3. **Deploy** — invite mode, 20-50 crew, 24h monitoring
+4. **Backlog P1** — `inner-page-header-component` (bumped to P1 this session)
 
 ---
 
@@ -66,17 +58,10 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | PR | Branch | Status | Notes |
 |----|--------|--------|-------|
-| #132 | feat/cv-wizard-steps-2-5 | Ready to merge | 2 files, UI only |
-| #133 | feat/ghost-profiles | Reviewer passed | 17 files, 3 migrations, needs rebase + merge |
-
-**Still uncommitted on `chore/remove-icloud-duplicates`:** Builder autocomplete + CV wizard Steps 1, 4-5 + review fixes (3 prior sessions). Commit still needed — separate from worktree PRs.
-
-**Untracked migration:** `20260331000005_skills_interests_summary.sql` — must be staged with that commit.
-
-**Backlog triage doc** (`sprints/backlog/TRIAGE-2026-04-01.md`) — held, uncommitted, ready to commit next session.
+| — | — | No open PRs | All lanes merged this session |
 
 ---
 
 ## Comprehensive Close-Out Spec
 
-See `sprints/PHASE1-CLOSEOUT.md` for the launch tracker. See `sprints/rallies/rally-006-prelaunch/BUILD-SPEC.md` for the approved Rally 006 build spec (18 items, full decision rationale).
+See `sprints/PHASE1-CLOSEOUT.md` for the launch tracker. See `sprints/rallies/rally-006-prelaunch/BUILD-SPEC.md` for the Rally 006 build spec (18 items — all complete).

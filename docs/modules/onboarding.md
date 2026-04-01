@@ -1,6 +1,6 @@
 ---
 module: onboarding
-updated: 2026-03-25
+updated: 2026-04-01
 status: shipped
 phase: 1A
 ---
@@ -58,6 +58,7 @@ One-line: Five-step wizard (name, handle, role, yacht, endorsement invites) that
 
 ## Recent Activity
 
+**2026-04-01** — Lane 1 (PR #136): Auth trigger fix — `handle_new_user()` no longer sets `full_name` from email prefix; new signups get NULL full_name so name step starts clean. Migration `20260401000004_fix_auth_trigger_name.sql`. OAuth/Google signups (metadata `full_name`/`name`) unaffected.
 **2026-03-25** — Phase 1 Close-Out Wave 3: Import wizard UX — phone formatting (libphonenumber-js/min), bio textarea in StepPersonal, `formatDateDisplay()` across all steps, inline add-language, editable review cards with edit-from-review navigation, `buildImportData()` factory replacing duplicate ConfirmedImportData construction. Onboarding Wizard.tsx unchanged (already on canonical save pipeline).
 **2026-03-21** — Sprint 10.3: Dark mode sidelined; Sprint 11 flagged as next sprint covering auth pages and welcome page redesign.
 **2026-03-17** — Phase 1A Cleanup Spec 01: Fixed legal page links in welcome page — `/legal/terms` → `/terms`, `/legal/privacy` → `/privacy`.
