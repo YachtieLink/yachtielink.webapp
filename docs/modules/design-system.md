@@ -1,6 +1,6 @@
 ---
 module: design-system
-updated: 2026-04-01
+updated: 2026-04-02
 status: shipped
 phase: 1A
 ---

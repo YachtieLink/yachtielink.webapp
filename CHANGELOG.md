@@ -135,8 +135,8 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 ### Next
 
 1. Apply pending Supabase migrations: `20260401000005_nationality_flag`, `20260402000001_ghost_profiles_public_read`
-2. Regenerate Supabase types after migrations
-3. Fix private dashboard + CV ghost_endorser join (post-merge warnings from Lane 2)
+2. Fix private profile dashboard + CV ghost_endorser join — `getProfileSections` + `getCvSections` in `lib/queries/profile.ts` still missing the join; profile owner sees "Anonymous" for ghost endorsements in their own dashboard
+3. Regenerate Supabase types after migrations
 4. Rally 007 — Launch QA full checklist
 
 ### Flags

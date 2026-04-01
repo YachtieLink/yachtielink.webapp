@@ -37,9 +37,11 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 ## Up Next (ordered)
 
 1. **Apply migrations** — `20260401000005_nationality_flag` + `20260402000001_ghost_profiles_public_read` (founder runs on Supabase)
-2. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
-3. **Rally 007 — Launch QA** — full checklist
-4. **Deploy** — invite mode, 20-50 crew, 24h monitoring
+2. **Ghost join gap** — private profile dashboard + CV queries still show "Anonymous" for ghost endorsements; add `ghost_endorser` join to `getProfileSections` + `getCvSections` (post-merge warning from Lane 2)
+3. **Regenerate Supabase types** — after migrations run
+4. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
+5. **Rally 007 — Launch QA** — full checklist
+6. **Deploy** — invite mode, 20-50 crew, 24h monitoring
 
 ---
 
