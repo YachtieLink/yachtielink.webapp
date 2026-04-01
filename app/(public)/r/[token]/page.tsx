@@ -118,33 +118,45 @@ export default async function EndorsementRequestPage({ params }: PageProps) {
     const name = requesterDisplayName(requester)
     const returnTo = encodeURIComponent(`/r/${token}`)
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--color-surface)] px-4 py-12 gap-6">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--color-surface)] px-4 py-12">
         <div className="max-w-sm w-full">
+          {/* Request context card */}
           <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-4 mb-6">
-            <p className="text-sm text-[var(--color-text-secondary)] mb-1">Endorsement request from</p>
-            <p className="text-lg font-bold text-[var(--color-text-primary)]">{name}</p>
+            <p className="text-xs text-[var(--color-text-tertiary)] mb-1">Endorsement request from</p>
+            <p className="text-base font-bold text-[var(--color-text-primary)]">{name}</p>
             <p className="text-sm text-[var(--color-text-secondary)]">{yacht.name}</p>
           </div>
 
           <h1 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
-            Sign in to write an endorsement
+            {name} asked you to endorse their work on {yacht.name}.
           </h1>
           <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-            {name} is asking you to endorse their work. It takes about two minutes.
+            It takes about two minutes.
           </p>
 
           <div className="flex flex-col gap-3">
+            {/* Primary: ghost flow — no account needed */}
             <Link
-              href={`/login?returnTo=${returnTo}`}
+              href={`/endorse/${token}`}
               className="flex h-12 items-center justify-center rounded-xl bg-[var(--color-teal-700)] text-white text-sm font-semibold"
             >
-              Sign in
+              Write endorsement
             </Link>
+
+            {/* Secondary: create account first, return here */}
             <Link
               href={`/signup?returnTo=${returnTo}`}
-              className="flex h-12 items-center justify-center rounded-xl border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm font-semibold"
+              className="flex h-12 items-center justify-center rounded-xl border border-[var(--color-teal-700)] text-[var(--color-teal-700)] text-sm font-semibold"
             >
-              Create an account
+              Write endorsement &amp; create account
+            </Link>
+
+            {/* Tertiary: existing account */}
+            <Link
+              href={`/login?returnTo=${returnTo}`}
+              className="flex h-12 items-center justify-center rounded-xl border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm font-medium"
+            >
+              Sign in &amp; write endorsement
             </Link>
           </div>
         </div>
