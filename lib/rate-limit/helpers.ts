@@ -26,6 +26,7 @@ export const RATE_LIMITS = {
   cvParse:           { limit: 10,  window: 60 * 60,           scope: 'user' as const, failOpen: true  }, // 10/1h/user — expensive, but Supabase RPC is the real gate
   cvPersonalParse:   { limit: 20,  window: 60 * 60,           scope: 'user' as const, failOpen: true  }, // 20/1h/user — lightweight AI call
   dataExport:        { limit: 5,   window: 60 * 60,           scope: 'user' as const, failOpen: true  }, // 5/1h/user — GDPR, must not block
+  ghostEndorsement:  { limit: 10,  window: 60 * 60,           scope: 'ip'   as const, failOpen: true  }, // 10/1h/IP  — unauthenticated ghost flow
 } as const;
 
 export async function applyRateLimit(
