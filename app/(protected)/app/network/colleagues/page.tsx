@@ -37,6 +37,14 @@ interface EndorsementRow {
   yacht_id: string
 }
 
+function buildColleagueName(fullName: string, displayName: string | null): string {
+  if (!displayName) return fullName
+  const firstName = fullName.split(' ')[0]
+  if (displayName === firstName) return fullName
+  const rest = fullName.split(' ').slice(1).join(' ')
+  return rest ? `${firstName} '${displayName}' ${rest}` : `${firstName} '${displayName}'`
+}
+
 export default async function ColleaguesPage() {
   const supabase = await createClient()
 
@@ -155,7 +163,7 @@ export default async function ColleaguesPage() {
       if (!group.colleagues.has(profile.id)) {
         group.colleagues.set(profile.id, {
           id: profile.id,
-          name: profile.display_name || profile.full_name,
+          name: buildColleagueName(profile.full_name, profile.display_name),
           handle: profile.handle,
           photoUrl: profile.profile_photo_url,
           role: profile.primary_role,
