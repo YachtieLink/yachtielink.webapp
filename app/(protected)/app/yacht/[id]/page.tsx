@@ -226,7 +226,7 @@ export default async function YachtDetailPage({ params }: PageProps) {
         )}
       </div>
 
-      <div className="px-4 pt-5">
+      <div className="pt-5">
         <PageHeader
           backHref="/app/profile"
           title={yacht.name}

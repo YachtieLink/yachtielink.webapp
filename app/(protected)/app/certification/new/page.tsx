@@ -9,7 +9,7 @@ import { useToast } from '@/components/ui/Toast'
 import { PageHeader } from '@/components/ui/PageHeader'
 import {
   Wrench, UtensilsCrossed, Stethoscope, Compass,
-  Scale, LifeBuoy, Waves, Plus, ChevronLeft, ChevronRight,
+  Scale, LifeBuoy, Waves, Plus, ChevronRight,
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
@@ -187,19 +187,13 @@ export default function CertNewPage() {
   if (step === 'cert') {
     return (
       <div className="flex flex-col gap-4 pb-24">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setStep('category')}
-            className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-xl text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
-            aria-label="Back"
-          >
-            <ChevronLeft size={20} />
-          </button>
-          <div>
-            <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">{category}</h1>
-            <p className="text-sm text-[var(--color-text-secondary)]">Choose your certification</p>
-          </div>
-        </div>
+        <PageHeader
+          onBack={() => setStep('category')}
+          backLabel="Categories"
+          title={category}
+          subtitle="Choose your certification"
+          sectionColor="teal"
+        />
         <ul className="bg-[var(--color-surface)] rounded-2xl divide-y divide-[var(--color-border)]">
           {certsInCategory.map((ct) => (
             <li key={ct.id}>
@@ -234,23 +228,13 @@ export default function CertNewPage() {
   // ── Step: Details ───────────────────────────────────────────────────────────
   return (
     <div className="flex flex-col gap-6 pb-24">
-      <div className="flex items-center gap-3">
-        <button
-          onClick={() => setStep(isOther && !category ? 'category' : 'cert')}
-          className="inline-flex items-center justify-center min-w-[44px] min-h-[44px] rounded-xl text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface-raised)] transition-colors"
-          aria-label="Back"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <div>
-          <h1 className="text-[28px] font-bold tracking-tight text-[var(--color-text-primary)]">
-            {isOther ? 'Other certification' : (selectedCert?.name ?? 'Certification')}
-          </h1>
-          {!isOther && category && (
-            <p className="text-sm text-[var(--color-text-secondary)]">{category}</p>
-          )}
-        </div>
-      </div>
+      <PageHeader
+        onBack={() => setStep(isOther && !category ? 'category' : 'cert')}
+        backLabel={isOther && !category ? 'Categories' : category || 'Back'}
+        title={isOther ? 'Other certification' : (selectedCert?.name ?? 'Certification')}
+        subtitle={!isOther && category ? category : undefined}
+        sectionColor="teal"
+      />
 
       <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
         {isOther && (

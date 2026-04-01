@@ -291,7 +291,7 @@ export function RequestEndorsementClient({
   )
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface)] px-4 pb-24">
+    <div className="min-h-screen bg-[var(--color-surface)] pb-24">
       <PageHeader backHref="/app/network" title="Request endorsements" />
 
       {/* Yacht card */}
