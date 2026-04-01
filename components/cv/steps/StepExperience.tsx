@@ -541,19 +541,22 @@ export function StepExperience({
   // ── Render ─────────────────────────────────────────────
   if (parseLoading) {
     return (
-      <div className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Your Experience</h2>
+      <div className="bg-white/90 border border-[var(--color-amber-200)] rounded-2xl p-5 flex flex-col gap-3 shadow-sm">
+        <h2 className="text-lg font-serif font-semibold text-[var(--color-text-primary)]">Your Career</h2>
         {[...Array(3)].map((_, i) => (
-          <Skeleton key={i} className="h-40 w-full rounded-2xl" />
+          <Skeleton key={i} className="h-14 w-full rounded-xl" />
         ))}
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+          Hang tight — we&apos;re linking up your career history.
+        </p>
       </div>
     )
   }
 
   if (cards.length === 0) {
     return (
-      <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-3">
-        <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Your Experience</h2>
+      <div className="bg-white/90 border border-[var(--color-amber-200)] rounded-2xl p-5 flex flex-col gap-3 shadow-sm">
+        <h2 className="text-lg font-serif font-semibold text-[var(--color-text-primary)]">Your Career</h2>
         <p className="text-sm text-[var(--color-text-secondary)]">
           We didn&apos;t find yacht experience on this CV — that&apos;s completely fine. You might be just
           starting out, or your experience is listed differently. You can add yachts anytime from your profile.
@@ -643,42 +646,42 @@ export function StepExperience({
 
   return (
     <div className="flex flex-col gap-2">
-      {/* Header */}
-      <div className="mb-1">
+      {/* Header + stats card */}
+      <div className="bg-white/90 border border-[var(--color-amber-200)] rounded-2xl p-5 shadow-sm flex flex-col gap-3">
         <h2 className="text-lg font-serif font-semibold text-[var(--color-text-primary)]">Your Career</h2>
-      </div>
 
-      {/* Stat cards — label pinned top, value fills remaining space centered */}
-      <div className="flex gap-2 mb-1">
-        {/* Yachts */}
-        <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
-          <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Yachts</p>
-          <div className="flex-1 flex items-center">
-            <p className="text-lg font-bold text-[var(--color-text-primary)] leading-tight">{yachtCountStr}</p>
+        {/* Stat cards — label pinned top, value fills remaining space centered */}
+        <div className="flex gap-2">
+          {/* Yachts */}
+          <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
+            <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Yachts</p>
+            <div className="flex-1 flex items-center">
+              <p className="text-lg font-bold text-[var(--color-text-primary)] leading-tight">{yachtCountStr}</p>
+            </div>
           </div>
+          {/* Time at sea */}
+          {totalMonths > 0 && (
+            <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
+              <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Sea service</p>
+              <div className="flex-1 flex items-center">
+                <p className="text-base font-bold text-[var(--color-text-primary)] leading-snug text-center">
+                  {totalYears > 0 && <>{totalYears} year{totalYears === 1 ? '' : 's'}</>}
+                  {totalYears > 0 && remainingMonths > 0 && <br />}
+                  {remainingMonths > 0 && <>{remainingMonths} month{remainingMonths === 1 ? '' : 's'}</>}
+                </p>
+              </div>
+            </div>
+          )}
+          {/* Since year */}
+          {earliestYear && (
+            <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
+              <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Since</p>
+              <div className="flex-1 flex items-center">
+                <p className="text-lg font-bold text-[var(--color-text-primary)] leading-tight">{earliestYear}</p>
+              </div>
+            </div>
+          )}
         </div>
-        {/* Time at sea */}
-        {totalMonths > 0 && (
-          <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
-            <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Sea service</p>
-            <div className="flex-1 flex items-center">
-              <p className="text-base font-bold text-[var(--color-text-primary)] leading-snug text-center">
-                {totalYears > 0 && <>{totalYears} year{totalYears === 1 ? '' : 's'}</>}
-                {totalYears > 0 && remainingMonths > 0 && <br />}
-                {remainingMonths > 0 && <>{remainingMonths} month{remainingMonths === 1 ? '' : 's'}</>}
-              </p>
-            </div>
-          </div>
-        )}
-        {/* Since year */}
-        {earliestYear && (
-          <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
-            <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Since</p>
-            <div className="flex-1 flex items-center">
-              <p className="text-lg font-bold text-[var(--color-text-primary)] leading-tight">{earliestYear}</p>
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Duplicate match warning */}

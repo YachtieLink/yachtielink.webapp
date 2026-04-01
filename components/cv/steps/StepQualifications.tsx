@@ -39,7 +39,7 @@ function AddCertInline({ onAdd }: { onAdd: (cert: ConfirmedCert) => void }) {
       <button
         type="button"
         onClick={() => setAdding(true)}
-        className="text-xs text-[var(--color-interactive)] self-start"
+        className="w-full py-3 rounded-2xl border-2 border-dashed border-[var(--color-amber-200)] text-sm font-medium text-[var(--color-amber-700)] hover:bg-[var(--color-amber-50)] transition-colors"
       >
         + Add certification
       </button>
@@ -79,7 +79,7 @@ function AddEduInline({ onAdd }: { onAdd: (edu: ConfirmedEducation) => void }) {
       <button
         type="button"
         onClick={() => setAdding(true)}
-        className="text-xs text-[var(--color-interactive)] self-start"
+        className="w-full py-3 rounded-2xl border-2 border-dashed border-[var(--color-amber-200)] text-sm font-medium text-[var(--color-amber-700)] hover:bg-[var(--color-amber-50)] transition-colors"
       >
         + Add education
       </button>
@@ -147,6 +147,8 @@ export function StepQualifications({ certifications, education, parseLoading, on
     setEdu(education.map(e => ({ institution: e.institution, qualification: e.qualification, field_of_study: e.field_of_study, start_date: e.start_date, end_date: e.end_date })))
   }
 
+  const [editing, setEditing] = useState(false)
+
   // Expand/edit state — expanded index shows inline detail fields
   const [expandedCert, setExpandedCert] = useState<number | null>(null)
   const [certDraft, setCertDraft] = useState<ConfirmedCert | null>(null)
@@ -195,49 +197,59 @@ export function StepQualifications({ certifications, education, parseLoading, on
     }
   }
 
+  /** Save any open draft and close expanded panels, then exit edit mode */
+  function handleEditDone() {
+    if (expandedCert !== null && certDraft) {
+      setCerts(prev => prev.map((c, j) => j === expandedCert ? certDraft : c))
+      setExpandedCert(null)
+      setCertDraft(null)
+    }
+    if (expandedEdu !== null && eduDraft) {
+      setEdu(prev => prev.map((e, j) => j === expandedEdu ? eduDraft : e))
+      setExpandedEdu(null)
+      setEduDraft(null)
+    }
+    setEditing(false)
+  }
+
   if (parseLoading) {
     return (
       <div className="bg-white/90 border border-[var(--color-amber-200)] rounded-2xl p-5 flex flex-col gap-3 shadow-sm">
-        <h2 className="text-lg font-serif font-semibold text-[var(--color-text-primary)]">Qualifications</h2>
+        <h2 className="text-lg font-serif font-semibold text-[var(--color-text-primary)]">Your Qualifications</h2>
         {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)}
-        <p className="text-sm text-[var(--color-text-secondary)] mt-1">Reading your qualifications...</p>
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1">Hang tight — we&apos;re reading your qualifications.</p>
       </div>
     )
   }
 
-  return (
-    <div className="bg-white/90 border border-[var(--color-amber-200)] rounded-2xl p-5 flex flex-col gap-5 shadow-sm">
-      <h2 className="text-lg font-serif font-semibold text-[var(--color-text-primary)]">Qualifications</h2>
-
-      {/* Stat boxes */}
-      <div className="flex gap-2">
-        <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
-          <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Certificates</p>
-          <div className="flex-1 flex items-center">
-            <p className="text-lg font-bold text-[var(--color-text-primary)] leading-tight">{certs.length}</p>
-          </div>
+  // ── Edit mode ────────────────────────────────────────────────
+  if (editing) {
+    return (
+      <div className="bg-white/90 border border-[var(--color-amber-200)] rounded-2xl shadow-sm flex flex-col">
+        <div className="flex items-center justify-between p-5 pb-0">
+          <h2 className="text-lg font-serif font-semibold text-[var(--color-text-primary)]">Edit qualifications</h2>
+          <button type="button" onClick={() => setEditing(false)} className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">Cancel</button>
         </div>
-        <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
-          <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Education</p>
-          <div className="flex-1 flex items-center">
-            <p className="text-lg font-bold text-[var(--color-text-primary)] leading-tight">{edu.length}</p>
-          </div>
-        </div>
-      </div>
 
-      {/* Certifications */}
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-[var(--color-text-primary)]">
-          Certificates {certs.length > 0 && `(${certs.length})`}
-        </p>
-        <p className="text-xs text-[var(--color-text-tertiary)]">
-          Professional licences and training — STCW, ENG1, Yachtmaster, food safety, etc.
-        </p>
-        {certs.length > 0 ? (
-          <>
-            <p className="text-xs text-[var(--color-text-tertiary)]">
-              Adding expiry dates and issuing bodies helps you stand out.
+        <div className="p-5 flex flex-col gap-5">
+          {/* Certifications */}
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-medium text-[var(--color-text-primary)]">
+              Certificates {certs.length > 0 && `(${certs.length})`}
             </p>
+            <p className="text-xs text-[var(--color-text-tertiary)]">
+              Professional licences and training — STCW, ENG1, Yachtmaster, food safety, etc.
+            </p>
+            {certs.length > 0 && (
+              <p className="text-xs text-[var(--color-text-tertiary)]">
+                Adding expiry dates and issuing bodies helps you stand out.
+              </p>
+            )}
+            {certs.length === 0 && (
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                No certifications found on your CV. Most captains look for STCW at minimum — add yours below.
+              </p>
+            )}
             {certs.map((cert, i) => {
               const isExpired = cert.expiry_date && new Date(cert.expiry_date) < new Date()
               const isExpanded = expandedCert === i
@@ -273,7 +285,8 @@ export function StepQualifications({ certifications, education, parseLoading, on
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); removeCert(i) }}
-                        className="text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-error)] p-1"
+                        className="h-10 w-10 flex items-center justify-center text-[var(--color-text-tertiary)] hover:text-[var(--color-error)] transition-colors rounded-lg hover:bg-[var(--color-surface-raised)]"
+                        aria-label="Remove"
                       >×</button>
                     </div>
                   </div>
@@ -325,25 +338,22 @@ export function StepQualifications({ certifications, education, parseLoading, on
                 </div>
               )
             })}
-          </>
-        ) : (
-          <p className="text-sm text-[var(--color-text-secondary)]">
-            No certifications found on your CV. Most captains look for STCW at minimum — add yours below.
-          </p>
-        )}
-        <AddCertInline onAdd={(cert) => setCerts([...certs, cert])} />
-      </div>
+            <AddCertInline onAdd={(cert) => setCerts([...certs, cert])} />
+          </div>
 
-      {/* Education */}
-      <div className="border-t border-[var(--color-border)] pt-4 flex flex-col gap-2">
-        <p className="text-sm font-medium text-[var(--color-text-primary)]">
-          Education {edu.length > 0 && `(${edu.length})`}
-        </p>
-        <p className="text-xs text-[var(--color-text-tertiary)]">
-          Degrees and diplomas — university, maritime academy, hospitality school, etc.
-        </p>
-        {edu.length > 0 ? (
-          <>
+          {/* Education */}
+          <div className="border-t border-[var(--color-border)] pt-4 flex flex-col gap-2">
+            <p className="text-sm font-medium text-[var(--color-text-primary)]">
+              Education {edu.length > 0 && `(${edu.length})`}
+            </p>
+            <p className="text-xs text-[var(--color-text-tertiary)]">
+              Degrees and diplomas — university, maritime academy, hospitality school, etc.
+            </p>
+            {edu.length === 0 && (
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                No education found on your CV — you can add degrees or diplomas anytime from your profile.
+              </p>
+            )}
             {edu.map((e, i) => {
               const isExpanded = expandedEdu === i
               const details = eduDetailCount(e)
@@ -373,7 +383,8 @@ export function StepQualifications({ certifications, education, parseLoading, on
                       <button
                         type="button"
                         onClick={(ev) => { ev.stopPropagation(); removeEdu(i) }}
-                        className="text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-error)] p-1"
+                        className="h-10 w-10 flex items-center justify-center text-[var(--color-text-tertiary)] hover:text-[var(--color-error)] transition-colors rounded-lg hover:bg-[var(--color-surface-raised)]"
+                        aria-label="Remove"
                       >×</button>
                     </div>
                   </div>
@@ -436,20 +447,99 @@ export function StepQualifications({ certifications, education, parseLoading, on
                 </div>
               )
             })}
-          </>
-        ) : (
-          <p className="text-sm text-[var(--color-text-secondary)]">
-            No education found on your CV — you can add degrees or diplomas anytime from your profile.
-          </p>
-        )}
-        <AddEduInline onAdd={(entry) => setEdu([...edu, entry])} />
+            <AddEduInline onAdd={(entry) => setEdu([...edu, entry])} />
+          </div>
+        </div>
+
+        {/* Sticky Done */}
+        <div className="sticky bottom-0 p-5 pt-3 bg-white/90 border-t border-[var(--color-amber-100)] rounded-b-2xl">
+          <Button onClick={handleEditDone} className="w-full">Done</Button>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Review mode (default) ────────────────────────────────────
+  return (
+    <div className="bg-white/90 border border-[var(--color-amber-200)] rounded-2xl p-5 flex flex-col gap-3 shadow-sm">
+      <h2 className="text-lg font-serif font-semibold text-[var(--color-text-primary)]">Your Qualifications</h2>
+
+      {/* Stat cards */}
+      <div className="flex gap-2">
+        <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
+          <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Certificates</p>
+          <div className="flex-1 flex items-center">
+            <p className="text-lg font-bold text-[var(--color-text-primary)] leading-tight">{certs.length}</p>
+          </div>
+        </div>
+        <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
+          <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Education</p>
+          <div className="flex-1 flex items-center">
+            <p className="text-lg font-bold text-[var(--color-text-primary)] leading-tight">{edu.length}</p>
+          </div>
+        </div>
       </div>
 
-      {/* Confirm */}
-      <div className="flex flex-col items-center gap-2 mt-1">
-        <Button onClick={() => onConfirm(certs, edu)} className="px-8">
-          Looks good
-        </Button>
+      {/* Cert review rows */}
+      {certs.length > 0 ? (
+        <div className="flex flex-col gap-1.5">
+          {certs.map((cert, i) => {
+            const isExpired = cert.expiry_date && new Date(cert.expiry_date) < new Date()
+            const subtitle = [
+              cert.expiry_date && !isExpired ? `Until ${formatDateDisplay(cert.expiry_date)}` : cert.expiry_date && isExpired ? `Expired ${formatDateDisplay(cert.expiry_date)}` : null,
+              cert.issued_date && !cert.expiry_date ? `Issued ${formatDateDisplay(cert.issued_date)}` : null,
+              cert.issuing_body,
+            ].filter(Boolean).join(' · ')
+
+            return (
+              <div key={i} className="flex items-start gap-2">
+                {isExpired && (
+                  <span className="mt-0.5 text-xs px-1.5 py-0.5 rounded font-medium bg-red-50 text-red-600 flex-shrink-0">Expired</span>
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-[var(--color-text-primary)] leading-snug">{cert.name}</p>
+                  {subtitle && <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">{subtitle}</p>}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      ) : (
+        <p className="text-sm text-[var(--color-text-secondary)]">
+          No certifications found — tap &ldquo;Edit&rdquo; to add yours.
+        </p>
+      )}
+
+      {/* Education review rows */}
+      {edu.length > 0 && (
+        <div className="flex flex-col gap-1.5 border-t border-[var(--color-border)] pt-3 mt-1">
+          {edu.map((e, i) => {
+            const subtitle = [
+              e.qualification,
+              e.field_of_study,
+              e.end_date ? formatDateDisplay(e.end_date) : null,
+            ].filter(Boolean).join(' · ')
+
+            return (
+              <div key={i} className="flex-1 min-w-0">
+                <p className="text-sm text-[var(--color-text-primary)] leading-snug">{e.institution}</p>
+                {subtitle && <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">{subtitle}</p>}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex flex-col gap-2 mt-2">
+        <Button onClick={() => onConfirm(certs, edu)} className="w-full">Looks good</Button>
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors py-2"
+        >
+          Edit qualifications
+        </button>
       </div>
     </div>
   )
