@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-01 (Worktree infra overhaul complete: auto-bootstrap snippets, docs-as-protocol, dual output, Codex W4. PRs #132 + #133 need rebasing + merge.)
+**Last updated:** 2026-04-01 (3 sessions today: Rally 008 doc redesign, worktree infra overhaul, then `/yl-worktree` skill + logger + bottleneck fixes. PRs #132 + #133 still need rebasing + merge.)
 
 ---
 
@@ -28,6 +28,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
+| /yl-worktree skill + bottleneck fixes | 2026-04-01 | /yl-worktree orchestrator skill, logger role, worker self-validation, model/effort matrix, master bottleneck prevention |
 | Worktree infra overhaul | 2026-04-01 | Docs-as-protocol, auto-bootstrap snippets, dual output, re-review mode, Codex W4, session location unified |
 | Rally 008 — Doc & skill redesign | 2026-04-01 | 3-tier context loading, CHANGELOG index, 11 module docs consolidated (33→11 files), 5 new yl-skills, 7 archived. ~88% token savings at session start. |
 | Sprint 13 launch polish | 2026-04-01 | Sitemap onboarding filter, robots.txt, cookie banner copy, login link fix, OG/Twitter fallback (PR #130, merged) |

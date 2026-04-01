@@ -26,6 +26,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-01 | Worktree infra | /yl-worktree skill, logger role, worker self-validation, master bottleneck fixes, model/effort matrix |
 | 2026-04-01 | Worktree infra | Worktree overhaul: docs-as-protocol, auto-bootstrap snippets, dual output, re-review mode, Codex W4 |
 | 2026-04-01 | Rally 008 | Doc & skill system redesign — 11 module docs collapsed (33→11 files), CHANGELOG index, 5 new yl-skills, 7 archived |
 | 2026-04-01 | Worktree session | First parallel worktree: Lanes 1-3, backlog triage, Rally 006 status |
@@ -111,6 +112,40 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 | 2026-03-09 | Planning | 5yr plan, yl_build_plan.md canonical Phase 1A sprint plan created |
 | 2026-03-08 | Planning | Planning set rewritten: yacht graph wedge, Phase 1A/1B/1C split |
 | 2026-03-08 | Project setup | Consolidated docs, CLAUDE.md + CHANGELOG.md created, project structure |
+
+## 2026-04-01 — Claude Code (Opus 4.6) — Worktree Skill + Logger + Bottleneck Fixes
+
+### Done
+
+- **`/yl-worktree` skill created** (`~/.claude/skills/yl-worktree/SKILL.md`) — 7-phase orchestrator: read state → determine mode (resume/fresh) → plan lanes → model/effort selection → create session infrastructure → output prompts → coordinate during session. Includes priority chain, bottleneck management, cleanup instructions.
+- **Logger role created** (`worktrees/logger/CLAUDE.md`) — dedicated Sonnet medium terminal for CHANGELOG/STATUS/module doc updates after each merge. Frees master to focus on planning + merge decisions.
+- **Worker self-validation upgraded** (`worktrees/worker/CLAUDE.md`) — workers now run type-check + drift-check + self-review their own diff (dead code, error states, null checks, imports) before reporting done. Catches ~80% of what reviewer flags, reducing reviewer turnaround.
+- **Master bottleneck prevention** (`worktrees/master/CLAUDE.md`) — new section: delegate docs to logger, prep next merge while reviewer works, workers can assist with review when idle, batch merges before doc updates.
+- **Master prompt simplified** (`worktrees/master/prompt.md`) — cold-start is now "Run /yl-worktree". Fallback full prompt retained for sessions where skill isn't loaded.
+- **Model/effort decision matrix** — built into /yl-worktree skill. Sonnet medium for simple UI, Sonnet high for bounded features, Opus high for schema/auth/cross-module. Reviewer always Opus. Logger always Sonnet medium.
+- **Worktree README updated** — logger in desktop layout + terminal table, communication protocol section, updated session flow diagram showing logger role.
+
+### Context
+
+- This session was primarily workflow design, not code. The worktree model ran its first real session earlier today — bottlenecks observed: master blocked on doc updates, reviewer ran full chain on re-reviews, workers idle after finishing.
+- The /yl-worktree skill now encapsulates the entire session bootstrap so any Opus session can pick it up with a single command.
+- PRs #132 and #133 still need rebasing + merge (unchanged from prior session).
+
+### Next
+
+1. **Rebase + merge PR #132** (CV Steps 2-3) — needs rebase onto post-Rally-008 main
+2. **Rebase + merge PR #133** (Ghost Profiles W1) — reviewer passed, needs rebase
+3. **First /yl-worktree-driven session** — test the skill end-to-end with real lanes
+4. **Close Rally 006** — date pickers + progress tick timing
+5. **Commit backlog triage + all worktree doc updates**
+
+### Flags
+
+- ⚠️ /yl-worktree skill is untested — first real session will validate it
+- ⚠️ Logger role is untested — need to see if Sonnet medium handles doc updates accurately
+- ⚠️ Worker self-validation additions need real-world validation — may need tuning based on what workers actually catch vs miss
+
+---
 
 ## 2026-04-01 — Claude Code (Opus 4.6) — Worktree Infrastructure Overhaul
 

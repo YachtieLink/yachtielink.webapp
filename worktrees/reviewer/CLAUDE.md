@@ -27,11 +27,17 @@ Do not start reviewing until directed.
 
 ```
 1. DIFF SCAN     — understand what changed
-2. /yl-review    — 6-phase quality gate (type-check, drift-check, Sonnet scan, Opus deep, YL drift, QA)
+2. /yl-review    — MANDATORY 6-phase quality gate
 3. VERDICT       — PASS / WARNING / BLOCK
 ```
 
-`/yl-review` runs all phases in one pass. Don't skip it. Don't substitute manual review for it.
+### ⚠️ MANDATORY: You MUST run /yl-review
+
+**Reading the diff and writing a verdict is NOT a review.** That is a code read. A code read is not sufficient.
+
+You MUST invoke the `/yl-review` skill for every lane. This is a slash command — type `/yl-review` in your Claude Code session. It launches automated type-checking, drift-checking, Sonnet scan, Opus deep review, YL drift pattern analysis, and interactive QA. You cannot replicate this manually.
+
+**If you skip /yl-review and write a manual verdict, your review is invalid and will be rejected by the master.**
 
 ### Step 1 — Diff Scan
 
@@ -43,16 +49,18 @@ git log main..HEAD --oneline
 
 Check: files match the worker's allowed list, no out-of-scope edits, no surprise migrations.
 
-### Step 2 — /yl-review
+### Step 2 — /yl-review (DO NOT SKIP)
 
-Run `/yl-review`. This runs the full 6-phase quality gate:
+Type `/yl-review` in your session. This is a skill that runs automatically. It performs:
 
-1. Type-check
-2. Drift-check
-3. Sonnet broad scan
-4. Opus deep review
-5. YL drift patterns
-6. Interactive QA (skip only if pure docs/config with zero UI impact)
+1. `npx tsc --noEmit` — type-check
+2. `npm run drift-check` — drift-check
+3. Sonnet broad scan — schema bugs, logic errors, UX regressions
+4. Opus deep review — traces changed contracts to all callers
+5. YL drift patterns — section colors, design system compliance
+6. Interactive QA — browser testing (skip only if pure docs/config with zero UI impact)
+
+Wait for it to complete before writing your verdict. Your verdict must reference the /yl-review output.
 
 ### Step 3 — Verdict + Dual Output
 

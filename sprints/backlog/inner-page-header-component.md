@@ -1,7 +1,7 @@
 # Inner Page Header — Consistent Layout for Sub-Pages
 
 **Status:** proposed
-**Priority guess:** P2 (visual polish, affects every sub-page)
+**Priority guess:** P1 (founder-flagged, affects every sub-page)
 **Date captured:** 2026-03-27
 
 ## Problem
@@ -57,3 +57,4 @@ Then refactor all inner pages to use `<PageHeader>` instead of their ad-hoc head
 - This is the kind of polish that makes the app feel intentional vs cobbled together
 - Could be part of Sprint 13 (Launch Polish) or done as a standalone junior sprint
 - The main tab pages do NOT need this — they have their own layout via the tab bar
+- **2026-04-01 founder feedback:** "the back button with headings all over the app looks bad. needs better synergy" — bumped to P1. The back button and heading sitting side by side with no visual relationship is a recurring eyesore (e.g. endorsement request page). The fix needs to feel cohesive, not just aligned.
