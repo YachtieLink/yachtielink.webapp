@@ -63,6 +63,91 @@ function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month, 0).getDate()
 }
 
+/** Parse a free-text date string into year/month/day. Returns null if unparseable. */
+function parseTextDate(
+  text: string,
+  includeDay: boolean,
+  optionalMonth: boolean,
+): { year: number; month: number | null; day: number | null } | null {
+  const t = text.trim()
+  if (!t) return null
+
+  // "YYYY" — year only
+  if (/^\d{4}$/.test(t)) {
+    const year = parseInt(t, 10)
+    if (year < 1900 || year > 2100) return null
+    return optionalMonth ? { year, month: null, day: null } : null
+  }
+
+  // "YYYY-MM"
+  const isoMonthYear = t.match(/^(\d{4})-(\d{2})$/)
+  if (isoMonthYear) {
+    const year = parseInt(isoMonthYear[1], 10)
+    const month = parseInt(isoMonthYear[2], 10)
+    if (month < 1 || month > 12) return null
+    return { year, month, day: null }
+  }
+
+  // "YYYY-MM-DD"
+  if (includeDay) {
+    const isoFull = t.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+    if (isoFull) {
+      const year = parseInt(isoFull[1], 10)
+      const month = parseInt(isoFull[2], 10)
+      const day = parseInt(isoFull[3], 10)
+      if (month < 1 || month > 12 || day < 1 || day > 31) return null
+      return { year, month, day }
+    }
+  }
+
+  // "MM/YYYY"
+  const mmYYYY = t.match(/^(\d{1,2})\/(\d{4})$/)
+  if (mmYYYY) {
+    const month = parseInt(mmYYYY[1], 10)
+    const year = parseInt(mmYYYY[2], 10)
+    if (month < 1 || month > 12) return null
+    return { year, month, day: null }
+  }
+
+  // "MM/DD/YYYY"
+  if (includeDay) {
+    const mmDDYYYY = t.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/)
+    if (mmDDYYYY) {
+      const month = parseInt(mmDDYYYY[1], 10)
+      const day = parseInt(mmDDYYYY[2], 10)
+      const year = parseInt(mmDDYYYY[3], 10)
+      if (month < 1 || month > 12 || day < 1 || day > 31) return null
+      return { year, month, day }
+    }
+  }
+
+  // "Mon YYYY" or "Month YYYY"
+  const monthNameYear = t.match(/^([A-Za-z]+)\s+(\d{4})$/)
+  if (monthNameYear) {
+    const monthName = monthNameYear[1].toLowerCase()
+    const year = parseInt(monthNameYear[2], 10)
+    const monthIdx = MONTHS.findIndex(m => m.toLowerCase() === monthName.slice(0, 3))
+    if (monthIdx === -1) return null
+    return { year, month: monthIdx + 1, day: null }
+  }
+
+  // "D Mon YYYY" or "D Month YYYY"
+  if (includeDay) {
+    const dayMonthYear = t.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})$/)
+    if (dayMonthYear) {
+      const day = parseInt(dayMonthYear[1], 10)
+      const monthName = dayMonthYear[2].toLowerCase()
+      const year = parseInt(dayMonthYear[3], 10)
+      const monthIdx = MONTHS.findIndex(m => m.toLowerCase() === monthName.slice(0, 3))
+      if (monthIdx === -1) return null
+      if (day < 1 || day > 31) return null
+      return { year, month: monthIdx + 1, day }
+    }
+  }
+
+  return null
+}
+
 export function DatePicker({
   value,
   onChange,
@@ -89,6 +174,18 @@ export function DatePicker({
   const [selYear, setSelYear] = useState<number | null>(parsed.year)
   const [selMonth, setSelMonth] = useState<number | null>(parsed.month)
   const [selDay, setSelDay] = useState<number | null>(parsed.day)
+
+  // Text input mode state
+  const [textMode, setTextMode] = useState(false)
+  const [textInput, setTextInput] = useState('')
+  const [textError, setTextError] = useState<string | null>(null)
+
+  // Detect mobile on mount — default to text input on narrow viewports
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setTextMode(true)
+    }
+  }, [])
 
   // Sync internal state when value prop changes externally
   useEffect(() => {
@@ -150,8 +247,44 @@ export function DatePicker({
     setSelYear(null)
     setSelMonth(null)
     setSelDay(null)
+    setTextInput('')
+    setTextError(null)
     onChange(null)
     setOpen(false)
+  }
+
+  function handleTextCommit() {
+    if (!textInput.trim()) {
+      setTextError(null)
+      return
+    }
+    const result = parseTextDate(textInput, includeDay, optionalMonth)
+    if (!result) {
+      setTextError(
+        includeDay
+          ? "Try '15 Mar 2020', '03/15/2020', or '2020-03-15'"
+          : "Try 'Mar 2020', '03/2020', or '2020-03'"
+      )
+      return
+    }
+    setTextError(null)
+    setSelYear(result.year)
+    setSelMonth(result.month)
+    setSelDay(result.day)
+    const newVal = buildValue(result.year, result.month, result.day, includeDay, optionalMonth)
+    onChange(newVal)
+    setOpen(false)
+  }
+
+  function switchToTextMode() {
+    setTextInput(formatDisplay(value, includeDay))
+    setTextError(null)
+    setTextMode(true)
+  }
+
+  function switchToPickerMode() {
+    setTextError(null)
+    setTextMode(false)
   }
 
   const displayValue = formatDisplay(value, includeDay)
@@ -195,65 +328,121 @@ export function DatePicker({
       {open && (
         <div className="relative z-50">
           <div className={`absolute top-1 ${alignRight ? 'right-0' : 'left-0'} min-w-[280px] bg-[var(--color-surface)] border border-[var(--color-border)] rounded-xl shadow-lg p-4 flex flex-col gap-3`}>
-            {/* Month + Year row */}
-            <div className={`grid gap-3 ${includeDay ? 'grid-cols-3' : 'grid-cols-2'}`}>
-              {/* Day (optional) — first to match DD/MM/YYYY display */}
-              {includeDay && (
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-[var(--color-text-secondary)]">Day</span>
-                  <select
-                    value={selDay ?? ''}
-                    onChange={(e) => handleDaySelect(Number(e.target.value))}
-                    className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
-                  >
-                    <option value="" disabled>Day</option>
-                    {days.map((d) => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
 
-              {/* Month */}
-              <div className="flex flex-col gap-1">
-                <span className="text-xs font-medium text-[var(--color-text-secondary)]">Month</span>
-                <select
-                  value={selMonth ?? ''}
+            {textMode ? (
+              /* ── Text input mode ─────────────────────────────── */
+              <div className="flex flex-col gap-2">
+                <input
+                  type="text"
+                  inputMode="text"
+                  value={textInput}
                   onChange={(e) => {
-                    const val = e.target.value
-                    if (val === '') {
-                      // User cleared month (optionalMonth mode)
-                      setSelMonth(null)
-                      const newVal = buildValue(selYear, null, null, includeDay, optionalMonth)
-                      if (newVal) onChange(newVal)
-                    } else {
-                      handleMonthSelect(Number(val))
-                    }
+                    setTextInput(e.target.value)
+                    setTextError(null)
                   }}
-                  className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
+                  onBlur={handleTextCommit}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleTextCommit()
+                    }
+                    if (e.key === 'Escape') setOpen(false)
+                  }}
+                  placeholder={includeDay ? '15 Mar 2020' : 'Mar 2020'}
+                  // eslint-disable-next-line jsx-a11y/no-autofocus
+                  autoFocus
+                  className={`
+                    h-10 w-full rounded-lg border px-3 text-sm
+                    bg-[var(--color-surface)] text-[var(--color-text-primary)]
+                    focus:outline-none focus:ring-2
+                    transition-colors
+                    ${textError
+                      ? 'border-[var(--color-error)] focus:border-[var(--color-error)] focus:ring-[var(--color-error)]/20'
+                      : 'border-[var(--color-border)] focus:border-[var(--color-interactive)] focus:ring-[var(--color-interactive)]/20'
+                    }
+                  `}
+                />
+                {textError && (
+                  <p className="text-xs text-[var(--color-error)]">{textError}</p>
+                )}
+                <button
+                  type="button"
+                  onClick={switchToPickerMode}
+                  className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-interactive)] transition-colors self-start"
                 >
-                  <option value="" disabled={!optionalMonth}>{optionalMonth ? '—' : 'Month'}</option>
-                  {MONTH_FULL.map((m, i) => (
-                    <option key={m} value={i + 1}>{m}</option>
-                  ))}
-                </select>
+                  Use picker
+                </button>
               </div>
+            ) : (
+              /* ── Dropdown picker mode ────────────────────────── */
+              <>
+                <div className={`grid gap-3 ${includeDay ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                  {/* Day (optional) — first to match DD/MM/YYYY display */}
+                  {includeDay && (
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs font-medium text-[var(--color-text-secondary)]">Day</span>
+                      <select
+                        value={selDay ?? ''}
+                        onChange={(e) => handleDaySelect(Number(e.target.value))}
+                        className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
+                      >
+                        <option value="" disabled>Day</option>
+                        {days.map((d) => (
+                          <option key={d} value={d}>{d}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
 
-              {/* Year */}
-              <div className="flex flex-col gap-1">
-                <span className="text-xs font-medium text-[var(--color-text-secondary)]">Year</span>
-                <select
-                  value={selYear ?? ''}
-                  onChange={(e) => handleYearSelect(Number(e.target.value))}
-                  className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
+                  {/* Month */}
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-medium text-[var(--color-text-secondary)]">Month</span>
+                    <select
+                      value={selMonth ?? ''}
+                      onChange={(e) => {
+                        const val = e.target.value
+                        if (val === '') {
+                          setSelMonth(null)
+                          const newVal = buildValue(selYear, null, null, includeDay, optionalMonth)
+                          if (newVal) onChange(newVal)
+                        } else {
+                          handleMonthSelect(Number(val))
+                        }
+                      }}
+                      className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
+                    >
+                      <option value="" disabled={!optionalMonth}>{optionalMonth ? '—' : 'Month'}</option>
+                      {MONTH_FULL.map((m, i) => (
+                        <option key={m} value={i + 1}>{m}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Year */}
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs font-medium text-[var(--color-text-secondary)]">Year</span>
+                    <select
+                      value={selYear ?? ''}
+                      onChange={(e) => handleYearSelect(Number(e.target.value))}
+                      className="h-10 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-2 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20"
+                    >
+                      <option value="" disabled>Year</option>
+                      {years.map((y) => (
+                        <option key={y} value={y}>{y}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={switchToTextMode}
+                  className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-interactive)] transition-colors self-start"
                 >
-                  <option value="" disabled>Year</option>
-                  {years.map((y) => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
+                  Type date
+                </button>
+              </>
+            )}
 
             {/* Clear button */}
             {value && (

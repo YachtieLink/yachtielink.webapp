@@ -22,6 +22,12 @@ interface ProgressWheelProps {
   label?: React.ReactNode;
   /** Colour of the filled arc */
   colour?: string;
+  /**
+   * Optional stagger delay in milliseconds. When > 0, adds a CSS transition-delay
+   * so multiple ProgressWheels on the same page animate in sequence rather than
+   * all at once. E.g. pass 0, 75, 150 for three wheels to stagger.
+   */
+  staggerMs?: number;
 }
 
 export function ProgressWheel({
@@ -31,6 +37,7 @@ export function ProgressWheel({
   strokeWidth = 6,
   label,
   colour = "var(--color-interactive)",
+  staggerMs = 0,
 }: ProgressWheelProps) {
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -76,6 +83,7 @@ export function ProgressWheel({
           strokeDasharray={circumference}
           strokeDashoffset={dashOffset}
           className="transition-all duration-500 ease-in-out"
+          style={staggerMs > 0 ? { transitionDelay: `${staggerMs}ms` } : undefined}
         />
       </svg>
 
