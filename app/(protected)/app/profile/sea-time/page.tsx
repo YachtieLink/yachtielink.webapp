@@ -15,6 +15,11 @@ interface SeaTimeDetailedRow {
   is_current: boolean
 }
 
+interface YachtTypeRow {
+  id: string
+  yacht_type: string | null
+}
+
 export default async function SeaTimePage() {
   const supabase = await createClient()
 
@@ -27,12 +32,19 @@ export default async function SeaTimePage() {
   const seaTimeEntries = (entries as SeaTimeDetailedRow[]) ?? []
   const totalDays = seaTimeEntries.reduce((sum, e) => sum + e.days, 0)
 
+  // Fetch yacht types for prefix display
+  const yachtIds = [...new Set(seaTimeEntries.map(e => e.yacht_id))]
+  const { data: yachtTypes } = yachtIds.length > 0
+    ? await supabase.from('yachts').select('id, yacht_type').in('id', yachtIds)
+    : { data: [] }
+  const yachtTypeMap = new Map((yachtTypes as YachtTypeRow[] ?? []).map(y => [y.id, y.yacht_type]))
+
   return (
     <PageTransition className="flex flex-col gap-4 pb-24">
       <PageHeader backHref="/app/profile" title="Sea Time" />
 
       {seaTimeEntries.length > 0 ? (
-        <SeaTimeBreakdown entries={seaTimeEntries} totalDays={totalDays} />
+        <SeaTimeBreakdown entries={seaTimeEntries} totalDays={totalDays} yachtTypeMap={yachtTypeMap} />
       ) : (
         <div className="text-center py-12">
           <p className="text-4xl mb-3">⚓</p>
