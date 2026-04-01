@@ -6,31 +6,33 @@ You are a senior software engineer working on a production Next.js application. 
 
 ---
 
-## Session Start
+## Session Start — Context Loading
 
-Every session, read in this order:
+Token budget matters. Load the minimum needed to start, expand as the task becomes clear.
 
-### Tier 1 — Always (orientation, ~6 files, <600 lines)
-1. This file (AGENTS.md)
-2. `STATUS.md` — quick-glance dashboard: current phase, active sprint, what shipped, what's next, blockers
-3. `CHANGELOG.md` — last 3 sessions (your external memory)
-4. `docs/ops/lessons-learned.md` — don't repeat known mistakes
-5. `docs/ops/feedback.md` — standing behavioral corrections
-6. Your agent profile: `docs/agents/claude-code.md` or `docs/agents/codex.md`
+### Tier 1 — Always (~3K tokens, load before doing anything)
+1. This file (AGENTS.md) — instructions + documentation registry
+2. `STATUS.md` — quick-glance dashboard
+3. `CHANGELOG.md` — read the **Index table only** (first ~80 lines). Dive into specific entries by date if you need detail.
 
-### Tier 2 — Task-specific (load what you need)
-6. Module state files for modules you'll touch (`docs/modules/<module>.md`)
-7. `sprints/README.md` + active sprint README and build_plan
-8. Discipline docs for the task type (see table below)
+That's it. Do not load anything else until you know what you're working on.
+
+### Tier 2 — On demand (load when you know the task)
+4. `docs/modules/<module>.md` — for modules you'll touch (consolidated: state + activity + decisions in one file)
+5. Active sprint README + build_plan — from `sprints/major/` or `sprints/junior/`
+6. `docs/ops/feedback.md` — standing behavioral corrections (load before building, not at session start)
+7. Discipline docs for the task type (see discipline table below)
+8. `docs/design-system/` — **only for frontend/UI work** (start with `README.md`, then drill into what you need)
 9. Last 1-2 session logs if continuing previous work (`sessions/`)
 
-### Tier 3 — Deep context (only if needed)
-10. Module decision/activity logs (`docs/modules/<module>.decisions.md` / `.activity.md`)
-11. `docs/yl_decisions.json` if making a product decision
-12. Design system docs if doing UI work (`docs/design-system/README.md`)
-13. `docs/yl_system_state.json` and `docs/yl_phase1_execution.md` for phase context
+### Tier 3 — Reference (grep, don't read whole files)
+10. `docs/ops/lessons-learned.md` — search for keywords related to your task, don't read all 78 entries
+11. `docs/canonical/yl_decisions.json` — search when making a product decision
+12. `CHANGELOG.md` full entries — search by date when you need historical context
+13. Completed sprint specs — only if you need to understand past work
+14. `docs/yl_system_state.json` and `docs/yl_phase1_execution.md` — phase context if needed
 
-**Load discipline context for the session.** Based on the task, read the relevant files from `docs/disciplines/`. Don't load all of them — pick what applies:
+**Discipline context (Tier 2).** Based on the task, read the relevant files from `docs/disciplines/`. Don't load all of them — pick what applies:
 
 | Discipline | File | Load when |
 |------------|------|-----------|
@@ -129,6 +131,18 @@ These guide judgement calls. When a decision feels like it might drift from them
 
 **When uncertain, ask.** If a feature request, product decision, or implementation choice doesn't sit right with the crew-first mission — raise it. Don't quietly build a softened version. Don't block it either. Surface it.
 
+### Decision Routing
+
+When a decision is made during a session, route it to the correct system:
+
+| Decision type | Where to log | Examples |
+|---------------|-------------|----------|
+| Constitutional / architectural | `docs/canonical/yl_decisions.json` (D-xxx ID) | "Crew-first power orientation," "Identity is free, presentation is paid," "Use RPC instead of direct query for X" |
+| Visual / UX / frontend | `docs/design-system/decisions/README.md` | "Chips subordinate to headings," "No accent stripes on cards," "Section color wayfinding" |
+| Process / behavioral | `docs/ops/feedback.md` | "Don't skip shipslog," "Stop summarizing after every response," "Always run type-check first" |
+
+**Rule:** If a founder correction is about *what the product looks like* → design-system/decisions. If it's about *how you work* → feedback.md. If it's a product-shaping architectural choice → yl_decisions.json. When in doubt, ask.
+
 ---
 
 ## Code Standards
@@ -222,67 +236,120 @@ A real Supabase account exists for automated testing. No code bypasses — it go
 
 ## Docs Reference
 
+See the **Documentation Registry** above for the full file inventory, maintenance rules, and tier assignments.
+
+Quick lookup for reference docs not covered by the registry:
+
 | Doc | Purpose |
 |-----|---------|
-| `STATUS.md` | Quick-glance dashboard — current sprint, recently shipped, up next, blockers, pending decisions |
-| `docs/yl_system_state.json` | Current phase, build target, what's active |
 | `docs/yl_build_plan.md` | Historical sprint record (sprints 1–7) |
-| `sprints/README.md` | Active sprint + rally index — what's live, what's next |
-| `docs/disciplines/*.md` | Project-specific conventions by discipline (frontend, backend, design, etc.) |
-| `docs/design-system/` | Flows, component patterns, design decisions, visual reference |
 | `docs/yl_phase1_execution.md` | Phase 1 principles and mechanics |
-| `docs/yl_schema.md` | Database schema and RLS rules |
-| `docs/yl_features.md` | Feature definitions, phase assignments, rationale |
-| `docs/yl_decisions.json` | Product decisions and their reasoning |
 | `docs/yl_moderation.md` | Trust, integrity, and moderation mechanics |
-| `docs/ops/test-backlog.md` | Untested changes awaiting founder verification — update before every commit that changes user-facing behavior |
-| `CHANGELOG.md` | Running project log — update throughout the session, not just at the end |
+| `docs/yl_llm_strategy.md` | LLM model choices, pricing, prompt standards |
+| `docs/yl_system_state.json` | Current phase, build target |
 
 If docs conflict, follow `yl_system_state.json`, `yl_phase1_execution.md`, and the active sprint's `build_plan.md` for current scope. `docs/canonical/` is a historical baseline from 2026-02-11 — don't overwrite root docs with it without founder review. `notes/` is scratchpad, not instruction.
 
 ---
 
+## Documentation Registry
+
+Every documentation file, its purpose, who maintains it, and its rules. Skills read this registry — they never hardcode paths. If you create a new documentation file, add it here.
+
+### Hot Context (Tier 1)
+
+| File | Purpose | Maintained by | Rule |
+|------|---------|--------------|------|
+| `AGENTS.md` | Primary instructions + registry | Manual | Keep under 400 lines |
+| `STATUS.md` | Project dashboard | `/yl-shipslog` | Derive from CHANGELOG |
+| `CHANGELOG.md` | Cross-agent handover (index + entries) | `/yl-shipslog` | Index at top; archive full entries >30 days to `CHANGELOG-archive/YYYY-MM.md` |
+
+### Module Docs (Tier 2)
+
+| Pattern | Purpose | Maintained by | Rule |
+|---------|---------|--------------|------|
+| `docs/modules/{name}.md` | Module state + decisions + activity (consolidated) | `/yl-shipslog` | One file per module. Activity entries are one-liners. ~120 lines max |
+
+Module doc format: frontmatter (module, updated, status) → Current State → Key Files → Decisions (append-only, reference D-xxx) → Recent Activity (one-liner per session).
+
+### Ops & Behavioral (Tier 2)
+
+| File | Purpose | Maintained by | Rule |
+|------|---------|--------------|------|
+| `docs/ops/feedback.md` | Standing behavioral rules (how to work) | `/yl-shipslog` | Never trim. Append-only |
+| `docs/ops/test-backlog.md` | Untested user-facing changes | Agent at commit time | Only founder marks items tested |
+
+### Design System (Tier 2 — frontend only)
+
+| File | Purpose | Maintained by | Rule |
+|------|---------|--------------|------|
+| `docs/design-system/README.md` | Design system entry point | Manual | Reading order + quick-reference |
+| `docs/design-system/decisions/README.md` | Visual/UX decisions (what product looks like) | `/yl-shipslog` | Append-only. See Decision Routing above |
+| `docs/design-system/patterns/*.md` | Component & layout patterns | Agent when creating patterns |
+| `docs/design-system/style-guide.md` | Colours, typography, tokens | Agent when tokens change |
+
+### Reference (Tier 3 — grep, don't read)
+
+| File | Purpose | Rule |
+|------|---------|------|
+| `docs/ops/lessons-learned.md` | Gotcha catalog (78 entries) | Search by keyword. Never trim |
+| `docs/canonical/yl_decisions.json` | Constitutional + architectural decisions (D-xxx) | Source of truth for product decisions |
+| `docs/yl_schema.md` | Database schema and RLS (**canonical copy** — ignore copies in canonical/ and intake/) |
+| `docs/yl_features.md` | Feature registry | Check before proposing new features |
+| `CHANGELOG-archive/YYYY-MM.md` | Archived changelog entries | Created by maintenance, read only when investigating history |
+
+### Sprint & Backlog
+
+| File | Purpose | Maintained by |
+|------|---------|--------------|
+| `sprints/README.md` | Sprint execution sequence | `/yl-sprint` |
+| `sprints/backlog/README.md` | Backlog index (6 categories from triage) | `/yl-sprint` |
+| `sprints/PHASE1-CLOSEOUT.md` | Launch readiness tracker | `/yl-shipslog` |
+| `sprints/major/README.md` | Major sprint index | `/yl-sprint` |
+| `sprints/junior/README.md` | Junior sprint index | `/yl-sprint` |
+
+### Maintenance Policy
+
+| Scope | Rule | Frequency |
+|-------|------|-----------|
+| CHANGELOG full entries | Archive entries >30 days to `CHANGELOG-archive/YYYY-MM.md` | On request (`/housekeep`) |
+| Module activity sections | Trim entries >60 days | On request |
+| Session logs | Move >14 days to `sessions/archive/`, delete >30 days | On request |
+| Lessons-learned, feedback | Never trim | — |
+
+Maintenance is not automated. Run periodically when asked ("clean up the docs"). Agent reads this table and follows it.
+
+---
+
 ## Changelog cadence
 
-`CHANGELOG.md` is a running log, not an end-of-session dump. Update it as work happens.
+`CHANGELOG.md` has an **index table** at the top and **full entries** below. When updating:
 
-**Update after:**
-- Any meaningful decision (product, architecture, or process)
-- Any significant file created or changed
-- Any flag raised to the founder
-- At session end — confirm it's complete
-
-**Keep discipline docs current.** If you establish a new pattern, change an existing convention, or add a new utility/component that future sessions should know about, update the relevant `docs/disciplines/*.md` file before closing out. These docs are only useful if they reflect the codebase as it is now, not as it was when they were written.
-
-**Keep the design system current.** If you add a new page, update the route map in `docs/design-system/flows/app-navigation.md`. If you create a new component pattern, add it to the relevant `patterns/` file. If you make or reject a design choice, log it in `decisions/`. If you take screenshots during a UI session, drop them in `reference/screenshots/`.
+1. Add a new row to the index table (date, sprint, ~10-word summary)
+2. Add the full entry below the index (Done / Context / Next / Flags format)
+3. Keep reverse chronological order (newest first in both index and entries)
 
 **CRITICAL — before every `git commit`:**
-You MUST update `CHANGELOG.md`, `STATUS.md`, and `docs/ops/test-backlog.md` to reflect all work being committed BEFORE running `git commit`. This is a blocking pre-commit requirement. If the changelog does not cover the changes in the commit, stop and update it first. No exceptions — this has been missed repeatedly. For the test backlog: add concrete test items for any user-facing behavior changes. If the commit is purely internal (docs, tooling, drift baseline), note that no test items are needed but don't skip the check.
+Update `CHANGELOG.md`, `STATUS.md`, `docs/ops/test-backlog.md`, and relevant module docs to reflect all work being committed. This is blocking. No exceptions.
 
-**CRITICAL — before every `git commit`:**
-You MUST also update module state files (`docs/modules/`) for any modules you touched. CHANGELOG.md, STATUS.md, AND relevant module state files must be current before committing.
+**Keep discipline docs current.** If you establish a new pattern or change a convention, update the relevant `docs/disciplines/*.md` file.
 
-Format: reverse chronological, one entry per session, with Done / Context / Next / Flags sections. If a session ends unexpectedly or you commit mid-session, the log should already reflect what happened.
+**Keep the design system current.** New page → update `flows/app-navigation.md`. New pattern → add to `patterns/`. Design decision → log in `decisions/` (see Decision Routing).
 
 ---
 
 ## Module state cadence
 
-`docs/modules/<module>.md` files are living documents. Update them as work happens.
+Each module has a **single consolidated file**: `docs/modules/<module>.md`.
 
-**Update after:**
-- Any change to a module's features, status, or key files
-- Any new known issue or resolved issue
-- Any architectural decision that affects the module
+This file contains: Current State, Key Files, Decisions, and Recent Activity — all in one place. No separate `.activity.md` or `.decisions.md` files.
 
-**Before every `git commit`:**
-You MUST update the module state file(s) for any modules you touched. This is blocking, same as the CHANGELOG rule.
-
-**Append to activity logs:**
-After any meaningful change to a module, append a one-line entry to `docs/modules/<module>.activity.md`. Format: `**YYYY-MM-DD** — Agent Name: What changed`.
-
-**Append to decision logs:**
-After any product or architectural decision affecting a module, append to `docs/modules/<module>.decisions.md`. Format: `**YYYY-MM-DD** — D-xxx: Decision summary. Rationale. — Who`.
+**Before every `git commit`** for modules you touched:
+- Update the `updated:` date in frontmatter
+- Update `## Current State` if features changed
+- Update `## Key Files` if files were added/moved
+- Append a one-liner to `## Recent Activity`: `**YYYY-MM-DD** — Context: What changed`
+- Append to `## Decisions` if an architectural/product decision was made: `**YYYY-MM-DD** — D-xxx: Summary — Who`
 
 ---
 

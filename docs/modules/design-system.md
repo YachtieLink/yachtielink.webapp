@@ -146,14 +146,39 @@ Dialog, Badge, Separator, Avatar, Tabs, Tooltip, Sheet, Skeleton, DropdownMenu
 - Section colours use 200-level shades in dark mode for softer appearance
 - All semantic tokens have dark overrides in globals.css
 
-## Decisions That Bind This Module
-
-- **D-003 / D-007**: Monetisation colour rule — teal for trust, sand for Pro presentation. Pro features never make users look "more trusted."
-- **D-013**: No auto-summary language — UI never labels endorsement density
-
 ## Next Steps
 
 - [ ] Build Salty mascot SVG illustration set for empty states
 - [ ] Audit all components for consistent dark mode support
 - [ ] Consider extracting section colour assignments to a config file if more sections are added
 - [ ] Document responsive breakpoint strategy (mobile-first, responsive up)
+
+## Decisions
+
+**2026-03-17** — Dark mode via CSS variables, not Tailwind dark: prefix. Semantic CSS custom properties (`--color-surface`, `--color-text-primary`) that swap values in `.dark` class. Fewer classes, less duplication, easier to maintain — components just work without per-element dark mode logic.
+**2026-03-17** — Split layout on desktop public profile. Photo sticky left (40%), content scrolling right (60%). Recruiters and captains view on desktop; the photo should be prominent and persistent.
+**2026-03-17** — Salty mascot personality: knows the ropes, not AI-branded. AI is invisible infrastructure, never mentioned in branding. "AI told you to do this" undermines crew trust.
+**2026-03-17** — Empty sections hidden, not shown as skeletons. A profile with 3 filled sections and 4 empty placeholders looks broken. A profile with 3 filled sections and nothing else looks complete. Own-profile page shows CTAs; public profile never does.
+**2026-03-17** — Profile Strength not Profile Completion. Labels: "Getting started" (0–30%), "Looking good" (31–60%), "Standing out" (61–85%), "All squared away" (86–100%). "60% complete" feels like a failing grade; "Looking good" at 60% changes user motivation.
+**2026-03-17** — Coral (#E8634A), navy (#2B4C7E), amber (#E5A832) as section accent colours alongside teal primary. Single-colour palette felt flat. Notion-style colour coding gives sections visual identity; teal remains primary.
+**2026-03-17** — Framer Motion for all animation, with shared presets in `lib/motion.ts`. CSS transitions too limited for coordinated entrance animations. Framer Motion integrates cleanly with React, supports AnimatePresence, and tree-shakes well.
+**2026-03-17** — DM Serif Display for headlines alongside DM Sans. DM Sans alone felt too utilitarian. Serif headlines add warmth — "professional without being corporate." Used sparingly: hero text, page titles.
+**2026-03-16** — Two-pass rally pattern (R1 + challengers) for design reviews. Single-pass analysis is too shallow; challenger agents find structural issues that first-pass rationalises away.
+
+## Recent Activity
+
+**2026-04-01** — CV wizard Steps 4-5: ChipSelect hierarchy rework (headings > chips), chip sizing downsized to text-xs/py-1, CV chips tinted not solid, hobby chips amber-tinted for distinction; StepReview overhaul with serif title, amber wayfinding borders, tinted skill/hobby chips, M/Y/S/Y prefixes.
+**2026-03-31** — CV wizard walkthrough: DatePicker selector reorder to Day-Month-Year; WCAG contrast fix (amber labels → text-secondary on white backgrounds); decision logged: no left border accent stripes on cards.
+**2026-03-21** — Sprint 10.3: Typography standardized — 28px bold tracking-tight titles, section headers unified; `card-soft` glass treatment on tinted background pages; spacing fixes, toast position uses CSS vars.
+**2026-03-21** — Sprint 10.3: Dark mode sidelined — force light mode, theme toggle replaced with "coming soon" placeholder; desktop layout deferred to Phase 1B.
+**2026-03-21** — Sprint 10.2: New components — Button variants (outline/link/icon), Input, Select, Textarea, FormField, IconButton, SectionBadge, ProfileAvatar; section color system (teal/amber/coral/navy/sand unique tab colors).
+**2026-03-21** — Sprint 10.2: Token migration — all hardcoded colors → CSS custom properties; dark mode tokens: 20+ variable overrides in globals.css; full-bleed backgrounds on CV, Insights, Network pages.
+**2026-03-21** — Sprint 10.1 Wave 1 C: Animation pass — `easeGentle` + `scrollRevealViewport` added to `lib/motion.ts`; `ProfileAccordion`, `IdentityCard`, `Toast`, `BottomSheet` wired to shared presets; `PageTransition` and `ScrollReveal` wrapper components created.
+**2026-03-21** — Sprint 10.1 Wave 1 D: DM Serif Display applied to profile names, section headings, page titles, auth pages (weight 400, no synthetic bold).
+**2026-03-21** — Sprint 10.1 Wave 1 B: Dark mode — ProfileStrength arc colours use `--color-strength-*` CSS vars; Insights chart colours use `--chart-*` vars; SidebarNav badge uses `--color-error`.
+**2026-03-18** — Project structure: Created `docs/design-system/` — `philosophy.md`, `style-guide.md`, `flows/` (5 user journey maps), `patterns/` (5 component pattern docs), `decisions/` (9 seeded design decisions), `reference/salty_mascot_spec.md`.
+**2026-03-17** — UI/UX refresh + Salty: Expanded colour palette — added coral, navy, amber token families (50/100/200/500/700 each) to globals.css; added DM Serif Display font; created `lib/motion.ts` with shared Framer Motion presets.
+**2026-03-17** — Phase 1A Cleanup Spec 07: Installed framer-motion; `AnimatedCard.tsx` and `ProfileCardList.tsx`; BottomSheet rewritten with AnimatePresence + spring slide-up; IdentityCard QR panel with height animation; Toast spring entrance/exit.
+**2026-03-17** — Phase 1A Cleanup Spec 01: Comprehensive CSS var migration — all remaining shadcn semantic vars replaced with design system tokens across 18+ files.
+**2026-03-15** — Brand Palette: Full brand palette swap → teal (#0D7377) + sand (#E8DCC8); DM Sans replacing Geist; shadcn/ui v4 installed with teal-themed CSS variables; `lib/utils.ts` with `cn()` helper.
+**2026-03-13** — Sprint 1: Established design token system in `globals.css` — navy, ocean, gold palettes, semantic CSS vars with dark overrides, dark mode via `.dark` class; inline dark mode init script (no FOUC).

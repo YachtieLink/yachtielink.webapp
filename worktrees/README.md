@@ -2,7 +2,9 @@
 
 Run parallel Claude Code sessions on isolated branches to compress sprint work.
 
-**Model:** 1 master (Opus) + 1 reviewer (Opus) + 2-3 workers (Sonnet, or Opus for complex lanes).
+**Model:** 1 master (Opus) + 1 reviewer (Opus) + 2-3 workers (Sonnet, or Opus for complex lanes) + 1 logger (Sonnet, optional).
+
+**Quick launch:** Run `/worktree-yl` in any Claude Code session to bootstrap everything.
 
 ---
 
@@ -30,6 +32,7 @@ You need 5 things visible. Recommended: iTerm2 with tabs/splits + one Chrome win
 | 3 | `/Users/ari/Developer/yl-wt-1` | **Sonnet** | Worker 1 — build lane 1 |
 | 4 | `/Users/ari/Developer/yl-wt-2` | **Sonnet** | Worker 2 — build lane 2 |
 | 5 | `/Users/ari/Developer/yl-wt-3` | **Sonnet/Opus** | Worker 3 (optional) — build lane 3 |
+| 6 | `/Users/ari/Developer/yachtielink.webapp` | **Sonnet** | Logger (optional) — doc updates after merges |
 
 **Chrome:** Keep one tab on `localhost:3000`. The reviewer's /test-yl step drives it for QA screenshots and interactive testing. Leave it visible — you'll see what the reviewer sees.
 
@@ -109,6 +112,8 @@ worktrees/
   reviewer/
     CLAUDE.md            <-- reviewer agent: runs full review chain
     prompt.md            <-- copy-paste prompt (persistent or one-shot)
+  logger/
+    CLAUDE.md            <-- logger agent: doc updates after merges
   worker/
     CLAUDE.md            <-- worker agent: bounded execution
     prompt-template.md   <-- template prompt, customized per lane
@@ -123,7 +128,7 @@ worktrees/
 
 ## Rules That Make This Work
 
-1. **Only the master edits shared docs** — CHANGELOG.md, STATUS.md, sprint trackers
+1. **Only the master (or logger) edits shared docs** — CHANGELOG.md, STATUS.md, sprint trackers
 2. **Clear file ownership** — if you can't describe which files each worker owns, the split is wrong
 3. **No scope creep in workers** — workers execute their lane, nothing more
 4. **Nothing merges without reviewer verdict** — the reviewer is the quality gate
@@ -135,9 +140,9 @@ worktrees/
 ## Session Flow at a Glance
 
 ```
-YOU + MASTER                    REVIEWER              WORKERS
-─────────────────               ─────────             ────────
-Plan lanes, define ownership    (waiting)             (not started)
+YOU + MASTER                    REVIEWER              WORKERS               LOGGER
+─────────────────               ─────────             ────────              ──────
+Plan lanes, define ownership    (waiting)             (not started)         (waiting)
 Create session + lane files
 Draft worker prompts
 Create worktrees
@@ -149,11 +154,11 @@ Monitor for overlap                                   Worker 1 done →
                                 /yachtielink-review
                                 /test-yl
                                 Verdict: PASS ──────→
-Master merges wt-1                                    Worker 2 done →
-Rebase wt-2, wt-3              Review wt-2 ←────────
-                                ...chain...
-                                Verdict: PASS ──────→
-Master merges wt-2
-/shipslog, update docs
+Master merges wt-1                                    Worker 2 done →       Log lane 1 ←
+Rebase wt-2, wt-3              Review wt-2 ←────────                       CHANGELOG ✓
+                                ...chain...                                 STATUS ✓
+                                Verdict: PASS ──────→                       modules ✓
+Master merges wt-2                                                          Log lane 2 ←
+Master plans next lanes                                                     /shipslog
 Cleanup worktrees
 ```

@@ -42,10 +42,9 @@ One-line: Email/password authentication with Supabase, PKCE code exchange, sessi
 | Supabase middleware client | `lib/supabase/middleware.ts` |
 | Supabase admin (service role) | `lib/supabase/admin.ts` |
 
-## Decisions That Bind This Module
+## Decisions
 
-- **D-012** — Growth pause mechanism: single config flag (`SIGNUP_MODE=invite`) to switch from public signup to invite-only
-- **D-036** — Current build target is Phase 1A; OAuth deferred until there are enough paying users to justify developer account costs
+**2025-11-20** — D-007: Identity is free infrastructure; presentation is paid and cosmetic only. Free identity removes barriers to graph formation. — Ari
 
 ## Next Steps
 
@@ -53,3 +52,18 @@ One-line: Email/password authentication with Supabase, PKCE code exchange, sessi
 - [ ] Activate Apple OAuth (same gating as Google)
 - [ ] Display auth error messages on `/welcome` when redirected from callback with `?error`
 - [ ] Add email change flow (currently no UI for changing account email)
+
+## Recent Activity
+
+**2026-03-21** — Sprint 10.3: Dark mode sidelined — force light mode, theme toggle replaced with "coming soon" placeholder.
+**2026-03-17** — Pre-merge audit: Completed launch env setup — PostHog (EU), Sentry (EU), SIGNUP_MODE=public, REDIS_URL live; created `memory/service_accounts.md` with all third-party accounts.
+**2026-03-17** — Redis swap: Switched rate limiter from `@vercel/kv` → `ioredis` using `REDIS_URL`; removed `@vercel/kv`, installed `ioredis`; singleton client, fail-open when `REDIS_URL` absent.
+**2026-03-17** — Phase 1A Cleanup Spec 04: Middleware auth — no changes needed, `proxy.ts` already handles session refresh correctly for Next.js 16.
+**2026-03-15** — Renamed `middleware.ts` → `proxy.ts`, export renamed `middleware` → `proxy` (Next.js 16 deprecation fix).
+**2026-03-15** — Sprint 8: Added `SIGNUP_MODE=invite` gate on `/welcome` and `/signup` via middleware; created `/invite-only` static landing page.
+**2026-03-15** — Sprint 8: Improved `/privacy` page — added GDPR legal bases (Art 6(1)(b)/(f)), technical data disclosure, Sentry SCCs note, objection/restriction/complaint rights.
+**2026-03-15** — Sprint 8: Created legal pages — `/terms` (Terms of Service) and `/privacy` (Privacy Policy with GDPR rights, cookie policy, data storage).
+**2026-03-14** — Sprint 5: Added `returnTo` preservation in middleware when bouncing unauthenticated users; login redirects post-login; signup passes `returnTo` as `next` param in email callback URL.
+**2026-03-13** — Sprint 1: Built full auth infrastructure — middleware, route protection, PKCE callback, login/signup/reset-password/update-password pages. Core DB schema with `users` table, auth trigger, RLS on every table. OAuth deliberately excluded until paying users justify setup cost.
+**2026-03-10** — Codex GUI: Structured `AGENTS.md` as primary instruction set including auth/security workflow and decision principles.
+**2026-03-08** — Created `CLAUDE.md`, `CHANGELOG.md`, `AGENTS.md`; confirmed Supabase projects created, auth enabled, RLS and env var connection pending.

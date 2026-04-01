@@ -143,11 +143,49 @@ Key variables (non-exhaustive):
 - `NEXT_PUBLIC_SITE_URL`
 - `CRON_SECRET`
 
-## Decisions That Bind This Module
+## Decisions
 
-- **D-012**: Growth pause mechanism — single config flag to switch from public signup to invite-only
-- **D-015**: Consensus-based moderation — system must support future moderation infrastructure
-- **D-036**: Current build target narrowed to yacht graph wedge — infrastructure supports Phase 1A scope
+**2026-01-31** — D-027: Crew availability toggle expires after 7 days, must re-toggle. Active opt-in protects crew from unwanted contact; weekly expiry prevents stale "available" crew getting spammed. — Ari
+
+**2026-01-28** — D-018: 67% supermajority for early account flag resolution, simple majority after 7 days, minimum 3 votes. Ossified accounts require 80%. Supermajority prevents marginal removals; minimum threshold prevents 1v1 disputes. — Ari
+
+**2026-01-28** — D-016: Verified status earned via seed set, endorsements from verified users, or tenure+density. Paid subscription path removed 2026-03-08 to preserve the canonical monetisation rule. — Ari
+
+**2026-01-28** — D-015: Moderation decisions resolved by community vote, not admin judgment. System-mediated moderation grounded in shared employment scales better and resists single points of failure. — Ari
+
+**2026-01-27** — D-012: Single config flag to switch from public signup to invite-only. PM can pause first, explain after if founder unavailable. Reversing a pause is easy; reversing trust damage is not. — Ari
+
+**2026-03-08** — D-036: Current build target narrowed to yacht graph wedge — infrastructure supports Phase 1A scope. — Ari
+
+## Recent Activity
+
+**2026-04-01** — Sprint 13 Polish Lane 2: Added `robots.txt` (disallow /app/, /onboarding/, /api/, /invite-only), sitemap `onboarding_complete` filter, OG/Twitter fallback metadata in root layout, cookie banner copy simplified, PublicHeader login link fix. PR #130 (merged).
+
+**2026-03-26** — Wave 5 QA: Replaced `proxy.ts` with `middleware.ts` for subdomain routing. Fixed P1: `createMiddlewareClient` stale response reference — changed to getter pattern. Added `withCookies` helper to propagate auth cookie refresh onto all redirect/rewrite responses. Added empty subdomain guard.
+
+**2026-03-25** — Codex: Added repo guardrails — `scripts/drift-check.mjs`, `npm run drift-check`, canonical-owner docs under `docs/ops/canonical-owners/`, critical-flow smoke checklist, and workflow/code-review updates to enforce them.
+
+**2026-03-21** — Sprint 10.1: Migration `20260321000001_fix_storage_buckets.sql` — bucket creation (user-photos, user-gallery), yacht-photos RLS fix (ex-crew write block), `get_sea_time()` SECURITY DEFINER consistency.
+
+**2026-03-21** — Sprint 10.1 Wave 1 F: API hardening — try/catch + handleApiError on stripe/portal, endorsement-requests, cron routes; health endpoint fixed to query `users` table with sanitised errors.
+
+**2026-03-21** — Sprint 10.1 Wave 1 I: `admin.ts` guarded with `import 'server-only'`.
+
+**2026-03-21** — Sprint 10.1 Wave 1 G: Storage — `uploadUserPhoto`, `uploadGalleryItem`, `deleteUserPhoto`, `deleteGalleryItem`, `extractStoragePath` added to `lib/storage/upload.ts`; account deletion cleans user-photos and user-gallery; PDF generation deletes previous export.
+
+**2026-03-21** — Sprint 10.1 Wave 1 E: Route cleanup — `/app/audience` deleted (function renamed to `NetworkPage`); ghost " 2" directories removed.
+
+**2026-03-18** — Project structure: Created `sprints/` folder hierarchy (major/, junior/, rallies/); `docs/disciplines/` with 6 discipline files; archived ops/ contents; updated AGENTS.md and CLAUDE.md with new structure.
+
+**2026-03-17** — Redis swap: Switched rate limiter from `@vercel/kv` → `ioredis` using `REDIS_URL`; `npm audit fix` → 0 vulnerabilities; Vercel KV (Redis Labs) connected to project — `REDIS_URL` live in all environments (EU Central, free 30 MB tier).
+
+**2026-03-17** — Pre-merge audit: Full codebase audit before merging `feat/sprint-8` → `main`; no critical conflicts; 10 `console.error` calls found (all safe, non-sensitive); `@vercel/kv` fully removed, `ioredis` properly in place.
+
+**2026-03-17** — Phase 1A Cleanup Spec 11: Deleted dead `lib/cors.ts`; route-level error boundary with Sentry capture; CV API routes replaced inline Supabase client with `createServiceClient()`; share-link route Zod validation for `yacht_id`; CV download route rate limiting; `handleApiError()` wired in catch blocks.
+
+**2026-03-17** — Phase 1A Cleanup Spec 09: Removed `Geist_Mono` font import; replaced `var(--font-geist-mono)` with system monospace stack; PostHogProvider lazy-loads posthog-js only on `/app/*` paths.
+
+**2026-03-17** — Phase 1A Cleanup: `staleTimes.dynamic: 300` in next.config.ts — 5 min client-side RSC cache; BottomTabBar + SidebarNav prefetch all 5 tab routes on mount.
 
 ## Next Steps
 

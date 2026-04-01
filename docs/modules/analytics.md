@@ -78,15 +78,30 @@ RPC functions (SECURITY DEFINER):
 
 Both crons verify `CRON_SECRET` bearer token and use the service role Supabase client.
 
-## Decisions That Bind This Module
-
-- **D-007**: Identity is free; presentation (including analytics) is paid
-- **D-013**: No auto-summary language — the Insights page shows raw numbers, never labels like "well viewed"
-- **D-023**: Pro tier includes profile analytics as a paid feature
-
 ## Next Steps
 
 - [ ] Add PDF download and link share tracking to public profile page (record_profile_event calls)
 - [ ] Consider weekly email digest for Pro users summarising their analytics
 - [ ] Track endorsement-related events (request sent, endorsement received) in PostHog
 - [ ] Evaluate whether chart library is needed or if CSS bars remain sufficient at scale
+
+## Decisions
+
+**2026-01-31** — D-023: Profile analytics included in Crew Pro tier (€12/month). Free tier has no analytics. — Ari
+
+## Recent Activity
+
+**2026-03-21** — Sprint 10.3: Insights page — Crew Pro CTA as sticky bottom overlay with expandable feature list; bento grid for Pro analytics (profile views hero + 2-col metrics); error toast on checkout failure; removed blur on teaser cards, readable text with inline Pro badge.
+**2026-03-21** — Sprint 10.3: Bug fix — `expiry_date` → `expires_at` column mismatch fixed in insights, cron, and certs.
+**2026-03-21** — Sprint 10.1 Wave 1 B: Insights chart colours now use `--chart-*` CSS vars for dark mode compatibility.
+**2026-03-18** — Phase 1A Profile Robustness: `lib/profile-summaries.ts` — `computeProfileStrength` helper for server-side strength scoring used in analytics context.
+**2026-03-17** — Pre-merge audit: Completed PostHog (EU) and Sentry (EU) launch env setup; created `memory/service_accounts.md` with all third-party accounts and Vercel env var status.
+**2026-03-17** — Phase 1A Cleanup Spec 09: PostHogProvider now lazy-loads `posthog-js` via dynamic import; only loads on `/app/*` paths to reduce bundle size on public pages.
+**2026-03-15** — Sprint 8: Sentry integration — `sentry.client.config.ts`, `sentry.server.config.ts`, `sentry.edge.config.ts`, `instrumentation.ts`; `app/error.tsx` Sentry-integrated error boundary; `lib/api/errors.ts` — `handleApiError()` with Sentry capture.
+**2026-03-15** — Sprint 8: PostHog — `PostHogProvider.tsx` (autocapture: false, replaysSessionSampleRate: 0); `lib/analytics/events.ts` — `trackEvent`, `identifyUser`, `resetAnalytics`; `lib/analytics/server.ts` — `trackServerEvent`, `getPostHogServer`; `CookieBanner.tsx` for consent.
+**2026-03-15** — Sprint 8: PostHog events wired (11 total) — `endorsement.created/deleted/requested`, `cv.parsed/parse_failed`, `pro.subscribed/cancelled`, `moderation.flagged`; stubs for `profile.created`, `profile.shared`, `attachment.created`.
+**2026-03-15** — Sprint 7: Insights tab full rewrite — Pro: time-range toggle (7d/30d/all-time), `AnalyticsChart.tsx` (pure CSS bar chart, no library), cert expiry card, plan management. Free: 5 teaser cards, profile completeness gate, UpgradeCTA.
+**2026-03-15** — Sprint 7: Cron `app/api/cron/analytics-nudge/route.ts` — weekly Monday cron: finds free users with 2x average views, sends one-time nudge email, sets `analytics_nudge_sent = true`.
+**2026-03-15** — Sprint 7: Migration `20260315000018` — `record_profile_event()`, `get_analytics_summary()`, `get_analytics_timeseries()` RPCs; index on `profile_analytics(user_id, event_type, occurred_at DESC)`.
+**2026-03-15** — Sprint 7: `app/(public)/u/[handle]/page.tsx` — added `record_profile_event('profile_view')` fire-and-forget call on every public profile visit.
+**2026-03-13** — Sprint 1: `profile_analytics` table created in core schema with owner read + public insert RLS; `internal.flags` table (no user access).

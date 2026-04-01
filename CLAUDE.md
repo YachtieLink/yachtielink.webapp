@@ -15,14 +15,16 @@ Read `AGENTS.md` first. That file contains all primary instructions, workflow, b
 After building code, follow this chain exactly. Do NOT skip steps. Do NOT commit without completing the chain.
 
 ```
-BUILD → type-check → drift-check → /review → /yachtielink-review → /test-yl → /shipslog → WAIT FOR FOUNDER → commit + push → PR
+BUILD → /yl-review → /yl-shipslog → WAIT FOR FOUNDER → commit + push → PR
 ```
+
+`/yl-review` includes type-check, drift-check, Sonnet scan, Opus deep review, YL drift patterns, and interactive QA — all in one skill. No need to run these separately.
 
 **Hard rules:**
 - NEVER merge PRs — founder merges
 - NEVER commit/push without founder's explicit permission
-- ALWAYS run `/shipslog` before commit (even if QA was done manually)
-- If the founder says "commit and push", run `/shipslog` first, then commit
+- ALWAYS run `/yl-shipslog` before commit (even if QA was done manually)
+- If the founder says "commit and push", run `/yl-shipslog` first, then commit
 
 ## Design & Frontend — Required Reading
 

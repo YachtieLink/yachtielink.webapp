@@ -74,12 +74,49 @@ One-line: Server-rendered public profile page at `/u/{handle}` with SEO metadata
 | Proxy / subdomain routing | `proxy.ts` |
 | Validation schemas | `lib/validation/schemas.ts` |
 
-## Decisions That Bind This Module
+## Decisions
 
-- **D-007** — Identity is free infrastructure; presentation is paid and cosmetic only
-- **D-014** — PDF snapshot is free; never monetised; paid scope limited to templates, layout polish, and watermark removal
-- **D-025** — Contextual profile visibility: direct link/QR shows full profile including contact details
-- **D-036** — Phase 1A includes public profile and PDF snapshot
+**2026-03-08** — D-036: Public profile is part of Phase 1A build target. Included in current launch slice alongside profile, CV import, yacht graph, and PDF snapshot. — Ari
+
+**2026-01-31** — D-025: Profile visibility varies by access method. Direct link/QR shows full profile including contact details. Search results show locked profiles requiring payment. Graph browsing shows full profiles (intentionally slow, doesn't scale for harvesting). — Ari
+
+**2026-01-28** — D-014: PDF snapshot/export is free identity infrastructure. Never monetised. Paid scope limited to templates, layout polish, and watermark removal. — Ari
+
+**2025-11-20** — D-007: Identity is free infrastructure; presentation is paid and cosmetic only. Free identity removes barriers to graph formation. — Ari
+
+## Recent Activity
+
+**2026-03-28** — Sprint 11c: Rich Portfolio mode (Pro) — `RichPortfolioLayout` orchestrator with density auto-detection and template variant selection. `BentoGrid` CSS Grid engine with `grid-template-areas`. 2 templates (Classic/Bold) each with full/medium/minimal density variants. 12 tile components. `PublicProfileContent` three-way layout branching with Pro fallback. Template selection in settings (Pro only). Migration adds `profile_template` column. Photo limit bumped 9→15 Pro. `FocalPointPicker` with pointer-capture drag + hero crop preview. PATCH endpoint for focal_x/focal_y on user_photos.
+
+**2026-03-28** — Sprint 11b: Portfolio mode — `PublicProfileContent` converted to client component with dual-layout branching (profile/portfolio). Created `ViewModeToggle`, `PortfolioLayout`, `MiniBentoGallery` (asymmetric grid), `PhotoLightbox` (full-screen viewer). `HeroSection` updated with scrim preset system (4 presets), accent color CSS variables (5 palettes). Endorsement pinning: API route, RLS migration, `EndorsementCard` pin UI, `EndorsementsPageClient` with optimistic updates. Education sub-page at `/u/[handle]/education`.
+
+**2026-03-26** — QA session: Fixed profile photo framing (`object-top` in PhotoGallery.tsx), experience summary bug (missing `yacht_id` in profile.ts select), name text-shadow strengthened for light photos (HeroSection + PublicProfileContent).
+
+**2026-03-25** — Phase 1 Wave 2: Major refactor — extracted shared query helpers (getPublicProfileSections, getCvSections, getViewerRelationship), split PublicProfileContent into 5 section components, replaced all any[] with typed interfaces, added hero age+sea time, fixed CV 404 (cv_public null semantics), fixed available_for_work missing from getUserByHandle.
+
+**2026-03-24** — QA Rally: Documented 8 bugs on public profile — missing age/sea time/flag in hero, CV view 404/blank/horizontal scroll, yacht names not clickable, no ensign flags. Bugfix sprint Wave 2 covers all.
+
+**2026-03-23** — CV Parse Sprint: Public CV viewer at /u/[handle]/cv (generated HTML via CvPreview or uploaded PDF iframe, gated by cv_public). PublicProfileContent "View CV" + download icon split replacing single download link. getUserByHandle extended with new personal fields. show_home_country + show_dob privacy respected in CvPreview viewer mode.
+
+**2026-03-21** — Sprint 10.3: Public profile hero identity — larger name (text-4xl), unified "Role · Dept" line; top bar with icon-only circular buttons (back/edit/share) replacing labelled pills.
+
+**2026-03-21** — Sprint 10.1: `PublicProfileContent` "N more" text made functional expand buttons.
+
+**2026-03-18** — Post-Phase1A fixes: Fixed mutual endorser count bug — `PublicProfileContent.tsx` was returning all endorsements when any shared yacht existed; now correctly counts only endorsers in the mutual colleague set.
+
+**2026-03-18** — Phase 1A Profile Robustness: Public profile `/u/[handle]` full rewrite — Bumble-style split layout (photo left 40% sticky on desktop, content right), accordion sections with smart summaries, save button for logged-in viewers, sectionVisibility respected, social links row, extended data sections (hobbies, education, skills, gallery).
+
+**2026-03-17** — Pre-merge audit: Fixed `app/api/cv/generate-pdf/route.ts` — `isPro: false` → `isPro: profile?.subscription_status === 'pro'`; was hardcoded false since Sprint 8, all users got free PDF tier regardless of plan.
+
+**2026-03-17** — Phase 1A Cleanup Spec 08: Created `app/api/og/route.tsx` — dynamic OG image generation (edge runtime, teal gradient, photo + name + role); public profile signup CTA section for non-logged-in viewers; branding footer linking to /welcome.
+
+**2026-03-17** — Phase 1A Cleanup Spec 10: Public profile — added founding member badge (amber), available-for-work status (green pulse), sea time stats.
+
+**2026-03-15** — Sprint 6: Public profile page full rewrite — server-rendered, parallel data fetch, all sections (hero, about, contact with visibility, employment history, certs with expiry status, endorsements, QR code); `generateMetadata` with OG + Twitter card tags.
+
+**2026-03-15** — Sprint 7: CV tab rewrite — profile preview + actions via `CvActions.tsx` (share link, PDF generate/download/regenerate, CV upload link, QR code toggle/download, template selector with Pro lock).
+
+**2026-03-15** — Sprint 7: Custom subdomain routing — middleware detects `*.yachtie.link` (excluding apex + www), rewrites to `/u/{subdomain}`; only the UI badge is gated to Pro.
 
 ## Next Steps
 

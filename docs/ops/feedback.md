@@ -6,12 +6,20 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 44 rules
+**Current count:** 45 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## Never Claim Fixes Passed Without Re-Verifying
+
+**Rule:** When you fix something (bug, test failure, lint error), always re-run the check to confirm it actually passed. Never report "fixed" based on what you think the fix should do — verify it. If you ran a test, it failed, and you applied a fix, re-run the test before telling the founder it's resolved.
+**Origin:** 2026-04-01 — Founder asked "you reran the tests on the failures?" after agent claimed fixes landed without re-verifying. The fixes were correct, but the claim was unverified.
+**How to apply:** After any fix: re-run the exact same check that surfaced the issue. Report the actual output, not your expectation. This applies to type-check, drift-check, tests, grep verification — anything where you're confirming a fix.
 
 ---
 

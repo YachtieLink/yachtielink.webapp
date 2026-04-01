@@ -78,12 +78,57 @@ Then fetches colleague profiles and yacht names in a second parallel batch. All 
 | `/api/profile-folders` | GET, POST | List user's folders, create new folder |
 | `/api/profile-folders/[id]` | PUT, DELETE | Rename folder, delete folder |
 
-## Decisions That Bind This Module
+## Decisions
 
-- **D-009**: Endorsements require shared yacht attachment — colleague graph is the gating mechanism
-- **D-028**: Graph edges are reality-bound — only shared employment creates connections
-- **D-029**: Contacts are non-graph — the colleague list is derived from real shared yachts, not follows
-- **D-011**: Absence of endorsements is neutral — empty endorsement list shows encouraging empty state, never shaming
+**2026-03-08** — D-036: Colleague graph included in Phase 1A build target. Timeline, messaging, and IRL interactions deferred. — Ari
+
+**2026-02-05** — D-035: Phase 1 hiring surfaces are constrained by design. Future phases may leverage the graph for hiring workflows. No Phase 1 constraint should be interpreted as a permanent prohibition. — Ari
+
+**2026-02-05** — D-034: Yachtielink is open to yachting professionals beyond crew under identical edge-formation and visibility rules, with no privileged trust or visibility. — Ari
+
+**2026-02-05** — D-033: Any participant or tagged user may remove themselves from an interaction or post at any time. Consent must be revocable to prevent coercion. — Ari
+
+**2026-02-05** — D-032: In-person encounters are first-class interaction objects requiring mutual confirmation. Public or private, with private interactions visible only to participants. — Ari
+
+**2026-02-05** — D-031: Timeline ordering is strictly chronological. Trending, boosting, virality, and engagement-weighted ranking are prohibited. Algorithmic surfacing corrupts truth-seeking. — Ari
+
+**2026-02-05** — D-030: A chronological timeline is permitted when visibility is bounded to a user's network. Users maintain real career memory without incentivising global engagement loops. — Ari
+
+**2026-02-05** — D-029: Contacts exist for messaging and limited timeline visibility only. They never create trust, endorsements, or graph edges. — Ari
+
+**2026-02-05** — D-028: Graph edges are created only by shared employment (colleagues) or verified in-person encounters (IRL connections). The graph must represent real-world overlap. — Ari
+
+## Recent Activity
+
+**2026-03-27** — Sprint 10.1: `font-serif` on network page h1. `cardHover` animation on SavedProfileCard (lift on hover, scale on tap). `popIn` on nav notification badges (BottomTabBar + SidebarNav).
+
+**2026-03-21** — Sprint 10.3: Network page — colleague cards link to `/u/{handle}`, endorsement text links converted to proper buttons; page title added.
+
+**2026-03-21** — Sprint 10.1 Wave 1 A2: Saved profiles promoted to `/app/network/saved` — server-side data fetching, folder CRUD, move-to-folder, empty state; `SavedTab` in `AudienceTabs` replaced with link card.
+
+**2026-03-21** — Sprint 10.1: Added `PATCH /api/saved-profiles/[id]` route for folder assignment.
+
+**2026-03-18** — Post-Phase1A fixes: Added error handling to `SavedTab` in `AudienceTabs.tsx` — `Promise.all` fetch now has `.catch()/.finally()` so tab shows empty state instead of hanging on network failure.
+
+**2026-03-18** — Phase 1A Profile Robustness: New tables — `profile_folders`, `saved_profiles` with RLS; new API routes `/api/saved-profiles` (GET/POST/DELETE), `/api/profile-folders` (GET/POST), `/api/profile-folders/[id]` (PUT/DELETE); `SaveProfileButton` component with optimistic toggle; `getSavedStatus()`, `getSavedProfiles()`, `getProfileFolders()` query helpers.
+
+**2026-03-17** — Phase 1A Cleanup Spec 10: BottomTabBar — added `networkBadge` prop with red dot indicator on Network tab; app layout fetches pending endorsement request count server-side.
+
+**2026-03-17** — Phase 1A Cleanup: New `/api/badge-count` endpoint + `lib/hooks/useNetworkBadge.ts` — polls every 60s client-side; moved network badge from server layout → client-side hook so app shell renders instantly.
+
+**2026-03-17** — Phase 1A Cleanup Spec 06: `SidebarNav.tsx` — desktop sidebar (`hidden md:flex`, fixed left, 64px, 5 tabs + YL logo); `components/nav/icons.tsx` shared icon SVGs; BottomTabBar gets `md:hidden` for mobile-only.
+
+**2026-03-15** — Sprint 7: `AudienceTabs.tsx` — replaced BottomSheet indirection with prominent teal CTA card linking to `/app/endorsement/request`, progress bar embedded.
+
+**2026-03-15** — Sprint 8: `lib/queries/notifications.ts` — `getPendingRequestCount` with React.cache for dedup.
+
+**2026-03-14** — Sprint 4: Replaced `app/audience` placeholder — `get_colleagues` RPC → profile + yacht lookup → colleague cards with shared yacht label and "Endorse" shortcut; colleague graph derived on access, not stored.
+
+**2026-03-14** — Sprint 5: `app/(protected)/app/audience/page.tsx` full rewrite — parallel fetch of all 5 data sets (colleague graph + endorsement requests/sent + endorsements received), passes to `AudienceTabs`.
+
+**2026-03-14** — Sprint 5: `AudienceTabs.tsx` — client tab component with endorsements/colleagues segment toggle, request-received list, endorsements-received list, requests-sent list with status pills, `RequestActions` component for cancel/resend.
+
+**2026-03-13** — Sprint 1: DB function `get_colleagues` — derives colleague graph on access via shared yacht attachments.
 
 ## Next Steps
 

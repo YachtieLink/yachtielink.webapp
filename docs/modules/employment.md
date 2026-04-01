@@ -41,17 +41,19 @@ One-line: Yacht entities as shared graph nodes, employment attachments linking c
 | Profile queries (attachments) | `lib/queries/profile.ts` |
 | Validation schemas | `lib/validation/schemas.ts` |
 
-## Decisions That Bind This Module
+## Decisions
 
-- **D-006** — No yacht merging in Phase 1; duplicates remain separate
-- **D-008** — Yacht graph in Phase 1: yacht entities as verification infrastructure
-- **D-009** — Endorsement gating rule: endorsements require shared yacht attachment
-- **D-017** — Yacht establishment rule: 60 days + crew threshold (defined, not enforced yet)
-- **D-028** — Graph edges are reality-bound: only shared employment creates edges
-- **D-036** — Phase 1A includes yacht entities and employment attachments
-- **D-037** — Yacht duplicate prevention via creation-time fuzzy match prompt (not yet implemented)
-- **D-038** — Yacht photo upload gated to users with attachment
-- **D-039** — Single cover photo in Sprint 4; full gallery deferred to Phase 1B Sprint 11
+**2026-03-14** — D-039: Yacht photos — single cover photo in Sprint 4, full multi-photo gallery deferred to Phase 1B Sprint 11. Cover photo adds visual authenticity with minimal build cost. — Ari
+
+**2026-03-14** — D-038: Yacht photo upload gated to users with a past or present attachment. Open upload would invite spam; attachment gating keeps the gallery credible by construction. — Ari
+
+**2026-03-14** — D-037: Yacht duplicate prevention via creation-time fuzzy match prompt. Merge deferred to Phase 2. Duplicate yachts break the colleague graph; prevention at creation time solves the majority of the problem with minimal complexity. — Ari
+
+**2026-01-28** — D-017: Yachts become "established" after 60 days AND reaching crew threshold. Balances open graph formation with protection against late-stage infiltration. — Ari
+
+**2026-01-05** — D-008: Introduce yacht entities as verification infrastructure in Phase 1. Yacht attachment is the gating mechanism for endorsements — without this, endorsements are meaningless. — Ari
+
+**2025-12-15** — D-006: Renamed or duplicate yachts remain separate entities in Phase 1. No merge functionality. Premature merging creates irreversible trust errors. — Ari
 
 ## Next Steps
 
@@ -59,3 +61,15 @@ One-line: Yacht entities as shared graph nodes, employment attachments linking c
 - [ ] Enforce yacht establishment rule (is_established auto-set after 60 days + crew threshold)
 - [ ] Full yacht photo gallery (Phase 1B Sprint 11, per D-039)
 - [ ] Yacht merge tooling (Phase 2, per D-006)
+
+## Recent Activity
+
+**2026-03-23** — CV Parse Sprint: Attachment edit — 4 new fields (employment_type, yacht_program, description w/ 2000 char counter, cruising_area). Cert edit — issuing_body field. 5-step CV import wizard with yacht cards, skip/edit, celebration screen. `saveConfirmedImport()` with yacht search→create, cert type matching, batch operations. PDF templates enhanced with builder, program, description, cruising area per employment + issuing body per cert.
+**2026-03-21** — Sprint 10.3: CV page bento button hierarchy — Share primary, Generate/Upload secondary, QR/Edit ghost; lock icons on Pro templates; `router.push` replacing `window.location.href`.
+**2026-03-18** — Phase 1A Profile Robustness: `profile_queries.ts` extended — `getExtendedProfileSections()`, `getEndorserRoleOnYacht()` added to support employment context on public profile.
+**2026-03-17** — Phase 1A Cleanup Spec 01: Fixed Wizard.tsx — `yachtielink.com` → `yachtie.link`, `Audience tab` → `Network tab`.
+**2026-03-14** — Sprint 4 pre-planning: Decided yacht merging deferred to Phase 2; invest in creation-time duplicate prevention instead; single cover photo per yacht (attachment-gated); updated docs for Sprint 4 scope.
+**2026-03-14** — Sprint 4: Migration `20260314000011_yacht_sprint4.sql` — `cover_photo_url` on yachts, `yacht_near_miss_log` table, `search_yachts` fuzzy RPC (trigram, 0.45 threshold), `yacht-photos` storage bucket. Built `YachtPicker.tsx` with fuzzy duplicate detection + near-miss logging. Built `/app/attachment/new` 3-step flow. Built `/app/attachment/[id]/edit` with soft-delete. Built `/app/yacht/[id]` detail page. Built `/app/yacht/[id]/photo` cover photo upload. Fixed `YachtsSection` link from `/u/:yacht_id` → `/app/yacht/:yacht_id`.
+**2026-03-14** — Sprint 3: Built `YachtsSection` component — reverse-chronological attachment list, expand to view yacht / request endorsements / edit attachment.
+**2026-03-13** — Sprint 1: Core schema — `yachts` table, `attachments` table, DB functions (`are_coworkers`, `are_coworkers_on_yacht`, `yacht_crew_count`, `get_colleagues`); seeded 7 departments and 56 roles across 8 departments.
+**2026-03-13** — Feature spec: yacht type limited to Motor Yacht / Sailing Yacht, length in exact metres, flag state dropdown, year built optional; endorsement signals from yacht history deferred to Phase 1B.
