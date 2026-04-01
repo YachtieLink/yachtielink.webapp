@@ -58,7 +58,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | PR | Branch | Status | Notes |
 |----|--------|--------|-------|
-| — | — | No open PRs | All lanes merged this session |
+| — | — | No open PRs | PRs #135–138 merged this session; PR #133 (Ghost Profiles W1) merged prior session |
 
 ---
 
