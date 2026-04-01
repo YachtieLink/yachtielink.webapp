@@ -696,6 +696,32 @@ Build with future upgrades in mind — architecture should not make these harder
 
 ---
 
+### Native Mobile App (Capacitor — iOS + Android)
+
+**What:** Wrap the existing Next.js webapp in Capacitor for native iOS and Android apps. Single codebase — the webapp IS the mobile app. Estimated ~10-15 sessions to ship both platforms.
+**Why:** App store presence is a credibility signal. Push notifications drive engagement. NFC tap-to-share enables in-person networking. Camera access improves photo upload UX.
+**Status:** specced — see `sprints/backlog/mobile-app-capacitor.md`
+**Priority:** High — ship after webapp is stable in invite mode
+**Key decisions:**
+- Capacitor, not React Native (no rewrite, one codebase)
+- Web layer updates automatically, native rebuilds monthly for non-breaking features
+- Subscription pricing: web ($9.99/mo via Stripe, 100% revenue) vs in-app ($12.99/mo via IAP, covers Apple's 30%/15% cut)
+- Don't offer IAP at launch — users subscribe on web. Add IAP only if conversion friction justifies it.
+- NFC tap-to-share: phone-to-phone (free) + physical NFC card/sticker (Pro perk or branded merch)
+- Founder tested Sworkit (Capacitor app) — native feel confirmed acceptable
+
+---
+
+### NFC Tap-to-Share Profile
+
+**What:** Crew taps phone to share their profile URL via NFC. Two modes: phone-to-phone (writes NDEF URL record) and physical NFC card/sticker (pre-programmed with profile URL).
+**Why:** In-person networking is how yachties find work — marina bars, boat shows, handovers. Tap-to-share is faster than "what's your Instagram?" and more professional.
+**Status:** specced — included in `sprints/backlog/mobile-app-capacitor.md`
+**Priority:** Nice to have — ships with native app (Phase 2)
+**Key notes:** Physical NFC cards as Pro perk = tangible subscription value crew can hold. Uses `@capawesome-team/capacitor-nfc` plugin.
+
+---
+
 ### Contacts Import (Native)
 
 **What:** Import contacts from phone's native contact list to send endorsement requests. Multi-select UI.
@@ -760,6 +786,59 @@ Build with future upgrades in mind — architecture should not make these harder
 **Status:** deferred
 **Priority:** Must have
 **Crew-first note:** Verified status should stay earned through trust evidence — not purchasable. If there's ever pressure to make it a paid feature, flag it.
+
+---
+
+### Yacht Reviews (Glassdoor for Yachting)
+
+**What:** Crew leave structured reviews of yachts after departing (ratings across 6 categories + freeform). Reviews are tied to verified tenure — you can only review a yacht you actually worked on, after you've left. Aggregate scores on yacht pages, individual reviews behind login.
+**Why:** Primary viral driver. Crew already gossip about yachts — YachtieLink gives it a verifiable home. Every review is content that drives SEO traffic and signups. Every departure is a content moment.
+**Status:** specced — see `sprints/backlog/yacht-reviews-glassdoor.md`
+**Priority:** High — this is what makes YachtieLink a platform, not just a tool
+**Key decisions:**
+- Anonymous by default (shows role + dates, not name). Optional named reviews.
+- Reviews unlock only after departure — can't review while onboard.
+- Management can respond publicly (like Glassdoor).
+- Minimum 3 reviews before showing aggregate scores (prevent identification).
+- 24h cooling-off period before publishing.
+- Free: 3 reviews readable/month. Pro: unlimited.
+
+---
+
+### Salary Benchmark Tool
+
+**What:** Crew privately input their salary and benefits, get benchmarked against similar roles (by role, yacht size, season type, contract type). Data is never shown individually — only aggregated anonymously.
+**Why:** No reliable salary data exists in yachting. YachtieLink becomes the authoritative source. Massive Pro value — could justify the subscription alone.
+**Status:** specced — see `sprints/backlog/insights-tab-overhaul.md`
+**Priority:** High — key Pro differentiator
+**Key decisions:**
+- Salary data encrypted, never shown to other users
+- Minimum threshold (10+ data points) before showing benchmarks
+- Output: percentile, range, benefits comparison, trends, certification premium
+- User can delete their salary data anytime
+
+---
+
+### Who Viewed Your Profile
+
+**What:** See who viewed your public profile — names, roles, yachts, timestamps. Mutual opt-in model: you can opt out of being visible, but then you also can't see who viewed yours (give to get).
+**Why:** LinkedIn's most addictive feature, adapted for yachting. Repeat viewers = strong hiring signal.
+**Status:** specced — see `sprints/backlog/insights-tab-overhaul.md`
+**Priority:** High — engagement driver + Pro value
+**Key decisions:**
+- Free: view count only (blurred names). Pro: full viewer list.
+- Reciprocity model — opt out of visibility = lose viewer tracking.
+- GDPR-compliant retention (auto-delete after 90 days).
+- Track repeat viewers ("Capt. James viewed your profile 4 times").
+
+---
+
+### Feature Voting & Public Roadmap
+
+**What:** Users suggest features and vote on what to build next. Public roadmap with Now/Next/Later columns and status tracking.
+**Why:** Product signal (real data on what crew want), community engagement, transparency builds trust.
+**Status:** idea — see `sprints/backlog/feature-voting-roadmap.md`
+**Priority:** Nice to have — can start with external tool (Canny) and migrate to in-app later
 
 ---
 
