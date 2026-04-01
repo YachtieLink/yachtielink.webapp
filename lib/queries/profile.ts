@@ -46,7 +46,7 @@ export const getUserById = cache(async (userId: string) => {
       stripe_customer_id, founding_member, show_watermark, template_id,
       ai_summary, ai_summary_edited, section_visibility, social_links,
       home_country, languages, dob, smoke_pref, appearance_note,
-      travel_docs, license_info, show_dob, show_home_country
+      travel_docs, license_info, show_dob, show_home_country, show_nationality_flag
     `)
     .eq('id', userId)
     .single()
@@ -71,7 +71,7 @@ export const getUserByHandle = cache(async (handle: string) => {
       cv_public, cv_public_source, latest_pdf_path, cv_storage_path,
       home_country, languages, available_for_work,
       smoke_pref, appearance_note, travel_docs, license_info, show_dob, show_home_country,
-      subscription_status, subscription_ends_at, subdomain_suspended,
+      show_nationality_flag, subscription_status, subscription_ends_at, subdomain_suspended,
       profile_view_mode, scrim_preset, accent_color, profile_template
     `)
     .eq('handle', handle.toLowerCase())

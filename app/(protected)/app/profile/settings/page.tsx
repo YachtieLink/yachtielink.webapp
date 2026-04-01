@@ -117,6 +117,7 @@ export default function ProfileSettingsPage() {
   const [homeCountry, setHomeCountry] = useState('')
   const [showDob, setShowDob] = useState(false)
   const [showHomeCountry, setShowHomeCountry] = useState(false)
+  const [showNationalityFlag, setShowNationalityFlag] = useState(false)
 
   // View mode
   const [profileViewMode, setProfileViewMode] = useState<'profile' | 'portfolio' | 'rich_portfolio'>('portfolio')
@@ -135,7 +136,7 @@ export default function ProfileSettingsPage() {
             full_name, display_name, handle, departments, primary_role,
             phone, whatsapp, email, contact_email, location_country, location_city,
             show_phone, show_whatsapp, show_email, show_location,
-            dob, home_country, show_dob, show_home_country,
+            dob, home_country, show_dob, show_home_country, show_nationality_flag,
             profile_view_mode, subscription_status, subscription_ends_at
           `)
           .eq('id', user.id)
@@ -171,6 +172,7 @@ export default function ProfileSettingsPage() {
         setHomeCountry(normalizeCountry(profile.home_country) ?? profile.home_country ?? '')
         setShowDob(profile.show_dob ?? false)
         setShowHomeCountry(profile.show_home_country ?? false)
+        setShowNationalityFlag((profile as { show_nationality_flag?: boolean | null }).show_nationality_flag ?? false)
         setProfileViewMode(profile.profile_view_mode ?? 'portfolio')
         setIsPro(isProFromRecord({
           subscription_status: profile.subscription_status ?? null,
@@ -245,10 +247,11 @@ export default function ProfileSettingsPage() {
           show_whatsapp: showWhatsapp,
           show_email:    showEmail,
           show_location: showLocation,
-          dob:               dob || null,
-          home_country:      homeCountry.trim() || null,
-          show_dob:          showDob,
-          show_home_country: showHomeCountry,
+          dob:                   dob || null,
+          home_country:          homeCountry.trim() || null,
+          show_dob:              showDob,
+          show_home_country:     showHomeCountry,
+          show_nationality_flag: showNationalityFlag,
           profile_view_mode: profileViewMode === 'rich_portfolio' && !isPro ? 'portfolio' : profileViewMode,
         })
         .eq('id', user.id)
@@ -410,6 +413,12 @@ export default function ProfileSettingsPage() {
         <div className="flex flex-col gap-1">
           <SearchableSelect label="Home Country" value={homeCountry} onChange={setHomeCountry} options={ALL_COUNTRIES.map((c) => ({ value: c, label: c }))} pinnedOptions={PINNED_COUNTRIES.map((c) => ({ value: c, label: c }))} placeholder="Search countries..." clearable clearLabel="No country" />
           <ToggleRow label="Show home country on profile" checked={showHomeCountry} onChange={setShowHomeCountry} />
+          <ToggleRow
+            label="Show nationality flag on profile"
+            sublabel={homeCountry ? 'Displays your country flag next to your name (replaces home country flag)' : 'Set a home country above to enable'}
+            checked={showNationalityFlag}
+            onChange={setShowNationalityFlag}
+          />
         </div>
       </div>
 

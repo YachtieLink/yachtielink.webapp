@@ -60,6 +60,7 @@ interface UserProfile {
   show_location?: boolean
   home_country?: string | null
   show_home_country?: boolean
+  show_nationality_flag?: boolean
   available_for_work?: boolean
   founding_member?: boolean
   social_links?: Array<{ platform: string; url: string }> | null
@@ -175,6 +176,7 @@ export function PublicProfileContent({
 
   const flag = user.home_country ? countryToFlag(user.home_country) : ''
   const homeCountryFlag = user.show_home_country !== false && flag ? flag : undefined
+  const showSvgFlag = !!user.show_nationality_flag && !!user.home_country
 
   return (
     // ── Dual-mode layout with accent CSS vars ────────────────────────────
@@ -211,6 +213,7 @@ export function PublicProfileContent({
         savedStatus={savedStatus}
         heroStats={heroStats}
         homeCountryFlag={homeCountryFlag}
+        nationalityFlagCountry={showSvgFlag ? user.home_country ?? undefined : undefined}
         viewModeToggle={viewModeToggle}
         scrimPreset={user.scrim_preset as ScrimPreset}
         focalX={heroFocalX}
