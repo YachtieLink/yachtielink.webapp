@@ -99,23 +99,23 @@ Your context sources (all committed to main by master before merges):
 - worktrees/lanes/lane-{N}-*-report.md — worker reports (if they exist)
 - git log / git diff — what actually changed in the code
 
-When the founder says "lane N merged" (or similar), do this:
-1. git pull (get the merged code)
-2. Read the session file — find lane N's QA verdict, PR number, and any notes
-3. Read worktrees/lanes/lane-{N}-review.md (reviewer's verdict)
-4. Read worktrees/lanes/lane-{N}-*.md (lane spec — what was built)
-5. Optionally: git log --oneline -3 and git diff HEAD~1 --stat
-6. Update ALL of these — do not skip any:
-   - CHANGELOG.md — add index row + full entry
-   - STATUS.md — update active sprint, recently shipped, up next, open PRs
+When the founder says "all lanes merged" (or similar), do this:
+1. git pull (get all the merged code)
+2. Read the session file — QA verdicts, PR numbers, notes for ALL lanes
+3. Read worktrees/lanes/lane-{N}-review.md for each lane (reviewer verdicts)
+4. Read worktrees/lanes/lane-{N}-*.md for each lane (lane specs)
+5. git log --oneline -10 to see all merged PRs
+6. Create a branch: git checkout -b chore/session-docs-YYYY-MM-DD
+7. Update ALL of these for ALL lanes in one pass — do not skip any:
+   - CHANGELOG.md — add index row + full entry (one entry covering all lanes)
+   - STATUS.md — update active sprint, recently shipped, up next
    - docs/modules/*.md — for any modules touched (state + activity one-liner)
    - Sprint trackers — mark completed items
-   - sessions/*.md — update lane status to "merged"
+   - sessions/*.md — update all lane statuses to "merged"
    - docs/ops/lessons-learned.md — only if a non-obvious gotcha surfaced
-7. Commit your doc updates to a branch (main is protected — use chore/session-docs-YYYY-MM-DD)
-8. Say "Logged. Ready for next."
-
-When ALL lanes are merged, run /yl-shipslog, then create a PR for all doc updates. Founder merges the docs PR last.
+8. Run /yl-shipslog for comprehensive session wrap-up
+9. Commit all doc updates, push, create PR
+10. Tell founder: "Docs PR ready"
 
 ⚠️ RULES:
 - Never edit code files — you touch .md files only
@@ -151,5 +151,5 @@ These are the short triggers you send. No context needed — agents read files.
 | Reviewer blocked | Tell worker: "check review file, fix" |
 | Worker fixed | Tell reviewer: "re-review lane N" |
 | Ready to merge | Tell master: "merge lane N" |
-| Merged | Tell logger: "lane N merged" |
+| All PRs merged | Tell logger: "all lanes merged" |
 | Logger done | Tell master: "logger done" |
