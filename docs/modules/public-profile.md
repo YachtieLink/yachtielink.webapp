@@ -86,6 +86,10 @@ One-line: Server-rendered public profile page at `/u/{handle}` with SEO metadata
 
 ## Recent Activity
 
+**2026-04-02** — Quick wins (PR #142): `CountryFlag` component added — on-demand SVG from flagcdn.com, `onError` hides on CDN failure. Nationality flag rendered in `HeroSection` next to user name when `show_nationality_flag = true` and `home_country` is set. SVG flag takes precedence over emoji flag when both toggles enabled. `show_nationality_flag` added to `getUserByHandle` SELECT.
+
+**2026-04-02** — Ghost Profiles verify (PR #143): Ghost endorser display wired into `PortfolioLayout` and `RichPortfolioLayout` SectionModal — both were silently showing "Anonymous" for ghost endorsements. Ghost endorser name/avatar/claim link now shown in all public profile views.
+
 **2026-03-28** — Sprint 11c: Rich Portfolio mode (Pro) — `RichPortfolioLayout` orchestrator with density auto-detection and template variant selection. `BentoGrid` CSS Grid engine with `grid-template-areas`. 2 templates (Classic/Bold) each with full/medium/minimal density variants. 12 tile components. `PublicProfileContent` three-way layout branching with Pro fallback. Template selection in settings (Pro only). Migration adds `profile_template` column. Photo limit bumped 9→15 Pro. `FocalPointPicker` with pointer-capture drag + hero crop preview. PATCH endpoint for focal_x/focal_y on user_photos.
 
 **2026-03-28** — Sprint 11b: Portfolio mode — `PublicProfileContent` converted to client component with dual-layout branching (profile/portfolio). Created `ViewModeToggle`, `PortfolioLayout`, `MiniBentoGallery` (asymmetric grid), `PhotoLightbox` (full-screen viewer). `HeroSection` updated with scrim preset system (4 presets), accent color CSS variables (5 palettes). Endorsement pinning: API route, RLS migration, `EndorsementCard` pin UI, `EndorsementsPageClient` with optimistic updates. Education sub-page at `/u/[handle]/education`.

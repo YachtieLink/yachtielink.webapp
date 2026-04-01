@@ -1,0 +1,3 @@
+- [Worktree file sync](feedback_worktree_file_sync.md) — lane files must be committed to main before worktree creation
+- [Reviewer must run /yl-review](feedback_reviewer_must_run_skill.md) — agents skip the skill unless prompt is forceful
+- [Master on Desktop app](feedback_master_desktop_app.md) — master needs Desktop app for browser QA, all others on CLI

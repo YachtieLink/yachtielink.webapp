@@ -6,13 +6,23 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 78 lessons
-<!-- Note: was 76, added 2 entries on 2026-03-31 (PostgreSQL return type change, prefix boost length gate) -->
+**Current count:** 79 lessons
+<!-- Note: was 78, added 1 entry on 2026-04-02 (ghost profiles RLS — public SELECT policy) -->
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## Ghost Profiles: Missing Public SELECT RLS Policy Makes Feature Invisible in Production
+
+**What happened:** The `ghost_profiles` table had only one SELECT policy: `claimed_by = auth.uid()`. This means the Supabase join `ghost_endorser:ghost_endorser_id(...)` returned null for every visitor who wasn't the claimer — including all public profile viewers and non-claimer authenticated users. Ghost endorsements silently fell through to the "Anonymous" fallback. The entire `GhostEndorserBadge` feature was invisible in production despite the code being correct.
+**Root cause:** The policy was written for the claim flow (owner only sees their ghost). A separate display policy for public visitors was never added.
+**Fix applied:** New migration `20260402000001_ghost_profiles_public_read.sql` adds `CREATE POLICY "ghost_profiles: public display read" ON public.ghost_profiles FOR SELECT USING (account_status = 'ghost')`. Only unclaimed ghosts are exposed — claimed ghosts have `account_status = 'claimed'` so are excluded automatically.
+**Lesson:** Any time a feature table is "write/own-read" but its data also needs to display publicly, write the public SELECT policy at the same time as the create migration. Ask explicitly: "who else needs to read this?" A reviewer/type-check/drift-check won't catch missing RLS policies — only end-to-end tracing reveals them.
+**Sprint:** 2026-04-01 worktree — Ghost Profiles Verify (Lane 2) | **Caught by:** Claude Code reviewer (Opus 4.6) | **Date:** 2026-04-02
 
 ---
 

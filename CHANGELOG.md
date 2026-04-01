@@ -26,6 +26,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-02 | Worktree session | 3-lane: inner-page-header redesign, ghost profiles verify + GhostEndorserBadge, custom 404 + nationality flag (PRs #142–144) |
 | 2026-04-01 | Bugfix sweep | 4-lane worktree: onboarding name trigger, colleague display names, country ISO resolution, DatePicker text mode + tick stagger (PRs #135–138) |
 | 2026-04-01 | Worktree infra | /yl-worktree skill, logger role, worker self-validation, master bottleneck fixes, model/effort matrix |
 | 2026-04-01 | Worktree infra | Worktree overhaul: docs-as-protocol, auto-bootstrap snippets, dual output, re-review mode, Codex W4 |
@@ -113,6 +114,36 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 | 2026-03-09 | Planning | 5yr plan, yl_build_plan.md canonical Phase 1A sprint plan created |
 | 2026-03-08 | Planning | Planning set rewritten: yacht graph wedge, Phase 1A/1B/1C split |
 | 2026-03-08 | Project setup | Consolidated docs, CLAUDE.md + CHANGELOG.md created, project structure |
+
+## 2026-04-02 — Parallel Worktree Session: Header Redesign + Ghost Profiles + Quick Wins
+
+### Done
+
+- **Lane 1 — PR #144** (`feat/inner-page-header`): `PageHeader` full redesign — two-part layout with a **sticky back bar** (section-color bottom border, 44px touch target, auto-derived section color from `lib/section-colors.ts`) and a **standalone title row** that scrolls with content. Backward-compatible API. `onBack` callback support for multi-step flows. `certification/new` and `attachment/new` converted from ad-hoc custom headers to PageHeader. 3 pages with double `px-4` wrappers fixed (yacht/[id], yacht/[id]/photo, endorsement/request). `count={0}` bug fixed. Orphaned `BackButton.tsx` deleted.
+- **Lane 2 — PR #143** (`feat/ghost-profiles-verify`): Ghost Profiles Wave 1 verification + `GhostEndorserBadge` wiring. Fixed critical blocker: added RLS public SELECT policy for `ghost_profiles` (migration `20260402000001`) — without it, the ghost_endorser join returned null for all non-claimer visitors, making the entire badge invisible in production. Wired `GhostEndorserBadge` into `EndorsementCard`, `EndorsementsSection`, `EndorsementsTile`, `PortfolioLayout`, `RichPortfolioLayout` SectionModal, and `EndorsementsPageClient`. Restored `'Anonymous'` fallback that was accidentally cleared. Added `ghost_endorser` join to `getPublicProfileSections` read model.
+- **Lane 3 — PR #142** (`feat/quick-wins-404-flag`): Custom 404 page (`app/not-found.tsx`) — auth-aware, routes logged-in users to profile, guests to `/welcome`. Copy: "Even the best navigators get lost." Nationality flag toggle — new `CountryFlag` component (flagcdn.com, on-demand SVG, `onError` hides on CDN failure), `show_nationality_flag` DB column (migration `20260401000005`), settings toggle with context-aware sublabel, wired into public profile hero. `show_nationality_flag` added to both `getUserById` and `getUserByHandle` for read model parity.
+
+### Context
+
+- All 3 lanes blocked by reviewer on first pass — all blockers resolved before merge.
+- Lane 2 critical: ghost RLS policy was missing from the original Wave 1 PR (#133) — ghost endorsements were silently invisible to all non-claimer visitors.
+- Open warnings (post-merge): private dashboard + CV queries still missing ghost_endorser join (profile owner sees "Anonymous" for ghost endorsements in their own dashboard). Supabase types need regeneration after migrations run.
+- Ghost UUID/name exposure via claim link — founder sign-off confirmed as acceptable for Phase 1.
+- Yacht-prefix fix included in session context commit (PR #141): new `lib/yacht-prefix.ts` utility, wired into `YachtMatchCard` and `SeaTimeBreakdown`.
+- Large backlog captured this session: 8 new backlog specs added (`profile-page-redesign`, `network-tab-overhaul`, `insights-tab-overhaul`, `more-tab-overhaul`, `photo-management-unified`, `yacht-reviews-glassdoor`, `feature-voting-roadmap`, `yacht-name-prefix-display`).
+
+### Next
+
+1. Apply pending Supabase migrations: `20260401000005_nationality_flag`, `20260402000001_ghost_profiles_public_read`
+2. Fix private profile dashboard + CV ghost_endorser join — `getProfileSections` + `getCvSections` in `lib/queries/profile.ts` still missing the join; profile owner sees "Anonymous" for ghost endorsements in their own dashboard
+3. Regenerate Supabase types after migrations
+4. Rally 007 — Launch QA full checklist
+
+### Flags
+
+- Ghost profiles RLS gap: any time a feature has both a data table AND a display surface, check that RLS allows public SELECT for the display case (not just owner access)
+
+---
 
 ## 2026-04-01 — Bugfix Sweep + Rally 006 Close (Parallel Worktree Session)
 

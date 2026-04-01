@@ -1,6 +1,6 @@
 ---
 module: design-system
-updated: 2026-04-01
+updated: 2026-04-02
 status: shipped
 phase: 1A
 ---
@@ -15,7 +15,8 @@ One-line: Brand token system (teal/sand/coral/navy/amber), custom + shadcn compo
 - Light mode and dark mode tokens with full `.dark` class overrides: working
 - shadcn/ui v4 (base-nova style) installed and themed to teal + sand palette: working
 - Custom YachtieLink components (Button, Card, Input, Toast, BottomSheet, ProgressWheel) alongside shadcn: working
-- Sprint 10.2 additions (Textarea, Select, FormField, IconButton, DatePicker, SectionBadge, ProfileAvatar, BackButton, EmptyState): working
+- Sprint 10.2 additions (Textarea, Select, FormField, IconButton, DatePicker, SectionBadge, ProfileAvatar, EmptyState): working
+- `BackButton.tsx`: **DELETED** — orphaned, no importers. Navigation handled by `PageHeader` sticky back bar.
 - Barrel export from `components/ui/index.ts`: working
 - DM Sans (body) + DM Serif Display (hero headlines) loaded via Next.js font system: working
 - Framer Motion preset library (`lib/motion.ts`): working — springSnappy, springGentle, easeFast, fadeUp, fadeIn, staggerContainer, cardHover, buttonTap, scrollReveal, popIn, easeGentle
@@ -118,7 +119,7 @@ DM Serif Display is reserved for landing page headlines, onboarding welcome, and
 | IconButton | `IconButton.tsx` | Icon-only button |
 | SectionBadge | `SectionBadge.tsx` | Coloured section label |
 | ProfileAvatar | `ProfileAvatar.tsx` | Photo with initials fallback |
-| BackButton | `BackButton.tsx` | Navigation back arrow |
+| CountryFlag | `CountryFlag.tsx` | On-demand SVG flag from flagcdn.com, `onError` hides on CDN failure |
 | EmptyState | `EmptyState.tsx` | Icon + title + description + optional action |
 | AnimatedCard | `AnimatedCard.tsx` | Motion wrapper for cards |
 | PageTransition | `PageTransition.tsx` | fadeUp wrapper for page content |
@@ -166,6 +167,8 @@ Dialog, Badge, Separator, Avatar, Tabs, Tooltip, Sheet, Skeleton, DropdownMenu
 **2026-03-16** — Two-pass rally pattern (R1 + challengers) for design reviews. Single-pass analysis is too shallow; challenger agents find structural issues that first-pass rationalises away.
 
 ## Recent Activity
+
+**2026-04-02** — Inner-page-header (PR #144): `PageHeader` full rewrite — two-part layout: sticky back bar (section-color 2px bottom border, 44px touch target, auto-derived from `backHref` using canonical `lib/section-colors.ts`) + standalone title row (scrolls with content, optional count/subtitle/actions). `onBack` callback for multi-step flows. `BackButton.tsx` deleted (orphaned). New `CountryFlag` component added (`components/ui/CountryFlag.tsx`) — loads individual SVG flags from flagcdn.com on demand, zero bundle impact.
 
 **2026-04-01** — Lane 3 (PR #138): DatePicker gains text+calendar hybrid mode — `parseTextDate()` handles 7 format patterns (ISO, US, natural), defaults to text on mobile, inline error with format hints, mode toggle. ProgressWheel gains `staggerMs` prop (default 0, backward compat) for organic tick animations. EndorsementBanner progress bars get 100ms/200ms stagger delays.
 **2026-04-01** — CV wizard Steps 4-5: ChipSelect hierarchy rework (headings > chips), chip sizing downsized to text-xs/py-1, CV chips tinted not solid, hobby chips amber-tinted for distinction; StepReview overhaul with serif title, amber wayfinding borders, tinted skill/hobby chips, M/Y/S/Y prefixes.

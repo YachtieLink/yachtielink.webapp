@@ -10,9 +10,9 @@ Parallel worktree session: 3 lanes + master QA. Inner-page-header redesign (P1),
 ## Lanes
 | Lane | Branch | Worktree | Model | Effort | Status |
 |------|--------|----------|-------|--------|--------|
-| 1 | feat/inner-page-header | yl-wt-1 | Opus | high | queued |
-| 2 | feat/ghost-profiles-verify | yl-wt-2 | Sonnet | high | queued |
-| 3 | feat/quick-wins-404-flag | yl-wt-3 | Sonnet | medium | queued |
+| 1 | feat/inner-page-header | yl-wt-1 | Opus | high | merged (PR #144) |
+| 2 | feat/ghost-profiles-verify | yl-wt-2 | Sonnet | high | merged (PR #143) |
+| 3 | feat/quick-wins-404-flag | yl-wt-3 | Sonnet | medium | merged (PR #142) |
 
 ## Merge Order
 1. Lane 3 (smallest, no deps — custom 404 + nationality flag)
