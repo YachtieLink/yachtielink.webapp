@@ -160,7 +160,7 @@ export function EndorsementBanner({ endorsementCount, mostRecentEndorsementDate 
                   <div className="flex-1 h-1 rounded-full bg-[var(--color-surface-raised)] overflow-hidden">
                     <div
                       className="h-full rounded-full bg-[var(--color-interactive)] transition-all"
-                      style={{ width: `${progressPct}%` }}
+                      style={{ width: `${progressPct}%`, transitionDelay: '100ms' }}
                     />
                   </div>
                 )}
@@ -201,7 +201,7 @@ export function EndorsementBanner({ endorsementCount, mostRecentEndorsementDate 
                     <div className="w-full h-1.5 rounded-full bg-[var(--color-surface-raised)] overflow-hidden">
                       <div
                         className="h-full rounded-full bg-[var(--color-interactive)] transition-all"
-                        style={{ width: `${progressPct}%` }}
+                        style={{ width: `${progressPct}%`, transitionDelay: '200ms' }}
                       />
                     </div>
                     <p className="text-xs text-[var(--color-text-tertiary)] mt-1">{progressCount}/5 endorsements</p>
