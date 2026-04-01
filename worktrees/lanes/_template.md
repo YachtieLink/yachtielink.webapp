@@ -45,9 +45,7 @@ docs/ops/
 - [ ] {{concrete deliverable 2}}
 - [ ] {{concrete deliverable 3}}
 - [ ] Type check passes
-- [ ] /review passes
-- [ ] /yachtielink-review passes
-- [ ] /test-yl passes
+- [ ] /yl-review passes (run by reviewer)
 - [ ] Completion report filled out
 
 ---

@@ -2,38 +2,36 @@
 
 You are a **worker session** operating inside a dedicated YachtieLink worktree. You execute one bounded lane of work assigned by the master session.
 
-Read `AGENTS.md` and `CLAUDE.md` first (they still apply). This file adds your worktree-specific rules.
-
 ---
 
-## Your Lane
+## Bootstrap (do this first, silently)
 
-Your lane assignment is in a file under `worktrees/lanes/`. Read it now — it defines:
+1. Read `AGENTS.md` (Tier 1 only — instructions + registry)
+2. Figure out which worktree you're in: run `pwd` to get your worktree number (yl-wt-1 → lane 1, yl-wt-2 → lane 2, etc.)
+3. Find your lane file: `ls worktrees/lanes/lane-{N}-*.md` (where N is your worktree number)
+4. Read your lane file — it has your task, scope, allowed files, forbidden files, and definition of done
+5. If your lane is frontend/UI, also read `docs/design-system/patterns/page-layout.md`
+6. Start building immediately. Don't ask the founder what to do — it's all in the lane file.
 
-- **Task** — what you're building
-- **Allowed files** — what you may edit
-- **Forbidden files** — what you must not touch
-- **Definition of done** — what "finished" looks like
+If no lane file exists for your worktree number, tell the founder: "No lane file found for my worktree. Check with master."
 
-If no lane file exists for your worktree, stop and ask the founder to check with the master session.
+---
 
 ## Hard Rules
 
 1. **Stay in your lane.** Only edit files listed in your lane assignment. If you need to touch something outside your scope, stop and report it.
-2. **No shared docs.** Never edit CHANGELOG.md, STATUS.md, sprint trackers, or Hivemind files. The master handles these.
+2. **No shared docs.** Never edit CHANGELOG.md, STATUS.md, sprint trackers. The master/logger handles these.
 3. **No scope creep.** If you discover related work that should happen, note it in your report — don't build it.
 4. **Report overlap immediately.** If your work would collide with another likely lane, stop and flag it.
-5. **Call out migrations.** If you need a Supabase migration, say so clearly in your report. Migrations are high-risk for parallel work.
+5. **Call out migrations.** If you need a Supabase migration, say so clearly in your report.
 
-## Sprint Chain (Modified for Workers)
-
-Workers build, self-validate thoroughly, then report. The **reviewer** handles deep /review, /yachtielink-review, and /test-yl. The **master** handles merge sequencing. The **logger** (if active) handles doc updates.
+## Build Chain
 
 ```
 BUILD → type-check → drift-check → self-review → REPORT → STOP
 ```
 
-### Self-validation (you do all of these before reporting done)
+### Self-validation (do all of these before reporting done)
 
 1. **Type-check:** `npx tsc --noEmit` — fix all errors you introduced
 2. **Drift-check:** `npm run drift-check` (if it exists) — fix any drift you caused
@@ -45,26 +43,53 @@ BUILD → type-check → drift-check → self-review → REPORT → STOP
    - Accessibility issues (missing aria labels, keyboard nav)
    - Mobile viewport issues (if touching UI)
 4. **Verify imports:** No unused imports, no circular dependencies
-5. **Test manually if possible:** If the change is UI, describe what you'd expect to see
 
-This self-review catches 80% of what the Opus reviewer would flag. The reviewer then focuses on the deep stuff — architecture, contracts, edge cases, cross-module impact.
-
-**Do NOT run /review, /yachtielink-review, or /test-yl** — the dedicated reviewer session handles these.
-
+**Do NOT run /yl-review** — the dedicated reviewer session handles this.
 **Do NOT commit or push** — the master handles merge sequencing.
+**Do NOT edit shared docs** — CHANGELOG.md, STATUS.md, sprint trackers, docs/ops/*.
 
-**Do NOT edit shared docs** — CHANGELOG.md, STATUS.md, sprint trackers, docs/ops/*. The logger or master handles these.
+## When You're Done — Dual Output
 
-## When You're Done
+You produce TWO outputs:
 
-Fill out a report using the template in `worktrees/worker/report-template.md` and save it to `worktrees/lanes/lane-{N}-report.md`. The master needs this to merge safely.
+### 1. Full report (for reviewer + logger + master) — write to file
+
+Fill out a report using the template in `worktrees/worker/report-template.md` and save it to `worktrees/lanes/lane-{N}-report.md`. Include everything: files changed, migrations, risks, what you tested.
+
+### 2. Dot-point summary (for founder) — say in chat
+
+Tell the founder in chat. Keep it short — 3-6 bullet points max:
+
+```
+Lane {N} complete:
+- Built X (N files)
+- Fixed Y
+- Migration: yes/no
+- Risks: {any}
+- Type check: clean
+```
+
+The founder doesn't need the full report — they need to know it's done and whether anything is unusual. The reviewer reads the file for detail.
+
+## Communication Protocol
+
+**Docs are the communication layer.** You communicate with other agents through files.
+
+- **Your output:** `worktrees/lanes/lane-{N}-report.md` — reviewer and logger read this directly
+- **Reviewer's output:** `worktrees/lanes/lane-{N}-review.md` — if sent back for fixes, read this file for blockers
+- **Next assignment:** Master writes a new lane file — read it directly
+
+The founder gives short triggers ("fix the blockers", "new lane file ready"), not content.
+
+### If sent back for fixes
+
+1. Read `worktrees/lanes/lane-{N}-review.md` for the reviewer's blockers
+2. Fix them
+3. Tell the founder: **"Lane {N} fixes done"** + dot-point summary of what you fixed
 
 ### If you finish early
 
-Tell the founder you're done. The master may assign you:
-- A bonus task from the backlog
-- A review assist (read another lane's diff, flag concerns)
-- Nothing (stand by for rebase after merge)
+Tell the founder. The master may write a new lane file for you, or have you stand by.
 
 ## If You Get Stuck
 

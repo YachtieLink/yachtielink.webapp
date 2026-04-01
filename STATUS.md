@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-01 (Rally 008 doc & skill redesign complete. 3-tier context loading, module consolidation, 5 new skills. Sprint 13 polish merged. CV wizard Steps 2-3 + Ghost Profiles Wave 1 PRs awaiting merge.)
+**Last updated:** 2026-04-01 (Worktree infra overhaul complete: auto-bootstrap snippets, docs-as-protocol, dual output, Codex W4. PRs #132 + #133 need rebasing + merge.)
 
 ---
 
@@ -18,9 +18,9 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 |--------|-------|--------|-------|
 | Rally 006 | 1B | 🔧 Nearly Done | CV wizard Steps 2-3 done (PR #132, unmerged). Steps 1, 4-5 done on `chore/remove-icloud-duplicates` (uncommitted). Date pickers + tick timing remain. |
 | Sprint 13 | 1B | 🔧 Code Complete | SEO/sitemap/OG/cookie/robots merged (PR #130). Ops + legal blocked on founder. |
-| Ghost Profiles W1 | 1B | 🔧 In Review | 3 migrations, non-auth endorsement flow, claim flow (PR #133). Reviewer pending. |
+| Ghost Profiles W1 | 1B | ✅ Reviewer Passed | 3 migrations, non-auth endorsement flow, claim flow (PR #133). Needs rebase + merge. |
 
-**Next action:** Merge PR #132 (CV Steps 2-3). Review and merge PR #133 (Ghost Profiles) after reviewer verdict. Close Rally 006 (date pickers + tick timing). Run migration `20260331000005`.
+**Next action:** Rebase PRs #132 + #133 onto main (Rally 008 changed main), merge both, run migrations. Close Rally 006 (date pickers + tick timing).
 
 ---
 
@@ -28,6 +28,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
+| Worktree infra overhaul | 2026-04-01 | Docs-as-protocol, auto-bootstrap snippets, dual output, re-review mode, Codex W4, session location unified |
 | Rally 008 — Doc & skill redesign | 2026-04-01 | 3-tier context loading, CHANGELOG index, 11 module docs consolidated (33→11 files), 5 new yl-skills, 7 archived. ~88% token savings at session start. |
 | Sprint 13 launch polish | 2026-04-01 | Sitemap onboarding filter, robots.txt, cookie banner copy, login link fix, OG/Twitter fallback (PR #130, merged) |
 | Builder autocomplete from DB | 2026-03-31 | yacht_builders table, 4 migrations, BuilderInput component, all consumers updated |
@@ -36,8 +37,8 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Merge PR #132** — CV wizard Steps 2-3 (no blockers)
-2. **Review + merge PR #133** — Ghost Profiles Wave 1 (reviewer verdict pending)
+1. **Rebase + merge PR #132** — CV wizard Steps 2-3 (needs rebase onto post-Rally-008 main)
+2. **Rebase + merge PR #133** — Ghost Profiles Wave 1 (reviewer passed, needs rebase)
 3. **Run migration** — `20260331000005_skills_interests_summary.sql` + 3 ghost profile migrations against production DB
 4. **Close Rally 006** — date pickers (text+calendar on mobile) + progress tick timing
 5. **Commit backlog triage** — consolidate duplicate save-yachts files
@@ -65,7 +66,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 | PR | Branch | Status | Notes |
 |----|--------|--------|-------|
 | #132 | feat/cv-wizard-steps-2-5 | Ready to merge | 2 files, UI only |
-| #133 | feat/ghost-profiles | Reviewer pending | 17 files, 3 migrations, needs careful review |
+| #133 | feat/ghost-profiles | Reviewer passed | 17 files, 3 migrations, needs rebase + merge |
 
 **Still uncommitted on `chore/remove-icloud-duplicates`:** Builder autocomplete + CV wizard Steps 1, 4-5 + review fixes (3 prior sessions). Commit still needed — separate from worktree PRs.
 

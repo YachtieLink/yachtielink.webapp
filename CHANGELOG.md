@@ -26,6 +26,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-01 | Worktree infra | Worktree overhaul: docs-as-protocol, auto-bootstrap snippets, dual output, re-review mode, Codex W4 |
 | 2026-04-01 | Rally 008 | Doc & skill system redesign — 11 module docs collapsed (33→11 files), CHANGELOG index, 5 new yl-skills, 7 archived |
 | 2026-04-01 | Worktree session | First parallel worktree: Lanes 1-3, backlog triage, Rally 006 status |
 | 2026-04-01 | Rally 006 / Sprint 13 | CV Steps 4-5 UX, code review fixes, Pro gate, rate limit buckets |
@@ -110,6 +111,45 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 | 2026-03-09 | Planning | 5yr plan, yl_build_plan.md canonical Phase 1A sprint plan created |
 | 2026-03-08 | Planning | Planning set rewritten: yacht graph wedge, Phase 1A/1B/1C split |
 | 2026-03-08 | Project setup | Consolidated docs, CLAUDE.md + CHANGELOG.md created, project structure |
+
+## 2026-04-01 — Claude Code (Opus 4.6) — Worktree Infrastructure Overhaul
+
+### Done
+
+- **Docs-as-protocol communication model** — all worktree agent docs (worker, reviewer, logger, master) updated. Agents read/write files directly instead of founder relaying content. Founder gives short triggers ("lane 1 done"), not summaries.
+- **Re-review mode for reviewer** — `worktrees/reviewer/CLAUDE.md` now instructs: on re-review, verify blockers from the review file + type-check + drift-check. Don't re-run full agent chain on fix commits.
+- **Session log location unified** — all references updated from `worktrees/sessions/` to `sessions/` across 8 files (master, logger, reviewer, prompt, checklist, README). `worktrees/sessions/` is no longer used.
+- **Stale skill references fixed** — 12 files updated: `/review` → `/yl-review`, `/shipslog` → `/yl-shipslog`, `/worktree-yl` → `/yl-worktree` across all worktree docs.
+- **Codex W4 added** — optional 4th worker slot for correctness-heavy lanes (migrations, RPC, auth, shared utilities). `docs/agents/codex.md` rewritten with worktree protocol. Model matrix updated in master CLAUDE.md and `/yl-worktree` skill. `/Users/ari/Developer/yl-wt-4` created.
+- **Feedback rule 46** — "Workers always use worktree branches, never main." Added to `docs/ops/feedback.md`.
+- **Ghost Profiles reviewer fixes committed** — PR #133 updated: RPC identity injection fixed (zero-parameter `claim_ghost_profile()`), email confirmation required, colleagues page null safety. Reviewer re-passed.
+- **Auto-bootstrap snippets** — all agent CLAUDE.md files rewritten to self-bootstrap. Workers auto-detect lane from `pwd`. Founder pastes one universal snippet per role, agents read their own instructions. `worktrees/SNIPPETS.md` created with all keywords.
+- **Dual output format** — workers and reviewer both produce: dot-point summary in chat (for founder) + full report in file (for other agents). Eliminates content relay.
+
+### Context
+
+- Rally 008 landed mid-session, requiring alignment of worktree docs with new structure (consolidated modules, renamed skills, 3-tier loading).
+- PRs #132 and #133 still need merging + rebasing onto main (Rally 008 changed main).
+- Backlog triage doc (`sprints/backlog/TRIAGE-2026-04-01.md`) still uncommitted.
+- `chore/remove-icloud-duplicates` branch still has 3 sessions of uncommitted work (builder autocomplete + CV Steps 1, 4-5 + review fixes).
+
+### Next
+
+1. **Rebase + merge PR #132** (CV Steps 2-3) onto updated main
+2. **Rebase + merge PR #133** (Ghost Profiles W1) — reviewer already passed
+3. **Run migrations** — `20260331000005` + 3 ghost profile migrations
+4. **Close Rally 006** — date pickers + progress tick timing
+5. **Commit `chore/remove-icloud-duplicates`** — 3 prior sessions of work
+6. **Commit backlog triage + worktree doc updates** — large uncommitted change set across worktree docs
+7. **Test new worktree protocol** — next session is the first with auto-bootstrap snippets, docs-as-protocol, dual output, and Codex W4
+
+### Flags
+
+- ⚠️ PRs #132 and #133 need rebasing — main advanced significantly with Rally 008
+- ⚠️ Reviewer ran full chain on re-review despite only needing blocker verification — re-review mode docs now address this but untested
+- ⚠️ Codex W4 is untested — first real session will validate the model
+
+---
 
 ## 2026-04-01 — Claude Code (Opus 4.6) — Rally 008: Documentation & Skill System Redesign
 
