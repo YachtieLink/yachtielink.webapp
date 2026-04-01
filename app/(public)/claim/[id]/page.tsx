@@ -35,13 +35,28 @@ export default async function ClaimPage({ params }: PageProps) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (user) {
-    // Authenticated — trigger claim immediately then redirect
+    // Require a confirmed email before claiming — unconfirmed signups must not steal ghosts
+    if (!user.email_confirmed_at) {
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-[var(--color-surface)] px-4">
+          <div className="max-w-sm text-center">
+            <p className="text-2xl mb-3">✉</p>
+            <h1 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
+              Verify your email first
+            </h1>
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              Check your inbox for a verification email, then come back to claim your profile.
+            </p>
+          </div>
+        </div>
+      )
+    }
+
+    // Authenticated + confirmed — trigger claim immediately then redirect
     try {
-      if (user.email) {
-        await claimGhostProfile(user.id, user.email)
-      }
+      await claimGhostProfile()
     } catch (err) {
-      // Non-fatal — if claim fails (e.g. email mismatch), continue to profile anyway
+      // Non-fatal — if claim fails (e.g. no email match), continue to profile anyway
       console.error('Ghost claim failed on landing page:', err)
     }
     redirect('/app/profile')

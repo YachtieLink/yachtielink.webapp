@@ -32,7 +32,7 @@ interface AttachmentRow {
 
 interface EndorsementRow {
   id: string
-  endorser_id: string
+  endorser_id: string | null  // nullable: ghost endorsements have null endorser_id
   recipient_id: string
   yacht_id: string
 }
@@ -50,6 +50,7 @@ export default async function ColleaguesPage() {
     supabase.from('endorsements')
       .select('id, endorser_id, recipient_id, yacht_id')
       .or(`endorser_id.eq.${user.id},recipient_id.eq.${user.id}`)
+      .not('endorser_id', 'is', null)  // exclude ghost endorsements (null endorser_id)
       .is('deleted_at', null),
   ])
 
@@ -113,6 +114,9 @@ export default async function ColleaguesPage() {
   const endorsementRelationMap = new Map<string, 'endorsed_you' | 'you_endorsed' | 'mutual'>()
   const endorsedByUserOnYacht = new Set<string>() // "colleagueId-yachtId"
   for (const e of endorsements) {
+    // Null guard: the query filters ghost endorsements (.not('endorser_id', 'is', null))
+    // but the type reflects the schema's nullable column — skip defensively.
+    if (!e.endorser_id) continue
     const otherId = e.endorser_id === user.id ? e.recipient_id : e.endorser_id
     const existing = endorsementRelationMap.get(otherId)
     if (e.endorser_id === user.id) {

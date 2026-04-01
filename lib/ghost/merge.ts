@@ -1,9 +1,9 @@
 /**
  * Ghost-to-real merge helpers.
  *
- * The core claim logic lives in the claim_ghost_profile Supabase RPC
- * (migration 20260401000002). This module provides typed wrappers for
- * calling that RPC from server-side code (API routes, server actions).
+ * The core claim logic lives in the claim_ghost_profile() Supabase RPC
+ * (migration 20260401000002). Identity is resolved inside the RPC from
+ * auth.uid() — no caller-supplied identity is accepted.
  */
 
 import { createClient } from '@/lib/supabase/server'
@@ -14,7 +14,10 @@ export type ClaimResult = {
 }
 
 /**
- * Claim all ghost profiles matching the given user's verified email.
+ * Claim all ghost profiles matching the authenticated user's verified email.
+ *
+ * The RPC resolves identity from auth.uid() and fetches the email from
+ * auth.users internally — this call passes no identity parameters.
  *
  * Atomically:
  *   1. Finds unclaimed ghosts with matching email
@@ -27,16 +30,10 @@ export type ClaimResult = {
  *
  * Throws if the RPC call fails.
  */
-export async function claimGhostProfile(
-  userId: string,
-  email: string
-): Promise<ClaimResult> {
+export async function claimGhostProfile(): Promise<ClaimResult> {
   const supabase = await createClient()
 
-  const { data, error } = await supabase.rpc('claim_ghost_profile', {
-    p_claiming_user_id: userId,
-    p_claiming_email:   email,
-  })
+  const { data, error } = await supabase.rpc('claim_ghost_profile')
 
   if (error) {
     throw new Error(`claim_ghost_profile failed: ${error.message}`)

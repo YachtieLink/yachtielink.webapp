@@ -34,34 +34,52 @@ CREATE INDEX endorsements_ghost_endorser_idx
 
 -- 6. claim_ghost_profile RPC
 --    Called from POST /api/ghost-profiles/claim after successful auth.
+--    NO CALLER-SUPPLIED IDENTITY — identity is resolved internally from auth.uid()
+--    and auth.users to prevent parameter-injection privilege escalation.
 --    Atomically:
---      a. Finds all unclaimed ghost profiles matching the user's email
---      b. Handles conflicts (soft-deletes ghost endorsements that would
+--      a. Resolves claiming user from auth.uid() (not a parameter)
+--      b. Fetches verified email from auth.users (not a parameter)
+--      c. Finds all unclaimed ghost profiles matching that email
+--      d. Handles conflicts (soft-deletes ghost endorsements that would
 --         collide with an existing real endorsement from the same user)
---      c. Migrates remaining endorsements: ghost_endorser_id → endorser_id
---      d. Marks ghost profiles as claimed
---      e. Sets onboarding_complete = true so the user bypasses the wizard
+--      e. Migrates remaining endorsements: ghost_endorser_id → endorser_id
+--      f. Marks ghost profiles as claimed
+--      g. Sets onboarding_complete = true so the user bypasses the wizard
 --    Returns JSONB: { migrated_count, ghost_ids_claimed }
-CREATE OR REPLACE FUNCTION public.claim_ghost_profile(
-  p_claiming_user_id UUID,
-  p_claiming_email   TEXT
-)
+CREATE OR REPLACE FUNCTION public.claim_ghost_profile()
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
-  v_ghost_id       UUID;
-  v_migrated_count INTEGER := 0;
-  v_claimed_ids    UUID[]  := '{}';
-  v_row_count      INTEGER;
+  v_claiming_user_id UUID;
+  v_claiming_email   TEXT;
+  v_ghost_id         UUID;
+  v_migrated_count   INTEGER := 0;
+  v_claimed_ids      UUID[]  := '{}';
+  v_row_count        INTEGER;
 BEGIN
+  -- Resolve identity from session — never trust caller-supplied values
+  v_claiming_user_id := auth.uid();
+  IF v_claiming_user_id IS NULL THEN
+    RAISE EXCEPTION 'claim_ghost_profile: not authenticated';
+  END IF;
+
+  -- Fetch email from auth.users — prevents caller from supplying someone else's email
+  SELECT email INTO v_claiming_email
+  FROM auth.users
+  WHERE id = v_claiming_user_id;
+
+  IF v_claiming_email IS NULL THEN
+    RAISE EXCEPTION 'claim_ghost_profile: user has no email address';
+  END IF;
+
   -- Find all unclaimed ghosts matching this email
   FOR v_ghost_id IN
     SELECT id
     FROM public.ghost_profiles
-    WHERE email = p_claiming_email
+    WHERE email = v_claiming_email
       AND account_status = 'ghost'
   LOOP
     -- Step A: Soft-delete ghost endorsements that would violate the existing
@@ -73,7 +91,7 @@ BEGIN
       AND EXISTS (
         SELECT 1
         FROM public.endorsements re
-        WHERE re.endorser_id  = p_claiming_user_id
+        WHERE re.endorser_id  = v_claiming_user_id
           AND re.recipient_id = ge.recipient_id
           AND re.yacht_id     = ge.yacht_id
           AND re.deleted_at IS NULL
@@ -82,7 +100,7 @@ BEGIN
     -- Step B: Migrate remaining ghost endorsements to the real user account
     UPDATE public.endorsements
     SET
-      endorser_id       = p_claiming_user_id,
+      endorser_id       = v_claiming_user_id,
       ghost_endorser_id = NULL
     WHERE ghost_endorser_id = v_ghost_id
       AND deleted_at IS NULL;
@@ -94,7 +112,7 @@ BEGIN
     UPDATE public.ghost_profiles
     SET
       account_status = 'claimed',
-      claimed_by     = p_claiming_user_id
+      claimed_by     = v_claiming_user_id
     WHERE id = v_ghost_id;
 
     v_claimed_ids := array_append(v_claimed_ids, v_ghost_id);
@@ -105,7 +123,7 @@ BEGIN
   IF cardinality(v_claimed_ids) > 0 THEN
     UPDATE public.users
     SET onboarding_complete = true
-    WHERE id = p_claiming_user_id;
+    WHERE id = v_claiming_user_id;
   END IF;
 
   RETURN jsonb_build_object(
@@ -115,4 +133,4 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.claim_ghost_profile(UUID, TEXT) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.claim_ghost_profile() TO authenticated;

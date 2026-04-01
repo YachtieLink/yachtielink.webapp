@@ -10,8 +10,13 @@ type ClaimResult = {
 /**
  * POST /api/ghost-profiles/claim
  *
- * Requires authentication. Calls the claim_ghost_profile RPC which:
- *   - Finds all unclaimed ghost profiles matching the user's verified email
+ * Requires authentication with a confirmed email.
+ * Calls the claim_ghost_profile() RPC which resolves identity internally
+ * from auth.uid() — no caller-supplied identity trusted.
+ *
+ * The RPC:
+ *   - Fetches the user's email from auth.users (not from this request)
+ *   - Finds all unclaimed ghost profiles matching that email
  *   - Migrates their endorsements to the real user account
  *   - Marks ghosts as claimed
  *   - Sets onboarding_complete = true (bypasses the wizard for claimers)
@@ -28,14 +33,16 @@ export async function POST(_req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    if (!user.email) {
-      return NextResponse.json({ error: 'Account has no verified email.' }, { status: 400 })
+    // Require a verified email — unconfirmed accounts must not claim ghost endorsements
+    if (!user.email_confirmed_at) {
+      return NextResponse.json(
+        { error: 'Please verify your email address before claiming a profile.' },
+        { status: 403 }
+      )
     }
 
-    const { data, error } = await supabase.rpc('claim_ghost_profile', {
-      p_claiming_user_id: user.id,
-      p_claiming_email:   user.email,
-    })
+    // RPC resolves identity from auth.uid() internally — no params passed
+    const { data, error } = await supabase.rpc('claim_ghost_profile')
 
     if (error) {
       console.error('claim_ghost_profile RPC error:', error)
