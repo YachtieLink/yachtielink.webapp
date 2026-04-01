@@ -8,6 +8,7 @@ import { YACHT_ROLES } from '@/lib/constants/roles'
 import { Skeleton } from '@/components/ui/skeleton'
 import { parsePhoneNumberFromString } from 'libphonenumber-js/min'
 import { countryToFlag, COUNTRY_TO_ISO } from '@/lib/constants/country-iso'
+import { normalizeCountry } from '@/lib/constants/country-normalize'
 import type { ParsedPersonal, ParsedLanguage } from '@/lib/cv/types'
 
 /** Format a phone string to international format, or return as-is if unparseable */
@@ -138,10 +139,10 @@ export function StepPersonal({ parsed, languages: parsedLangs, existing, parsePe
   const [primaryRole, setPrimaryRole] = useState(merge(existing.primary_role, parsed?.primary_role))
   const [bio, setBio] = useState(merge(existing.bio, parsed?.bio).slice(0, 500))
   const [phone, setPhone] = useState(() => formatPhone(merge(existing.phone, parsed?.phone)))
-  const [locationCountry, setLocationCountry] = useState(merge(existing.location_country, parsed?.location_country))
+  const [locationCountry, setLocationCountry] = useState(normalizeCountry(merge(existing.location_country, parsed?.location_country)) ?? merge(existing.location_country, parsed?.location_country))
   const [locationCity, setLocationCity] = useState(merge(existing.location_city, parsed?.location_city))
   const [dob, setDob] = useState(merge(existing.dob, parsed?.dob))
-  const [homeCountry, setHomeCountry] = useState(merge(existing.home_country, parsed?.home_country))
+  const [homeCountry, setHomeCountry] = useState(normalizeCountry(merge(existing.home_country, parsed?.home_country)) ?? merge(existing.home_country, parsed?.home_country))
   const [smokePref, setSmokePref] = useState(merge(existing.smoke_pref, parsed?.smoke_pref))
   const [appearanceNote, setAppearanceNote] = useState(merge(existing.appearance_note, parsed?.appearance_note))
   const [licenseInfo, setLicenseInfo] = useState(merge(existing.license_info, parsed?.license_info))
@@ -159,10 +160,10 @@ export function StepPersonal({ parsed, languages: parsedLangs, existing, parsePe
     if (parsed.primary_role) setPrimaryRole(parsed.primary_role)
     if (parsed.bio) setBio(parsed.bio.slice(0, 500))
     if (parsed.phone) setPhone(formatPhone(parsed.phone))
-    if (parsed.location_country) setLocationCountry(parsed.location_country)
+    if (parsed.location_country) setLocationCountry(normalizeCountry(parsed.location_country) ?? parsed.location_country)
     if (parsed.location_city) setLocationCity(parsed.location_city)
     if (parsed.dob) setDob(parsed.dob)
-    if (parsed.home_country) setHomeCountry(parsed.home_country)
+    if (parsed.home_country) setHomeCountry(normalizeCountry(parsed.home_country) ?? parsed.home_country)
     if (parsed.smoke_pref) setSmokePref(parsed.smoke_pref)
     if (parsed.appearance_note) setAppearanceNote(parsed.appearance_note)
     if (parsed.license_info) setLicenseInfo(parsed.license_info)

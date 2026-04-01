@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/Toast'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { ALL_COUNTRIES, PINNED_COUNTRIES } from '@/lib/constants/countries'
+import { normalizeCountry } from '@/lib/constants/country-normalize'
 import { RESERVED_HANDLES } from '@/lib/constants/reserved-handles'
 import { isProFromRecord } from '@/lib/stripe/pro-shared'
 import { User, Phone, Mail, MapPin, Calendar, Globe, LayoutGrid } from 'lucide-react'
@@ -160,14 +161,14 @@ export default function ProfileSettingsPage() {
         setPhone(profile.phone ?? '')
         setWhatsapp(profile.whatsapp ?? '')
         setContactEmail(profile.contact_email ?? profile.email ?? '')
-        setLocationCountry(profile.location_country ?? '')
+        setLocationCountry(normalizeCountry(profile.location_country) ?? profile.location_country ?? '')
         setLocationCity(profile.location_city ?? '')
         setShowPhone(profile.show_phone ?? false)
         setShowWhatsapp(profile.show_whatsapp ?? false)
         setShowEmail(profile.show_email ?? false)
         setShowLocation(profile.show_location ?? false)
         setDob(profile.dob ?? '')
-        setHomeCountry(profile.home_country ?? '')
+        setHomeCountry(normalizeCountry(profile.home_country) ?? profile.home_country ?? '')
         setShowDob(profile.show_dob ?? false)
         setShowHomeCountry(profile.show_home_country ?? false)
         setProfileViewMode(profile.profile_view_mode ?? 'portfolio')
