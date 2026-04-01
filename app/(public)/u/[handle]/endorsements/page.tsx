@@ -58,6 +58,9 @@ export default async function EndorsementsPage({ params }: Props) {
           endorserName: e.endorser?.display_name ?? e.endorser?.full_name ?? 'Anonymous',
           endorserPhoto: e.endorser?.profile_photo_url ?? null,
           endorserHandle: e.endorser?.handle ?? null,
+          ghostEndorserId: e.ghost_endorser?.id ?? null,
+          ghostEndorserName: e.ghost_endorser?.full_name ?? null,
+          ghostEndorserRole: e.ghost_endorser?.primary_role ?? null,
           yachtName: e.yacht?.name ?? null,
         }))}
         isOwner={isOwner}

@@ -38,8 +38,14 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
   const current = shown[activeIndex]
   if (!current) return null
 
-  const endorserName = current.endorser?.display_name || current.endorser?.full_name || 'Anonymous'
-  const endorserAvatar = current.endorser?.profile_photo_url
+  const isGhost = !current.endorser && !!current.ghost_endorser
+  const endorserName = isGhost
+    ? (current.ghost_endorser?.full_name ?? 'Anonymous')
+    : (current.endorser?.display_name || current.endorser?.full_name || 'Anonymous')
+  const endorserAvatar = isGhost ? null : (current.endorser?.profile_photo_url ?? null)
+  const endorserRole = isGhost
+    ? (current.ghost_endorser?.primary_role ?? null)
+    : (current.endorser_role_label ?? null)
   const yachtName = current.yacht?.name
 
   return (
@@ -83,9 +89,9 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
         )}
         <div className="text-center">
           <p className="text-xs font-semibold text-[var(--color-text-primary)]">{endorserName}</p>
-          {(current.endorser_role_label || yachtName) && (
+          {(endorserRole || yachtName) && (
             <p className="text-[10px] text-[var(--color-text-secondary)]">
-              {current.endorser_role_label}{current.endorser_role_label && yachtName ? ' · ' : ''}{yachtName}
+              {endorserRole}{endorserRole && yachtName ? ' · ' : ''}{yachtName}
             </p>
           )}
         </div>

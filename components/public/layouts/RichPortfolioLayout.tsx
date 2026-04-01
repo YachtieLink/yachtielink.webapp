@@ -459,12 +459,17 @@ export function RichPortfolioLayout({
       >
         <div className="flex flex-col gap-0 divide-y divide-[var(--color-border-subtle)]">
           {endorsements.map((end) => {
-            const endorserName = end.endorser?.display_name || end.endorser?.full_name || 'Anonymous'
+            const isGhost = !end.endorser && !!end.ghost_endorser
+            const endorserName = isGhost
+              ? end.ghost_endorser!.full_name
+              : (end.endorser?.display_name || end.endorser?.full_name || 'Anonymous')
+            const endorserAvatar = isGhost ? null : (end.endorser?.profile_photo_url ?? null)
+            const claimHref = isGhost ? `/claim/${end.ghost_endorser!.id}` : null
             return (
               <div key={end.id} className="py-4 first:pt-0 last:pb-0">
                 <div className="flex items-center gap-2.5 mb-2.5">
-                  {end.endorser?.profile_photo_url ? (
-                    <img src={end.endorser.profile_photo_url} alt="" className="w-8 h-8 rounded-full object-cover object-top" />
+                  {endorserAvatar ? (
+                    <img src={endorserAvatar} alt="" className="w-8 h-8 rounded-full object-cover object-top" />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-500">
                       {endorserName.charAt(0)}
@@ -473,6 +478,10 @@ export function RichPortfolioLayout({
                   <div>
                     {end.endorser?.handle ? (
                       <button onClick={() => setPendingNav({ url: `/u/${end.endorser!.handle}`, label: endorserName })} className="text-sm font-semibold text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] text-left">
+                        {endorserName}
+                      </button>
+                    ) : claimHref ? (
+                      <button onClick={() => setPendingNav({ url: claimHref, label: endorserName })} className="text-sm font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] text-left transition-colors">
                         {endorserName}
                       </button>
                     ) : (
