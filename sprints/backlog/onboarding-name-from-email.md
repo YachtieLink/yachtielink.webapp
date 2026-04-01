@@ -1,6 +1,6 @@
 # Onboarding: Auth Trigger Sets Name from Email Prefix
 
-**Status:** idea
+**Status:** shipped
 **Priority guess:** P2 (important)
 **Date captured:** 2026-03-26
 
