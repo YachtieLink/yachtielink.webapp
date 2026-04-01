@@ -40,8 +40,26 @@ Wrap the existing Next.js webapp in Capacitor to ship native iOS and Android app
 - Google Play Developer account ($25 one-time)
 - App icons and splash screens designed
 
+## NFC Tap-to-Share Profile
+Two modes, both use `@capawesome-team/capacitor-nfc`:
+
+**Phone-to-phone:** Crew taps "Share via NFC" on their profile → holds phone near another phone → writes NDEF URL record (`yachtie.link/u/handle`) → receiver's phone opens the profile. Free, built into the app.
+
+**Physical NFC card/sticker:** Pre-programmed with profile URL. Crew taps any phone to share their profile — no app needed on the receiver's end. Could be:
+- Pro perk (one free card with Pro subscription)
+- Sold as branded merch
+- "Program your card" flow in app: hold card to phone → writes URL → done
+- Massive branding opportunity — crew carry a YachtieLink card alongside their certs
+
 ## Future upgrade path
 If Capacitor feel isn't enough long-term → Expo (React Native) rewrite of UI layer only. Same Supabase backend, same types, same queries. Phase 3+ conversation.
+
+## App Store Subscription Strategy
+- **Web subscription (Stripe):** Full price, no platform cut, 100% revenue
+- **In-app subscription (Apple IAP):** Priced higher to cover Apple's 30%/15% cut
+- Example: $9.99/mo on web, $12.99/mo in-app
+- Don't offer IAP at launch — users subscribe via web. Add IAP later only if web-only friction hurts conversions.
+- App store build cadence: monthly rebuilds for native features, web layer updates automatically
 
 ## Notes
 - Founder tested Sworkit (Capacitor app) and confirmed the native feel is acceptable
