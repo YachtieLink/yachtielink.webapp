@@ -37,6 +37,42 @@ Use both: the smoke checklist catches regressions, the test backlog catches whet
 
 ## Untested Changes
 
+### PRs #135–138 — Bugfix Sweep + Rally 006 Close
+Date: 2026-04-01
+
+#### Onboarding — Name Step (PR #136)
+- [ ] Sign up with a new email/password account → name step should appear empty (not pre-filled with "firstname.lastname" from email)
+- [ ] Sign up via Google OAuth → name step pre-fills correctly from Google profile name
+
+#### Colleague Display Names (PR #137)
+- [ ] Visit Network → Colleagues tab → colleagues show full names ("James Whitfield", not just "James")
+- [ ] If a colleague has a nickname that differs from their first name → shows `"Charlotte 'Charlie' Beaumont"` pattern
+- [ ] Visit /app/endorsement/request → colleague list shows full names with same pattern
+
+#### Country ISO Resolution — Profile Settings (PR #135)
+- [ ] Open Profile Settings → Personal section → if home_country or location_country were stored as ISO codes (e.g. "MC", "AU"), they now display correctly as "Monaco", "Australia"
+- [ ] Import a CV that contains ISO country codes → after import, country fields in settings show full names
+- [ ] Monaco, Gibraltar, Cayman Islands, British Virgin Islands all selectable in country dropdowns
+
+#### DatePicker — Text + Calendar Mode (PR #138)
+- [ ] On mobile: DatePicker defaults to text input mode (not dropdown selects)
+- [ ] Type "Mar 2020" → parsed and synced to picker correctly
+- [ ] Type "03/2020" → parsed correctly
+- [ ] Type "2020-03" → parsed correctly
+- [ ] Type an invalid date → inline error appears with format hints
+- [ ] "Use picker" toggle → switches to dropdown select mode
+- [ ] On desktop: picker defaults to dropdown mode, text mode available via toggle
+
+#### ProgressWheel Stagger Animation (PR #138)
+- [ ] Profile strength wheel: tick marks animate with slight stagger (organic, not simultaneous)
+- [ ] EndorsementBanner progress bars: tier fill animates with 100ms/200ms stagger between collapsed/expanded states
+
+#### General
+- [ ] `npm run build` passes (pre-existing RESEND_API_KEY failure is not our change)
+- [ ] Type-check clean on main
+
+---
+
 ### Wave 2 — Public Profile Refactor + Shared Read Models
 Branch: `fix/phase1-wave1-cv-consolidation` | Date: 2026-03-25
 

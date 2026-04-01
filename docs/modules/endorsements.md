@@ -1,6 +1,6 @@
 ---
 module: endorsements
-updated: 2026-03-21
+updated: 2026-04-01
 status: shipped
 phase: 1A
 ---
@@ -95,6 +95,7 @@ One-line: Endorsement requests, endorsement creation with coworker gating and co
 
 ## Recent Activity
 
+**2026-04-01** — Lanes 2+3 (PRs #137, #138): Endorsement request page updated to show full colleague names with nickname pattern. EndorsementBanner gains stagger animation delays (100ms collapsed, 200ms expanded) for organic tier-fill progression.
 **2026-04-01** — Ghost Profiles W1 Lane 3: Ghost endorsement flow — endorser_id nullable, ghost_endorser_id FK, `claim_ghost_profile()` SECURITY DEFINER RPC, non-auth guest endorsement route with IP rate limiting + content moderation, `/endorse/[token]` guest form, `/r/[token]` three-option layout for unauthed users. PR #133.
 
 **2026-03-21** — Sprint 10.1 Wave 1 F: Added try/catch + handleApiError on endorsement-requests routes; Zod validation on DELETE `/api/saved-profiles`.

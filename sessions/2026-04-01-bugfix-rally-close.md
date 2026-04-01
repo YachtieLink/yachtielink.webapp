@@ -74,7 +74,7 @@ Parallel worktree session: 4 lanes — 3 bugfixes + Rally 006 close. Ghost Profi
 ## Lanes Status
 | Lane | Branch | Worktree | Status |
 |------|--------|----------|--------|
-| 1 | fix/onboarding-name-trigger | yl-wt-1 | reviewer passed, awaiting QA |
-| 2 | fix/colleague-display-names | yl-wt-2 | reviewer passed, awaiting QA |
-| 3 | fix/rally-006-datepicker-tick | yl-wt-3 | reviewer passed, awaiting QA |
-| 4 | fix/country-select-monaco | yl-wt-4 | reviewer passed + master fixes applied, awaiting QA |
+| 1 | fix/onboarding-name-trigger | yl-wt-1 | merged (PR #136) |
+| 2 | fix/colleague-display-names | yl-wt-2 | merged (PR #137) |
+| 3 | fix/rally-006-datepicker-tick | yl-wt-3 | merged (PR #138) |
+| 4 | fix/country-select-monaco | yl-wt-4 | merged (PR #135) |

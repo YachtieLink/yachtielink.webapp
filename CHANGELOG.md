@@ -26,6 +26,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-01 | Bugfix sweep | 4-lane worktree: onboarding name trigger, colleague display names, country ISO resolution, DatePicker text mode + tick stagger (PRs #135–138) |
 | 2026-04-01 | Worktree infra | /yl-worktree skill, logger role, worker self-validation, master bottleneck fixes, model/effort matrix |
 | 2026-04-01 | Worktree infra | Worktree overhaul: docs-as-protocol, auto-bootstrap snippets, dual output, re-review mode, Codex W4 |
 | 2026-04-01 | Rally 008 | Doc & skill system redesign — 11 module docs collapsed (33→11 files), CHANGELOG index, 5 new yl-skills, 7 archived |
@@ -112,6 +113,34 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 | 2026-03-09 | Planning | 5yr plan, yl_build_plan.md canonical Phase 1A sprint plan created |
 | 2026-03-08 | Planning | Planning set rewritten: yacht graph wedge, Phase 1A/1B/1C split |
 | 2026-03-08 | Project setup | Consolidated docs, CLAUDE.md + CHANGELOG.md created, project structure |
+
+## 2026-04-01 — Bugfix Sweep + Rally 006 Close (Parallel Worktree Session)
+
+### Done
+
+- **Lane 1 — PR #136** (`fix/onboarding-name-trigger`): Auth trigger fix — `handle_new_user()` no longer populates `full_name` from email prefix. New signups get NULL `full_name`, allowing clean onboarding name step. Migration `20260401000004_fix_auth_trigger_name.sql`. Worker added `nullif(trim(...), '')` guard for whitespace metadata. OAuth signups unaffected.
+- **Lane 2 — PR #137** (`fix/colleague-display-names`): Colleague display names — full `"First Last"` shown throughout. Nickname pattern `"Charlotte 'Charlie' Beaumont"` when `display_name` differs from first name. Applied to colleagues page and endorsement request page. `get_colleagues` RPC correctly deduplicates — multi-accordion appearance is intended UX, not a bug.
+- **Lane 3 — PR #138** (`fix/rally-006-datepicker-tick`): DatePicker text+calendar hybrid mode — text input defaults on mobile, format-aware `parseTextDate()` handles 7 format patterns (ISO, US, natural). Inline error with format hints. `ProgressWheel` gains `staggerMs` prop for organic tick animations. `EndorsementBanner` gets 100ms/200ms stagger delays across 3 tiers.
+- **Lane 4 — PR #135** (`fix/country-select-monaco`): Country ISO resolution — new `lib/constants/country-normalize.ts` normalizer converts any ISO alpha-2/alpha-3 code or common abbreviation to canonical country name. Wired into CV parse save path (`save-parsed-cv-data.ts`) and profile settings load path (`settings/page.tsx`). CV prompt clarified to request full names, not ISO codes. Master also added Gibraltar/Cayman Islands/BVI to `ALL_COUNTRIES` and fixed 5 retired ISO codes (Russia SU→RU, Serbia YU→RS, Benin DY→BJ, Burkina Faso HV→BF, Timor-Leste TP→TL).
+
+### Context
+
+- Parallel worktree session: 4 lanes, all /yl-review passed (Lane 4: WARNING, merged with post-merge addressables). Browser QA: Lanes 2–4 PASS, Lane 1 migration-only (no UI).
+- Master fixed Lane 4 P1s directly in worktree before push: added missing territories to `ALL_COUNTRIES`, fixed retired ISO codes, added `normalizeCountry()` to CV wizard display path.
+- Rally 006 is now fully closed — all 18 build-spec items complete.
+- 4 backlog items captured: `profile-layout-visual-preview`, `yacht-type-prefix-format`, `endorsement-request-yacht-display`, `inner-page-header-component` (bumped to P1).
+
+### Next
+
+1. Rally 007 — Launch QA (full checklist against prod)
+2. Deploy — invite mode, 20–50 crew, 24h monitoring
+3. Monitor: `useProfileSettings` hook has no country normalization (dead code, no live impact — P2-2 from Lane 4 review)
+
+### Flags
+
+- Rally 006: CLOSED ✅
+
+---
 
 ## 2026-04-01 — Claude Code (Opus 4.6) — Worktree Skill + Logger + Bottleneck Fixes
 
