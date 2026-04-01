@@ -36,6 +36,14 @@ interface Attachment {
   yachts: { id: string; name: string; yacht_type: string | null; cover_photo_url: string | null } | null
 }
 
+function buildColleagueName(fullName: string, displayName: string | null): string {
+  if (!displayName) return fullName
+  const firstName = fullName.split(' ')[0]
+  if (displayName === firstName) return fullName
+  const rest = fullName.split(' ').slice(1).join(' ')
+  return rest ? `${firstName} '${displayName}' ${rest}` : `${firstName} '${displayName}'`
+}
+
 export default async function RequestEndorsementPage({
   searchParams,
 }: {
@@ -164,7 +172,7 @@ export default async function RequestEndorsementPage({
 
   // Build colleague options with status info
   const colleagues = ((profilesRes.data as UserProfile[]) ?? []).map((profile) => {
-    const name = profile.display_name ?? profile.full_name
+    const name = buildColleagueName(profile.full_name, profile.display_name)
     const alreadyEndorsed = endorsedRecipientIds.has(profile.id)
 
     // Check for existing request to this colleague (by user_id or email)
