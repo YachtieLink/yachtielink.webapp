@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import type { ParsedCvData, ConfirmedImportData, SaveStats } from '@/lib/cv/types'
+import { normalizeCountry } from '@/lib/constants/country-normalize'
 import { resolveOrCreateBuilder } from '@/lib/yacht/resolve-builder'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -187,10 +188,10 @@ export async function saveConfirmedImport(
     if (p.primary_role) updates.primary_role = p.primary_role
     if (p.bio) updates.bio = p.bio
     if (p.phone) updates.phone = p.phone
-    if (p.location_country) updates.location_country = p.location_country
+    if (p.location_country) updates.location_country = normalizeCountry(p.location_country) ?? p.location_country
     if (p.location_city) updates.location_city = p.location_city
     if (p.dob) updates.dob = p.dob
-    if (p.home_country) updates.home_country = p.home_country
+    if (p.home_country) updates.home_country = normalizeCountry(p.home_country) ?? p.home_country
     if (p.smoke_pref) updates.smoke_pref = p.smoke_pref
     if (p.appearance_note) updates.appearance_note = p.appearance_note
     if (p.travel_docs?.length) updates.travel_docs = p.travel_docs
@@ -284,7 +285,7 @@ export async function saveConfirmedImport(
           name: yacht.yacht_name,
           yacht_type: yacht.yacht_type,
           length_meters: yacht.length_meters,
-          flag_state: yacht.flag_state,
+          flag_state: normalizeCountry(yacht.flag_state) ?? yacht.flag_state,
           builder_id: builderId,
           created_by: userId,
         }).select('id').single()
