@@ -34,9 +34,7 @@ _If migration added: describe what it does and any ordering concerns._
 
 - [ ] Type check passed (`npx tsc --noEmit`)
 - [ ] Lint passed
-- [ ] /review passed
-- [ ] /yachtielink-review passed
-- [ ] /test-yl passed
+- [ ] /yl-review passed (run by reviewer, not worker)
 - [ ] Manual QA notes: _describe what you tested_
 
 ## Risks

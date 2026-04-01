@@ -9,7 +9,7 @@ Use this every worktree push session.
 - [ ] Define lanes (2-3 max)
 - [ ] Verify no file overlap between lanes
 - [ ] Check: does any lane need migrations? If >1, reconsider the split
-- [ ] Create session file in `worktrees/sessions/`
+- [ ] Create session file in `sessions/`
 - [ ] Create lane files in `worktrees/lanes/`
 - [ ] Draft worker prompts
 - [ ] Founder creates worktrees and launches worker sessions
@@ -30,7 +30,7 @@ Use this every worktree push session.
 
 ## Post-Merge
 
-- [ ] Run /shipslog
+- [ ] Run /yl-shipslog
 - [ ] Update CHANGELOG.md with all work from all lanes
 - [ ] Update STATUS.md
 - [ ] Update module state files for touched modules

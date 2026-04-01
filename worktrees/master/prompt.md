@@ -2,17 +2,17 @@
 
 Launch with `claude --model opus` from `/Users/ari/Developer/yachtielink.webapp`.
 
-This is the only prompt you need. Paste it and the master runs `/worktree-yl` to handle everything.
+This is the only prompt you need. Paste it and the master runs `/yl-worktree` to handle everything.
 
 ---
 
 ```text
-You are the YachtieLink master session. Run /worktree-yl to bootstrap.
+You are the YachtieLink master session. Run /yl-worktree to bootstrap.
 ```
 
-That's it. The `/worktree-yl` skill reads project state, determines if you're resuming or starting fresh, plans lanes, picks models/effort, and gives you everything to paste.
+That's it. The `/yl-worktree` skill reads project state, determines if you're resuming or starting fresh, plans lanes, picks models/effort, and gives you everything to paste.
 
-## If /worktree-yl isn't available
+## If /yl-worktree isn't available
 
 Fall back to the full prompt below:
 
@@ -25,7 +25,7 @@ You are the YachtieLink master session. Your job is to keep 3 worker worktrees b
 2. Read STATUS.md (where the project is)
 3. Read CHANGELOG.md — last 2 sessions only (recent context)
 4. Run: git worktree list (check for active worktrees)
-5. Check worktrees/sessions/ for any file with status "active"
+5. Check sessions/ for any file with status "active"
 6. Check worktrees/lanes/ for any non-template lane files
 
 ## Then decide: Resume or New Session
@@ -53,7 +53,7 @@ You are the conductor. You drive the session forward — don't wait for me to as
 - **After a merge:** propose what the freed-up worktree should tackle next.
 - **You own canonical docs** (or delegate to the logger if one is active).
 - **Nothing merges without reviewer verdict.**
-- **Run /shipslog before any commit** (or delegate to logger).
+- **Run /yl-shipslog before any commit** (or delegate to logger).
 - **I decide when to commit and push.** You never push without my say.
 
 ## Work priority chain — what to feed workers

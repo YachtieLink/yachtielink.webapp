@@ -11,7 +11,7 @@ Read `AGENTS.md` and `CLAUDE.md` first (they still apply). This file adds your w
 Every time you're launched, figure out whether you're resuming or starting fresh:
 
 1. Run `git worktree list` — are there active worktrees beyond main?
-2. Check `worktrees/sessions/` — is there a file with `status: active`?
+2. Check `sessions/` — is there a file with `status: active`?
 3. Check `worktrees/lanes/` — are there non-template lane files?
 
 **Resuming:** Read the session + lane files. Report status of each lane (planning/active/done/merged). Ask the founder what to do next — review, merge, reassign, or wrap up.
@@ -26,7 +26,7 @@ Every time you're launched, figure out whether you're resuming or starting fresh
 
 1. **Plan lanes** — Read repo state with the founder. Decide 2-3 non-overlapping work lanes.
 2. **Define ownership** — For each lane, write down exactly which files/directories the worker may edit and which are off-limits.
-3. **Populate working docs** — Create a session file in `worktrees/sessions/` and a lane file per worker in `worktrees/lanes/`.
+3. **Populate working docs** — Create a session file in `sessions/` and a lane file per worker in `worktrees/lanes/`.
 4. **Brief workers** — The founder pastes customized prompts into each worker session. You draft these.
 5. **Monitor** — Watch for overlap reports from workers. If two workers are about to collide, intervene.
 6. **Merge** — Merge the cleanest/smallest branch first. Rebase remaining worktrees after each merge.
@@ -56,7 +56,7 @@ These files are master-only (or logger if one is active):
 - `sprints/` planning docs and indexes
 - `docs/modules/*.md` (consolidated: state + activity + decisions in one file)
 - `docs/ops/test-backlog.md`
-- Session and lane files in `worktrees/sessions/` and `worktrees/lanes/`
+- Session files in `sessions/`, lane files in `worktrees/lanes/`
 - The merge sequence and rebase coordination
 
 **If a Logger terminal is active:** Delegate all doc updates to it after each merge. You focus on planning and merge decisions only. This prevents you from becoming the bottleneck.
@@ -85,16 +85,16 @@ The workers are fast. You and the reviewer are the bottleneck. Mitigate:
 1. Read CHANGELOG.md, STATUS.md, active sprint
 2. Discuss priorities with founder
 3. Define 2-3 lanes (file ownership, scope, definition of done)
-4. Create session file: worktrees/sessions/YYYY-MM-DD-<slug>.md
+4. Create session file: sessions/YYYY-MM-DD-<slug>.md
 5. Create lane files: worktrees/lanes/lane-N-<slug>.md
 6. Draft worker prompts (from worktrees/worker/prompt-template.md)
 7. Founder launches worktrees, worker sessions, and reviewer session
 8. Monitor for overlap, answer worker questions
 9. As workers finish → founder directs reviewer to their branch
-10. Reviewer runs /review → /yachtielink-review → /test-yl → verdict
+10. Reviewer runs /yl-review → verdict
 11. On PASS → merge cleanest first, rebase surviving worktrees
-12. On BLOCK → founder relays blockers to worker for fixes, re-review
-13. Run /shipslog and update canonical docs after all merges
+12. On BLOCK → founder tells worker to check review file, worker fixes, re-review
+13. Run /yl-shipslog and update canonical docs after all merges
 14. Clean up merged worktrees
 ```
 
@@ -125,7 +125,7 @@ Only one worker should create Supabase migrations at a time. If unavoidable, ins
 
 ## Model Selection for Workers
 
-Default workers to **Sonnet** unless the lane qualifies for Opus. This saves cost and Sonnet handles bounded execution well — the sprint chain (/review, /yachtielink-review) catches quality issues before merge.
+Default workers to **Sonnet** unless the lane qualifies for Opus. This saves cost and Sonnet handles bounded execution well — the sprint chain (/yl-review) catches quality issues before merge.
 
 When drafting worker prompts, include a model recommendation for each lane.
 
@@ -141,7 +141,13 @@ When drafting worker prompts, include a model recommendation for each lane.
 - Ambiguous scope that requires judgment calls about architecture
 - Refactoring that touches shared abstractions or contracts
 
-**Typical split:** 2 Sonnet workers + 1 Opus worker if one lane is harder, or all 3 Sonnet if lanes are straightforward. The master session stays on Opus.
+**Use Codex (optional W4) when:**
+- Migration/RPC/auth/RLS/shared-utility lanes where correctness matters more than iteration speed
+- Cross-file refactors with blast radius ("consolidate duplicate paths into one canonical path")
+- Contract-safe changes: trace all callers, preserve invariants, no behavior change
+- Not for UI polish, copy tuning, or browser-driven QA
+
+**Typical split:** 2-3 Sonnet workers for UI/feature lanes + Opus for cross-module lanes. Add Codex as W4 for a backend correctness lane when one exists. The master session stays on Opus.
 
 Include the model recommendation in each lane file under a `**Model:**` field so the founder knows which to launch.
 

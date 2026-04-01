@@ -6,12 +6,20 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 45 rules
+**Current count:** 46 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## Workers Always Use Worktree Branches — Never Main
+
+**Rule:** Workers always operate on a worktree branch, never directly on main. Even for docs-only or trivial work, the output merges through a branch. No exceptions, no judgement calls about whether work is "big enough" for isolation.
+**Origin:** 2026-04-01, first worktree push session. Worker 2 was reassigned to backlog triage (docs-only) and ran from main. Founder corrected: workers on branches is good operational hygiene — simpler rule, safer default.
+**How to apply:** When reassigning a freed worker mid-session, always give them a new branch in their existing worktree (or create a fresh worktree). Never have them work directly on main.
 
 ---
 
