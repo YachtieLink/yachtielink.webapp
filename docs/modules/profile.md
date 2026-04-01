@@ -20,7 +20,7 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 - Bio: free-text, editable at `/app/about/edit`
 - Primary role + departments: set during onboarding, editable
 - Contact info (phone, WhatsApp, contact_email, location): working at `/app/profile/settings` with per-field inline show/hide toggles. `contact_email` is separate from auth email — falls back to `email` if null.
-- Profile settings page: rewritten with 4 sections — Identity (name/handle/role/departments), Contact (phone/whatsapp/contact_email/location with inline toggles), Personal (DOB/home country with toggles), Layout (view mode selector). Scrim/accent/template settings removed from UI (backlog item for rebuild with live preview).
+- Profile settings page: rewritten with 4 sections — Identity (name/handle/role/departments), Contact (phone/whatsapp/contact_email/location with inline toggles), Personal (DOB/home country with toggles + `show_nationality_flag` SVG flag toggle), Layout (view mode selector). Scrim/accent/template settings removed from UI (backlog item for rebuild with live preview).
 - Display settings: View Mode (profile/portfolio/rich_portfolio with Pro lock) on settings page. Hero Scrim presets and Accent Colour swatches removed from UI — values preserved in DB but no editing UI. `rich_portfolio` coerced to `portfolio` on save for non-Pro users.
 - Section visibility: working — PATCH endpoint toggles individual sections (about, experience, endorsements, certifications, hobbies, education, skills, photos, gallery) via `section_visibility` JSONB column
 - Social links: working — up to 7 links (Instagram, LinkedIn, TikTok, YouTube, X, Facebook, website) via PATCH API
@@ -85,6 +85,8 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 - [x] Bump MAX_PHOTOS_PRO 9 → 15 (Sprint 11c — shipped PR #107)
 
 ## Recent Activity
+
+**2026-04-02** — Quick wins (PR #142): `show_nationality_flag` boolean column added to `users` (migration `20260401000005`, DEFAULT false). Toggle added to settings page Personal section with context-aware sublabel (hints when no home country set; "Replaces home country flag" when country is set). `show_nationality_flag` added to `getUserById` SELECT for read model parity.
 
 **2026-04-01** — Lane 4 (PR #135): Country ISO resolution — new `lib/constants/country-normalize.ts` normalizer converts ISO alpha-2/alpha-3 + common abbreviations to canonical country name. Wired into CV parse save path and settings load path. CV prompt clarified. Added Gibraltar/Cayman/BVI to ALL_COUNTRIES. Fixed 5 retired ISO codes (Russia SU→RU, Serbia YU→RS, Benin DY→BJ, Burkina Faso HV→BF, Timor-Leste TP→TL).
 **2026-03-29** — Settings IA: Rewrote profile settings page (4 sections). Added `contact_email` column + migration. Created `CvDetailsCard` for CV-only fields. Stripped account page to auth-only. Fixed PDF generator + CV preview to use `contact_email ?? email`. Deleted dead `useProfileSettings` hook. Fixed WheelACard milestone link. Fixed PDF Pro gate to use `isProFromRecord()`.

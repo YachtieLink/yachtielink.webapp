@@ -95,6 +95,8 @@ One-line: Endorsement requests, endorsement creation with coworker gating and co
 
 ## Recent Activity
 
+**2026-04-02** — Ghost Profiles verify + GhostEndorserBadge (PR #143): `GhostEndorserBadge` wired into `EndorsementCard`, `EndorsementsSection`, `EndorsementsTile`, `PortfolioLayout`, `RichPortfolioLayout` SectionModal, and `EndorsementsPageClient`. `ghost_endorser` join added to `getPublicProfileSections` read model. RLS public SELECT policy added for `ghost_profiles` (migration `20260402000001`) — critical fix: ghost endorser join was returning null for all non-claimer visitors. `'Anonymous'` fallback restored. Open: private dashboard + CV queries still need ghost_endorser join.
+
 **2026-04-01** — Lanes 2+3 (PRs #137, #138): Endorsement request page updated to show full colleague names with nickname pattern. EndorsementBanner gains stagger animation delays (100ms collapsed, 200ms expanded) for organic tier-fill progression.
 **2026-04-01** — Ghost Profiles W1 Lane 3: Ghost endorsement flow — endorser_id nullable, ghost_endorser_id FK, `claim_ghost_profile()` SECURITY DEFINER RPC, non-auth guest endorsement route with IP rate limiting + content moderation, `/endorse/[token]` guest form, `/r/[token]` three-option layout for unauthed users. PR #133.
 

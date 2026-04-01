@@ -37,6 +37,57 @@ Use both: the smoke checklist catches regressions, the test backlog catches whet
 
 ## Untested Changes
 
+### PRs #142–144 — Inner-page-header + Ghost Profiles Verify + Custom 404 + Nationality Flag
+Date: 2026-04-02
+
+> ⚠️ Apply Supabase migrations first: `20260401000005_nationality_flag` + `20260402000001_ghost_profiles_public_read`
+
+#### Inner-page-header — PR #144
+
+- [ ] Visit any inner page (e.g. `/app/about/edit`, `/app/network/colleagues`) → sticky back bar appears at top of screen, scrolls stay pinned
+- [ ] Back bar shows correct parent label (e.g. "Profile", "Network", "CV") matching the current tab section
+- [ ] Back bar has section-color bottom border (teal for Profile pages, navy for Network pages, amber for CV pages, coral for Endorsements)
+- [ ] Title row below the bar scrolls with page content (not sticky)
+- [ ] Tap back button → navigates to parent page
+- [ ] `/app/endorsement/request` page: sticky bar not inset (full-bleed, no extra padding gap)
+- [ ] `/app/yacht/[id]` page: sticky bar full-bleed
+- [ ] Saved Profiles page with 0 profiles: title shows "Saved Profiles" (no "(0)" appended)
+- [ ] Saved Profiles page with profiles: title shows "Saved Profiles (N)" with count
+- [ ] `/app/certification/new`: multi-step flow uses back bar with step-name back label + onBack callback (doesn't navigate away)
+- [ ] `/app/attachment/new`: same multi-step back behavior
+
+#### Ghost Profiles — GhostEndorserBadge — PR #143
+
+- [ ] Visit a public profile that has ghost endorsements (endorser has no YachtieLink account) → endorser name shows (not "Anonymous"), ghost badge visible
+- [ ] Ghost endorsement in Portfolio layout → ghost name + badge visible (not "Anonymous")
+- [ ] Ghost endorsement in Rich Portfolio SectionModal → ghost name + badge visible
+- [ ] Ghost endorsement card → claim link visible (e.g. "Join YachtieLink to connect")
+- [ ] Regular (non-ghost) endorsement → unaffected, displays as normal
+- [ ] Visit endorsements full-page `/u/[handle]/endorsements` → ghost endorsements render correctly
+
+#### Custom 404 Page — PR #142
+
+- [ ] Visit a non-existent URL (e.g. `/does-not-exist`) → branded 404 page appears with "Even the best navigators get lost." copy
+- [ ] Logged in: 404 page shows a link to profile (not `/welcome`)
+- [ ] Logged out: 404 page shows a link to `/welcome`
+- [ ] Supabase unavailable scenario: 404 page still renders without 500-ing (degrades to guest view)
+
+#### Nationality Flag Toggle — PR #142
+
+- [ ] Profile Settings → Personal section → "Show nationality flag" toggle present
+- [ ] Toggle enabled with no home country set: toggle shows hint "Set a home country above to enable" (or similar disabled hint)
+- [ ] Toggle enabled with home country set: toggle active, sublabel "Replaces home country flag"
+- [ ] Visit your own public profile with toggle OFF → no SVG flag in hero
+- [ ] Visit your own public profile with toggle ON + home country set → SVG flag renders next to name
+- [ ] SVG flag renders at correct size (small, inline, ~16-20px)
+- [ ] flagcdn.com unavailable: flag element hidden, name displays normally without broken image icon
+
+#### General
+- [ ] `npm run build` passes
+- [ ] Type-check clean: `npx tsc --noEmit`
+
+---
+
 ### PRs #135–138 — Bugfix Sweep + Rally 006 Close
 Date: 2026-04-01
 
