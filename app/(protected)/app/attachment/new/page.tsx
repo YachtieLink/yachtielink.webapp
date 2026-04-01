@@ -116,21 +116,14 @@ export default function AttachmentNewPage() {
   // ── step: role ──────────────────────────────────────────────────
   if (step === 'role') {
     return (
-      <div className="min-h-screen bg-[var(--color-surface)] pt-8 pb-24">
-        <div className="mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setStep('yacht')}
-            className="px-0 text-[var(--color-interactive)]"
-          >
-            ← {yacht?.name}
-          </Button>
-        </div>
-        <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Your role</h1>
-        <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-          What was your role on {yacht?.name}?
-        </p>
+      <div className="min-h-screen bg-[var(--color-surface)] pb-24">
+        <PageHeader
+          onBack={() => setStep('yacht')}
+          backLabel={yacht?.name ?? 'Yacht'}
+          title="Your role"
+          subtitle={`What was your role on ${yacht?.name ?? 'this yacht'}?`}
+          sectionColor="teal"
+        />
 
         {/* Department filter */}
         <div className="flex flex-wrap gap-2 mb-4">
@@ -215,21 +208,14 @@ export default function AttachmentNewPage() {
 
   // ── step: dates ─────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-      <div className="mb-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setStep('role')}
-          className="px-0 text-[var(--color-interactive)]"
-        >
-          ← {roleLabel}
-        </Button>
-      </div>
-      <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-1">Dates</h1>
-      <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-        When did you work on {yacht?.name}?
-      </p>
+    <div className="min-h-screen bg-[var(--color-surface)] pb-24">
+      <PageHeader
+        onBack={() => setStep('role')}
+        backLabel={roleLabel || 'Role'}
+        title="Dates"
+        subtitle={`When did you work on ${yacht?.name ?? 'this yacht'}?`}
+        sectionColor="teal"
+      />
 
       <div className="flex flex-col gap-4">
         <DatePicker

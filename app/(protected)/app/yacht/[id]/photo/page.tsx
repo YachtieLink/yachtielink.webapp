@@ -55,7 +55,7 @@ export default function YachtPhotoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-surface)] px-4 pb-24">
+    <div className="min-h-screen bg-[var(--color-surface)] pb-24">
       <PageHeader
         backHref={`/app/yacht/${params.id}`}
         title="Cover photo"
