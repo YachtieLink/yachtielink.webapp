@@ -227,16 +227,21 @@ export function PortfolioLayout({
         <SectionCard title="My Endorsements" icon={<MessageSquareQuote size={16} />} accentColor="#f97066" index={sectionIndex++}>
           <div className="flex flex-col gap-4">
             {endorsements.slice(0, 3).map((end) => {
-              const endorserName = end.endorser?.display_name || end.endorser?.full_name || 'Anonymous'
-              const endorserHandle = end.endorser?.handle
+              const isGhost = !end.endorser && !!end.ghost_endorser
+              const endorserName = isGhost
+                ? (end.ghost_endorser!.full_name)
+                : (end.endorser?.display_name || end.endorser?.full_name || 'Anonymous')
+              const endorserHandle = isGhost ? null : (end.endorser?.handle ?? null)
+              const endorserAvatar = isGhost ? null : (end.endorser?.profile_photo_url ?? null)
+              const claimHref = isGhost ? `/claim/${end.ghost_endorser!.id}` : null
               return (
                 <div key={end.id}>
                   <p className="text-sm text-[var(--color-text-primary)] italic line-clamp-3">
                     &ldquo;{end.content}&rdquo;
                   </p>
                   <div className="flex items-center gap-2 mt-2">
-                    {end.endorser?.profile_photo_url ? (
-                      <img src={end.endorser.profile_photo_url} alt={endorserName} className="w-6 h-6 rounded-full object-cover object-top" />
+                    {endorserAvatar ? (
+                      <img src={endorserAvatar} alt={endorserName} className="w-6 h-6 rounded-full object-cover object-top" />
                     ) : (
                       <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">
                         {endorserName.charAt(0)}
@@ -245,6 +250,10 @@ export function PortfolioLayout({
                     <div className="min-w-0">
                       {endorserHandle ? (
                         <button onClick={() => setPendingNav({ url: `/u/${endorserHandle}`, label: endorserName })} className="text-xs font-medium text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] truncate block text-left transition-colors">
+                          {endorserName}
+                        </button>
+                      ) : claimHref ? (
+                        <button onClick={() => setPendingNav({ url: claimHref, label: endorserName })} className="text-xs font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] truncate block text-left transition-colors">
                           {endorserName}
                         </button>
                       ) : (

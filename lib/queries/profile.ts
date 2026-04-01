@@ -267,6 +267,7 @@ export async function getPublicProfileSections(userId: string) {
       .select(`
         id, content, created_at, endorser_role_label, recipient_role_label, is_pinned,
         endorser:endorser_id ( id, display_name, full_name, handle, profile_photo_url ),
+        ghost_endorser:ghost_endorser_id ( id, full_name, primary_role ),
         yacht:yachts!yacht_id ( id, name )
       `)
       .eq('recipient_id', userId)

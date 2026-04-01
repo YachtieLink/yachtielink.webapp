@@ -13,6 +13,9 @@ interface EndorsementItem {
   endorserName: string
   endorserPhoto: string | null
   endorserHandle: string | null
+  ghostEndorserId: string | null
+  ghostEndorserName: string | null
+  ghostEndorserRole: string | null
   yachtName: string | null
 }
 
@@ -62,6 +65,9 @@ export function EndorsementsPageClient({ endorsements: initial, isOwner }: Endor
           endorserRole={end.endorser_role_label}
           endorserPhoto={end.endorserPhoto}
           endorserHandle={end.endorserHandle}
+          ghostEndorserId={end.ghostEndorserId}
+          ghostEndorserName={end.ghostEndorserName}
+          ghostEndorserRole={end.ghostEndorserRole}
           yachtName={end.yachtName}
           date={end.created_at}
           content={end.content}

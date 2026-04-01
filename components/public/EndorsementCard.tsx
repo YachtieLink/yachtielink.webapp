@@ -6,12 +6,17 @@ import { motion } from 'framer-motion'
 import { Pin } from 'lucide-react'
 import { cardHover } from '@/lib/motion'
 import { ProfileAvatar } from '@/components/ui/ProfileAvatar'
+import { GhostEndorserBadge } from '@/components/ghost/GhostEndorserBadge'
 
 interface EndorsementCardProps {
   endorserName: string
   endorserRole?: string | null
   endorserPhoto?: string | null
   endorserHandle?: string | null
+  /** Ghost endorser data — mutually exclusive with endorserHandle */
+  ghostEndorserId?: string | null
+  ghostEndorserName?: string | null
+  ghostEndorserRole?: string | null
   yachtName?: string | null
   yachtId?: string | null
   date: string
@@ -29,6 +34,9 @@ export function EndorsementCard({
   endorserRole,
   endorserPhoto,
   endorserHandle,
+  ghostEndorserId,
+  ghostEndorserName,
+  ghostEndorserRole,
   yachtName,
   yachtId,
   date,
@@ -72,54 +80,80 @@ export function EndorsementCard({
 
       {/* Endorser info */}
       <div className="flex items-center gap-3 mb-3">
-        {endorserHandle ? (
-          onNavigate ? (
-            <button onClick={() => onNavigate(`/u/${endorserHandle}`, endorserName)}>
-              <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
-            </button>
-          ) : (
-            <Link href={`/u/${endorserHandle}`}>
-              <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
-            </Link>
-          )
+        {ghostEndorserId && ghostEndorserName ? (
+          <>
+            <GhostEndorserBadge
+              ghostId={ghostEndorserId}
+              fullName={ghostEndorserName}
+              primaryRole={ghostEndorserRole ?? null}
+              linkable={!onNavigate}
+            />
+            <p className="text-xs text-[var(--color-text-tertiary)] ml-auto shrink-0">
+              {yachtName && (
+                <>
+                  {yachtId && onNavigate ? (
+                    <button onClick={() => onNavigate(`/app/yacht/${yachtId}`, yachtName)} className="hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
+                      {yachtName}
+                    </button>
+                  ) : yachtName}
+                  {' · '}
+                </>
+              )}
+              {formattedDate}
+            </p>
+          </>
         ) : (
-          <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
-        )}
-        <div className="min-w-0 flex-1">
-          {endorserHandle ? (
-            onNavigate ? (
-              <button onClick={() => onNavigate(`/u/${endorserHandle}`, endorserName)} className="text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] truncate block text-left transition-colors">
-                {endorserName}
-              </button>
+          <>
+            {endorserHandle ? (
+              onNavigate ? (
+                <button onClick={() => onNavigate(`/u/${endorserHandle}`, endorserName)}>
+                  <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
+                </button>
+              ) : (
+                <Link href={`/u/${endorserHandle}`}>
+                  <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
+                </Link>
+              )
             ) : (
-              <Link href={`/u/${endorserHandle}`} className="text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--color-interactive)] truncate block">
-                {endorserName}
-              </Link>
-            )
-          ) : (
-            <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
-              {endorserName}
-            </p>
-          )}
-          {endorserRole && (
-            <p className="text-xs text-[var(--color-text-secondary)] truncate">
-              {endorserRole}
-            </p>
-          )}
-          <p className="text-xs text-[var(--color-text-tertiary)]">
-            {yachtName && (
-              <>
-                {yachtId && onNavigate ? (
-                  <button onClick={() => onNavigate(`/app/yacht/${yachtId}`, yachtName)} className="hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
-                    {yachtName}
-                  </button>
-                ) : yachtName}
-                {' · '}
-              </>
+              <ProfileAvatar name={endorserName} src={endorserPhoto} size="md" />
             )}
-            {formattedDate}
-          </p>
-        </div>
+            <div className="min-w-0 flex-1">
+              {endorserHandle ? (
+                onNavigate ? (
+                  <button onClick={() => onNavigate(`/u/${endorserHandle}`, endorserName)} className="text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--accent-500,#0f9b8e)] truncate block text-left transition-colors">
+                    {endorserName}
+                  </button>
+                ) : (
+                  <Link href={`/u/${endorserHandle}`} className="text-sm font-medium text-[var(--color-text-primary)] hover:text-[var(--color-interactive)] truncate block">
+                    {endorserName}
+                  </Link>
+                )
+              ) : (
+                <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
+                  {endorserName}
+                </p>
+              )}
+              {endorserRole && (
+                <p className="text-xs text-[var(--color-text-secondary)] truncate">
+                  {endorserRole}
+                </p>
+              )}
+              <p className="text-xs text-[var(--color-text-tertiary)]">
+                {yachtName && (
+                  <>
+                    {yachtId && onNavigate ? (
+                      <button onClick={() => onNavigate(`/app/yacht/${yachtId}`, yachtName)} className="hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
+                        {yachtName}
+                      </button>
+                    ) : yachtName}
+                    {' · '}
+                  </>
+                )}
+                {formattedDate}
+              </p>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Content */}

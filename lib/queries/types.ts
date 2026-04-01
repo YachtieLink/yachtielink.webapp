@@ -44,6 +44,11 @@ export type PublicEndorsement = {
     handle?: string | null
     profile_photo_url: string | null
   } | null
+  ghost_endorser: {
+    id: string
+    full_name: string
+    primary_role: string | null
+  } | null
   yacht: {
     id: string
     name: string

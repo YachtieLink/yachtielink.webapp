@@ -31,6 +31,9 @@ export function EndorsementsSection({ endorsements, mutualEndorserCount, handle,
                 endorserRole={end.endorser_role_label}
                 endorserPhoto={end.endorser?.profile_photo_url}
                 endorserHandle={end.endorser?.handle}
+                ghostEndorserId={end.ghost_endorser?.id}
+                ghostEndorserName={end.ghost_endorser?.full_name}
+                ghostEndorserRole={end.ghost_endorser?.primary_role}
                 yachtName={end.yacht?.name}
                 yachtId={end.yacht?.id}
                 date={end.created_at}
