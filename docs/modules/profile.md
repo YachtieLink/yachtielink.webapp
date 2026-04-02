@@ -86,6 +86,8 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 
 ## Recent Activity
 
+**2026-04-02** — Worktree lanes 1+3 (pending push): ghost_endorser join added to `getProfileSections` and `getCvSections` — private dashboard + CV now resolve ghost endorser names. `CvEndorsement` type updated. `SocialLinksRow` extended with optional `editable`/`onDelete` props. Full Social Links section added to profile settings (load/add/delete/save via `/api/profile/social-links` PATCH). Visibility toggle sublabels added to all 4 settings toggles. SVG wireframe thumbnails added to layout selector buttons. `content-start` fix on `HobbiesTile` for interests chip layout at wide viewports.
+
 **2026-04-02** — Quick wins (PR #142): `show_nationality_flag` boolean column added to `users` (migration `20260401000005`, DEFAULT false). Toggle added to settings page Personal section with context-aware sublabel (hints when no home country set; "Replaces home country flag" when country is set). `show_nationality_flag` added to `getUserById` SELECT for read model parity.
 
 **2026-04-01** — Lane 4 (PR #135): Country ISO resolution — new `lib/constants/country-normalize.ts` normalizer converts ISO alpha-2/alpha-3 + common abbreviations to canonical country name. Wired into CV parse save path and settings load path. CV prompt clarified. Added Gibraltar/Cayman/BVI to ALL_COUNTRIES. Fixed 5 retired ISO codes (Russia SU→RU, Serbia YU→RS, Benin DY→BJ, Burkina Faso HV→BF, Timor-Leste TP→TL).

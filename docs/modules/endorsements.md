@@ -1,6 +1,6 @@
 ---
 module: endorsements
-updated: 2026-04-01
+updated: 2026-04-02
 status: shipped
 phase: 1A
 ---
@@ -95,6 +95,8 @@ One-line: Endorsement requests, endorsement creation with coworker gating and co
 
 ## Recent Activity
 
+**2026-04-02** — Worktree lane 1 (pending push): ghost_endorser join added to `getProfileSections` + `getCvSections` — private dashboard and CV now show ghost endorser names. Name-resolution chain updated in `EndorsementsSection.tsx` (private) and `CvPreview.tsx`. Ghost flow fixes: guest form now blocked at page-load for existing users (admin client email+phone check); self-endorsement guard added to `claim_ghost_profile()` RPC (Step A soft-deletes endorsements where `recipient_id = claiming_user`); phone-only dedup closed — API submit also checks `recipient_phone`. Migration `20260402000002` adds partial index `users_phone_idx` and extends RPC for phone-based claim matching.
+**2026-04-02** — Worktree lane 2 (pending push): `EndorsementCard.tsx` restructured to show endorser role + yacht on one line ("Second Engineer on Driftwood") with date on separate line. Applied across `EndorsementsTile.tsx` and private `EndorsementsSection.tsx`. Note: ghost endorser path in EndorsementCard still uses old layout format — follow-up fix captured in backlog.
 **2026-04-02** — Ghost Profiles verify + GhostEndorserBadge (PR #143): `GhostEndorserBadge` wired into `EndorsementCard`, `EndorsementsSection`, `EndorsementsTile`, `PortfolioLayout`, `RichPortfolioLayout` SectionModal, and `EndorsementsPageClient`. `ghost_endorser` join added to `getPublicProfileSections` read model. RLS public SELECT policy added for `ghost_profiles` (migration `20260402000001`) — critical fix: ghost endorser join was returning null for all non-claimer visitors. `'Anonymous'` fallback restored. Open: private dashboard + CV queries still need ghost_endorser join.
 
 **2026-04-01** — Lanes 2+3 (PRs #137, #138): Endorsement request page updated to show full colleague names with nickname pattern. EndorsementBanner gains stagger animation delays (100ms collapsed, 200ms expanded) for organic tier-fill progression.

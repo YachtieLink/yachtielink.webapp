@@ -86,6 +86,7 @@ One-line: Server-rendered public profile page at `/u/{handle}` with SEO metadata
 
 ## Recent Activity
 
+**2026-04-02** — Worktree lanes 2+3 (pending push): Yacht type prefix (M/Y, S/Y) applied via `prefixedYachtName` helper across `ExperienceSection.tsx`, `ExperienceTile.tsx`. Interests chip responsive bug fixed in `HobbiesTile.tsx` (`content-start` prevents chip rows from stretching at wide viewports). Ghost endorser path in `EndorsementCard.tsx` still uses old layout format — follow-up needed.
 **2026-04-02** — Quick wins (PR #142): `CountryFlag` component added — on-demand SVG from flagcdn.com, `onError` hides on CDN failure. Nationality flag rendered in `HeroSection` next to user name when `show_nationality_flag = true` and `home_country` is set. SVG flag takes precedence over emoji flag when both toggles enabled. `show_nationality_flag` added to `getUserByHandle` SELECT.
 
 **2026-04-02** — Ghost Profiles verify (PR #143): Ghost endorser display wired into `PortfolioLayout` and `RichPortfolioLayout` SectionModal — both were silently showing "Anonymous" for ghost endorsements. Ghost endorser name/avatar/claim link now shown in all public profile views.

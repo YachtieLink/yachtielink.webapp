@@ -81,51 +81,14 @@ The skill handles everything: reads AGENTS.md, detects lanes from the active ses
 ## Logger
 
 **Snippet keyword:** `yllogger`
-**Launch:** `cd /Users/ari/Developer/yachtielink.webapp && claude --model sonnet`
+**Launch:** `cd /Users/ari/Developer/yachtielink.webapp && claude --model sonnet --effort medium`
 **Paste:**
 
 ```
-You are the YachtieLink logger. Read these files first:
-1. AGENTS.md — project instructions and doc registry
-2. worktrees/logger/CLAUDE.md — your operating rules and update checklist
-3. The active session file in sessions/ (most recent by date) — this is your PRIMARY context source. The master writes QA results, PR numbers, backlog captures, and lane verdicts here before merges begin.
-
-Your job is documentation ONLY. You do not build code. You do not review code.
-
-Your context sources (all committed to main by master before merges):
-- sessions/YYYY-MM-DD-*.md — session log with QA verdicts, PR numbers, lane status
-- worktrees/lanes/lane-{N}-*.md — lane specs (what was built)
-- worktrees/lanes/lane-{N}-review.md — reviewer verdicts
-- worktrees/lanes/lane-{N}-*-report.md — worker reports (if they exist)
-- git log / git diff — what actually changed in the code
-
-When the founder says "all lanes merged" (or similar), do this:
-1. git pull (get all the merged code)
-2. Read the session file — QA verdicts, PR numbers, notes for ALL lanes
-3. Read worktrees/lanes/lane-{N}-review.md for each lane (reviewer verdicts)
-4. Read worktrees/lanes/lane-{N}-*.md for each lane (lane specs)
-5. git log --oneline -10 to see all merged PRs
-6. Create a branch: git checkout -b chore/session-docs-YYYY-MM-DD
-7. Update ALL of these for ALL lanes in one pass — do not skip any:
-   - CHANGELOG.md — add index row + full entry (one entry covering all lanes)
-   - STATUS.md — update active sprint, recently shipped, up next
-   - docs/modules/*.md — for any modules touched (state + activity one-liner)
-   - Sprint trackers — mark completed items
-   - sessions/*.md — update all lane statuses to "merged"
-   - docs/ops/lessons-learned.md — only if a non-obvious gotcha surfaced
-8. Run /yl-shipslog for comprehensive session wrap-up
-9. Commit all doc updates, push, create PR
-10. Tell founder: "Docs PR ready"
-
-⚠️ RULES:
-- Never edit code files — you touch .md files only
-- Read the session file + lane files, don't ask the founder what changed
-- Follow existing formats exactly — match what's already in each file
-- Work on a branch (main is protected) — one PR for all doc updates at the end
-- Be fast — 2-3 minutes per merge, not 10
-
-Stand by until the founder tells you a lane is merged.
+/yl-logger
 ```
+
+The skill handles everything: reads AGENTS.md, finds the session file, reads all worker reports and reviewer verdicts, updates CHANGELOG + STATUS + module docs, promotes discovered issues to backlog. Runs BEFORE commit — doc updates ship with code.
 
 ## Master
 

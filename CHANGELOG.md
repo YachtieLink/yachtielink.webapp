@@ -26,6 +26,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-02 | Worktree session | 3-lane: ghost join fix + ghost flow fixes (Opus, migration), endorsement + yacht display polish, interests + social links UX (pending push) |
 | 2026-04-02 | Worktree session | 3-lane: inner-page-header redesign, ghost profiles verify + GhostEndorserBadge, custom 404 + nationality flag (PRs #142–144) |
 | 2026-04-01 | Bugfix sweep | 4-lane worktree: onboarding name trigger, colleague display names, country ISO resolution, DatePicker text mode + tick stagger (PRs #135–138) |
 | 2026-04-01 | Worktree infra | /yl-worktree skill, logger role, worker self-validation, master bottleneck fixes, model/effort matrix |
@@ -114,6 +115,36 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 | 2026-03-09 | Planning | 5yr plan, yl_build_plan.md canonical Phase 1A sprint plan created |
 | 2026-03-08 | Planning | Planning set rewritten: yacht graph wedge, Phase 1A/1B/1C split |
 | 2026-03-08 | Project setup | Consolidated docs, CLAUDE.md + CHANGELOG.md created, project structure |
+
+## 2026-04-02 — Worktree Session: Ghost Join Fix + Ghost Flow Fixes + Display Polish + Social Links UX
+
+### Done
+
+- **Lane 1 — fix/ghost-closeout (PASS after 4 review rounds, Opus upgrade)**: *Part A — Ghost join gap:* Added `ghost_endorser:ghost_endorser_id` join to `getProfileSections` and `getCvSections` in `lib/queries/profile.ts` — private dashboard and CV views now resolve ghost endorser names. Updated `CvEndorsement` type in `lib/queries/types.ts`. Name-resolution chains updated in `EndorsementsSection.tsx` (private) and `CvPreview.tsx`. Ticked 3 completed PHASE1-CLOSEOUT items. *Part B — Ghost flow fixes (critical, Opus upgrade):* Three launch-blocking bugs fixed: (1) Existing users no longer hit the ghost form — `/endorse/[token]` page-load check (admin client, email + phone) redirects to sign-in with `returnTo` preserved. (2) Ghost profiles auto-claimed on signup — `claim_ghost_profile()` called from auth callback (covers email verify + OAuth) and middleware one-time cookie (`yl_ghost_checked`, 1-year maxAge, wrapped in try-catch) for password login. (3) Phone dedup gap closed — both page-load and submit checks match `recipient_phone` against `users.phone`. New migration `20260402000002_ghost_claim_phone_and_safeguards.sql`: partial index `users_phone_idx`, extended RPC (email + phone claim matching), self-endorsement guard (Step A soft-deletes ghost endorsements where `recipient_id = claiming_user` before migration).
+- **Lane 2 — fix/display-polish (PASS)**: Endorsement cards show endorser role + yacht context ("Second Engineer on Driftwood") across `components/public/EndorsementCard.tsx`, `EndorsementsTile.tsx`, and private `EndorsementsSection.tsx`. Yacht type prefix (M/Y, S/Y) applied via `prefixedYachtName` helper across `ExperienceSection`, `ExperienceTile`, `YachtsSection`. `SavedProfileCard` gains `seaTimeDays`/`yachtCount` props for richer detail line (not yet wired from caller — falls back gracefully to role + departments). Visibility toggle sublabels added to all 4 toggles in settings.
+- **Lane 3 — fix/interests-socials (PASS after Round 1 fixes)**: Fixed interests chip responsive bug (`content-start` on `HobbiesTile`). Added full Social Links section to profile settings (load, add/delete, save via `/api/profile/social-links`). Added Social Links review card to `StepReview` with Edit-back-to-step-4 navigation. Added SVG wireframe thumbnails to layout selector buttons. Round 1 reviewer fixes: CV import button disabled-state fix, social links write routed through `/api/profile/social-links` PATCH (not direct Supabase), add-link cap raised 3 → 7.
+
+### Context
+
+- All 3 lanes /yl-review PASS. Lane 1 required 4 rounds (Opus upgrade) — 6 security blockers resolved in Round 1, middleware try-catch + cookie maxAge in Round 2. No scope creep, no lane boundary violations.
+- Lane 1 migration `20260402000002` must run after `20260402000001_ghost_profiles_public_read`.
+- Open warnings: (1) Stale inline endorsements query in `app/(protected)/app/cv/preview/page.tsx` — no ghost join, captured in backlog. (2) `SavedProfileCard` sea-time props inert until wired from `SavedProfilesClient.tsx`. (3) Duplicate icon components (TikTokIcon × 3, XIcon × 2, PLATFORM_CONFIG) — deferred.
+
+### Next
+
+1. Commit + push all 3 branches, create PRs, merge
+2. Apply migration `20260402000002_ghost_claim_phone_and_safeguards` (after `20260402000001`)
+3. Wire `SavedProfileCard` sea-time/yacht-count props from `SavedProfilesClient.tsx`
+4. Replace stale inline endorsements query in `app/(protected)/app/cv/preview/page.tsx` with `getCvSections()` call
+5. Extract duplicate icon components to `components/icons/`
+
+### Flags
+
+- Ghost claim is now automatic on signup (auth callback + middleware). No user action needed for new signups.
+- Middleware ghost claim uses service-role client — never exposes user data to anon key.
+- SavedProfileCard `seaTimeDays`/`yachtCount` props are implemented but inert — needs follow-up wiring.
+
+---
 
 ## 2026-04-02 — Parallel Worktree Session: Header Redesign + Ghost Profiles + Quick Wins
 

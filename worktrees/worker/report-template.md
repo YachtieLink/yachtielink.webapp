@@ -41,6 +41,16 @@ _If migration added: describe what it does and any ordering concerns._
 
 _Anything the master should know before merging. Shared file touches, edge cases, incomplete work._
 
+## Discovered Issues
+
+_Out-of-scope problems you noticed in files you touched. File path + what's wrong. Logger promotes these to backlog. Think proactively — check adjacent code for bugs, dead code, inconsistent patterns, duplicated logic. Finding issues is as valuable as the lane work._
+
+- **[BUG]** `path/to/file.tsx` — description. Suggested fix: ...
+- **[DEBT]** `path/to/file.tsx` — description. Suggested fix: ...
+- **[UX]** `path/to/file.tsx` — description. Suggested fix: ...
+
+_Delete the examples above and replace with real findings, or write "None discovered" if genuinely clean._
+
 ## Overlap Detected
 
 - [ ] None
