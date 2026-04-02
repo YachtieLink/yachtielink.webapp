@@ -4,7 +4,7 @@ import { Ship } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { PageTransition } from '@/components/ui/PageTransition'
-import { formatSeaTime } from '@/lib/profile-summaries'
+import { formatSeaTime } from '@/lib/sea-time'
 
 export default async function AttachmentListPage() {
   const supabase = await createClient()
@@ -65,7 +65,7 @@ export default async function AttachmentListPage() {
                     new Date(att.started_at).getTime()) / 86_400_000
                 ))
               : 0
-            const duration = formatSeaTime(days)
+            const duration = formatSeaTime(days).displayShort
 
             return (
               <Link

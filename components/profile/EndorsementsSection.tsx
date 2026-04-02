@@ -1,14 +1,12 @@
 'use client'
 
-import Link from 'next/link'
 import { EmptyState } from '@/components/ui/EmptyState'
 
 interface Endorsement {
   id: string
-  endorser_id: string
   content: string
   created_at: string
-  yacht_id: string
+  yacht_id: string | null
   endorser: {
     display_name: string | null
     full_name: string
@@ -26,7 +24,6 @@ interface Endorsement {
 
 interface EndorsementsSectionProps {
   endorsements: Endorsement[]
-  currentUserId?: string
 }
 
 const EXCERPT_LENGTH = 140
@@ -36,7 +33,7 @@ function excerpt(text: string): string {
   return text.slice(0, EXCERPT_LENGTH).trimEnd() + '…'
 }
 
-export function EndorsementsSection({ endorsements, currentUserId }: EndorsementsSectionProps) {
+export function EndorsementsSection({ endorsements }: EndorsementsSectionProps) {
   if (endorsements.length === 0) {
     return (
       <div className="bg-[var(--color-surface)] rounded-2xl p-5">
@@ -62,7 +59,6 @@ export function EndorsementsSection({ endorsements, currentUserId }: Endorsement
             month: 'short',
             year: 'numeric',
           })
-          const isOwn = currentUserId && e.endorser_id === currentUserId
 
           return (
             <li key={e.id} className="border-l-2 border-[var(--color-interactive)] pl-4">
@@ -73,14 +69,6 @@ export function EndorsementsSection({ endorsements, currentUserId }: Endorsement
                 {endorserName}
                 {e.yachts ? ` · ${e.yachts.name}` : ''}
                 {' · '}{date}
-                {isOwn && (
-                  <Link
-                    href={`/app/endorsement/${e.id}/edit`}
-                    className="text-xs text-[var(--color-interactive)] hover:underline ml-2"
-                  >
-                    Edit
-                  </Link>
-                )}
               </p>
             </li>
           )
