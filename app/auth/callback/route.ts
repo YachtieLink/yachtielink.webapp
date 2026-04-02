@@ -15,7 +15,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/app/profile";
+  const next = searchParams.get("next") ?? searchParams.get("returnTo") ?? "/app/profile";
   const error = searchParams.get("error");
   const errorDescription = searchParams.get("error_description");
 
@@ -40,6 +40,10 @@ export async function GET(request: Request) {
       url.searchParams.set("error_description", exchangeError.message);
       return NextResponse.redirect(url);
     }
+
+    // Auto-claim ghost profiles matching this user's verified email (idempotent, non-fatal)
+    const { error: claimError } = await supabase.rpc('claim_ghost_profile')
+    if (claimError) console.error('Auto ghost claim:', claimError.message)
 
     // Redirect to intended destination (safe — only allow relative paths)
     const safeNext = next.startsWith("/") ? next : "/app/profile";
