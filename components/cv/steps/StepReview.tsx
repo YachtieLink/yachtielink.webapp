@@ -2,10 +2,21 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Instagram, Linkedin, Globe } from 'lucide-react'
+import { TikTokIcon } from '@/components/ui/social-icons'
 import { Button } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
 import { formatDateDisplay } from '@/lib/cv/types'
-import type { ConfirmedImportData, SaveStats } from '@/lib/cv/types'
+import type { ConfirmedImportData, SaveStats, ParsedSocialMedia } from '@/lib/cv/types'
+
+function socialLabel(sm: ParsedSocialMedia): string | null {
+  const parts: string[] = []
+  if (sm.instagram) parts.push('Instagram')
+  if (sm.linkedin) parts.push('LinkedIn')
+  if (sm.tiktok) parts.push('TikTok')
+  if (sm.website) parts.push('Website')
+  return parts.length > 0 ? parts.join(', ') : null
+}
 
 interface StepReviewProps {
   importData: ConfirmedImportData
@@ -43,7 +54,7 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
   const [saving, setSaving] = useState(false)
   const [stats, setStats] = useState<SaveStats | null>(null)
 
-  const { personal, languages, yachts, certifications, education, skills, hobbies, skillsSummary, interestsSummary } = importData
+  const { personal, languages, yachts, certifications, education, skills, hobbies, skillsSummary, interestsSummary, socialMedia } = importData
 
   const hasPersonal = !!(personal.full_name || personal.bio || personal.phone || personal.primary_role)
   const totalItems = [
@@ -215,7 +226,43 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
         </div>
       )}
 
-      {totalItems === 0 && (
+      {/* Social links */}
+      {socialLabel(socialMedia) && (
+        <div className="bg-[var(--color-surface)] rounded-2xl p-3 border border-[var(--color-amber-200)]">
+          <SectionHeader title="Social Links" count={0} step={4} onEdit={onEditStep} />
+          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+            {socialMedia.instagram && (
+              <span className="flex items-center gap-1 text-xs text-[var(--color-text-secondary)]">
+                <Instagram size={12} className="shrink-0" />
+                {socialMedia.instagram}
+              </span>
+            )}
+            {socialMedia.linkedin && (
+              <span className="flex items-center gap-1 text-xs text-[var(--color-text-secondary)]">
+                <Linkedin size={12} className="shrink-0" />
+                {socialMedia.linkedin}
+              </span>
+            )}
+            {socialMedia.tiktok && (
+              <span className="flex items-center gap-1 text-xs text-[var(--color-text-secondary)]">
+                <TikTokIcon size={12} />
+                {socialMedia.tiktok}
+              </span>
+            )}
+            {socialMedia.website && (
+              <span className="flex items-center gap-1 text-xs text-[var(--color-text-secondary)]">
+                <Globe size={12} className="shrink-0" />
+                {socialMedia.website}
+              </span>
+            )}
+          </div>
+          <p className="text-[11px] text-[var(--color-text-tertiary)] mt-1.5">
+            Tap Edit to correct any links before importing.
+          </p>
+        </div>
+      )}
+
+      {totalItems === 0 && !socialLabel(socialMedia) && (
         <p className="text-sm text-[var(--color-text-secondary)]">Nothing to import. You can add details from your profile.</p>
       )}
 
@@ -226,7 +273,7 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
       </div>
 
       <div className="pt-2 mt-2 border-t border-[var(--color-border)]">
-        <Button onClick={handleImport} loading={saving} className="w-full" disabled={totalItems === 0}>
+        <Button onClick={handleImport} loading={saving} className="w-full" disabled={totalItems === 0 && !socialLabel(socialMedia)}>
           Import to my profile
         </Button>
       </div>
