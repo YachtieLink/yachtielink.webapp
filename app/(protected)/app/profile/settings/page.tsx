@@ -14,8 +14,8 @@ import { ALL_COUNTRIES, PINNED_COUNTRIES } from '@/lib/constants/countries'
 import { normalizeCountry } from '@/lib/constants/country-normalize'
 import { RESERVED_HANDLES } from '@/lib/constants/reserved-handles'
 import { isProFromRecord } from '@/lib/stripe/pro-shared'
-import { User, Phone, Mail, MapPin, Calendar, Globe, LayoutGrid, Instagram, Linkedin, Youtube, Facebook, Link2, Plus, X } from 'lucide-react'
-import { TikTokIcon, XIcon } from '@/components/ui/social-icons'
+import { User, Phone, Mail, MapPin, Calendar, Globe, LayoutGrid, Link2, Plus, X } from 'lucide-react'
+import { getPlatformIcon } from '@/components/ui/social-icons'
 import { ALL_PLATFORMS, SOCIAL_PLATFORM_META } from '@/lib/social-platforms'
 import type { SocialPlatform } from '@/lib/social-platforms'
 
@@ -29,17 +29,6 @@ const HANDLE_RE = /^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$/
 interface SocialLinkItem {
   platform: SocialPlatform
   url: string
-}
-
-// Platform config for settings UI — merges shared metadata with icons at size 16
-const SOCIAL_PLATFORM_CONFIG: Record<SocialPlatform, { label: string; icon: React.ReactNode; placeholder: string }> = {
-  instagram: { label: SOCIAL_PLATFORM_META.instagram.label, icon: <Instagram size={16} />, placeholder: SOCIAL_PLATFORM_META.instagram.placeholder },
-  linkedin:  { label: SOCIAL_PLATFORM_META.linkedin.label,  icon: <Linkedin size={16} />,  placeholder: SOCIAL_PLATFORM_META.linkedin.placeholder },
-  tiktok:    { label: SOCIAL_PLATFORM_META.tiktok.label,    icon: <TikTokIcon size={16} />, placeholder: SOCIAL_PLATFORM_META.tiktok.placeholder },
-  youtube:   { label: SOCIAL_PLATFORM_META.youtube.label,   icon: <Youtube size={16} />,   placeholder: SOCIAL_PLATFORM_META.youtube.placeholder },
-  x:         { label: SOCIAL_PLATFORM_META.x.label,         icon: <XIcon size={16} />,     placeholder: SOCIAL_PLATFORM_META.x.placeholder },
-  facebook:  { label: SOCIAL_PLATFORM_META.facebook.label,  icon: <Facebook size={16} />,  placeholder: SOCIAL_PLATFORM_META.facebook.placeholder },
-  website:   { label: SOCIAL_PLATFORM_META.website.label,   icon: <Globe size={16} />,     placeholder: SOCIAL_PLATFORM_META.website.placeholder },
 }
 
 interface Role {
@@ -446,16 +435,16 @@ export default function ProfileSettingsPage() {
         {socialLinks.length > 0 && (
           <div className="flex flex-col gap-2">
             {socialLinks.map((link) => {
-              const cfg = SOCIAL_PLATFORM_CONFIG[link.platform]
-              if (!cfg) return null
+              const meta = SOCIAL_PLATFORM_META[link.platform]
+              if (!meta) return null
               return (
                 <div key={link.platform} className="flex items-center gap-2 min-h-[44px]">
-                  <span className="text-[var(--color-text-secondary)] shrink-0">{cfg.icon}</span>
+                  <span className="text-[var(--color-text-secondary)] shrink-0">{getPlatformIcon(link.platform, 16)}</span>
                   <span className="flex-1 text-sm text-[var(--color-text-primary)] truncate">{link.url}</span>
                   <button
                     type="button"
                     onClick={() => setSocialLinks(socialLinks.filter(l => l.platform !== link.platform))}
-                    aria-label={`Remove ${cfg.label}`}
+                    aria-label={`Remove ${meta.label}`}
                     className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--color-error)] transition-colors shrink-0"
                   >
                     <X size={14} />
@@ -482,7 +471,7 @@ export default function ProfileSettingsPage() {
                   .filter(p => !socialLinks.some(l => l.platform === p))
                   .slice(0, 5)
                   .map((p) => {
-                    const cfg = SOCIAL_PLATFORM_CONFIG[p]
+                    const meta = SOCIAL_PLATFORM_META[p]
                     return (
                       <button
                         key={p}
@@ -490,8 +479,8 @@ export default function ProfileSettingsPage() {
                         onClick={() => { setAddingPlatform(p); setAddingUrl('') }}
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-dashed border-[var(--color-interactive)]/40 text-xs font-medium text-[var(--color-interactive)] hover:bg-[var(--color-interactive)]/5 transition-colors min-h-[36px]"
                       >
-                        {cfg.icon}
-                        <span>{cfg.label}</span>
+                        {getPlatformIcon(p, 16)}
+                        <span>{meta.label}</span>
                         <Plus size={10} />
                       </button>
                     )
@@ -503,12 +492,12 @@ export default function ProfileSettingsPage() {
             {addingPlatform !== null && (
               <div className="flex items-center gap-2">
                 <span className="text-[var(--color-text-secondary)] shrink-0">
-                  {SOCIAL_PLATFORM_CONFIG[addingPlatform].icon}
+                  {getPlatformIcon(addingPlatform, 16)}
                 </span>
                 <input
                   value={addingUrl}
                   onChange={(e) => setAddingUrl(e.target.value)}
-                  placeholder={SOCIAL_PLATFORM_CONFIG[addingPlatform].placeholder}
+                  placeholder={SOCIAL_PLATFORM_META[addingPlatform].placeholder}
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {

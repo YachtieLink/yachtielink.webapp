@@ -1,5 +1,21 @@
 // Shared custom social platform icons (no Lucide equivalents)
 
+import { Instagram, Linkedin, Youtube, Facebook, Globe } from 'lucide-react'
+import type { SocialPlatform } from '@/lib/social-platforms'
+
+/** Returns the icon element for a given platform at the requested size. */
+export function getPlatformIcon(platform: SocialPlatform, size: number): React.ReactNode {
+  switch (platform) {
+    case 'instagram': return <Instagram size={size} />
+    case 'linkedin':  return <Linkedin size={size} />
+    case 'tiktok':   return <TikTokIcon size={size} />
+    case 'youtube':  return <Youtube size={size} />
+    case 'x':        return <XIcon size={size} />
+    case 'facebook': return <Facebook size={size} />
+    case 'website':  return <Globe size={size} />
+  }
+}
+
 export function TikTokIcon({ size = 16 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">

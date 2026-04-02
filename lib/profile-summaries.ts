@@ -5,7 +5,7 @@
 
 // ── Sea time ─────────────────────────────────────────────────────────────────
 
-export function formatSeaTime(totalDays: number): string {
+function formatSeaTimeCompact(totalDays: number): string {
   if (totalDays <= 0) return '0 months'
   const years = Math.floor(totalDays / 365)
   const months = Math.floor((totalDays % 365) / 30)
@@ -57,7 +57,7 @@ export function countExpiringCerts(certs: Cert[]): number {
 
 export function experienceSummary(attachments: Attachment[]): string {
   const { totalDays, yachtCount } = computeSeaTime(attachments)
-  const time = formatSeaTime(totalDays)
+  const time = formatSeaTimeCompact(totalDays)
   if (yachtCount === 0) return 'No experience added yet'
   return `${time} sea time · ${yachtCount} ${yachtCount === 1 ? 'yacht' : 'yachts'}`
 }
