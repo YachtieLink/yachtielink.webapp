@@ -238,7 +238,7 @@ Use mixed card sizes to create visual rhythm instead of uniform stacks.
 
 | Property | Style |
 |----------|-------|
-| Background | White with coloured left border OR coloured tint background |
+| Background | White with coloured tint background (section-colored). **No left border accent stripes — hard rejected by founder (2026-03-31).** |
 | Border | `border border-border` with `shadow-sm` |
 | Shadow hover | `shadow-md` + `-translate-y-0.5` (interactive cards) |
 | Radius | `rounded-2xl` |
