@@ -13,7 +13,7 @@ export function HobbiesTile({ hobbies }: HobbiesTileProps) {
         <Heart size={14} className="text-[var(--color-text-tertiary)]" />
         <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">My Interests</span>
       </div>
-      <div className="flex flex-wrap gap-1.5 flex-1">
+      <div className="flex flex-wrap gap-1.5 flex-1 content-start">
         {hobbies.map((h) => (
           <span key={h} className="text-xs px-2.5 py-1 rounded-full bg-transparent text-[var(--color-text-secondary)] border border-[var(--color-border)]">
             {h}

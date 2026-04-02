@@ -41,9 +41,12 @@ interface SocialLinksRowProps {
   links: SocialLink[]
   /** light = white icons for use over dark/photo backgrounds */
   variant?: 'default' | 'light'
+  /** editable = shows × delete button next to each icon */
+  editable?: boolean
+  onDelete?: (platform: SocialPlatform) => void
 }
 
-export function SocialLinksRow({ links, variant = 'default' }: SocialLinksRowProps) {
+export function SocialLinksRow({ links, variant = 'default', editable = false, onDelete }: SocialLinksRowProps) {
   if (!links || links.length === 0) return null
 
   const baseColor = variant === 'light'
@@ -55,7 +58,28 @@ export function SocialLinksRow({ links, variant = 'default' }: SocialLinksRowPro
       {links.map(({ platform, url }) => {
         const config = PLATFORM_CONFIG[platform]
         if (!config) return null
-        return (
+        return editable && onDelete ? (
+          <div key={platform} className="flex items-center gap-1">
+            <Link
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={config.label}
+              className={`${baseColor} transition-colors ${config.hoverColor} leading-none`}
+              title={config.label}
+            >
+              {config.icon}
+            </Link>
+            <button
+              type="button"
+              onClick={() => onDelete(platform)}
+              aria-label={`Remove ${config.label}`}
+              className="w-4 h-4 flex items-center justify-center rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-tertiary)] hover:bg-[var(--color-error)]/10 hover:text-[var(--color-error)] transition-colors text-[10px] leading-none"
+            >
+              ×
+            </button>
+          </div>
+        ) : (
           <Link
             key={platform}
             href={url}
