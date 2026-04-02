@@ -146,6 +146,7 @@ export function parsedToConfirmedImport(parsed: ParsedCvData): ConfirmedImportDa
       // Drop runtime-only AI fields not stored in attachments
       ({ crew_count: _, guest_count: _g, former_names: _f, ...rest }) => rest,
     ),
+    landJobs: parsed.employment_land ?? [],
     certifications: parsed.certifications,
     education: (parsed.education ?? []).map(
       ({ location: _, ...rest }) => rest,
@@ -174,6 +175,7 @@ export async function saveConfirmedImport(
     attachmentsEnriched: 0,
     dateOverlaps: 0,
     educationCreated: 0,
+    landExperienceCreated: 0,
     skillsAdded: 0,
     hobbiesAdded: 0,
     languagesUpdated: false,
@@ -194,12 +196,28 @@ export async function saveConfirmedImport(
     if (p.home_country) updates.home_country = normalizeCountry(p.home_country) ?? p.home_country
     if (p.smoke_pref) updates.smoke_pref = p.smoke_pref
     if (p.appearance_note) updates.appearance_note = p.appearance_note
-    if (p.travel_docs?.length) updates.travel_docs = p.travel_docs
+    // UX6d: Travel docs merge — union of existing + parsed, dedup by document name, never remove
+    if (p.travel_docs?.length) {
+      const { data: currentUserDocs } = await supabase.from('users').select('travel_docs').eq('id', userId).single()
+      const existingDocs = (currentUserDocs?.travel_docs ?? []) as string[]
+      const existingDocsLower = new Set(existingDocs.map(d => d.toLowerCase().trim()))
+      const newDocs = p.travel_docs.filter(d => !existingDocsLower.has(d.toLowerCase().trim()))
+      if (newDocs.length > 0) {
+        updates.travel_docs = [...existingDocs, ...newDocs]
+      }
+    }
     if (p.license_info) updates.license_info = p.license_info
 
+    // UX6c: Languages merge — dedup by language name (case-insensitive), never remove existing
     if (data.languages.length > 0) {
-      updates.languages = data.languages
-      stats.languagesUpdated = true
+      const { data: currentUser } = await supabase.from('users').select('languages').eq('id', userId).single()
+      const existingLangs = (currentUser?.languages ?? []) as Array<{ language: string; proficiency: string }>
+      const existingLangNames = new Set(existingLangs.map(l => l.language.toLowerCase().trim()))
+      const newLangs = data.languages.filter(l => !existingLangNames.has(l.language.toLowerCase().trim()))
+      if (newLangs.length > 0) {
+        updates.languages = [...existingLangs, ...newLangs]
+        stats.languagesUpdated = true
+      }
     }
 
     // Skills & interests summaries
@@ -415,21 +433,48 @@ export async function saveConfirmedImport(
     }
   } catch (err) { console.error('[saveConfirmedImport] certifications section error:', err) }
 
-  // 4. Education
-  for (const edu of data.education) {
-    try {
-      const { error } = await supabase.from('user_education').insert({
-        user_id: userId,
-        institution: edu.institution,
-        qualification: edu.qualification,
-        field_of_study: edu.field_of_study,
-        started_at: edu.start_date ? normalizeDateToISO(edu.start_date) : null,
-        ended_at: edu.end_date ? normalizeDateToISO(edu.end_date) : null,
-      })
-      if (!error) stats.educationCreated++
-      else console.error(`[saveConfirmedImport] education insert error for "${edu.institution}":`, error.message)
-    } catch (err) { console.error('[saveConfirmedImport] education section error:', err) }
-  }
+  // 4. Education (UX6b: dedup on institution + qualification, case-insensitive)
+  try {
+    const { data: existingEducation } = await supabase
+      .from('user_education')
+      .select('id, institution, qualification')
+      .eq('user_id', userId)
+
+    for (const edu of data.education) {
+      const existingMatch = (existingEducation ?? []).find(ee =>
+        ee.institution?.toLowerCase().trim() === edu.institution?.toLowerCase().trim() &&
+        (ee.qualification ?? '').toLowerCase().trim() === (edu.qualification ?? '').toLowerCase().trim()
+      )
+
+      if (existingMatch) {
+        // Update existing entry only where currently empty
+        const enrichFields: Record<string, unknown> = {}
+        if (!existingMatch.qualification && edu.qualification) enrichFields.qualification = edu.qualification
+        if (edu.field_of_study) enrichFields.field_of_study = edu.field_of_study
+        if (edu.start_date) enrichFields.started_at = normalizeDateToISO(edu.start_date)
+        if (edu.end_date) enrichFields.ended_at = normalizeDateToISO(edu.end_date)
+        if (Object.keys(enrichFields).length > 0) {
+          await supabase.from('user_education').update(enrichFields).eq('id', existingMatch.id)
+        }
+      } else {
+        const { error } = await supabase.from('user_education').insert({
+          user_id: userId,
+          institution: edu.institution,
+          qualification: edu.qualification,
+          field_of_study: edu.field_of_study,
+          started_at: edu.start_date ? normalizeDateToISO(edu.start_date) : null,
+          ended_at: edu.end_date ? normalizeDateToISO(edu.end_date) : null,
+        })
+        if (!error) {
+          stats.educationCreated++
+          // Track for dedup within same batch
+          existingEducation?.push({ id: 'new', institution: edu.institution, qualification: edu.qualification ?? null })
+        } else {
+          console.error(`[saveConfirmedImport] education insert error for "${edu.institution}":`, error.message)
+        }
+      }
+    }
+  } catch (err) { console.error('[saveConfirmedImport] education section error:', err) }
 
   // 5. Skills (deduplicate)
   try {
@@ -457,9 +502,52 @@ export async function saveConfirmedImport(
     }
   } catch (err) { console.error('[saveConfirmedImport] hobbies section error:', err) }
 
-  // 7. Endorsement requests — not yet implemented
+  // 7. Land experience (shore-side employment) — dedup on company + role (case-insensitive)
+  try {
+    const { data: existingLandExp } = await supabase
+      .from('land_experience')
+      .select('id, company, role')
+      .eq('user_id', userId)
+
+    for (const job of data.landJobs ?? []) {
+      const existingMatch = (existingLandExp ?? []).find(el =>
+        el.company?.toLowerCase().trim() === job.company?.toLowerCase().trim() &&
+        el.role?.toLowerCase().trim() === job.role?.toLowerCase().trim()
+      )
+
+      if (existingMatch) {
+        // Enrich existing entry only where currently empty
+        const enrichFields: Record<string, unknown> = {}
+        if (job.start_date) enrichFields.start_date = normalizeDateToISO(job.start_date)
+        if (job.end_date) enrichFields.end_date = normalizeDateToISO(job.end_date)
+        if (job.description) enrichFields.description = job.description
+        if (job.industry) enrichFields.industry = job.industry
+        if (Object.keys(enrichFields).length > 0) {
+          await supabase.from('land_experience').update(enrichFields).eq('id', existingMatch.id)
+        }
+      } else {
+        const { error } = await supabase.from('land_experience').insert({
+          user_id: userId,
+          company: job.company,
+          role: job.role,
+          start_date: job.start_date ? normalizeDateToISO(job.start_date) : null,
+          end_date: job.end_date ? normalizeDateToISO(job.end_date) : null,
+          description: job.description ?? '',
+          industry: job.industry ?? '',
+        })
+        if (!error) {
+          stats.landExperienceCreated++
+          existingLandExp?.push({ id: 'new', company: job.company, role: job.role })
+        } else {
+          console.error(`[saveConfirmedImport] land experience insert error for "${job.company}":`, error.message)
+        }
+      }
+    }
+  } catch (err) { console.error('[saveConfirmedImport] land experience section error:', err) }
+
+  // 8. Endorsement requests — not yet implemented
   // TODO: implement endorsement request sending when ready
 
-  console.log('[saveConfirmedImport] stats:', JSON.stringify(stats))
+  console.debug('[saveConfirmedImport] stats:', JSON.stringify(stats))
   return stats
 }

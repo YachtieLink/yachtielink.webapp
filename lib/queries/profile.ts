@@ -126,6 +126,16 @@ export async function getProfileSections(userId: string) {
  * Fetch extended profile sections (Phase 1A Profile Robustness): hobbies, education, skills,
  * user photos (gallery), and work gallery. Runs all in parallel.
  */
+export const getLandExperience = cache(async (userId: string) => {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('land_experience')
+    .select('id, company, role, start_date, end_date, description, industry')
+    .eq('user_id', userId)
+    .order('sort_order')
+  return data ?? []
+})
+
 export async function getExtendedProfileSections(userId: string) {
   const supabase = await createClient()
   const [hobbiesRes, educationRes, skillsRes, photosRes, galleryRes] = await Promise.all([

@@ -61,6 +61,7 @@ export interface ParsedLandEmployment {
   start_date: string | null
   end_date: string | null
   description: string | null
+  industry?: string | null
 }
 
 export interface ParsedCertification {
@@ -189,6 +190,7 @@ export interface ConfirmedImportData {
   personal: ConfirmedPersonal
   languages: ParsedLanguage[]
   yachts: ConfirmedYacht[]
+  landJobs: ParsedLandEmployment[]
   certifications: ConfirmedCert[]
   education: ConfirmedEducation[]
   skills: string[]
@@ -207,6 +209,7 @@ export interface SaveStats {
   attachmentsEnriched: number
   dateOverlaps: number
   educationCreated: number
+  landExperienceCreated: number
   skillsAdded: number
   hobbiesAdded: number
   languagesUpdated: boolean
