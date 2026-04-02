@@ -65,6 +65,7 @@ Multi-agent, multi-angle review of the whole app.
 
 | Slug | Status | Scope |
 |------|--------|-------|
+| [rally-009-premvp-polish](./rally-009-premvp-polish/) | 🔧 Building | Pre-MVP polish — 4 sessions, 18 items: bugs, tech debt, data integrity, tab redesigns |
 | [rally-003-codebase-bugs](./rally-003-codebase-bugs/) | 🔍 In Progress | Full codebase bug audit — 6 agents, schema/RLS/logic/UX/API/perf |
 
 ---
@@ -73,6 +74,10 @@ Multi-agent, multi-angle review of the whole app.
 
 | Slug | Date | Type | Scope | Proposal |
 |------|------|------|-------|----------|
+| [rally-008-doc-skill-redesign](./rally-008-doc-skill-redesign/) | 2026-04-01 | System | Doc & skill system — 11 module docs collapsed, 5 new skills, 7 archived | — |
+| [rally-006-prelaunch](./rally-006-prelaunch/) | 2026-04-02 | Full Audit | Pre-launch bug sweep + polish — 18 items, all complete | [BUILD-SPEC.md](./rally-006-prelaunch/BUILD-SPEC.md) |
+| [rally-005-auth-resilience](./rally-005-auth-resilience/) | 2026-03-29 | System | Auth incident response — 12 fixes | — |
+| [rally-003-codebase-bugs](./rally-003-codebase-bugs/) | 2026-03-22 | Full Audit | Full codebase bug audit — 52 confirmed bugs | — |
 | [rally-001-full-audit](./rally-001-full-audit/) | 2026-03-16 | Full Audit | Full app, 6 agents, 2 rounds | [final_proposal.md](./rally-001-full-audit/final_proposal.md) |
 | [rally-002-pr-example](./rally-002-pr-example/) | example | PR Rally | **Reference template** — example of a lightweight PR rally | [README.md](./rally-002-pr-example/README.md) |
 

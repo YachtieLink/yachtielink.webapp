@@ -10,7 +10,6 @@ These often happen between major sprints or when something looks off and you wan
 
 | Slug | Started | Summary |
 |------|---------|---------|
-| ui-public-profile-button-margin | 2026-03-22 | Top bar buttons on public profile sit flush against screen edge |
 
 ---
 
@@ -47,4 +46,4 @@ What does "done" look like?
 
 | Slug | Completed | Summary |
 |------|-----------|---------|
-| — | — | None yet |
+| ui-public-profile-button-margin | 2026-04-02 | Superseded by inner-page-header redesign (PR #144) |

@@ -1,5 +1,7 @@
 # Avatar Thumbnail Framing — Head Cut Off
 
+**Status: PARTIALLY RESOLVED** — Most avatars fixed with object-top. SavedProfileCard still needs fix (folded into Rally 009 Session 1 Lane 2).
+
 **Status:** proposed
 **Priority guess:** P2 (visible UX bug)
 **Date captured:** 2026-03-27

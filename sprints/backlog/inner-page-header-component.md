@@ -1,5 +1,7 @@
 # Inner Page Header — Consistent Layout for Sub-Pages
 
+**Status: RESOLVED** — Shipped in PR #144 (InnerPageHeader → PageHeader component, 2026-04-02)
+
 **Status:** proposed
 **Priority guess:** P1 (founder-flagged, affects every sub-page)
 **Date captured:** 2026-03-27

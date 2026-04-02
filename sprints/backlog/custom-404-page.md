@@ -1,5 +1,7 @@
 # Custom 404 Page
 
+**Status: RESOLVED** — Shipped in PR #142 (branded 404 page, 2026-04-02)
+
 **Status:** idea
 **Priority guess:** P3 (nice-to-have)
 **Date captured:** 2026-03-26
