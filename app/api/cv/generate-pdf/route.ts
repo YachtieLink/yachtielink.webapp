@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
           phone, whatsapp, email, contact_email, location_country, location_city,
           show_phone, show_whatsapp, show_email, show_location,
           subscription_status, subscription_ends_at, latest_pdf_path,
-          dob, home_country, smoke_pref, appearance_note, travel_docs, license_info, languages, show_dob
+          dob, home_country, show_home_country, smoke_pref, appearance_note, travel_docs, license_info, languages, show_dob
         `)
         .eq('id', user.id)
         .single(),

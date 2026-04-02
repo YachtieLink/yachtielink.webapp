@@ -40,11 +40,13 @@ export default async function SavedProfilesPage() {
   let colleagueSet = new Set<string>()
   let certMap: Record<string, string[]> = {}
 
+  let seaTimeMap: Record<string, { totalDays: number; yachtCount: number }> = {}
+
   if (savedUserIds.length > 0) {
-    // Colleague overlap via attachments (shared yachts)
+    // Colleague overlap + sea time via attachments
     const { data: overlap } = await supabase
       .from('attachments')
-      .select('user_id, yacht_id')
+      .select('user_id, yacht_id, started_at, ended_at')
       .in('user_id', [user.id, ...savedUserIds])
       .is('deleted_at', null)
 
@@ -52,10 +54,27 @@ export default async function SavedProfilesPage() {
       const viewerYachts = new Set(
         overlap.filter((r: any) => r.user_id === user.id).map((r: any) => r.yacht_id)
       )
+      const today = new Date()
+      const yachtSetsPerUser: Record<string, Set<string>> = {}
+
       for (const row of overlap) {
         if (row.user_id !== user.id && viewerYachts.has(row.yacht_id)) {
           colleagueSet.add(row.user_id)
         }
+        if (row.user_id === user.id) continue
+        // Compute sea time days — mirrors get_sea_time() SQL logic
+        if (row.started_at) {
+          const start = new Date(row.started_at)
+          const end = row.ended_at ? new Date(row.ended_at) : today
+          const days = Math.max(0, Math.floor((end.getTime() - start.getTime()) / 86400000))
+          if (!seaTimeMap[row.user_id]) seaTimeMap[row.user_id] = { totalDays: 0, yachtCount: 0 }
+          if (!yachtSetsPerUser[row.user_id]) yachtSetsPerUser[row.user_id] = new Set()
+          seaTimeMap[row.user_id].totalDays += days
+          if (row.yacht_id) yachtSetsPerUser[row.user_id].add(row.yacht_id)
+        }
+      }
+      for (const uid of Object.keys(seaTimeMap)) {
+        seaTimeMap[uid].yachtCount = yachtSetsPerUser[uid]?.size ?? 0
       }
     }
 
@@ -83,6 +102,8 @@ export default async function SavedProfilesPage() {
     watching: p.watching ?? false,
     isColleague: p.saved_user?.id ? colleagueSet.has(p.saved_user.id) : false,
     topCerts: p.saved_user?.id ? (certMap[p.saved_user.id] ?? []) : [],
+    seaTimeDays: p.saved_user?.id ? (seaTimeMap[p.saved_user.id]?.totalDays ?? 0) : 0,
+    yachtCount: p.saved_user?.id ? (seaTimeMap[p.saved_user.id]?.yachtCount ?? 0) : 0,
   }))
 
   const folders = foldersRes.data ?? []

@@ -23,6 +23,7 @@ interface UserProfile {
   show_location?: boolean
   dob?: string | null
   home_country?: string | null
+  show_home_country?: boolean | null
   smoke_pref?: string | null
   appearance_note?: string | null
   travel_docs?: string[] | null
@@ -500,7 +501,7 @@ function renderPersonalDetailsSection(user: UserProfile, s: Record<string, any>)
 
 function renderHeaderSubline(user: UserProfile): string {
   const parts: string[] = []
-  if (user.home_country) parts.push(user.home_country)
+  if (user.home_country && user.show_home_country !== false) parts.push(user.home_country)
   if (user.dob && user.show_dob !== false) parts.push(`${calculateAge(user.dob)} years old`)
   return parts.join(' · ')
 }

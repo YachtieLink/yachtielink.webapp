@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import { Eye, EyeOff, StickyNote, Trash2, FolderInput, ExternalLink } from 'lucide-react'
 import { cardHover } from '@/lib/motion'
 import { SavedProfileNoteEditor } from './SavedProfileNoteEditor'
+import { formatSeaTime } from '@/lib/sea-time'
 
 interface SavedProfileCardProps {
   saved: {
@@ -28,6 +29,8 @@ interface SavedProfileCardProps {
   }
   isColleague: boolean
   topCerts: string[]
+  seaTimeDays?: number
+  yachtCount?: number
   folders: Array<{ id: string; name: string; emoji?: string | null }>
   onUpdate: (id: string, patch: Partial<{ notes: string | null; watching: boolean; folder_id: string | null }>) => void
   onUnsave: (id: string) => void
@@ -38,6 +41,8 @@ export function SavedProfileCard({
   user,
   isColleague,
   topCerts,
+  seaTimeDays,
+  yachtCount,
   folders,
   onUpdate,
   onUnsave,
@@ -81,6 +86,12 @@ export function SavedProfileCard({
           )}
           {topCerts.length > 0 && (
             <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">{topCerts.join(' · ')}</p>
+          )}
+          {(seaTimeDays !== undefined && seaTimeDays > 0) && (
+            <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">
+              {formatSeaTime(seaTimeDays).displayShort} at sea
+              {yachtCount !== undefined && yachtCount > 0 && ` · ${yachtCount} ${yachtCount === 1 ? 'yacht' : 'yachts'}`}
+            </p>
           )}
         </div>
 

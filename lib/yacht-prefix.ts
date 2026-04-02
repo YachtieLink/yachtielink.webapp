@@ -20,6 +20,7 @@ export function yachtTypePrefix(yachtType: string | null | undefined): string {
 /** Prefix a yacht name with its type if not already prefixed */
 export function prefixedYachtName(name: string, yachtType: string | null | undefined): string {
   if (!name.trim()) return name
+  if (!yachtType) return name
   const prefix = yachtTypePrefix(yachtType)
   const upper = name.trimStart().toUpperCase()
   for (const p of KNOWN_PREFIXES) {
