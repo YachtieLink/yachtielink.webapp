@@ -88,19 +88,19 @@ export function EndorsementCard({
               primaryRole={ghostEndorserRole ?? null}
               linkable={!onNavigate}
             />
-            <p className="text-xs text-[var(--color-text-tertiary)] ml-auto shrink-0">
+            <div className="ml-auto shrink-0 text-right">
               {yachtName && (
-                <>
+                <p className="text-xs text-[var(--color-text-secondary)]">
+                  on{' '}
                   {yachtId && onNavigate ? (
                     <button onClick={() => onNavigate(`/app/yacht/${yachtId}`, yachtName)} className="hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
                       {yachtName}
                     </button>
                   ) : yachtName}
-                  {' · '}
-                </>
+                </p>
               )}
-              {formattedDate}
-            </p>
+              <p className="text-xs text-[var(--color-text-tertiary)]">{formattedDate}</p>
+            </div>
           </>
         ) : (
           <>

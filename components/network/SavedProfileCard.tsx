@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Eye, EyeOff, StickyNote, Trash2, FolderInput, ExternalLink } from 'lucide-react'
 import { cardHover } from '@/lib/motion'
-import { formatSeaTime } from '@/lib/sea-time'
 import { SavedProfileNoteEditor } from './SavedProfileNoteEditor'
 
 interface SavedProfileCardProps {
@@ -29,8 +28,6 @@ interface SavedProfileCardProps {
   }
   isColleague: boolean
   topCerts: string[]
-  seaTimeDays?: number | null
-  yachtCount?: number | null
   folders: Array<{ id: string; name: string; emoji?: string | null }>
   onUpdate: (id: string, patch: Partial<{ notes: string | null; watching: boolean; folder_id: string | null }>) => void
   onUnsave: (id: string) => void
@@ -41,8 +38,6 @@ export function SavedProfileCard({
   user,
   isColleague,
   topCerts,
-  seaTimeDays,
-  yachtCount,
   folders,
   onUpdate,
   onUnsave,
@@ -50,17 +45,7 @@ export function SavedProfileCard({
   const [showNote, setShowNote] = useState(!!saved.notes)
   const [showFolderMenu, setShowFolderMenu] = useState(false)
   const displayName = user.display_name ?? user.full_name
-
-  const detailLine = (() => {
-    if (seaTimeDays != null && yachtCount != null && yachtCount > 0) {
-      const seaStr = formatSeaTime(seaTimeDays).displayShort
-      return `${seaStr} at sea · ${yachtCount} ${yachtCount === 1 ? 'yacht' : 'yachts'}`
-    }
-    if (seaTimeDays != null && seaTimeDays > 0) {
-      return `${formatSeaTime(seaTimeDays).displayShort} at sea`
-    }
-    return [user.primary_role, user.departments?.join(' · ')].filter(Boolean).join(' · ')
-  })()
+  const subtitle = [user.primary_role, user.departments?.join(' · ')].filter(Boolean).join(' · ')
 
   return (
     <motion.div
@@ -85,8 +70,8 @@ export function SavedProfileCard({
           <Link href={`/u/${user.handle}`} className="hover:underline">
             <p className="text-sm font-semibold text-[var(--color-text-primary)] truncate">{displayName}</p>
           </Link>
-          {detailLine && (
-            <p className="text-xs text-[var(--color-text-secondary)] truncate">{detailLine}</p>
+          {subtitle && (
+            <p className="text-xs text-[var(--color-text-secondary)] truncate">{subtitle}</p>
           )}
           {user.location_country && (
             <p className="text-xs text-[var(--color-text-tertiary)]">{user.location_country}</p>
