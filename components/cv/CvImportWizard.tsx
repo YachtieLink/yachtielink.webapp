@@ -85,11 +85,12 @@ function ParseProgress({ startedAt }: { startedAt: number }) {
 import { saveConfirmedImport } from '@/lib/cv/save-parsed-cv-data'
 import { StepPersonal } from '@/components/cv/steps/StepPersonal'
 import { StepExperience } from '@/components/cv/steps/StepExperience'
+import { StepLandExperience } from '@/components/cv/steps/StepLandExperience'
 import { StepQualifications } from '@/components/cv/steps/StepQualifications'
 import { StepExtras } from '@/components/cv/steps/StepExtras'
 import { StepReview } from '@/components/cv/steps/StepReview'
 import type {
-  ParsedCvData, ParsedPersonal, ParsedLanguage,
+  ParsedCvData, ParsedPersonal, ParsedLanguage, ParsedLandEmployment,
   ConfirmedYacht, ConfirmedCert, ConfirmedEducation,
   ConfirmedImportData, ConfirmedPersonal, SaveStats, ParsedSocialMedia,
 } from '@/lib/cv/types'
@@ -105,6 +106,7 @@ function buildImportData(opts: {
   confirmedPersonal: ParsedPersonal | null
   confirmedLanguages: ParsedLanguage[]
   confirmedYachts: ConfirmedYacht[]
+  confirmedLandJobs: ParsedLandEmployment[]
   confirmedCerts: ConfirmedCert[]
   confirmedEducation: ConfirmedEducation[]
   skills: string[]
@@ -122,6 +124,7 @@ function buildImportData(opts: {
     personal: opts.confirmedPersonal ?? EMPTY_PERSONAL,
     languages: opts.confirmedLanguages,
     yachts: opts.confirmedYachts,
+    landJobs: opts.confirmedLandJobs,
     certifications: opts.confirmedCerts,
     education: opts.confirmedEducation,
     skills: opts.skills.filter(s => !existingSkillsLower.has(s.toLowerCase())),
@@ -141,7 +144,7 @@ interface CvImportWizardProps {
   existingHobbies: string[]
 }
 
-const TOTAL_STEPS = 5
+const TOTAL_STEPS = 6
 
 export function CvImportWizard({
   userId,
@@ -174,6 +177,7 @@ export function CvImportWizard({
   const [confirmedPersonal, setConfirmedPersonal] = useState<ParsedPersonal | null>(null)
   const [confirmedLanguages, setConfirmedLanguages] = useState<ParsedLanguage[]>([])
   const [confirmedYachts, setConfirmedYachts] = useState<ConfirmedYacht[]>([])
+  const [confirmedLandJobs, setConfirmedLandJobs] = useState<ParsedLandEmployment[]>([])
   const [confirmedCerts, setConfirmedCerts] = useState<ConfirmedCert[]>([])
   const [confirmedEducation, setConfirmedEducation] = useState<ConfirmedEducation[]>([])
   const [skills, setSkills] = useState<string[]>(existingSkills)
@@ -289,6 +293,7 @@ export function CvImportWizard({
         if (state.confirmedPersonal) setConfirmedPersonal(state.confirmedPersonal)
         if (state.confirmedLanguages) setConfirmedLanguages(state.confirmedLanguages)
         if (state.confirmedYachts) setConfirmedYachts(state.confirmedYachts)
+        if (state.confirmedLandJobs) setConfirmedLandJobs(state.confirmedLandJobs)
         if (state.confirmedCerts) setConfirmedCerts(state.confirmedCerts)
         if (state.confirmedEducation) setConfirmedEducation(state.confirmedEducation)
         if (state.skills) setSkills(state.skills)
@@ -337,18 +342,18 @@ export function CvImportWizard({
     sessionStorage.setItem(key, JSON.stringify({
       parsed, parsedPersonal, parsedLanguages,
       step, confirmedPersonal, confirmedLanguages,
-      confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies,
+      confirmedYachts, confirmedLandJobs, confirmedCerts, confirmedEducation, skills, hobbies,
       skillsSummary, interestsSummary, socialMedia,
     }))
-  }, [parsed, parsedPersonal, parsedLanguages, step, confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, skillsSummary, interestsSummary, socialMedia, parsePersonalLoading, parseLoading, storagePath])
+  }, [parsed, parsedPersonal, parsedLanguages, step, confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedLandJobs, confirmedCerts, confirmedEducation, skills, hobbies, skillsSummary, interestsSummary, socialMedia, parsePersonalLoading, parseLoading, storagePath])
 
   const getImportData = useCallback((): ConfirmedImportData => {
     return buildImportData({
-      confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts,
+      confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedLandJobs, confirmedCerts,
       confirmedEducation, skills, hobbies, skillsSummary, interestsSummary, existingSkills, existingHobbies,
       socialMedia,
     })
-  }, [confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedCerts, confirmedEducation, skills, hobbies, skillsSummary, interestsSummary, existingSkills, existingHobbies, socialMedia])
+  }, [confirmedPersonal, confirmedLanguages, confirmedYachts, confirmedLandJobs, confirmedCerts, confirmedEducation, skills, hobbies, skillsSummary, interestsSummary, existingSkills, existingHobbies, socialMedia])
 
   const handleSave = useCallback(async (): Promise<SaveStats | null> => {
     try {
@@ -422,7 +427,15 @@ export function CvImportWizard({
           {step > 1 && (
             <button
               type="button"
-              onClick={() => setStep(step - 1)}
+              onClick={() => {
+                if (step === 4) {
+                  // Skip land experience step going back if no land jobs
+                  const hasLandJobs = (parsed?.employment_land ?? []).length > 0 || confirmedLandJobs.length > 0
+                  setStep(hasLandJobs ? 3 : 2)
+                } else {
+                  setStep(step - 1)
+                }
+              }}
               className="text-xs text-[var(--color-interactive)]"
             >
               Back
@@ -457,13 +470,13 @@ export function CvImportWizard({
               onConfirm={(personal, langs) => {
                 setConfirmedPersonal(personal)
                 setConfirmedLanguages(langs)
-                if (returnToReviewRef.current) { returnToReviewRef.current = false; setStep(5) }
+                if (returnToReviewRef.current) { returnToReviewRef.current = false; setStep(6) }
                 else setStep(2)
               }}
             />
           )}
 
-          {step >= 2 && step <= 4 && parseLoading && !parseRateLimited && (
+          {step >= 2 && step <= 5 && parseLoading && !parseRateLimited && (
             <ParseProgress startedAt={parseStartedAt} />
           )}
 
@@ -476,13 +489,28 @@ export function CvImportWizard({
               initialConfirmed={confirmedYachts.length > 0 ? confirmedYachts : undefined}
               onConfirm={(yachts) => {
                 setConfirmedYachts(yachts)
-                if (returnToReviewRef.current) { returnToReviewRef.current = false; setStep(5) }
-                else setStep(3)
+                if (returnToReviewRef.current) { returnToReviewRef.current = false; setStep(6) }
+                else {
+                  // Skip land experience step if no land jobs parsed
+                  const hasLandJobs = (parsed?.employment_land ?? []).length > 0 || confirmedLandJobs.length > 0
+                  setStep(hasLandJobs ? 3 : 4)
+                }
               }}
             />
           )}
 
           {step === 3 && (!parseLoading || parseRateLimited) && (
+            <StepLandExperience
+              landJobs={confirmedLandJobs.length > 0 ? confirmedLandJobs : (parsed?.employment_land ?? [])}
+              onConfirm={(jobs) => {
+                setConfirmedLandJobs(jobs)
+                if (returnToReviewRef.current) { returnToReviewRef.current = false; setStep(6) }
+                else setStep(4)
+              }}
+            />
+          )}
+
+          {step === 4 && (!parseLoading || parseRateLimited) && (
             <StepQualifications
               certifications={parsed?.certifications ?? []}
               education={parsed?.education ?? []}
@@ -492,13 +520,13 @@ export function CvImportWizard({
               onConfirm={(certs, edu) => {
                 setConfirmedCerts(certs)
                 setConfirmedEducation(edu)
-                if (returnToReviewRef.current) { returnToReviewRef.current = false; setStep(5) }
-                else setStep(4)
+                if (returnToReviewRef.current) { returnToReviewRef.current = false; setStep(6) }
+                else setStep(5)
               }}
             />
           )}
 
-          {step === 4 && (!parseLoading || parseRateLimited) && (
+          {step === 5 && (!parseLoading || parseRateLimited) && (
             <StepExtras
               skills={skills}
               hobbies={hobbies}
@@ -513,11 +541,11 @@ export function CvImportWizard({
               onSkillsSummaryChange={setSkillsSummary}
               onInterestsSummaryChange={setInterestsSummary}
               onSocialChange={setSocialMedia}
-              onConfirm={() => setStep(5)}
+              onConfirm={() => setStep(6)}
             />
           )}
 
-          {step === 5 && (
+          {step === 6 && (
             <StepReview
               importData={getImportData()}
               onSave={handleSave}

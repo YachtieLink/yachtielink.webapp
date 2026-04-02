@@ -3,14 +3,15 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Heart, Wrench, Camera } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
-import { getUserById, getProfileSections, getExtendedProfileSections } from '@/lib/queries/profile'
+import { getUserById, getProfileSections, getExtendedProfileSections, getLandExperience } from '@/lib/queries/profile'
 import { getProStatus } from '@/lib/stripe/pro'
 import { ProfileHeroCard } from '@/components/profile/ProfileHeroCard'
 import { ProfileStrength } from '@/components/profile/ProfileStrength'
 import { ProfileSectionGrid, type SectionItem } from '@/components/profile/ProfileSectionGrid'
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { PersonalDetailsCard } from '@/components/profile/PersonalDetailsCard'
-import { SeaTimeSummary } from '@/components/profile/SeaTimeSummary'
+import { CareerTimeline } from '@/components/profile/CareerTimeline'
+import { formatSeaTime } from '@/lib/sea-time'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageTransition } from '@/components/ui/PageTransition'
 import {
@@ -32,7 +33,7 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/welcome')
 
-  const [profile, { attachments, certifications: certs, endorsements }, extended, { data: profilePhotos }, seaTimeRes, proStatus] =
+  const [profile, { attachments, certifications: certs, endorsements }, extended, { data: profilePhotos }, seaTimeRes, proStatus, landExperience] =
     await Promise.all([
       getUserById(user.id),
       getProfileSections(user.id),
@@ -44,6 +45,7 @@ export default async function ProfilePage() {
         .order('sort_order'),
       supabase.rpc('get_sea_time', { p_user_id: user.id }),
       getProStatus(user.id),
+      getLandExperience(user.id),
     ])
 
   const seaTime = seaTimeRes.data as { total_days: number; yacht_count: number }[] | null
@@ -98,8 +100,8 @@ export default async function ProfilePage() {
     {
       key: 'experience',
       label: 'Experience',
-      summary: experienceSummary(attachments ?? []),
-      count: attachments?.length ?? 0,
+      summary: experienceSummary(attachments ?? []) + (landExperience.length > 0 ? ` + ${landExperience.length} shore-side` : ''),
+      count: (attachments?.length ?? 0) + landExperience.length,
       visible: sectionVisibility.experience ?? true,
       editHref: '/app/attachment',
     },
@@ -240,8 +242,33 @@ export default async function ProfilePage() {
         isPro={proStatus.isPro}
       />
 
-      {/* Sea time summary card */}
-      <SeaTimeSummary totalDays={seaTimeTotalDays} yachtCount={seaTimeYachtCount} />
+      {/* Sea time + career — one card */}
+      {(seaTimeTotalDays > 0 || (attachments?.length ?? 0) > 0 || landExperience.length > 0) && (
+        <div className="bg-[var(--color-surface-raised)] rounded-2xl p-5">
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">&#9875; Sea Time</h3>
+              {seaTimeTotalDays > 0 && (
+                <>
+                  <p className="text-lg font-bold text-[var(--color-text-primary)]">
+                    {formatSeaTime(seaTimeTotalDays).displayLong} at sea
+                  </p>
+                  <p className="text-sm text-[var(--color-text-secondary)]">
+                    across {seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}
+                  </p>
+                </>
+              )}
+            </div>
+            <Link
+              href="/app/profile/sea-time"
+              className="text-sm text-[var(--color-interactive)] hover:underline shrink-0 mt-1"
+            >
+              View &#9656;
+            </Link>
+          </div>
+          <CareerTimeline attachments={attachments ?? []} landExperience={landExperience} />
+        </div>
+      )}
 
       {/* Social links */}
       {Array.isArray(profile.social_links) && (profile.social_links as any[]).length > 0 && (

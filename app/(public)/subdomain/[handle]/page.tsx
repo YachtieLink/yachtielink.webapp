@@ -12,6 +12,7 @@ import {
   getPublicProfileSections,
   getExtendedProfileSections,
   getViewerRelationship,
+  getLandExperience,
 } from '@/lib/queries/profile'
 import { isProFromRecord } from '@/lib/stripe/pro'
 import type { ProfilePhoto, Hobby, Education, Skill, GalleryItem, MutualColleague } from '@/lib/queries/types'
@@ -81,11 +82,13 @@ export default async function SubdomainPage({ params }: Props) {
     extended,
     { data: { user: viewer } },
     seaTimeRes,
+    landExperience,
   ] = await Promise.all([
     getPublicProfileSections(user.id),
     getExtendedProfileSections(user.id),
     supabase.auth.getUser(),
     supabase.rpc('get_sea_time', { p_user_id: user.id }),
+    getLandExperience(user.id),
   ])
 
   const seaTime = seaTimeRes.data as { total_days: number; yacht_count: number }[] | null
@@ -157,6 +160,7 @@ export default async function SubdomainPage({ params }: Props) {
         attachments={attachments}
         certifications={certifications}
         endorsements={endorsements}
+        landExperience={landExperience}
         profilePhotos={extended.photos as ProfilePhoto[]}
         hobbies={extended.hobbies as Hobby[]}
         education={extended.education as Education[]}

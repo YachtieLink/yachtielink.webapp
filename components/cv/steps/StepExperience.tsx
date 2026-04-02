@@ -815,10 +815,10 @@ export function StepExperience({
         initialMode="search"
       />
 
-      {/* Non-yacht roles — gentle mention */}
+      {/* Non-yacht roles — mention if present */}
       {landJobs.length > 0 && (
         <p className="text-xs text-[var(--color-text-tertiary)] px-1 mt-1">
-          We also found {landJobs.length} shore-based role{landJobs.length === 1 ? '' : 's'} — we&apos;ll support these soon.
+          We also found {landJobs.length} shore-based role{landJobs.length === 1 ? '' : 's'} — you&apos;ll review {landJobs.length === 1 ? 'it' : 'them'} next.
         </p>
       )}
 

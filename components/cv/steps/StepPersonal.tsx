@@ -205,6 +205,11 @@ export function StepPersonal({ parsed, languages: parsedLangs, existing, parsePe
   trackOverwrite('Nationality', existing.home_country, homeCountry, setHomeCountry)
   trackOverwrite('Phone', existing.phone, phone, (v) => setPhone(formatPhone(v)))
   trackOverwrite('License', existing.license_info, licenseInfo, setLicenseInfo)
+  trackOverwrite('Location (country)', existing.location_country, locationCountry, setLocationCountry)
+  trackOverwrite('Location (city)', existing.location_city, locationCity, setLocationCity)
+  trackOverwrite('Date of birth', existing.dob, dob, setDob)
+  trackOverwrite('Smoking', existing.smoke_pref, smokePref, setSmokePref)
+  trackOverwrite('Tattoos / piercings', existing.appearance_note, appearanceNote, setAppearanceNote)
 
   const displayFields: { label: string; value: string }[] = []
   if (fullName) displayFields.push({ label: 'Name', value: fullName })
