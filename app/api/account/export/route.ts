@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
     hobbiesRes,
     photosRes,
     galleryRes,
+    landExperienceRes,
   ] = await Promise.all([
     admin.from('users').select('*').eq('id', user.id).single(),
     admin.from('attachments').select('*, yacht:yachts!yacht_id(*)').eq('user_id', user.id),
@@ -45,6 +46,7 @@ export async function GET(req: NextRequest) {
     admin.from('user_hobbies').select('*').eq('user_id', user.id),
     admin.from('user_photos').select('*').eq('user_id', user.id),
     admin.from('user_gallery').select('*').eq('user_id', user.id),
+    admin.from('land_experience').select('*').eq('user_id', user.id),
   ]);
 
   const exportData = {
@@ -63,6 +65,7 @@ export async function GET(req: NextRequest) {
     hobbies: hobbiesRes.data ?? [],
     photos: photosRes.data ?? [],
     gallery: galleryRes.data ?? [],
+    land_experience: landExperienceRes.data ?? [],
   };
 
   return new Response(JSON.stringify(exportData, null, 2), {

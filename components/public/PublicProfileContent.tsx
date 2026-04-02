@@ -34,7 +34,7 @@ import { scrimPresets, type ScrimPreset } from '@/lib/scrim-presets'
 import type {
   PublicAttachment, PublicCertification, PublicEndorsement,
   ProfilePhoto, Hobby, Education, Skill, GalleryItem,
-  ViewerRelationship,
+  ViewerRelationship, LandExperienceEntry,
 } from '@/lib/queries/types'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -76,11 +76,14 @@ interface UserProfile {
   subscription_ends_at?: string | null
 }
 
+export type { LandExperienceEntry } from '@/lib/queries/types'
+
 export interface PublicProfileContentProps {
   user: UserProfile
   attachments: PublicAttachment[]
   certifications: PublicCertification[]
   endorsements: PublicEndorsement[]
+  landExperience?: LandExperienceEntry[]
   profilePhotos: ProfilePhoto[]
   hobbies: Hobby[]
   education: Education[]
@@ -110,6 +113,7 @@ export function PublicProfileContent({
   attachments,
   certifications,
   endorsements,
+  landExperience = [],
   profilePhotos,
   hobbies,
   education,
@@ -280,6 +284,7 @@ export function PublicProfileContent({
         attachments={attachments}
         certifications={certifications}
         endorsements={endorsements}
+        landExperience={landExperience}
         hobbies={hobbies}
         education={education}
         skills={skills}
@@ -307,7 +312,7 @@ export function PublicProfileContent({
 // ── Profile Mode (extracted for modal state) ──────────────────────────────────
 
 function ProfileModeContent({
-  user, attachments, certifications, endorsements, hobbies, education, skills, gallery,
+  user, attachments, certifications, endorsements, landExperience = [], hobbies, education, skills, gallery,
   sectionVisibility, isLoggedIn, isOwnProfile, displayName, firstName,
   sharedYachtIdSet, mutualEndorserCount, seaTimeTotalDays, seaTimeYachtCount,
   colleagueCount, profileUrl, savedStatus,
@@ -316,6 +321,7 @@ function ProfileModeContent({
   attachments: PublicAttachment[]
   certifications: PublicCertification[]
   endorsements: PublicEndorsement[]
+  landExperience?: LandExperienceEntry[]
   hobbies: Hobby[]
   education: Education[]
   skills: Skill[]
@@ -441,9 +447,9 @@ function ProfileModeContent({
           )}
 
           {/* My Experience */}
-          {sectionVisible(sectionVisibility, 'experience', attachments.length > 0) && (
+          {sectionVisible(sectionVisibility, 'experience', attachments.length > 0 || landExperience.length > 0) && (
             <div id="section-experience">
-              <ExperienceSection attachments={attachments} sharedYachtIdSet={sharedYachtIdSet} seaTimeTotalDays={seaTimeTotalDays} seaTimeYachtCount={seaTimeYachtCount} onNavigate={isLoggedIn ? (url, label) => setPendingNav({ url, label }) : undefined} />
+              <ExperienceSection attachments={attachments} landExperience={landExperience} sharedYachtIdSet={sharedYachtIdSet} seaTimeTotalDays={seaTimeTotalDays} seaTimeYachtCount={seaTimeYachtCount} onNavigate={isLoggedIn ? (url, label) => setPendingNav({ url, label }) : undefined} />
             </div>
           )}
 
@@ -521,7 +527,7 @@ function ProfileModeContent({
 
         {/* Fallback when all sections are hidden */}
         {!sectionVisible(sectionVisibility, 'about', !!(user.ai_summary || user.bio)) &&
-         !sectionVisible(sectionVisibility, 'experience', attachments.length > 0) &&
+         !sectionVisible(sectionVisibility, 'experience', attachments.length > 0 || landExperience.length > 0) &&
          !sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) &&
          !sectionVisible(sectionVisibility, 'certifications', certifications.length > 0) &&
          !sectionVisible(sectionVisibility, 'education', education.length > 0) &&

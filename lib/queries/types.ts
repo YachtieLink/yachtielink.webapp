@@ -92,6 +92,18 @@ export type GalleryItem = {
   yachts?: { name: string } | null
 }
 
+// ── Land Experience ───────────────────────────────────────────────────────
+
+export type LandExperienceEntry = {
+  id: string
+  company: string
+  role: string
+  start_date: string | null
+  end_date: string | null
+  description: string | null
+  industry: string | null
+}
+
 // ── Viewer Relationship ────────────────────────────────────────────────────
 
 export type MutualColleague = {

@@ -60,6 +60,7 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
   const totalItems = [
     hasPersonal ? 1 : 0,
     yachts.length,
+    importData.landJobs.length,
     certifications.length,
     education.length,
     skills.length + hobbies.length,
@@ -82,6 +83,7 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
     const itemCount = [
       stats.personalUpdated ? 1 : 0,
       stats.yachtsCreated,
+      stats.landExperienceCreated,
       stats.certsCreated,
       stats.educationCreated,
       stats.skillsAdded,
@@ -100,6 +102,7 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
         <div className="text-xs text-[var(--color-text-tertiary)] flex flex-wrap gap-2 justify-center">
           {stats.personalUpdated && <span>Profile updated</span>}
           {stats.yachtsCreated > 0 && <span>· {stats.yachtsCreated} yacht{stats.yachtsCreated === 1 ? '' : 's'}</span>}
+          {stats.landExperienceCreated > 0 && <span>· {stats.landExperienceCreated} shore-side role{stats.landExperienceCreated === 1 ? '' : 's'}</span>}
           {stats.certsCreated > 0 && <span>· {stats.certsCreated} cert{stats.certsCreated === 1 ? '' : 's'}</span>}
           {stats.educationCreated > 0 && <span>· {stats.educationCreated} education</span>}
           {stats.skillsAdded > 0 && <span>· {stats.skillsAdded} skill{stats.skillsAdded === 1 ? '' : 's'}</span>}
@@ -163,10 +166,28 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
         </div>
       )}
 
+      {/* Land Experience */}
+      {importData.landJobs.length > 0 && (
+        <div className="bg-[var(--color-surface)] rounded-2xl p-3 border border-[var(--color-amber-200)]">
+          <SectionHeader title="Shore-Side Experience" count={importData.landJobs.length} step={3} onEdit={onEditStep} />
+          <div className="flex flex-col gap-0.5 mt-1.5">
+            {importData.landJobs.map((j, i) => {
+              const start = formatDateDisplay(j.start_date)
+              const end = formatDateDisplay(j.end_date) || 'Present'
+              return (
+                <p key={i} className="text-xs text-[var(--color-text-secondary)]">
+                  {j.company} — {j.role}{start ? ` · ${start} — ${end}` : ''}
+                </p>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Certifications */}
       {certifications.length > 0 && (
         <div className="bg-[var(--color-surface)] rounded-2xl p-3 border border-[var(--color-amber-200)]">
-          <SectionHeader title="Certifications" count={certifications.length} step={3} onEdit={onEditStep} />
+          <SectionHeader title="Certifications" count={certifications.length} step={4} onEdit={onEditStep} />
           <div className="flex flex-col gap-0.5 mt-1.5">
             {certifications.map((c, i) => (
               <p key={i} className="text-xs text-[var(--color-text-secondary)]">
@@ -180,7 +201,7 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
       {/* Education */}
       {education.length > 0 && (
         <div className="bg-[var(--color-surface)] rounded-2xl p-3 border border-[var(--color-amber-200)]">
-          <SectionHeader title="Education" count={education.length} step={3} onEdit={onEditStep} />
+          <SectionHeader title="Education" count={education.length} step={4} onEdit={onEditStep} />
           <div className="flex flex-col gap-0.5 mt-1.5">
             {education.map((e, i) => (
               <p key={i} className="text-xs text-[var(--color-text-secondary)]">
@@ -194,7 +215,7 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
       {/* Skills & Hobbies */}
       {(skills.length > 0 || dedupedHobbies.length > 0) && (
         <div className="bg-[var(--color-surface)] rounded-2xl p-3 border border-[var(--color-amber-200)]">
-          <SectionHeader title="Skills & Interests" count={skills.length + dedupedHobbies.length} step={4} onEdit={onEditStep} />
+          <SectionHeader title="Skills & Interests" count={skills.length + dedupedHobbies.length} step={5} onEdit={onEditStep} />
           {skills.length > 0 && (
             <>
               <div className="flex flex-wrap gap-1.5 mt-2">
@@ -229,7 +250,7 @@ export function StepReview({ importData, onSave, onEditStep }: StepReviewProps) 
       {/* Social links */}
       {socialLabel(socialMedia) && (
         <div className="bg-[var(--color-surface)] rounded-2xl p-3 border border-[var(--color-amber-200)]">
-          <SectionHeader title="Social Links" count={0} step={4} onEdit={onEditStep} />
+          <SectionHeader title="Social Links" count={0} step={5} onEdit={onEditStep} />
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             {socialMedia.instagram && (
               <span className="flex items-center gap-1 text-xs text-[var(--color-text-secondary)]">
