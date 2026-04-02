@@ -14,6 +14,11 @@ interface Endorsement {
     full_name: string
     handle: string | null
   } | null
+  ghost_endorser: {
+    id: string
+    full_name: string
+    primary_role: string | null
+  } | null
   yachts: {
     name: string
   } | null
@@ -52,7 +57,7 @@ export function EndorsementsSection({ endorsements, currentUserId }: Endorsement
 
       <ul className="flex flex-col gap-4">
         {endorsements.map((e) => {
-          const endorserName = e.endorser?.display_name ?? e.endorser?.full_name ?? 'Anonymous'
+          const endorserName = e.endorser?.display_name ?? e.endorser?.full_name ?? e.ghost_endorser?.full_name ?? 'Anonymous'
           const date = new Date(e.created_at).toLocaleDateString('en-GB', {
             month: 'short',
             year: 'numeric',

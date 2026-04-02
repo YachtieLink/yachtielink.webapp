@@ -151,6 +151,9 @@ export type CvEndorsement = {
     display_name: string | null
     full_name: string
   } | null
+  ghost_endorser: {
+    full_name: string
+  } | null
   yacht: {
     name: string
   } | null
