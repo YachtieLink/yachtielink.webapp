@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button, Input, Select, DatePicker } from '@/components/ui'
 import { Skeleton } from '@/components/ui/skeleton'
 import { formatDateDisplay } from '@/lib/cv/types'
+import { calculateSeaTimeDays, detectOverlaps, type DateRange } from '@/lib/sea-time'
 import { YachtMatchCard, type MatchState } from '@/components/yacht/YachtMatchCard'
 import { YachtPickerModal } from '@/components/yacht/YachtPicker'
 import type {
@@ -46,6 +47,10 @@ interface StepExperienceProps {
   onConfirm: (yachts: ConfirmedYacht[]) => void
   /** Pre-confirmed yachts from a previous pass (e.g. when returning from review) */
   initialConfirmed?: ConfirmedYacht[]
+}
+
+interface IndexedDateRange extends DateRange {
+  cardIndex: number
 }
 
 const EMPLOYMENT_TYPES = [
@@ -597,31 +602,36 @@ export function StepExperience({
     .sort()[0]
   const earliestYear = earliestStart ? earliestStart.split('-')[0] : null
 
-  // Calculate total months at sea
-  let totalMonths = 0
-  for (const card of activeCards) {
+  // Build date ranges from all non-skipped cards with valid start dates
+  const indexedSeaRanges: IndexedDateRange[] = []
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i]
+    if (card.override.status === 'skipped') continue
     const s = card.confirmed.start_date
-    const e = card.confirmed.end_date
     if (!s) continue
-    const startParts = s.split('-').map(Number)
-    const startM = (startParts[0] ?? 0) * 12 + (startParts[1] ?? 1)
-    let endM: number
-    if (!e || e === 'Current' || e === 'Present') {
-      const now = new Date()
-      endM = now.getFullYear() * 12 + (now.getMonth() + 1)
-    } else {
-      const endParts = e.split('-').map(Number)
-      endM = (endParts[0] ?? 0) * 12 + (endParts[1] ?? 1)
-    }
-    totalMonths += Math.max(0, endM - startM)
+    const start = parseCVDate(s)
+    if (!start) continue
+    const e = card.confirmed.end_date
+    const end = (!e || e === 'Current' || e === 'Present')
+      ? new Date()
+      : (parseCVDate(e) ?? new Date())
+    indexedSeaRanges.push({ start, end, cardIndex: i })
   }
-  const totalYears = Math.floor(totalMonths / 12)
-  const remainingMonths = totalMonths % 12
-  const timeStr = totalYears > 0
-    ? remainingMonths > 0
-      ? `${totalYears} year${totalYears === 1 ? '' : 's'} ${remainingMonths} month${remainingMonths === 1 ? '' : 's'}`
-      : `${totalYears} year${totalYears === 1 ? '' : 's'}`
-    : `${remainingMonths} month${remainingMonths === 1 ? '' : 's'}`
+
+  // Union-based sea time — no double-counting of overlapping stints
+  const seaTimeDays = calculateSeaTimeDays(indexedSeaRanges)
+  const totalYears = Math.floor(seaTimeDays / 365.25)
+  const remainingMonths = Math.floor((seaTimeDays % 365.25) / 30.44)
+
+  // Detect overlapping stints for user warnings
+  const rawOverlaps = detectOverlaps(indexedSeaRanges)
+  const overlapCardIndices = new Set<number>()
+  let maxOverlapDays = 0
+  for (const o of rawOverlaps) {
+    if (o.overlapDays > maxOverlapDays) maxOverlapDays = o.overlapDays
+    overlapCardIndices.add(o.rangeA.cardIndex)
+    overlapCardIndices.add(o.rangeB.cardIndex)
+  }
 
   // Detect role category from common keywords
   function getRoleCategory(): string | null {
@@ -660,7 +670,7 @@ export function StepExperience({
             </div>
           </div>
           {/* Time at sea */}
-          {totalMonths > 0 && (
+          {(totalYears > 0 || remainingMonths > 0) && (
             <div className="flex-1 rounded-2xl bg-[var(--color-amber-50)]/50 border border-[var(--color-amber-100)] px-3 pt-2.5 pb-3 flex flex-col items-center">
               <p className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wider">Sea service</p>
               <div className="flex-1 flex items-center">
@@ -696,9 +706,30 @@ export function StepExperience({
         </div>
       )}
 
+      {/* Overlap warning */}
+      {rawOverlaps.length > 0 && (
+        maxOverlapDays >= 28 ? (
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
+            <p className="text-sm font-medium text-amber-900">
+              Some of your roles overlap. The longest overlap is {maxOverlapDays} days. Your sea time will be calculated based on actual calendar days, not summed separately.
+            </p>
+          </div>
+        ) : (
+          <div className="bg-[var(--color-surface)] border border-[var(--color-border)] rounded-2xl px-4 py-3">
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              Some of your roles overlap. The longest overlap is {maxOverlapDays} days. This is common for handover periods.
+            </p>
+          </div>
+        )
+      )}
+
       {/* Compact career list */}
       {cards.map((card, i) => (
-        <div key={i} id={`yacht-card-${i}`}>
+        <div
+          key={i}
+          id={`yacht-card-${i}`}
+          className={overlapCardIndices.has(i) ? 'rounded-2xl ring-2 ring-amber-400' : undefined}
+        >
           <YachtCardWrapper
             cardState={card}
             userId={userId}
@@ -831,6 +862,19 @@ export function StepExperience({
 }
 
 // ── Helpers ───────────────────────────────────────────────────
+
+/** Parse a CV date string ("YYYY-MM-DD", "YYYY-MM", or "YYYY") into a Date. Returns null for invalid or absent values. */
+function parseCVDate(dateStr: string | null | undefined): Date | null {
+  if (!dateStr || dateStr === 'Current' || dateStr === 'Present') return null
+  const parts = dateStr.split('-').map(Number)
+  const year = parts[0]
+  if (!year || isNaN(year)) return null
+  const month = (parts[1] ?? 1) - 1
+  const day = parts[2] ?? 1
+  const date = new Date(year, month, day)
+  if (isNaN(date.getTime())) return null
+  return date
+}
 
 function buildConfirmedFromParsed(y: ParsedYachtEmployment): ConfirmedYacht {
   return {
