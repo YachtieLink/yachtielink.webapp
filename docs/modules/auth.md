@@ -55,6 +55,8 @@ One-line: Email/password authentication with Supabase, PKCE code exchange, sessi
 
 ## Recent Activity
 
+**2026-04-02** — Ghost flow fixes (pending push, lane 1 fix/ghost-closeout): Auth callback (`app/auth/callback/route.ts`) now calls `claim_ghost_profile()` after PKCE code exchange — ghost endorsements auto-merged on email verification and OAuth. Middleware (`middleware.ts`) fires a one-time ghost claim on first authenticated navigation via `yl_ghost_checked` session cookie (maxAge 1 year, wrapped in try-catch to prevent middleware crash on Supabase timeout) — covers password login path. Auth callback now checks both `next` and `returnTo` params for redirect consistency.
+
 **2026-03-21** — Sprint 10.3: Dark mode sidelined — force light mode, theme toggle replaced with "coming soon" placeholder.
 **2026-03-17** — Pre-merge audit: Completed launch env setup — PostHog (EU), Sentry (EU), SIGNUP_MODE=public, REDIS_URL live; created `memory/service_accounts.md` with all third-party accounts.
 **2026-03-17** — Redis swap: Switched rate limiter from `@vercel/kv` → `ioredis` using `REDIS_URL`; removed `@vercel/kv`, installed `ioredis`; singleton client, fail-open when `REDIS_URL` absent.
