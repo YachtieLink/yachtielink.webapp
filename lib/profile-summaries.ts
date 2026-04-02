@@ -3,16 +3,10 @@
  * collapsed ProfileAccordion section.
  */
 
+import { calculateSeaTimeDays, formatSeaTime, type DateRange } from './sea-time'
+
 // ── Sea time ─────────────────────────────────────────────────────────────────
 
-function formatSeaTimeCompact(totalDays: number): string {
-  if (totalDays <= 0) return '0 months'
-  const years = Math.floor(totalDays / 365)
-  const months = Math.floor((totalDays % 365) / 30)
-  if (years === 0) return `${months}m`
-  if (months === 0) return `${years}y`
-  return `${years}y ${months}m`
-}
 
 type Attachment = {
   started_at: string | null
@@ -31,17 +25,16 @@ function resolveYachtId(a: Attachment): string | undefined {
 
 export function computeSeaTime(attachments: Attachment[]): { totalDays: number; yachtCount: number } {
   const yachtIds = new Set<string>()
-  let totalDays = 0
+  const ranges: DateRange[] = []
   for (const a of attachments) {
     if (!a.started_at) continue
     const start = new Date(a.started_at)
     const end = a.ended_at ? new Date(a.ended_at) : new Date()
-    const days = Math.max(0, Math.floor((end.getTime() - start.getTime()) / 86_400_000))
-    totalDays += days
+    ranges.push({ start, end })
     const yachtId = resolveYachtId(a)
     if (yachtId) yachtIds.add(yachtId)
   }
-  return { totalDays, yachtCount: yachtIds.size }
+  return { totalDays: calculateSeaTimeDays(ranges), yachtCount: yachtIds.size }
 }
 
 // ── Cert expiry ───────────────────────────────────────────────────────────────
@@ -57,7 +50,7 @@ export function countExpiringCerts(certs: Cert[]): number {
 
 export function experienceSummary(attachments: Attachment[]): string {
   const { totalDays, yachtCount } = computeSeaTime(attachments)
-  const time = formatSeaTimeCompact(totalDays)
+  const time = formatSeaTime(totalDays).displayShort
   if (yachtCount === 0) return 'No experience added yet'
   return `${time} sea time · ${yachtCount} ${yachtCount === 1 ? 'yacht' : 'yachts'}`
 }
