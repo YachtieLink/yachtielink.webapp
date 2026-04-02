@@ -100,7 +100,7 @@ Then fetches colleague profiles and yacht names in a second parallel batch. All 
 
 ## Recent Activity
 
-**2026-04-02** — Worktree lane 2 (pending push): `SavedProfileCard` gains optional `seaTimeDays`/`yachtCount` props for richer detail line ("6y 7m at sea · 2 yachts"). Not yet wired from `SavedProfilesClient.tsx` — falls back to role + departments until follow-up wiring.
+**2026-04-02** — Rally 009 Session 1 Lane 2 (`fix/p2-bug-fixes`): `SavedProfileCard` sea time fully wired — `page.tsx` computes `seaTimeDays`/`yachtCount` from attachment dates (mirrors `get_sea_time()` SQL), passed through `SavedProfilesClient.tsx`, rendered as "1y 6mo at sea · 2 yachts" detail line. `Math.max(0, ...)` guard prevents negative-days edge case.
 **2026-04-01** — Lane 2 (PR #137): Colleague display names updated to show full `"First Last"` throughout. Nickname pattern `"Charlotte 'Charlie' Beaumont"` when display_name differs from first name. Applied to colleagues page and endorsement request page. `get_colleagues` RPC confirmed to deduplicate correctly — multi-accordion is intentional UX.
 **2026-03-27** — Sprint 10.1: `font-serif` on network page h1. `cardHover` animation on SavedProfileCard (lift on hover, scale on tap). `popIn` on nav notification badges (BottomTabBar + SidebarNav).
 

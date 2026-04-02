@@ -1,99 +1,85 @@
-# QA Report — 2026-04-02
+# QA Report — 2026-04-02 (Rally 009 Session 1)
 
-**Tester:** Claude Code (Opus 4.6) — Master
-**Session:** sessions/2026-04-02-ghost-closeout-ux-polish.md
-**Lanes tested:** Lane 1 (yl-wt-1), Lane 2 (yl-wt-2), Lane 3 (yl-wt-3)
+**Tester:** Claude Code (Opus 4.6) — Tester
+**Session:** sessions/2026-04-02-rally009-session1.md
+**Lanes tested:** 1, 2, 3
 **Verdict:** PASS
-
----
 
 ## Tested (every input → output pair)
 
 | # | Lane | Feature | Input | Expected Output | Actual | Status |
 |---|------|---------|-------|-----------------|--------|--------|
-| 1.1 | 1 | Ghost join — private profile | Navigate to /app/profile | Ghost endorser name shows, not "Anonymous" | Dev QA has no ghost endorsements; verified on Ari's public profile — "Sarah Mitchell" shows correctly | ✅ |
-| 1.2 | 1 | Ghost join — public profile | Navigate to /u/ari | Ghost endorser "Sarah Mitchell" with "M/Y Go" | Sarah Mitchell shows with name + yacht | ✅ |
-| 1.3 | 1 | Existing user page-load check | Visit /endorse/{token} with recipient_email matching existing user | "You already have an account" + sign-in button | Code verified (lines 139-189 of endorse page). No pending request with matching email in test data to trigger live. | ✅ (code) |
-| 1.4 | 1 | New person ghost form | Visit /endorse/{token} for shareable link (no email) | Ghost form renders | Ghost form shows: "Endorse ari", text area, submit button, "Add details" expander | ✅ |
-| 1.5 | 1 | Cancelled request | Visit /endorse/{token} for cancelled request | "Request cancelled" message | Shows "Request cancelled / This endorsement request was cancelled." | ✅ |
-| 1.6 | 1 | Middleware ghost claim | Password login with matching ghost email | Ghost claim fires via yl_ghost_checked cookie | Code verified in middleware.ts — RPC call wrapped in try-catch, cookie with 1yr maxAge | ✅ (code) |
-| 1.7 | 1 | Auth callback ghost claim | OAuth/PKCE flow | claim_ghost_profile() fires after exchangeCodeForSession | Code verified in auth/callback/route.ts | ✅ (code) |
-| 2.1 | 2 | Endorsement card — non-ghost | View endorsements on /u/ari/endorsements | "Role on Yacht" + date on separate line | "Second Stewardess on M/Y Go" + "Mar 2026" | ✅ |
-| 2.2 | 2 | Endorsement card — ghost | View ghost endorsement on /u/ari/endorsements | "on Yacht" + date on separate line | "Sarah Mitchell" / "Chief Stewardess" + "on M/Y Go" / "Apr 2026" | ✅ |
-| 2.3 | 2 | Yacht type prefix — experience | View experience section | "M/Y Go" not "Go" | "M/Y Go — Bartender" | ✅ |
-| 2.4 | 2 | Yacht type prefix — bento tile | View Charlotte's bento endorsement | "on TS Driftwood" | "Head Chef on TS Driftwood" | ✅ |
-| 2.5 | 2 | Visibility toggle sublabels | Navigate to /app/profile/settings | Each toggle has descriptive subtext | All 7 toggles have sublabels: phone, WhatsApp, email, location, DOB, home country, nationality flag | ✅ |
-| 3.1 | 3 | Interests chips responsive | View /u/ari at 569px and 1024px | Compact chips, no tall empty rectangles | "Rugby", "Surfing" render compact at both widths | ✅ |
-| 3.2 | 3 | Social links in settings | Navigate to settings | Social links section with existing links + add chips | Instagram, LinkedIn, Website shown; TikTok, YouTube, X, Facebook as suggestion chips | ✅ |
-| 3.3 | 3 | Add social link | Tap TikTok chip → enter URL → Add → Save → Reload | Link persisted to DB | TikTok URL added, saved, survived reload | ✅ |
-| 3.4 | 3 | Delete social link | Click × on Website → verify removed | Link removed from list, platform re-appears as suggestion | Website removed; "Website +" chip re-appeared | ✅ |
-| 3.5 | 3 | CV review socials | CV review step shows parsed social links | Social Links card with edit button to step 4 | Code verified — StepReview.tsx lines 229-258 show social links with icons + Edit button | ✅ (code) |
-| 3.6 | 3 | Layout thumbnails | View layout selector in settings | SVG wireframes above each option | Profile (editorial), Portfolio (card grid), Rich Portfolio (bento) — each with wireframe + label + description | ✅ |
-| 3.7 | 3 | Social links cap | Add links, check suggestion chips filter | Already-added platforms filtered from suggestions | With 3 links, 4 suggestions shown; correctly filters added platforms | ✅ |
+| 1 | 1 | Tab bar padding (mobile) | Navigate to /app/profile on 375x812 viewport, scroll to bottom | Content clears tab bar with pb-20 (80px) padding | padding-bottom: 80px confirmed via inspect, content fully visible above tab bar | pass |
+| 2 | 1 | Tab bar padding (desktop) | Resize to 1280x800, inspect main element | pb-0 on desktop, pl-16 for sidebar | padding-bottom: 0px, padding-left: 64px confirmed | pass |
+| 3 | 1 | CV preview ghost join | Navigate to /app/cv/preview | Page uses getCvSections() with ghost_endorser join instead of inline query | Page loads, renders CV data correctly. getCvSections includes ghost_endorser:ghost_endorser_id(full_name) at line 317 | pass |
+| 4 | 1 | Interests chips (pre-existing) | Check HobbiesTile on charlotte's public profile | Chips use content-start, no vertical stretching | Chips render correctly with flex-wrap and content-start (already on main from previous session) | pass |
+| 5 | 2 | SavedProfileCard sea time | Navigate to /app/network/saved | Cards show sea time + yacht count | Olivia: "1y 6mo at sea · 1 yacht", James: "5y 10mo at sea · 2 yachts", Charlotte: "3y 7mo at sea · 1 yacht" | pass |
+| 6 | 2 | Yacht prefix null guard | View /u/dev-qa experience section | Yachts without yacht_type show name only (no prefix) | "Big Sky" renders without prefix, "M/Y Go" renders with prefix | pass |
+| 7 | 2 | prefixedYachtName empty guard | Code review of lib/yacht-prefix.ts | Empty string returns as-is, null yacht_type returns name only | Guards present: `if (!name.trim()) return name` and `if (!yachtType) return name` | pass |
+| 8 | 2 | show_home_country on CV PDF | Code review of ProfilePdfDocument.tsx | Home country respects show_home_country toggle | `user.home_country && user.show_home_country !== false` — correct conditional | pass |
+| 9 | 2 | generate-pdf route selects show_home_country | Code review of api/cv/generate-pdf/route.ts | Query includes show_home_country field | Added to select string | pass |
+| 10 | 3 | Social icons dedup (settings) | Navigate to /app/profile/settings, scroll to Social & Links | Icons render via getPlatformIcon() | Instagram, LinkedIn, Globe icons render correctly. TikTok, YouTube, X, Facebook chips show proper icons | pass |
+| 11 | 3 | Social icons dedup (public profile) | Navigate to /u/dev-qa | Social icons in hero use SocialLinksRow with shared getPlatformIcon() | Instagram, LinkedIn, Globe icons render on hero | pass |
+| 12 | 3 | Social platform config dedup | Code review of settings/page.tsx + SocialLinksRow.tsx | Both use SOCIAL_PLATFORM_META from lib/social-platforms.ts, no duplicate PLATFORM_CONFIG | Local PLATFORM_CONFIG and SOCIAL_PLATFORM_CONFIG removed, both use shared config | pass |
+| 13 | 3 | formatSeaTime collision | Navigate to /app/attachment | Durations render using formatSeaTime from lib/sea-time | All attachments show correct durations (4mo, 6mo, 1y 0mo, etc). Import changed from lib/profile-summaries to lib/sea-time | pass |
+| 14 | 3 | EndorsementsSection dead code | Code review of components/profile/EndorsementsSection.tsx | Removed endorser_id, currentUserId, isOwn check. Fixed yacht_id: string to string or null | All dead code removed, nullable type fixed | pass |
+| 15 | 3 | TikTokIcon extraction | Code review of StepExtras.tsx + social-icons.tsx | Local TikTokIcon definition removed, imports from shared file | StepExtras imports TikTokIcon from components/ui/social-icons | pass |
 
 ## Toggle Matrix
 
-No new toggles added in this session. Lane 2 added sublabels to existing toggles. Existing toggle ON/OFF behavior unchanged.
-
 | Toggle | ON result | OFF result | Sensible? |
 |--------|-----------|------------|-----------|
-| Show phone | Phone visible on public profile | Phone hidden | ✅ |
-| Show home country | Country name shows | Country hidden | ✅ |
-| Show nationality flag | Flag emoji next to name | No flag | ✅ |
+| show_home_country (CV PDF) | Home country appears in PDF header subline | Home country hidden from PDF header | Yes — matches existing show_dob pattern |
+| show_home_country (settings) | Toggle ON, sublabel "Your home country will appear on your public profile" | Toggle OFF, home country hidden | Yes |
 
 ## Copy Review
 
-All copy verified as clear and accurate:
-- Toggle sublabels (Lane 2): descriptive, no jargon, match actual behavior
-- Social links section header: "Show your social profiles on your public page" — clear
-- DOB sublabel: "Calculated from date of birth" — informative (on Lane 3 which has original copy)
-- DOB sublabel: "Your age (not date of birth) will appear on your public profile" — clearer (on Lane 2)
-- Nationality flag sublabel: "Displays your country flag next to your name (replaces home country flag)" — accurate
+- Settings sublabels verified: "Your age (not date of birth) will appear on your public profile", "Your home country will appear on your public profile", "Displays your country flag next to your name (replaces home country flag)" — all clear and accurate.
+- Social & Links section header "Show your social profiles on your public page" — accurate.
+- SavedProfileCard detail line "Xy Zmo at sea · N yachts" — clear, matches existing patterns.
+- No misleading or inaccurate copy found.
 
 ## Visual Consistency
 
-- Endorsement cards: ghost and non-ghost use consistent layout. Ghost shows role from ghost_profile + "on Yacht". Non-ghost shows "Role on Yacht". Both have date on separate line.
-- Social link icons: consistent size, teal accent for interactive elements, dashed border for suggestion chips
-- Layout thumbnails: SVG wireframes are distinct and clearly represent each layout type
+- SavedProfileCard sea time line uses same text-xs text-tertiary styling as the cert line above it — consistent.
+- Social icons in settings match the same teal interactive color as other settings elements.
+- Platform suggestion chips use dashed border matching the design system pattern for "add more" affordances.
+- Profile layout SVG thumbnails are visually distinct and correctly represent each layout.
+- No visual inconsistencies found.
 
 ## Journey Tests
 
-| Journey | Steps | Result |
-|---------|-------|--------|
-| Ghost endorsement link → form → submit | Click shareable link → see form → type endorsement | Form renders correctly for shareable link (no email). Submit button present. |
-| Cancelled request link | Click link for cancelled request | Clean "Request cancelled" message |
-| Settings → add social → save → verify | Settings → tap chip → type URL → Add → Save → reload settings | Link persisted, suggestion chips updated |
-| Settings → delete social → save → verify | Settings → click × → save → reload | Link removed, platform re-appears as suggestion |
+- **Saved profiles journey:** Login → /app/network/saved → view saved profiles with sea time → click external link icon → lands on public profile. End-to-end works.
+- **Settings → public profile journey:** Edit settings (social links visible) → view public profile → social icons appear in hero. Consistent.
+- **CV preview journey:** Login → /app/cv/preview → full CV renders with all sections including endorsements query via getCvSections(). No data loss from query refactor.
+- **Attachment list journey:** Login → /app/attachment → all yachts listed with correct sea time durations using formatSeaTime from canonical location.
 
 ## Architecture Check
 
-- **Ghost auto-claim coverage:** Auth callback (OAuth/PKCE) + middleware (password login) + claim page (manual). Three paths cover all auth flows. Idempotent RPC, try-catch in middleware, 1yr cookie to prevent repeated calls.
-- **Social links save path:** Profile fields save via Supabase `.update()`, social links save via separate API route `/api/profile/social-links` (PATCH). Non-atomic but error toast is explicit about partial failure.
-- **Phone dedup:** Page-load check + API submit check both query `users.phone` via admin client. Partial index exists for performance.
+- **getCvSections() as canonical query:** CV preview now uses the same query helper as the public profile. Eliminates the stale inline query that was missing the ghost_endorser join.
+- **getPlatformIcon() centralization:** All social icon consumers route through one function. Adding a new platform requires one change in social-icons.tsx + one entry in social-platforms.ts.
+- **formatSeaTime canonical location:** lib/sea-time.ts is now the single source. The old duplicate in profile-summaries.ts is renamed to private formatSeaTimeCompact (used only within that file). No collision possible.
+- **SavedProfileCard sea time computation:** Computed server-side in page.tsx using attachment dates, mirroring SQL get_sea_time() logic. Potential drift risk if the SQL function changes, but acceptable.
+- No architecture gaps found.
 
-## Fixed (low/med — already applied)
+## Fixed (low/med — already applied in worktrees)
 
-None — no inline fixes needed during this QA pass.
+| # | Lane | File | What was wrong | What was fixed |
+|---|------|------|----------------|----------------|
+| — | — | — | None | None |
 
-## Escalated (high — needs resolution)
+## Escalated (high — needs worker fix)
 
-None.
-
-## Pre-existing issues (not introduced by these lanes)
-
-| # | File | Issue | Severity |
-|---|------|-------|----------|
-| 1 | `app/(public)/r/[token]/page.tsx` | `/r/{token}` route missing `status === 'accepted'` guard. Accepted requests show the endorsement form instead of an "already submitted" message. Users could re-submit on an already-accepted request. | MEDIUM |
-| 2 | `lib/validation/schemas.ts:177` | `socialLinksSchema` accepts `javascript:` URLs via `z.string().url()`. Needs `.refine(u => /^https?:\/\//.test(u))`. Pre-existing from overnight audit — noted in Lane 3 review. | CRITICAL (pre-existing) |
+| # | Lane | File | Issue | Impact | Recommendation |
+|---|------|------|-------|--------|----------------|
+| — | — | — | None | None | None |
 
 ## Backlog items created
 
-None new from QA — the pre-existing issues above were already noted in previous reviews.
+None.
 
 ## Discovered Issues
 
-- **[BUG]** `app/(public)/r/[token]/page.tsx` — Missing accepted-status guard allows re-submission on accepted requests. Suggest adding `if (request.status === 'accepted') { return <AlreadySubmitted /> }` after the cancelled check.
+_Problems found during QA that are out of scope for current lanes._
 
----
-
-**QA complete. All 3 lanes pass. Ready for logger → commit → push.**
+- **[NOTE]** Ghost endorser name display on CV preview could not be verified end-to-end with browser testing because the only ghost endorsement in the DB belongs to the founder's account (not a test account). Code path verified correct via code review (getCvSections includes ghost_endorser join at lib/queries/profile.ts:317). Full browser verification would require creating a test ghost endorsement for a seed account.

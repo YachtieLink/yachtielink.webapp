@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-02 (Rally 009 planned: 4 sessions, 18 pre-MVP items specced into lane-ready build plans. PRs #148-150 merged. 7 backlog items closed as resolved. /grill-me prep doc written.)
+**Last updated:** 2026-04-02 (Rally 009 Session 1 complete: 3 lanes shipped — mobile UX, P2 bugs, tech debt sweep. /grill-me done: all sessions unblocked. Branches ready to push.)
 
 ---
 
@@ -26,6 +26,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
+| Rally 009 Session 1 — mobile UX + P2 bugs + tech debt | 2026-04-02 | Tab-bar padding, CV preview canonical query, saved sea time, yacht prefix null guard, PDF home-country toggle, social icons dedup, formatSeaTime canonical, EndorsementsSection cleanup |
 | Skill hardening — review, tester, file ownership | 2026-04-02 | /yl-review zero-tolerance + two-step, /yl-tester agent, file ownership rules, cwd conventions, 7 chain gaps fixed |
 | Ghost join fix + ghost flow fixes | 2026-04-02 | ghost_endorser join, page-load check, auto-claim, phone dedup, migration (PR #148) |
 | Display polish — endorsement context + yacht prefix | 2026-04-02 | Endorser role+yacht on cards, M/Y S/Y prefix, toggle sublabels (PR #149) |
@@ -40,8 +41,9 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Rally 009 — Pre-MVP Polish** — 4 sessions, 18 items. Session 1 ready to launch (bugs + tech debt). See `sprints/rallies/rally-009-premvp-polish/README.md`
-2. **/grill-me sessions** — 3 design interviews needed to unblock Sessions 3-4 (Network, Profile, Insights, Photo redesigns). See `rally-009-premvp-polish/grill-me-prep.md`
+1. **Commit + push Rally 009 Session 1** — 3 branches ready (`fix/mobile-ux-fixes`, `fix/p2-bug-fixes`, `chore/tech-debt-sweep`). No merge order constraint.
+2. **Rally 009 Session 2** — CV restore data integrity (trackOverwrite, education dedup, etc.). After Session 1 merged.
+3. **Rally 009 Sessions 3-4** — Now unblocked by /grill-me decisions. See `rally-009-premvp-polish/grill-me-decisions-2026-04-02.md`.
 3. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
 4. **Rally 007 — Launch QA** — full checklist (after Rally 009 completes)
 5. **Deploy** — invite mode, 20-50 crew, 24h monitoring
@@ -63,7 +65,9 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | PR | Branch | Status | Notes |
 |----|--------|--------|-------|
-| — | — | No open PRs | PRs #148–150 merged. Rally 009 Session 1 queued. |
+| pending | fix/mobile-ux-fixes | ready to push | Lane 1: tab-bar padding + CV preview canonical query |
+| pending | fix/p2-bug-fixes | ready to push | Lane 2: saved sea time, yacht prefix null guard, PDF home-country toggle |
+| pending | chore/tech-debt-sweep | ready to push | Lane 3: social icons dedup, formatSeaTime, EndorsementsSection cleanup |
 
 ---
 

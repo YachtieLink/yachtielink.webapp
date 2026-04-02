@@ -26,7 +26,78 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-02 | Rally 009 /grill-me | Design interview: 42 Qs resolved, 5-tab UX audit, 9 additional fixes confirmed. All sessions unblocked. |
+| 2026-04-02 | Rally 009 Session 1 | 3-lane: mobile UX tab-bar padding + CV preview canonical query, P2 bugs (saved sea time, yacht prefix null guard, PDF home-country toggle), tech debt sweep (social icons dedup, formatSeaTime, EndorsementsSection) |
 | 2026-04-02 | Rally 009 planning | Full pre-MVP backlog triage: 30 items across 7 sessions specced into lane-ready build plans. 42 /grill-me questions prepped. 7 backlog items closed as resolved. Junior sprints updated. |
+
+## 2026-04-02 — Rally 009 /grill-me (Opus, Desktop + Chrome MCP)
+
+### Done
+- Ran full /grill-me design interview: 42 questions across 10 sections, all resolved with founder
+- **§1 Non-yachting:** Integrated timeline (not separate section), reverse chronological, anchor vs briefcase icon. 4-week overlap threshold. Recalc on next view.
+- **§2 Network:** Accordion (1 yacht expanded), keep 0/5 fraction format, auto-discovery + "invite crew" CTA, yacht search at bottom. Rich mini yacht cards, full navy wayfinding, beautiful endorsement quote cards.
+- **§3 Profile:** 4-group model confirmed (About/Personal/Career/Media). Sea time in hero + Career. Strength ring in hero card. CTA inside strength meter. CV Details move to Profile.
+- **§4 Insights:** "Who Viewed" pulled into Layer 1 (Pro). Profile Saves + View Source Breakdown added. Dashboard visual upgrade. Free tier gets career snapshot + coaching + blurred analytics.
+- **§5 Photos:** Unified page. AI enhancement IN as Pro feature. Focal point only (no adjustments). Pro contextual assignment (3 slots) IN.
+- **§6 Endorsements:** Ghost on invite, colleague-first, inline ghost suggestions, 1 nudge after 7 days.
+- **§7 Certs:** Auto-approve after 10+, new column alongside existing, separate entries per issuing authority (no aliases, captain decides equivalence, can flag "commonly accepted as X").
+- **§8 Reporting:** Profile + yacht reporting. Yacht = duplicate flagging tool. Email alerts on every report. Transfer experience feature. Endorsement dormant until both on same yacht.
+- **§9 Roadmap:** Fully in-app, 3-tab BuddyBoss pattern (Roadmap/Feature Requests/Released). No Canny. Equal votes. Populate with Phase 2+3.
+- **§10 Settings:** Keep 3 view modes. Phone/WhatsApp already built. Q10.3 superseded by §8 graph integrity.
+- **5-tab UX/IA audit** using parallel subagents. Found 7 cross-tab problems.
+- **UX fixes confirmed:** Hero card edit, rename "Endorse" → "Request", free Insights career snapshot, Saved Profiles → Network (bookmark icon), CV re-parse confirmation.
+- **CV restore gaps found:** 7 fields missing trackOverwrite, education creates duplicates, languages/travel docs silently replaced. All 4 fixes added to scope.
+- **Platform-wide rules established:** Back nav = previous context, visual bar = public profile, each tab owns its color, don't send users off-platform, endorsement = proof of co-service.
+
+### Context
+- Browsed localhost:3000 live via Chrome MCP throughout — Profile, CV, Insights, Network, More, public profiles (dev-qa + Charlotte Beaumont), endorsement request flow, settings page
+- Founder overrode recommendations on: Q1.1 (integrated timeline), Q2.3 (keep fraction), Q5.2 (AI enhancement in), Q5.4 (contextual photos in), Q7.3 (no aliases), Q8.2 (email alerts), Q9.1 (no Canny)
+
+### Next
+- Sessions 1-2 can proceed immediately (no blockers)
+- Sessions 3-4 now fully unblocked by these decisions
+- UX audit fixes should be scoped into sessions (likely Session 1 for quick wins, Session 3-4 for redesign items)
+- CV restore gaps are Session 2 scope (data integrity)
+
+### Flags
+- "Endorse" button is actively misleading users — rename is urgent, consider Session 1
+- CV re-parse can silently overwrite 7 fields — data safety issue for Session 2
+- Education creates duplicates on every re-parse — needs dedup before any user re-imports
+
+### Files
+- `sprints/rallies/rally-009-premvp-polish/grill-me-prep.md` — DECISION lines on all 42 Qs + UX audit summary
+- `sprints/rallies/rally-009-premvp-polish/grill-me-decisions-2026-04-02.md` — **NEW** clean decision summary (190 lines)
+- `sprints/rallies/rally-009-premvp-polish/ux-audit-2026-04-02.md` — **NEW** full 5-tab UX/IA audit
+
+---
+
+## 2026-04-02 — Rally 009 Session 1: Mobile UX + P2 Bug Fixes + Tech Debt Sweep
+
+### Done
+- **Lane 1 — fix/mobile-ux-fixes (PASS):** Added `pb-20 md:pb-0` bottom padding to app layout shell (`app/(protected)/app/layout.tsx`) — content now clears the fixed tab bar on all mobile app pages. Replaced stale inline query in CV preview (`app/(protected)/app/cv/preview/page.tsx`) with canonical `getCvSections()` which includes the `ghost_endorser` join and `yacht.id` field the inline query was missing.
+- **Lane 2 — fix/p2-bug-fixes (PASS, Round 1 fix):** Wired `seaTimeDays`/`yachtCount` through the full saved profiles stack — `page.tsx` computes sea time from attachment dates (JS mirrors `get_sea_time()` SQL), `SavedProfilesClient.tsx` passes props, `SavedProfileCard.tsx` renders "1y 6mo at sea · 2 yachts" detail line. Round 1 reviewer fix: added `Math.max(0, ...)` guard for negative-days edge case. Added null guard to `prefixedYachtName()` in `lib/yacht-prefix.ts` — unknown/null vessel types no longer get a misleading `M/Y` prefix. Fixed CV PDF path to respect `show_home_country` toggle — added field to `generate-pdf` route select + toggle check in `ProfilePdfDocument.tsx`.
+- **Lane 3 — chore/tech-debt-sweep (PASS):** Extracted `TikTokIcon` and `XIcon` to shared `components/ui/social-icons.tsx` — removed 3 inline duplicates across settings, SocialLinksRow, StepExtras. Created `lib/social-platforms.ts` with `SOCIAL_PLATFORM_META` — eliminated duplicate `PLATFORM_CONFIG`/`SOCIAL_PLATFORM_CONFIG` from settings and SocialLinksRow. Removed exported `formatSeaTime` from `lib/profile-summaries.ts` (made private as `formatSeaTimeCompact`); `app/(protected)/app/attachment/page.tsx` now imports from canonical `lib/sea-time.ts`. Cleaned `components/profile/EndorsementsSection.tsx` — fixed `yacht_id: string | null`, removed unused `endorser_id`, removed dead `currentUserId`/`isOwn` props.
+
+### Context
+- All 3 lanes /yl-review PASS. Lane 2 required 1 round (Math.max guard). Lanes 1 + 3 first-round pass.
+- QA: 15 tests, all PASS. No escalated issues. Ghost endorser CV join verified via code review (no test ghost endorsement in seed accounts for browser verification).
+- No migrations. No design decisions. All 3 branches independent — no merge order constraint.
+
+### Next
+1. Commit + push all 3 branches, create PRs, merge (in any order)
+2. Rally 009 Session 2 (after Session 1 merged)
+3. /grill-me decisions feed into Sessions 3-4 build plans
+
+### Flags
+- `SavedProfileCard` sea time mirrors `get_sea_time()` SQL in JS — potential drift if SQL function changes
+- `app/(protected)/app/attachment/page.tsx` has pre-existing `[auth-refetch]` drift-check warning — not introduced by this lane
+- `EndorsementsSection.tsx` has no active callers — effectively dead code, candidate for deletion
+
+### Backlog captured
+No new backlog items.
+
+---
+
 | 2026-04-02 | Skill hardening | Worktree system overhaul: /yl-review hardened (zero-tolerance, two-step Sonnet→Opus, cleanup gaps), /yl-tester created (dedicated QA agent), file ownership rules, cwd conventions, 7 chain gaps fixed |
 | 2026-04-02 | Worktree session | 3-lane: ghost join fix + ghost flow fixes (Opus, migration), endorsement + yacht display polish, interests + social links UX (PRs #148–150) |
 | 2026-04-02 | Worktree session | 3-lane: inner-page-header redesign, ghost profiles verify + GhostEndorserBadge, custom 404 + nationality flag (PRs #142–144) |

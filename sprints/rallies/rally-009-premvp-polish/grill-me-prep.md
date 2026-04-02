@@ -179,6 +179,8 @@ MEDIA: Profile Photo, Work Gallery
 
 **Question:** Is this grouping right? Any fields misplaced? Should Career include Sea Time or should that stay as a hero card stat?
 
+**DECISION:** Accepted recommendation. 4-group model confirmed. — 2026-04-02
+
 ### Q3.2: Sea time card placement
 
 **Options:**
@@ -187,6 +189,8 @@ MEDIA: Profile Photo, Work Gallery
 - **C) Both** — Summary in hero, detail in Career.
 
 **Recommendation:** C — summary number in hero card, detailed breakdown (by yacht, by role) in Career section.
+
+**DECISION:** Accepted recommendation. Both — summary in hero, detail in Career. — 2026-04-02
 
 ### Q3.3: Profile Strength repositioning
 
@@ -199,6 +203,8 @@ MEDIA: Profile Photo, Work Gallery
 
 **Recommendation:** A — compact ring in hero card. Clean, always visible, doesn't take extra space.
 
+**DECISION:** Accepted recommendation. Compact ring inside hero card. — 2026-04-02
+
 ### Q3.4: Sticky CTA format
 
 **Context:** Dynamic CTA based on profile state (<50%: "Complete profile", 50-80%: "Add photo", >80%: "Share profile").
@@ -210,6 +216,8 @@ MEDIA: Profile Photo, Work Gallery
 
 **Recommendation:** C — keeps it contained. Floating buttons are annoying on mobile. Banner is ignorable. Strength meter + CTA together make a clear "here's what to do next" widget.
 
+**DECISION:** Accepted recommendation. CTA inside Profile Strength area. — 2026-04-02
+
 ### Q3.5: CV Details relocation
 
 **Context:** CV Details (smoking preference, tattoo visibility, travel docs, driving license) currently live on the CV tab. Proposal: move to Profile tab under Personal Details.
@@ -217,6 +225,8 @@ MEDIA: Profile Photo, Work Gallery
 **Question:** Will users expect these on the Profile tab? Or should they stay on CV because they're CV-specific?
 
 **Recommendation:** Move to Profile. These are personal attributes, not CV formatting choices. The CV tab should be output-only (generated PDF, sharing controls).
+
+**DECISION:** Accepted recommendation. Move CV Details to Profile under Personal Details. CV tab becomes output-only. — 2026-04-02
 
 ---
 
@@ -235,6 +245,8 @@ MEDIA: Profile Photo, Work Gallery
 
 **Note:** Layer 1 (this session) only shows aggregate counts, so retention only matters when Layer 2 ships. But design the schema now so we don't need to migrate later.
 
+**DECISION:** Accepted recommendation (30d individual / aggregate forever). PLUS: "Who Viewed You" pulled into Layer 1 as Pro feature — show individual viewers (name, role, date) for last 30 days. Free users see blurred teaser. — 2026-04-02
+
 ### Q4.2: Free tier teaser — real or placeholder?
 
 **Options:**
@@ -244,11 +256,15 @@ MEDIA: Profile Photo, Work Gallery
 
 **Recommendation:** A — real count, blurred detail. Builds trust (real number) and creates desire (what's behind the blur).
 
+**DECISION:** Accepted recommendation. Real aggregate count, blurred detail for free tier. — 2026-04-02
+
 ### Q4.3: Search appearances — do we track this?
 
 **Question:** Is "search appearances" (how often the user appears in search results) currently tracked? If not, should we add it for Layer 1?
 
 **Recommendation:** Check if `record_profile_event('search_appearance')` exists. If yes, show it. If no, skip for Layer 1 — add in Layer 2 when we build search properly.
+
+**DECISION:** Accepted recommendation. Check if tracking exists, show if yes, skip if no. — 2026-04-02
 
 ### Q4.4: Cert Manager — where in More tab?
 
@@ -259,6 +275,8 @@ MEDIA: Profile Photo, Work Gallery
 
 **Recommendation:** A — under YOUR ACCOUNT. Keeps groups lean. Certs-as-documents are account management, not profile display.
 
+**DECISION:** Accepted recommendation. Cert Manager under YOUR ACCOUNT in More tab. — 2026-04-02
+
 ### Q4.5: Weekly digest opt-in
 
 **Question:** If/when we add a weekly insights email digest (Layer 5), should it be:
@@ -268,6 +286,14 @@ MEDIA: Profile Photo, Work Gallery
 **Recommendation:** A — opt-in. Less email = less annoyance. Better for a product that serves a community with trust at its core.
 
 **Note:** Not building this in Layer 1. Just need the decision to inform the More tab IA (where notification preferences live).
+
+**DECISION:** Accepted recommendation. Opt-in. Not building in Layer 1. — 2026-04-02
+
+**ADDITIONAL DECISIONS (§4):**
+- **"Who Viewed You" pulled into Layer 1** as Pro feature. Individual viewers (name, role, date) for last 30 days. Free users see blurred teaser.
+- **Profile Saves added to Layer 1.** "X people saved your profile" — already tracked, easy win.
+- **View Source Breakdown added to Layer 1.** Where views come from: direct link, public profile search, QR code scan.
+- **Insights dashboard visual upgrade.** Make it look cooler — richer metric cards, bold coral wayfinding, sparklines with personality. Same "make it beautiful" standard as Network redesign.
 
 ---
 
@@ -282,6 +308,8 @@ MEDIA: Profile Photo, Work Gallery
 
 **Recommendation:** A — same page. Two sections: "Profile Photo" (single photo + focal point + 3-format preview) and "Work Gallery" (grid). One page, complete photo management.
 
+**DECISION:** Accepted recommendation. Unified page with two sections. — 2026-04-02
+
 ### Q5.2: AI photo enhancement
 
 **Question:** Should we ship AI enhancement for MVP? If yes, which API?
@@ -293,11 +321,15 @@ MEDIA: Profile Photo, Work Gallery
 
 **Recommendation:** Skip for MVP. Focal point picker + smart crop covers 90% of the use case. AI enhancement is a Pro upsell feature for post-launch.
 
+**DECISION:** Override recommendation. Include AI photo enhancement as Pro feature for MVP. One-tap "Enhance" button, API integration (evaluate Claid.ai or similar). Brilliant upsell if quality is good. Need to pick API and test quality during build. — 2026-04-02
+
 ### Q5.3: Basic adjustments
 
 **Question:** Should the focal point picker also include brightness/contrast/crop adjustments?
 
 **Recommendation:** No. Keep it focal-point-only for MVP. The point is "tell us where your face is, we'll crop smart everywhere." Adjustments add complexity. Users have their own photo editors.
+
+**DECISION:** Accepted recommendation. Focal point only, no adjustments. — 2026-04-02
 
 ### Q5.4: Pro contextual assignment
 
@@ -312,6 +344,8 @@ MEDIA: Profile Photo, Work Gallery
 
 **Note:** For MVP, just one photo for all contexts. This question is for architecture planning only.
 
+**DECISION:** Include in MVP as Pro feature. Context-first UX: 3 labeled slots (Avatar Photo, Hero Photo, CV Photo), click to assign. Free users get 1 photo for all contexts. — 2026-04-02
+
 ### Q5.5: Migration backfill
 
 **Question:** If we add a `role` column to `user_photos`, how do we handle existing users?
@@ -319,6 +353,8 @@ MEDIA: Profile Photo, Work Gallery
 - **B) Run a backfill migration** — Set `role = 'profile'` where `sort_order = 0`
 
 **Recommendation:** B — explicit migration is safer. Don't rely on convention when a one-time SQL update takes 2 minutes to write.
+
+**DECISION:** Developer decision — not a founder question. Will use explicit migration. — 2026-04-02
 
 ---
 
@@ -337,6 +373,8 @@ Browse to `/app/endorsement/request` on localhost:3000 while asking these.
 
 **Recommendation:** A — ghost profiles are already built. Creating one on invite means the endorsement request is pre-linked.
 
+**DECISION:** Accepted recommendation. Create ghost profile on external invite. — 2026-04-02
+
 ### Q6.2: Yacht-first or colleague-first
 
 **Question:** Should the request flow be:
@@ -344,6 +382,8 @@ Browse to `/app/endorsement/request` on localhost:3000 while asking these.
 - **B) See all colleagues grouped by yacht** → pick who to request from
 
 **Recommendation:** B — shows the full picture. User may not remember which yacht a colleague was on.
+
+**DECISION:** Accepted recommendation. Colleague-first — show all grouped by yacht. — 2026-04-02
 
 ### Q6.3: Ghost profile suggestions prominence
 
@@ -354,6 +394,8 @@ Where should "Suggested (not on YachtieLink)" appear?
 
 **Recommendation:** C — most natural. Growth happens organically.
 
+**DECISION:** Accepted recommendation. Inline within yacht groups, tagged as "not on platform." — 2026-04-02
+
 ### Q6.4: Re-nudge limits
 
 If someone was requested and hasn't responded, how many reminders?
@@ -362,6 +404,8 @@ If someone was requested and hasn't responded, how many reminders?
 - **C) No limit, but rate-limited** (max 1 per week)
 
 **Recommendation:** A — one gentle nudge. Crew talk, being pushy hurts reputation.
+
+**DECISION:** Accepted recommendation. 1 reminder after 7 days, no more. — 2026-04-02
 
 ---
 
@@ -376,6 +420,8 @@ When unrecognized certs appear 10+ times, should they:
 
 **Recommendation:** C — ship fast, correct later. 20-50 invited crew are trusted.
 
+**DECISION:** Accepted recommendation. Auto-approve after 10+ appearances, flag for admin review. — 2026-04-02
+
 ### Q7.2: Existing certification_type_id migration
 
 - **A) Migrate to new registry** — repoint FK
@@ -384,6 +430,8 @@ When unrecognized certs appear 10+ times, should they:
 
 **Recommendation:** B — add new column. Don't break existing data.
 
+**DECISION:** Accepted recommendation. Add new column alongside existing. Don't break existing data. — 2026-04-02
+
 ### Q7.3: Regional cert variants
 
 AMSA (Australian) vs MCA (UK) naming:
@@ -391,6 +439,8 @@ AMSA (Australian) vs MCA (UK) naming:
 - **B) Separate entries per region**
 
 **Recommendation:** A — aliases. Same qualification, different regional names.
+
+**DECISION:** Override recommendation. Separate entries per issuing authority (MCA, AMSA, etc.). No aliases, no assumed equivalencies. Can flag with a note like "Commonly accepted as ENG1 equivalent" — but the decision is the captain's/flag state's, not the registry's. — 2026-04-02
 
 ---
 
@@ -404,6 +454,14 @@ Is this the right set? Anything missing or too granular?
 
 **Recommendation:** Good set. Keep as-is.
 
+**DECISION:** Report button on profiles AND yacht pages. Profile categories: fake profile, false employment claim, inappropriate content, harassment, spam, other. Yacht reporting is primarily a **duplicate flagging tool** — "This is the same vessel as [search]" feeds a merge queue. Yacht categories: duplicate yacht (primary — with search to select the other entry), incorrect details, other. The graph self-verifies through connection strength, so fake yachts aren't the real problem — duplicates fragmenting the graph are. — 2026-04-02
+
+**ADDITIONAL DECISIONS (§8):**
+- **Transfer experience feature needed.** User-initiated: move your employment attachment from one yacht node to another (e.g., from duplicate "Serenity" to correct "M/Y Serenity"). Dates, role, everything moves.
+- **Endorsement visibility on yacht transfer:** Endorsement is hidden until BOTH endorser and endorsee are attached to the same yacht node. Not deleted — dormant. Reappears automatically when the second person transfers or when admin merges the duplicates. No user confirmation needed — the graph state determines visibility.
+- **Colleague connections rebuild automatically** based on new shared yacht after transfer.
+- **This overrides Q10.3** — no "move endorsements?" dialog. The system handles it through graph consistency.
+
 ### Q8.2: Admin workflow
 
 - **A) Supabase dashboard** — view reports table directly. Zero dev.
@@ -411,6 +469,8 @@ Is this the right set? Anything missing or too granular?
 - **C) Email notifications** — reports trigger email to founder
 
 **Recommendation:** A for MVP. 20-50 users won't generate many reports.
+
+**DECISION:** Override recommendation. Email notification to founder on every report filed (who reported, who/what reported, category, notes). Could scale beyond 20-50 fast. No admin page needed yet, but alerts are non-negotiable. — 2026-04-02
 
 ---
 
@@ -426,6 +486,8 @@ Browse to `/app/more/roadmap` on localhost:3000.
 
 **Recommendation:** C — keep the roadmap page, add Canny for "Share your idea."
 
+**DECISION:** Override recommendation. Fully in-app, 3-tab pattern modeled on BuddyBoss: Roadmap (curated pipeline in columns — In Progress / Next / Committed but later), Feature Requests (user submissions with upvote + title + description + category), Released (shipped features). Sand section color. No external tools, users never leave the app. — 2026-04-02
+
 ### Q9.2: What to show on public roadmap
 
 **Show:** Endorsement writing assist, Smart cert matching, Network redesign, Crew search, Direct messaging, Yacht reviews, AI profile enhancement
@@ -434,11 +496,15 @@ Browse to `/app/more/roadmap` on localhost:3000.
 
 Is this the right split?
 
+**DECISION:** Populate roadmap with Phase 2 and Phase 3 features. No specific list curated now — pull from the phase plans when building. — 2026-04-02
+
 ### Q9.3: Pro weighted votes
 
 Should Pro users' votes count more?
 
 **Recommendation:** No. Equal votes. Weighted voting feels unfair and undermines community trust.
+
+**DECISION:** Accepted recommendation. Equal votes. No Pro weighting. — 2026-04-02
 
 ---
 
@@ -452,6 +518,8 @@ Confirm: remove scrim picker, accent color picker, template picker. Keep view mo
 
 **Recommendation:** Yes, remove them all.
 
+**DECISION:** Keep the 3 view mode options (Profile, Portfolio, Rich Portfolio). These are the "presentation is paid" Pro feature. No scrim/accent/template pickers exist — question was outdated. — 2026-04-02
+
 ### Q10.2: Phone/WhatsApp split
 
 - **A) Two separate fields** — Phone + WhatsApp, with "Same as phone" checkbox
@@ -459,6 +527,8 @@ Confirm: remove scrim picker, accent color picker, template picker. Keep view mo
 - **C) Keep single field** — label it "Phone / WhatsApp"
 
 **Recommendation:** A — two fields with checkbox. Cleanest.
+
+**DECISION:** Already built. Phone and WhatsApp are separate fields with individual "Show on profile" toggles. No change needed. — 2026-04-02
 
 ### Q10.3: Attachment transfer scope
 
@@ -469,30 +539,28 @@ When user corrects a yacht match, should endorsements transfer too?
 
 **Recommendation:** C — ask the user. The endorsement context may be yacht-specific.
 
+**DECISION:** Superseded by §8 yacht graph integrity decisions. Endorsement visibility is automatic based on graph state — hidden (dormant) until both parties are on the same yacht node. No user dialog needed. — 2026-04-02
+
 ---
 
-## Summary: All Questions (42 total)
+## Status: ALL QUESTIONS RESOLVED — 2026-04-02
 
-### Must answer before building (blocks sessions):
-- Q2.1: Network unified view layout
-- Q2.3: "0/5 endorsements" — is there a limit?
-- Q3.1: Profile section groupings
-- Q4.2: Free tier teaser approach
-- Q6.2: Yacht-first or colleague-first endorsement request
-- Q9.1: Canny vs in-app for feedback
+All 42 original questions answered. Additionally, a full UX/IA audit of all 5 tabs was conducted and produced 5 cross-tab fixes + 4 CV restore gap fixes.
 
-### Should answer but have safe defaults:
-- Q1.1-Q1.5: Non-yachting + overlapping dates
-- Q2.2, Q2.4-Q2.6: Network details
-- Q3.2-Q3.5: Profile details
-- Q4.1, Q4.3-Q4.5: Insights details
-- Q5.1-Q5.5: Photo details
-- Q6.1, Q6.3-Q6.4: Endorsement request details
-- Q7.1-Q7.3: Cert registry details
-- Q8.1-Q8.2: Reporting details
-- Q9.2-Q9.3: Roadmap details
-- Q10.1-Q10.3: Settings details
+### UX Audit — Additional Decisions (confirmed by founder)
 
-### Can defer entirely:
-- Q5.4: Pro contextual assignment UX (not building this session)
-- Q4.5: Weekly digest opt-in (not building this session)
+| # | Decision | Affects |
+|---|----------|---------|
+| UX1 | **Add tap-to-edit on Profile hero card** for name/role/handle. Remove "Edit profile & contact info" from More tab. | Profile, More |
+| UX2 | **Rename "Endorse" to "Request"** on Colleagues tab. | Network |
+| UX3 | **Free Insights: career snapshot + coaching + blurred analytics.** Sea time/yachts/certs/colleagues (always non-zero), Profile Strength coaching, then blurred real analytics with upgrade CTA. | Insights |
+| UX4 | **Move Saved Profiles to Network.** Bookmark icon in header → sub-page. Remove from More. | Network, More |
+| UX5 | **Confirmation dialog on CV re-parse.** | CV |
+| UX6a | **Add `trackOverwrite` to 7 missing fields** (location country/city, DOB, smoking, appearance, travel docs, languages). | CV import |
+| UX6b | **Add dedup for education** on re-parse (institution + qualification check). | CV import |
+| UX6c | **Languages: merge instead of replace** (dedup by name, append new). | CV import |
+| UX6d | **Travel docs: merge instead of replace** (union of existing + parsed). | CV import |
+
+### Full reference docs
+- `grill-me-decisions-2026-04-02.md` — clean summary table of all decisions
+- `ux-audit-2026-04-02.md` — full per-tab UX/IA audit with findings and ownership map
