@@ -1,7 +1,80 @@
 /**
- * Sea time formatting utility.
- * Used on: profile page (summary card), sea time breakdown page, public profile stat line.
+ * Sea time utilities.
+ * Used on: profile page (summary card), sea time breakdown page, public profile stat line,
+ * CV import wizard (overlap detection), profile summaries accordion.
  * Single source of truth — do not duplicate this logic.
+ */
+
+export interface DateRange {
+  start: Date
+  end: Date
+}
+
+/**
+ * Merge overlapping date ranges into a minimal union set.
+ * Returns non-overlapping ranges sorted by start date.
+ */
+export function mergeOverlappingRanges(ranges: DateRange[]): DateRange[] {
+  if (ranges.length === 0) return []
+  const valid = ranges.filter(r => r.start.getTime() <= r.end.getTime())
+  if (valid.length === 0) return []
+  const sorted = [...valid].sort((a, b) => a.start.getTime() - b.start.getTime())
+  const merged: DateRange[] = [{ start: new Date(sorted[0].start), end: new Date(sorted[0].end) }]
+  for (let i = 1; i < sorted.length; i++) {
+    const current = sorted[i]
+    const last = merged[merged.length - 1]
+    if (current.start.getTime() <= last.end.getTime()) {
+      if (current.end.getTime() > last.end.getTime()) {
+        last.end = new Date(current.end)
+      }
+    } else {
+      merged.push({ start: new Date(current.start), end: new Date(current.end) })
+    }
+  }
+  return merged
+}
+
+/**
+ * Calculate total sea time days from potentially overlapping date ranges.
+ * Uses union-based calculation to avoid double-counting overlapping periods.
+ */
+export function calculateSeaTimeDays(ranges: DateRange[]): number {
+  const merged = mergeOverlappingRanges(ranges)
+  return merged.reduce((total, r) => {
+    return total + Math.max(0, Math.floor((r.end.getTime() - r.start.getTime()) / 86_400_000))
+  }, 0)
+}
+
+/**
+ * Detect overlapping date range pairs.
+ * Returns each overlapping pair with the duration of the overlap in days.
+ * Generic so that subtypes (e.g. IndexedDateRange with cardIndex) are preserved in results.
+ */
+export function detectOverlaps<T extends DateRange>(ranges: T[]): Array<{
+  rangeA: T
+  rangeB: T
+  overlapDays: number
+}> {
+  const result: Array<{ rangeA: T; rangeB: T; overlapDays: number }> = []
+  for (let i = 0; i < ranges.length; i++) {
+    for (let j = i + 1; j < ranges.length; j++) {
+      const a = ranges[i]
+      const b = ranges[j]
+      const overlapStart = Math.max(a.start.getTime(), b.start.getTime())
+      const overlapEnd = Math.min(a.end.getTime(), b.end.getTime())
+      if (overlapStart < overlapEnd) {
+        const overlapDays = Math.floor((overlapEnd - overlapStart) / 86_400_000)
+        if (overlapDays > 0) {
+          result.push({ rangeA: a, rangeB: b, overlapDays })
+        }
+      }
+    }
+  }
+  return result
+}
+
+/**
+ * Sea time formatting utility.
  */
 
 export interface SeaTimeFormatted {
