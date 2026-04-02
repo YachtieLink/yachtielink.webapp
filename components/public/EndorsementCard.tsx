@@ -133,22 +133,20 @@ export function EndorsementCard({
                   {endorserName}
                 </p>
               )}
-              {endorserRole && (
+              {(endorserRole || yachtName) && (
                 <p className="text-xs text-[var(--color-text-secondary)] truncate">
                   {endorserRole}
-                </p>
-              )}
-              <p className="text-xs text-[var(--color-text-tertiary)]">
-                {yachtName && (
-                  <>
-                    {yachtId && onNavigate ? (
+                  {endorserRole && yachtName && ' on '}
+                  {yachtName && (
+                    yachtId && onNavigate ? (
                       <button onClick={() => onNavigate(`/app/yacht/${yachtId}`, yachtName)} className="hover:text-[var(--accent-500,#0f9b8e)] transition-colors">
                         {yachtName}
                       </button>
-                    ) : yachtName}
-                    {' · '}
-                  </>
-                )}
+                    ) : yachtName
+                  )}
+                </p>
+              )}
+              <p className="text-xs text-[var(--color-text-tertiary)]">
                 {formattedDate}
               </p>
             </div>

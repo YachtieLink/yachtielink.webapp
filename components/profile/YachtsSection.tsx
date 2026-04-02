@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { prefixedYachtName } from '@/lib/yacht-prefix'
 
 interface Attachment {
   id: string
@@ -69,15 +70,14 @@ export function YachtsSection({ attachments }: YachtsSectionProps) {
                 >
                   <div className="min-w-0">
                     <p className="font-medium text-sm text-[var(--color-text-primary)] truncate">
-                      {yacht?.name ?? 'Unknown yacht'}
+                      {prefixedYachtName(yacht?.name ?? 'Unknown yacht', yacht?.yacht_type)}
                     </p>
                     <p className="text-xs text-[var(--color-text-secondary)] truncate">
                       {att.role_label} · {formatDateRange(att.started_at, att.ended_at)}
                     </p>
-                    {yacht?.yacht_type && (
+                    {yacht?.flag_state && (
                       <p className="text-xs text-[var(--color-text-secondary)]">
-                        {yacht.yacht_type}
-                        {yacht.flag_state ? ` · ${yacht.flag_state}` : ''}
+                        {yacht.flag_state}
                       </p>
                     )}
                   </div>

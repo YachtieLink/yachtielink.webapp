@@ -9,6 +9,7 @@ interface Endorsement {
   content: string
   created_at: string
   yacht_id: string
+  role_label?: string | null
   endorser: {
     display_name: string | null
     full_name: string
@@ -64,10 +65,13 @@ export function EndorsementsSection({ endorsements, currentUserId }: Endorsement
               <p className="text-sm text-[var(--color-text-primary)] leading-relaxed">
                 &ldquo;{excerpt(e.content)}&rdquo;
               </p>
-              <p className="text-xs text-[var(--color-text-secondary)] mt-1">
+              <p className="text-xs font-medium text-[var(--color-text-secondary)] mt-1">
                 {endorserName}
-                {e.yachts ? ` · ${e.yachts.name}` : ''}
-                {' · '}{date}
+                {e.role_label && `, ${e.role_label}`}
+                {e.yachts && ` on ${e.yachts.name}`}
+              </p>
+              <p className="text-xs text-[var(--color-text-tertiary)]">
+                {date}
                 {isOwn && (
                   <Link
                     href={`/app/endorsement/${e.id}/edit`}

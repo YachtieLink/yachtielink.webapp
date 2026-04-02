@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { Anchor } from 'lucide-react'
 import { formatDate } from '@/lib/format-date'
+import { prefixedYachtName } from '@/lib/yacht-prefix'
 import type { PublicAttachment } from '@/lib/queries/types'
 
 interface ExperienceTileProps {
@@ -27,7 +28,7 @@ export function ExperienceTile({ attachments, handle, maxShow = 3 }: ExperienceT
             <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[var(--accent-500,#14b8a6)]" />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">
-                {att.yachts?.name ?? 'Unknown Yacht'}
+                {prefixedYachtName(att.yachts?.name ?? 'Unknown Yacht', att.yachts?.yacht_type)}
                 {att.role_label && <span className="font-normal text-[var(--color-text-secondary)]"> — {att.role_label}</span>}
               </p>
               {(att.started_at || att.ended_at) && (
