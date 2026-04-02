@@ -1,29 +1,17 @@
-# Session 4 — Insights Layer 1 + Photo Unification + More Tab
+# Session 4 — Insights Layer 1 + Photo Unification + CV Tab Redesign + Settings IA
 
 **Rally:** 009 Pre-MVP Polish
-**Status:** BLOCKED — needs /grill-me to resolve Insights privacy model + Photo UX decisions
-**Estimated time:** ~8 hours across 2-3 workers
-**Dependencies:** /grill-me session (Insights + Photo), Sessions 1-3 merged
-
----
-
-## ⚠️ OPEN QUESTIONS — Must resolve in /grill-me before building
-
-See `grill-me-prep.md` §4 (Insights) and §5 (Photo) for the full question list with recommendations.
-
-**Critical decisions:**
-1. Insights: Profile view retention window (GDPR) — 90 days? Configurable?
-2. Insights: Free tier teaser — blurred real data or placeholder?
-3. Photo: Work gallery location — within unified page or separate?
-4. Photo: AI enhancement — which API? Ship without for MVP?
-5. Photo: Pro contextual assignment UX — how does user pick which photo for which context?
+**Status:** READY TO BUILD
+**Estimated time:** ~10 hours across 2-3 workers
+**Dependencies:** Sessions 1-3 merged
+**Grill-me decisions applied:** §4 (Insights), §5 (Photos), UX3 (free insights), UX5 (CV re-parse confirmation)
 
 ---
 
 ## Lane 1: Insights Tab Layer 1 (Opus, high)
 
 **Branch:** `feat/insights-layer1`
-**Objective:** Transform Insights from sparse teaser cards into a real analytics dashboard. Move non-analytics features (cert manager, subscription) to More tab. Show real value to Pro users.
+**Objective:** Transform Insights from sparse teaser cards into a real analytics dashboard. Move non-analytics features (cert manager, subscription) to Settings tab. Show real value to Pro users. Make free users feel valued from day one.
 
 ### Current State
 
@@ -32,100 +20,159 @@ See `grill-me-prep.md` §4 (Insights) and §5 (Photo) for the full question list
 - `components/insights/UpgradeCTA.tsx` (131 lines) — founding member offer
 - Data: `get_analytics_timeseries()` + `get_analytics_summary()` RPCs
 
-### Target State
+### Target State — Pro User
 
 ```
-┌──────────────────────────────┐
-│ Career Insights         coral│
-├──────────────────────────────┤
-│ ┌──────────────────────────┐ │
-│ │ Profile Views      ▲ 23%│ │  ← Sparkline + trend indicator
-│ │ ████████▓▓ 47 this week │ │
-│ └──────────────────────────┘ │
-│ ┌────────────┐┌────────────┐ │
-│ │ Downloads  ││ Shares     │ │  ← Side-by-side metric cards
-│ │ 12 ▲ 8%   ││ 5 ▼ 2%    │ │
-│ └────────────┘└────────────┘ │
-│ ┌──────────────────────────┐ │
-│ │ Search Appearances    31 │ │  ← New metric (if tracking exists)
-│ └──────────────────────────┘ │
-│                              │
-│ [7d] [30d] [All time]       │  ← Time range selector
-│                              │
-│ ┌──────────────────────────┐ │
-│ │ 🔒 Who Viewed You       │ │  ← Pro teaser for Layer 2
-│ │ Upgrade to see who's    │ │
-│ │ looking at your profile │ │
-│ │ [Upgrade to Crew Pro]   │ │
-│ └──────────────────────────┘ │
-└──────────────────────────────┘
+┌─────────────────────────────────┐
+│ Career Insights           coral │
+├─────────────────────────────────┤
+│ [7d]  [30d]  [All time]        │
+│                                 │
+│ ┌─────────────────────────────┐ │
+│ │ Profile Views       ▲ 23%  │ │  Hero metric — big, bold
+│ │ ████████▓▓▓  449 this month│ │  Sparkline with coral fill
+│ └─────────────────────────────┘ │
+│                                 │
+│ ┌────────────┐ ┌──────────────┐ │
+│ │ Downloads  │ │ Shares       │ │  Side-by-side stat cards
+│ │ 12  ▲ 8%  │ │ 5   ▼ 2%    │ │
+│ └────────────┘ └──────────────┘ │
+│ ┌────────────┐ ┌──────────────┐ │
+│ │ Saves      │ │ Sources      │ │  NEW metrics (Q4 decisions)
+│ │ 7  ▲ 40%  │ │ 60% direct   │ │
+│ └────────────┘ └──────────────┘ │
+│                                 │
+│ WHO VIEWED YOU            Pro   │  NEW — pulled into Layer 1 (Q4.1)
+│ ┌─────────────────────────────┐ │
+│ │ James W. · Captain          │ │  Real viewer cards
+│ │    Viewed 2 days ago       │ │
+│ │ Charlotte B. · Ch Stew      │ │
+│ │    Viewed 5 days ago       │ │
+│ │ See all 12 viewers →       │ │
+│ └─────────────────────────────┘ │
+└─────────────────────────────────┘
+```
+
+### Target State — Free User (UX3)
+
+```
+┌─────────────────────────────────┐
+│ Career Insights           coral │
+├─────────────────────────────────┤
+│ YOUR PROFESSIONAL FOOTPRINT     │
+│ ┌────────┐ ┌────────┐ ┌──────┐ │
+│ │ 11y 4m │ │   11   │ │  10  │ │  Career snapshot (always non-zero)
+│ │Sea Time│ │ Yachts │ │Certs │ │
+│ └────────┘ └────────┘ └──────┘ │
+│                                 │
+│ PROFILE STRENGTH                │
+│ ┌─────────────────────────────┐ │
+│ │ 70% — Standing out         │ │  Coaching widget
+│ │ Next: Add a profile photo  │ │
+│ │ [Add photos]               │ │
+│ └─────────────────────────────┘ │
+│                                 │
+│ ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┐ │
+│ │ Profile Views      ░░░░░  │ │  Blurred real analytics
+│ │ ░░░░░░░░░░░  ░░░ this mo  │ │
+│ │                             │ │
+│ │ Downloads ░░  Shares ░░   │ │
+│ │                             │ │
+│ │ WHO VIEWED YOU              │ │
+│ │ ░░░░░░░░░░░░░░░░░░░░░░   │ │
+│ └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┘ │
+│                                 │
+│ ┌─────────────────────────────┐ │
+│ │ See who's viewing your     │ │  Upgrade CTA
+│ │ profile and what's working │ │
+│ │ [Upgrade to Crew Pro]      │ │
+│ └─────────────────────────────┘ │
+└─────────────────────────────────┘
 ```
 
 ### Tasks
 
-#### Task 1: Move Cert Manager + Subscription to More Tab
+#### Task 1: Move Cert Manager + Subscription to Settings Tab
 
 Remove from Insights page:
 - Cert Document Manager card
 - Crew Pro subscription/plan card
 
-These move to More tab (Lane 3 handles receiving them).
+These move to Settings tab (Lane 3 handles receiving them).
 
 **Files:**
 - `app/(protected)/app/insights/page.tsx` — remove sections
 - Cert manager component — identify and note for Lane 3
 
-#### Task 2: Enhanced Analytics Cards
+#### Task 2: Enhanced Analytics Cards + Dashboard Visual Upgrade
 
-Replace current basic cards with richer metric components:
+Replace current basic cards with richer metric components. "Make it look cooler" — bold coral wayfinding, sparklines with personality (grill-me NEW decision).
 
 New component: `components/insights/MetricCard.tsx`
-- Metric value (large number)
-- Trend indicator (▲/▼ percentage vs previous period)
-- Sparkline chart (7 data points for weekly, 30 for monthly)
-- Coral accent color
+- Metric value (large number, `text-2xl font-bold`)
+- Trend indicator (▲/▼ percentage vs previous period, green up / red down)
+- Sparkline chart with coral fill (7 data points for weekly, 30 for monthly)
 - Responsive: full-width on mobile, 2-up grid where space allows
+- Label: `text-sm text-secondary`
 
 **Metrics to show (Layer 1):**
-- Profile Views — already tracked via `record_profile_event('profile_view')`
+- Profile Views — already tracked via `record_profile_event('profile_view')` — **hero metric** (large card, top position)
 - PDF Downloads — already tracked via `record_profile_event('pdf_download')`
 - Link Shares — already tracked via `record_profile_event('link_share')`
-- Search Appearances — check if tracked; if not, add tracking in public profile search results
+- Profile Saves — already tracked — **NEW** (grill-me decision). "X people saved your profile."
+- View Source Breakdown — **NEW** (grill-me decision). Where views come from: direct link, public profile search, QR code.
+- Search Appearances — check if tracked; if yes show, if no skip (Q4.3)
 
-#### Task 3: Time Range Selector
+#### Task 3: Who Viewed You — Pro Feature (Q4.1 NEW)
 
-Enhance existing time range selector:
-- Pill-style toggle: 7d | 30d | All time
+Pulled from Layer 2 into Layer 1 as a Pro-only feature.
+
+- Individual viewers: name, role, date — last 30 days
+- Individual viewer data retained 30 days, aggregate forever
+- Shown as a list of person rows below the metric cards
+- "See all X viewers" progressive disclosure link
+- Free users see blurred teaser of the section
+
+New component: `components/insights/WhoViewedYou.tsx`
+
+#### Task 4: Time Range Selector
+
+Pill-style toggle: 7d | 30d | All time
 - Affects all metric cards simultaneously
 - Persist selection in URL search params (so back button preserves it)
 - Default: 30d
 
-#### Task 4: Free Tier Experience
+#### Task 5: Free Tier Experience (UX3)
 
-Free users see:
-- Profile views sparkline with blurred/grayed overlay
-- Real count visible but no trend or details
-- "Upgrade to Crew Pro to see detailed analytics" CTA
-- Founding member pricing if applicable
-- Teaser card for "Who Viewed You" (Layer 2, Pro only)
+Free users see (top to bottom):
+1. **Career snapshot stats** — sea time, yachts, certs (always non-zero after CV parse). These are real numbers the user earned. Three stat cards in a row.
+2. **Profile Strength coaching widget** — percentage ring, next action CTA. Coaching that helps them improve.
+3. **Blurred real analytics** — profile views, downloads, shares, saves, who viewed you. Real aggregate count visible but detail blurred. Honest approach builds trust and creates desire.
+4. **Upgrade CTA** — "See who's viewing your profile and what's working" + [Upgrade to Crew Pro]. Founding member pricing if applicable.
 
-**Don't show fake data.** Show real aggregate count, blur the detail. Users trust real numbers.
+The tab is useful from day one. No dead tab. No paywall wall.
 
-#### Task 5: Coral Section Color
+#### Task 6: Coral Section Color + Visual Quality
 
-Apply coral wayfinding throughout:
+Apply coral wayfinding throughout — same commitment as CV tab with amber:
 - Page background: `var(--color-coral-50)`
-- Metric card accents: `var(--color-coral-500)` for sparkline bars
-- Trend positive: `var(--color-coral-700)`
-- Headers: coral text accents
-- Cards: `var(--color-surface)` base
+- Metric card sparklines: `var(--color-coral-500)` fill
+- Trend positive: green, trend negative: red
+- Section headers: coral text accents
+- Cards: `var(--color-surface)` base (never section-colored card bg)
+- Loading skeleton: coral pulse animation
+- Use section colors from `lib/section-colors.ts` — never hardcode hex
+
+**Quality bar:** Compare output to Charlotte's public profile. Metrics should feel like achievements, charts should have personality. Not clinical.
 
 **Allowed files:**
 - `app/(protected)/app/insights/page.tsx` — rewrite
 - `components/insights/MetricCard.tsx` — new
+- `components/insights/WhoViewedYou.tsx` — new
 - `components/insights/AnalyticsChart.tsx` — enhance or replace
 - `components/insights/UpgradeCTA.tsx` — update
 - `components/insights/TimeRangeSelector.tsx` — new
+- `components/insights/CareerSnapshot.tsx` — new (free tier)
 - `lib/section-colors.ts` (read only)
 
 **Forbidden files:**
@@ -137,7 +184,7 @@ Apply coral wayfinding throughout:
 ## Lane 2: Photo Management Unification (Opus, high)
 
 **Branch:** `feat/unified-photos`
-**Objective:** Merge 3 fragmented photo pages into one unified experience. One photo used everywhere with focal point control.
+**Objective:** Merge 3 fragmented photo pages into one unified experience. One photo used everywhere with focal point control. AI enhancement for Pro. Contextual photo assignment for Pro.
 
 ### Current State
 
@@ -149,36 +196,44 @@ Apply coral wayfinding throughout:
 
 ### Target State
 
-One page: `/profile/photos/page.tsx` with two sections:
+One page: `/profile/photos/page.tsx` with profile photo section + work gallery section. Pro users get AI enhancement + contextual assignment.
 
 ```
-┌──────────────────────────────┐
-│ Your Photos            teal  │
-├──────────────────────────────┤
-│ PROFILE PHOTO                │
-│ ┌─────────────────────────┐  │
-│ │ [Current photo]         │  │  ← Large preview
-│ │                         │  │
-│ │  ⊕ Set focal point     │  │
-│ └─────────────────────────┘  │
-│                              │
-│ Preview:                     │
-│ ┌───┐ ┌─────────┐ ┌────┐   │
-│ │ ○ │ │ 16:9    │ │ □  │   │  ← 3-format live preview
-│ │   │ │ Hero    │ │ CV │   │     (circle, wide, square)
-│ └───┘ └─────────┘ └────┘   │
-│                              │
-│ [Upload new photo]           │
-│                              │
-│ ─────────────────────────── │
-│                              │
-│ WORK GALLERY                 │
-│ ┌────┐ ┌────┐ ┌────┐       │  ← Drag-reorder grid
-│ │    │ │    │ │ +  │       │
-│ └────┘ └────┘ └────┘       │
-│ 2/3 photos (Free)           │
-│ [Upgrade for 15 photos]     │
-└──────────────────────────────┘
+┌──────────────────────────────────┐
+│ Your Photos              teal    │
+├──────────────────────────────────┤
+│ PROFILE PHOTO                    │
+│ ┌─────────────────────────────┐  │
+│ │ [Current photo]             │  │  Large preview
+│ │                             │  │
+│ │  Set focal point            │  │
+│ │  [Enhance] Pro              │  │  ← AI enhancement (Q5.2)
+│ └─────────────────────────────┘  │
+│                                  │
+│ Preview:                         │
+│ ┌───┐ ┌─────────┐ ┌────┐       │
+│ │ ○ │ │ 16:9    │ │ □  │       │  3-format live preview
+│ │   │ │ Hero    │ │ CV │       │  (circle, wide, square)
+│ └───┘ └─────────┘ └────┘       │
+│                                  │
+│ CONTEXT ASSIGNMENT         Pro   │  ← Pro contextual (Q5.4)
+│ ┌──────────┐┌──────────┐┌─────┐ │
+│ │ Avatar   ││ Hero     ││ CV  │ │  3 labeled slots
+│ │ [photo]  ││ [photo]  ││[ph] │ │  Click to assign
+│ └──────────┘└──────────┘└─────┘ │
+│ Free: 1 photo for all contexts   │
+│                                  │
+│ [Upload new photo]               │
+│                                  │
+│ ─────────────────────────────── │
+│                                  │
+│ WORK GALLERY                     │
+│ ┌────┐ ┌────┐ ┌────┐           │  Drag-reorder grid
+│ │    │ │    │ │ +  │           │
+│ └────┘ └────┘ └────┘           │
+│ 2/3 photos (Free)               │
+│ [Upgrade for 15 photos]         │
+└──────────────────────────────────┘
 ```
 
 ### Tasks
@@ -199,8 +254,8 @@ Top of page: single profile photo management.
 - All three previews update in real-time as focal point moves
 - Upload/replace button
 
-**Free tier:** 1 profile photo, focal point editing.
-**Pro tier:** Future — 3 photos with context assignment (not built in this session, just leave the architecture open).
+**Free tier:** 1 profile photo, focal point editing, 1 photo for all contexts.
+**Pro tier:** Multiple photos with contextual assignment (Task 4), AI enhancement (Task 5).
 
 #### Task 3: 3-Format Preview Component
 
@@ -208,12 +263,36 @@ New component: `components/profile/PhotoFormatPreview.tsx`
 - Takes: photo URL, focal point coordinates (x%, y%)
 - Renders 3 containers side by side:
   - Circle (64px diameter) — avatar use
-  - 16:9 rectangle (160×90) — hero/OG use
-  - Square (90×90) — CV/PDF use
+  - 16:9 rectangle (160x90) — hero/OG use
+  - Square (90x90) — CV/PDF use
 - Each applies `object-position` based on focal point
 - Updates live as focal point changes
 
-#### Task 4: Work Gallery Section
+#### Task 4: Pro Contextual Photo Assignment (Q5.4 — included in MVP)
+
+Pro users can assign different photos to different contexts. Context-first UX:
+
+- 3 labeled slots: Avatar, Hero, CV
+- Click a slot to assign a photo from their uploaded photos
+- Visual: each slot shows the photo cropped to its aspect ratio
+- Free users see the 3 slots but they all show the same photo with a note: "1 photo for all contexts. Upgrade for context-specific photos."
+
+New component: `components/profile/ContextAssignment.tsx`
+
+#### Task 5: AI Photo Enhancement (Q5.2 — included as Pro MVP feature)
+
+One-tap "Enhance" button on any photo. Pro-only feature.
+
+- Evaluate API integration (Claid.ai or similar)
+- Button appears on profile photo and gallery photos
+- Shows before/after preview
+- User confirms before saving enhanced version
+- Free users see the button grayed with Pro badge
+- Brilliant upsell — tangible value users can see immediately
+
+New component: `components/profile/PhotoEnhance.tsx`
+
+#### Task 6: Work Gallery Section
 
 Below profile photo: work gallery.
 - Existing drag-reorder grid (from current photos page)
@@ -221,18 +300,18 @@ Below profile photo: work gallery.
 - Free: 3 photos / Pro: 15 photos limit display
 - Remove yacht-tagging complexity for now (simplify)
 
-#### Task 5: Migration (if needed)
+#### Task 7: Migration — Explicit Backfill (Q5.5)
+
+Explicit migration, not convention (decided by founder).
 
 If `user_photos` doesn't already have a `role` column:
 ```sql
 ALTER TABLE public.user_photos ADD COLUMN role TEXT DEFAULT 'gallery';
 ```
 
-Mark the first user photo as `role = 'profile'`, rest as `role = 'gallery'`.
+Run a backfill migration: mark the first user photo as `role = 'profile'`, rest as `role = 'gallery'`. Do not rely on sort order convention.
 
-**Check first** — if photos are already distinguished by order (first = profile), skip migration and use convention.
-
-#### Task 6: Update Consumers
+#### Task 8: Update Consumers
 
 All places that display the user's avatar/photo need to use the focal point:
 - `ProfileAvatar` or equivalent — apply `object-position: {focalX}% {focalY}%`
@@ -247,6 +326,8 @@ All places that display the user's avatar/photo need to use the focal point:
 - `app/(protected)/app/profile/photo/page.tsx` — remove or redirect (if exists)
 - `components/profile/FocalPointPicker.tsx` — enhance
 - `components/profile/PhotoFormatPreview.tsx` — new
+- `components/profile/ContextAssignment.tsx` — new
+- `components/profile/PhotoEnhance.tsx` — new
 - `components/profile/PhotoGallery.tsx` — may refactor
 - `components/profile/ProfileAvatar.tsx` — focal point
 - `components/pdf/ProfilePdfDocument.tsx` — focal point
@@ -258,66 +339,137 @@ All places that display the user's avatar/photo need to use the focal point:
 
 ---
 
-## Lane 3: More Tab Completion (Sonnet, medium)
+## Lane 3: CV Tab Redesign + Settings IA (Sonnet, medium)
 
-**Branch:** `chore/more-tab-final`
-**Objective:** Receive Cert Manager + Subscription from Insights. Finalize More tab IA.
+**Branch:** `chore/cv-settings-final`
+**Objective:** Make CV tab output-only (Q3.5). Receive Cert Manager + Subscription in Settings. Finalize Settings IA to match design guide.
 
-### Tasks
+### CV Tab Tasks
 
-#### Task 1: Receive Cert Manager
+#### Task 1: CV Tab Becomes Output-Only (Q3.5)
 
-Move the Cert Document Manager component from Insights to More tab under YOUR ACCOUNT or a new DOCUMENTS group.
-- Component may need minor restyling (coral → sand accent)
+CV tab is now a document hub — generate, preview, download, share. No data entry.
+
+- Remove CV Details section (moved to Profile under Personal Details in Session 3)
+- Remove any inline editing of experience/cert data
+- CV is built from Profile data — make this clear with an education card
+
+#### Task 2: Rename "Visitor Downloads" to "Sharing"
+
+Per design guide: rename the download permission section.
+
+- New label: "Sharing"
+- New copy: "Who can download from your public profile?"
+- Radio options: No download / YachtieLink CV / Your uploaded CV
+
+#### Task 3: Education Card — Link to Profile
+
+Add a card that helps users understand the output-only model:
+
+```
+┌─────────────────────────────┐
+│ Your CV is built from your  │
+│ profile. Edit your          │
+│ experience and certs on the │
+│ Profile tab.                │
+│ [Go to Profile]             │
+└─────────────────────────────┘
+```
+
+#### Task 4: Re-Parse Confirmation Dialog (UX5)
+
+"Update from new CV" button must show a confirmation dialog before proceeding:
+
+- Dialog text: "This will re-parse your CV and may overwrite edits you've made. Continue?"
+- Two buttons: Cancel (default/safe) and Continue (destructive action)
+- Amber warning treatment on the re-parse card: caution icon, clear copy about overwrite risk
+
+#### Task 5: Template Picker — Collapse to Single Line
+
+Per design guide: template picker is not a full radio group.
+
+- Collapsed format: "Standard . Change" — single line
+- Tap "Change" to expand picker inline
+- Secondary UI element, not competing with primary actions
+
+### Settings Tab Tasks
+
+#### Task 6: Receive Cert Manager
+
+Move the Cert Document Manager component from Insights to Settings tab under ACCOUNT group.
+- Component may need minor restyling (coral accent to sand accent)
 - Keep all functionality intact
 
-#### Task 2: Receive Subscription Card
+#### Task 7: Receive Subscription Card
 
-Move the subscription/plan management from Insights to More tab.
-- Place under BILLING group (already exists)
+Move the subscription/plan management from Insights to Settings tab.
+- Place under PLAN group
 - Merge with existing plan display
+- Show Pro value — not just what you're paying, but what you're getting
 - Ensure Stripe portal link still works
 
-#### Task 3: Final IA
+#### Task 8: Settings IA — Match Design Guide
 
-Complete the IA from Session 2 prep:
+Update Settings page IA to match the design guide exactly. Five groups:
+
 ```
-YOUR ACCOUNT
-  Login & Security
-  Cert Documents              ← NEW (from Insights)
-  Data Export
-  Delete Account
+ACCOUNT
+  Login & security           >
+  Cert Documents             >   <- From Insights
+  Data export (GDPR)         >   <- Renamed from "Download my data"
 
-YOUR PROFILE
-  Edit Profile & Contact
-  Display Settings
-  Visibility
-
-BILLING
-  Current Plan                ← ENHANCED (merged with Insights subscription)
-  Manage Subscription         ← Stripe portal link
-
-SAVED
-  Saved Profiles
+PLAN
+  Crew Pro . Monthly         >
+  Renews 1 Jan 2030
+  Pro features: 3 photos,
+  15 gallery, analytics,
+  premium templates
 
 APP
-  Appearance (coming soon)
-  Feature Roadmap
+  Appearance (dark mode)     >
+  Notifications (coming soon)
+
+COMMUNITY
+  Feature Roadmap & Ideas    >   <- BuddyBoss 3-tab pattern (§9)
+  Report a problem           >
 
 LEGAL
-  Terms of Service
-  Privacy Policy
+  Terms of Service           >
+  Privacy Policy             >
 
-[SIGN OUT]
+Sign out                         <- Quiet text link
+
+─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+Delete my account            >   <- Isolated danger zone
 ```
 
-#### Task 4: Sand Section Color (if not done in Session 2)
+**Removed rows:**
+- "Edit profile & contact info" — removed entirely, Profile tab handles all editing (UX1, Session 3)
+- "Saved Profiles" — moved to Network tab (UX4, Session 3)
 
-Verify sand wayfinding is applied. If Session 2 Lane 3 already did this, skip.
+**Added rows:**
+- Cert Documents (from Insights)
+- Feature Roadmap & Ideas under COMMUNITY (§9 decision — in-app, BuddyBoss 3-tab pattern)
+
+**Renamed:**
+- Tab label: "More" to "Settings"
+- "Download my data" to "Data export (GDPR)"
+
+#### Task 9: Sand Section Color (if not done in Session 2)
+
+Verify sand wayfinding is applied throughout:
+- Page background: `var(--color-sand-50)`
+- Group header accents: sand
+- Pro badges: sand accent
+- Row accents: sand
+- Mini profile card at top for user context
+- Icons on every group header for visual wayfinding
 
 **Allowed files:**
-- `app/(protected)/app/more/page.tsx`
+- `app/(protected)/app/more/page.tsx` — rewrite
+- `app/(protected)/app/cv/page.tsx` — rewrite for output-only
 - Cert manager component (moved from insights)
+- Subscription component (moved from insights)
 
 **Forbidden files:** Everything else.
 
@@ -326,11 +478,23 @@ Verify sand wayfinding is applied. If Session 2 Lane 3 already did this, skip.
 ## Exit Criteria
 
 - Insights tab shows real analytics with sparkline charts and trend indicators
-- Free users see teaser with real aggregate data (not fake numbers)
-- Pro users see detailed analytics with time range selector
+- "Who Viewed You" shows in Layer 1 as Pro feature with individual viewer cards
+- Profile Saves and View Source Breakdown metrics are displayed
+- Dashboard looks beautiful — bold coral, sparklines with personality, matches Charlotte quality bar
+- Free users see career snapshot (sea time/yachts/certs) + Profile Strength coaching + blurred real analytics
+- Free Insights tab is useful from day one — no dead tab
 - Cert Manager and Subscription no longer on Insights tab
 - Photo management is one unified page with profile photo + gallery sections
+- AI photo enhancement available as Pro feature with one-tap enhance
+- Pro contextual photo assignment works with 3 labeled slots (Avatar, Hero, CV)
+- Photo migration uses explicit backfill (not convention)
 - Focal point picker shows 3-format live preview
 - All avatar/hero/CV consumers respect focal point
-- More tab is complete with all items properly organized
+- CV tab is output-only — no data entry, education card links to Profile
+- "Visitor Downloads" renamed to "Sharing"
+- Re-parse shows confirmation dialog before proceeding
+- Template picker collapsed to single line
+- Settings IA uses 5 groups: Account, Plan, App, Community, Legal
+- "Edit profile" and "Saved Profiles" removed from Settings
+- Feature Roadmap under Community section
 - All three pages use correct section color wayfinding (coral, teal, sand)

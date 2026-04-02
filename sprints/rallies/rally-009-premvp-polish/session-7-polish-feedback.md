@@ -1,9 +1,10 @@
-# Session 7 — Desktop Polish + Feedback + Settings
+# Session 7 — Desktop Polish + Roadmap + Settings + Cross-Cutting
 
 **Rally:** 009 Pre-MVP Polish
-**Status:** BLOCKED — needs /grill-me for roadmap/feedback decisions
+**Status:** Ready (all grill-me decisions resolved)
 **Estimated time:** ~6 hours across 3 workers
 **Dependencies:** Sessions 1-6 merged (all features built, this is final polish)
+**Grill-me decisions applied:** §9 (Q9.1–Q9.3), §10 (Q10.1–Q10.3), Platform-Wide Rules
 
 ---
 
@@ -70,43 +71,44 @@ Verify that all responsive breakpoints use the same Tailwind `md:` and `lg:` con
 
 ---
 
-## Lane 2: Roadmap + Feedback Mechanism (Sonnet, high)
+## Lane 2: Roadmap + Feedback — In-App 3-Tab BuddyBoss Pattern (Sonnet, high)
 
 **Branch:** `feat/roadmap-feedback`
-**Objective:** Enhance the existing roadmap page with interactive feedback. Give users a voice. Show them what's coming to build excitement.
+**Objective:** Build a fully in-app roadmap and feedback system. Users never leave the app. Modeled on the BuddyBoss 3-tab pattern. Sand section color.
 
 ### Current State
 - `/app/more/roadmap/page.tsx` exists with 10 hardcoded items (5 shipped, 5 planned)
 - Email link for feature suggestions: `mailto:hello@yachtie.link`
 - No voting, no interactive feedback
 
-### Target State
+### Target State — 3-Tab In-App Pattern (Q9.1)
 
-Two options depending on /grill-me decision:
+No external tools (Canny, Nolt, etc.) — users never leave the app (Platform-Wide Rule).
 
-#### Option A: External Tool (Canny/Nolt) — Recommended for MVP
+**Tab 1: Roadmap** — Curated pipeline managed by the team
+- **In Progress** — features currently being built
+- **Next** — features committed and coming soon
+- **Committed (Later)** — features confirmed but further out
 
-- Keep existing roadmap page as curated "What's Coming" showcase
-- Add "Share Your Ideas" section at bottom linking to external board
-- Set up Canny (or chosen tool) with YachtieLink branding
-- SSO integration so logged-in users auto-authenticate on feedback board
+**Tab 2: Feature Requests** — User-submitted ideas with community voting
+- Submit: title + description + category
+- Upvote toggle (one vote per user, equal weight — no Pro weighting per Q9.3)
+- Sort by votes / newest
+- Categories TBD (e.g., Profile, Network, CV, Insights, General)
 
-**Minimal code changes:**
-- Update roadmap page copy
-- Add link/embed for external board
-- Configure Canny SSO (API key + user token generation)
+**Tab 3: Released** — Shipped features (celebration + transparency)
+- Recently shipped features with brief descriptions
+- Shows users their votes mattered
 
-#### Option B: In-App Build
+### Migration (Required)
 
-Full in-app feature voting:
-
-**Migration:**
 ```sql
 CREATE TABLE public.feature_suggestions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   title TEXT NOT NULL CHECK (char_length(title) BETWEEN 5 AND 100),
   description TEXT CHECK (char_length(description) <= 1000),
+  category TEXT CHECK (category IN ('profile', 'network', 'cv', 'insights', 'general')),
   status TEXT DEFAULT 'suggested' CHECK (status IN ('suggested', 'under_review', 'planned', 'in_progress', 'shipped', 'declined')),
   vote_count INT DEFAULT 1,
   created_at TIMESTAMPTZ DEFAULT now()
@@ -121,20 +123,58 @@ CREATE TABLE public.feature_votes (
 );
 ```
 
-**Pages:**
-- `/app/more/roadmap` — enhanced with Now/Next/Later columns + Shipped section
-- `/app/more/roadmap/suggest` — suggestion form (title + description)
-- Voting: upvote button per feature, one vote per user, toggle on/off
-
-### Task 1: Roadmap Page Redesign
-
-Regardless of Option A or B, update the roadmap page:
+### Task 1: Roadmap Page — 3-Tab Layout
 
 **Layout:**
 ```
 ┌──────────────────────────────┐
-│ What's Coming           sand │
+│ Feature Roadmap         sand │
 ├──────────────────────────────┤
+│ [Roadmap] [Requests] [Shipped]│  ← 3-tab segment control
+│                              │
+│ ── Tab 1: Roadmap ────────── │
+│                              │
+│ IN PROGRESS             🔧  │
+│ ┌──────────────────────────┐ │
+│ │ Endorsement Writing Help │ │
+│ │ Smart Cert Matching      │ │
+│ │ Network Tab Redesign     │ │
+│ └──────────────────────────┘ │
+│                              │
+│ NEXT                    📋  │
+│ ┌──────────────────────────┐ │
+│ │ Crew Search (Pro)        │ │
+│ │ Direct Messaging         │ │
+│ └──────────────────────────┘ │
+│                              │
+│ COMMITTED (LATER)       🗓  │
+│ ┌──────────────────────────┐ │
+│ │ Yacht Reviews            │ │
+│ │ AI Profile Enhancement   │ │
+│ └──────────────────────────┘ │
+│                              │
+│ ── Tab 2: Feature Requests ─ │
+│                              │
+│ ┌──────────────────────────┐ │
+│ │ 💡 Have an idea?         │ │
+│ │ We build what the        │ │
+│ │ community wants.         │ │
+│ │ [Submit a Feature Idea]  │ │
+│ └──────────────────────────┘ │
+│                              │
+│ Sort: [Most Voted] [Newest]  │
+│                              │
+│ ┌──────────────────────────┐ │
+│ │ ▲ 12  Dark mode          │ │
+│ │       "Would love a..."  │ │
+│ │       Profile · 3 days   │ │
+│ ├──────────────────────────┤ │
+│ │ ▲  8  Job board          │ │
+│ │       "Somewhere to..."  │ │
+│ │       General · 1 week   │ │
+│ └──────────────────────────┘ │
+│                              │
+│ ── Tab 3: Released ───────── │
 │                              │
 │ RECENTLY SHIPPED        🟢  │
 │ ┌──────────────────────────┐ │
@@ -142,46 +182,30 @@ Regardless of Option A or B, update the roadmap page:
 │ │ Inner Page Headers NEW   │ │
 │ │ Nationality Flags  NEW   │ │
 │ └──────────────────────────┘ │
-│                              │
-│ BUILDING NOW            🔧  │
-│ ┌──────────────────────────┐ │
-│ │ Endorsement Writing Help │ │
-│ │ Smart Cert Matching      │ │
-│ │ Network Tab Redesign     │ │
-│ └──────────────────────────┘ │
-│                              │
-│ COMING SOON             📋  │
-│ ┌──────────────────────────┐ │
-│ │ Crew Search (Pro)        │ │
-│ │ Direct Messaging         │ │
-│ │ Yacht Reviews            │ │
-│ └──────────────────────────┘ │
-│                              │
-│ ┌──────────────────────────┐ │
-│ │ 💡 Have an idea?         │ │
-│ │ We build what the        │ │
-│ │ community wants.         │ │
-│ │ [Share Your Idea]        │ │
-│ └──────────────────────────┘ │
 └──────────────────────────────┘
 ```
 
-### Task 2: Feedback Mechanism
+### Task 2: Feature Submission Form
 
-**If Canny (Option A):**
-- "Share Your Idea" links to Canny board
-- Set up Canny SSO in `/app/api/canny/sso/route.ts`
-- Users auto-authenticated when they click through
+Route: `/app/more/roadmap/suggest`
 
-**If In-App (Option B):**
-- "Share Your Idea" opens `/app/more/roadmap/suggest`
-- Simple form: title + optional description
-- Vote mechanism on roadmap items
-- Sort by votes
+Simple form:
+- Title (required, 5-100 chars)
+- Description (optional, max 1000 chars)
+- Category dropdown (Profile, Network, CV, Insights, General)
+- Submit button
+- Back nav: "← Feature Roadmap" (Platform-Wide Rule)
 
-### Task 3: Curate Roadmap Content
+### Task 3: Voting Mechanism
 
-Update hardcoded roadmap items to reflect current state. Show enough to excite, not everything:
+- Upvote button per feature request (toggle on/off)
+- One vote per user, equal weight for all users (Q9.3)
+- `vote_count` maintained via trigger or app logic
+- Sort by most voted (default) or newest
+
+### Task 4: Populate with Phase 2 + Phase 3 Features (Q9.2)
+
+Seed the Roadmap tab with real features from Phase 2 and Phase 3 plans. Show enough to excite, not everything:
 
 **Show (exciting, builds anticipation):**
 - Endorsement writing assist
@@ -199,10 +223,9 @@ Update hardcoded roadmap items to reflect current state. Show enough to excite, 
 - Crew Pass background checks
 
 **Allowed files:**
-- `app/(protected)/app/more/roadmap/page.tsx` — rewrite
-- `app/(protected)/app/more/roadmap/suggest/page.tsx` — new (if Option B)
-- `app/api/canny/` — new (if Option A with SSO)
-- `supabase/migrations/` — only if Option B
+- `app/(protected)/app/more/roadmap/page.tsx` — rewrite with 3-tab pattern
+- `app/(protected)/app/more/roadmap/suggest/page.tsx` — new submission form
+- `supabase/migrations/` — feature_suggestions + feature_votes tables
 
 **Forbidden files:**
 - Other tab pages
@@ -210,115 +233,88 @@ Update hardcoded roadmap items to reflect current state. Show enough to excite, 
 
 ---
 
-## Lane 3: Settings Polish (Sonnet, medium)
+## Lane 3: Settings Polish + Cross-Cutting (Sonnet, medium)
 
-**Branch:** `fix/settings-polish`
-**Objective:** Small but impactful settings improvements. Visibility toggle clarity, display settings cleanup, phone/WhatsApp split, attachment transfer.
+**Branch:** `fix/settings-cross-cutting`
+**Objective:** Settings improvements plus platform-wide cross-cutting items discovered during the grill-me interview.
 
-### Task 1: Visibility Toggle Clarity
+### Task 1: Visibility Toggle Sublabels
 
 **Problem:** Profile visibility toggles in settings don't explain what they control. User toggles off "Experience" and has no idea what disappeared.
 
 **Fix:** Add sublabels to every visibility toggle explaining what it shows/hides on the public profile.
 
 Examples:
-- **Experience** → "Your yacht positions and date ranges on your public profile"
-- **Certifications** → "Your qualifications and expiry dates on your public profile"
-- **Endorsements** → "Endorsements from colleagues on your public profile"
-- **Skills** → "Your skill tags on your public profile"
-- **Hobbies** → "Your interests and hobbies on your public profile"
-- **Gallery** → "Your work photos on your public profile"
-- **Languages** → "Languages you speak on your public profile"
+- **Experience** — "Your yacht positions and date ranges on your public profile"
+- **Certifications** — "Your qualifications and expiry dates on your public profile"
+- **Endorsements** — "Endorsements from colleagues on your public profile"
+- **Skills** — "Your skill tags on your public profile"
+- **Hobbies** — "Your interests and hobbies on your public profile"
+- **Gallery** — "Your work photos on your public profile"
+- **Languages** — "Languages you speak on your public profile"
 
 **File:** `app/(protected)/app/profile/settings/page.tsx` or wherever visibility toggles are rendered
 
-### Task 2: Display Settings Cleanup
+### Task 2: Display Settings — Keep 3 View Modes (Q10.1)
 
-**Problem:** Founder called scrim/accent/template pickers "bullshit." They add complexity for minimal value.
+**Decision:** Keep the 3 view mode options (Profile, Portfolio, Rich Portfolio). These are the "presentation is paid" Pro feature. No changes needed to view mode selector.
 
-**Fix (pending /grill-me confirmation — expected answer: remove them):**
-- Remove scrim picker (hardcode sensible default)
-- Remove accent color picker (use section color system)
-- Remove template picker (if it exists beyond view mode)
-- Keep view mode selector only (Standard / Portfolio / Compact)
-- Clean up any orphaned settings state/UI
+**No removal of scrim/accent/template pickers** — they don't exist in the current build. The original spec was based on an incorrect assumption. This task is effectively a no-op unless the view mode selector needs visual polish to match the sand section color system.
 
-**File:** Display settings section of profile settings page
+### Task 3: Back Navigation — Platform-Wide Audit (Platform-Wide Rule)
 
-### Task 3: Phone/WhatsApp Split
+**Decision from grill-me:** Back navigation must show WHERE you're going, not generic "Back." Label format is "← Network" / "← Profile" / "← Settings". Never a default page — always returns to previous context.
 
-**Problem:** Single phone field forces crew to pick one number. Many have a ship SIM (calls) and home SIM (WhatsApp).
+**Fix:** Audit all pages that have back buttons and update:
+- Every inner page / detail view must show contextual back label
+- Format: "← [Parent Page Name]"
+- Position: top-left, `text-[var(--color-interactive)]`
+- Never "← Back"
 
-**Fix:** Split single `phone` field into two fields:
-- **Phone** — primary contact number
-- **WhatsApp** — WhatsApp number (can be same or different)
-- "Same as phone" toggle/checkbox for convenience
-- Both optional, both displayed on profile where appropriate
+**Pages to audit (at minimum):**
+- `/app/more/roadmap` — "← Settings"
+- `/app/more/roadmap/suggest` — "← Feature Roadmap"
+- `/app/endorsement/request` — "← Network"
+- `/app/network/saved` — "← Network"
+- Yacht detail pages — "← Network"
+- Profile section edit pages — "← Profile"
+- CV preview — "← CV"
+- Any other inner pages added in Sessions 1-6
 
-**Migration:** Add `whatsapp_number` column to users table (or wherever phone is stored).
+**Reference:** `frontend-design-guide.md` Back Navigation section, Platform-Wide Rules in grill-me decisions.
 
-**Files:**
-- `supabase/migrations/` — add column (ONLY if Lane 1 doesn't already have a migration — otherwise coordinate)
-- Profile settings form — split field
-- Public profile — display both if different
-- Endorsement share/invite — use WhatsApp number for WhatsApp share links
+### Task 4: Skeleton Loading for New Components (Design Guide Universal Principle 7)
 
-**IMPORTANT:** This lane may need a migration. If Lane 1 already has the migration slot, either:
-- Add the column to Lane 1's migration (coordinate with Lane 1 worker)
-- Or make this Task 3 a separate follow-up after Session 6 merges
+**Decision from design guide:** Every page loads with content-shaped skeleton placeholders that match the actual layout. Section-colored pulse animation. The page should feel like it's materializing, not loading.
 
-### Task 4: Attachment Transfer ("Wrong Yacht?")
+**Fix:** Audit all new components built in Sessions 3-6 and add skeleton loading states:
+- Network accordion (navy pulse) — Session 3
+- Insights dashboard metrics (coral pulse) — Session 4
+- Endorsement request flow (navy pulse) — Session 5
+- Any new Settings/More pages (sand pulse) — Session 6
+- Roadmap 3-tab page (sand pulse) — this session's Lane 2
 
-**Problem:** When CV parse matches someone to the wrong yacht, there's no way to fix it without deleting and re-adding the experience entry.
-
-**Fix:** Add a "Wrong yacht?" action on experience entries that:
-1. Shows the current yacht match
-2. Opens yacht search to find the correct yacht
-3. Updates the `yacht_id` on the attachment/experience entry
-4. Preserves all other data (dates, role, description)
-
-**Files:**
-- Experience entry component (wherever yacht attachments are displayed with edit capability)
-- May need a PATCH endpoint for updating yacht_id on an attachment
-- Yacht search component (reuse from Network Yachts tab)
+**Pattern:**
+- Skeleton shapes match actual content layout (not generic rectangles)
+- Pulse animation uses the section color (navy-200, coral-200, sand-200, etc.)
+- Skeleton appears immediately, content fades in when loaded
+- Use existing skeleton utilities if available, or create a shared `<SectionSkeleton color="navy" />` component
 
 ### Task 5: CV Staleness Nudge
 
 **DEFERRED to Phase 2** per founder decision. Do not build.
 
 **Allowed files:**
-- `app/(protected)/app/profile/settings/page.tsx` — visibility sublabels + display settings
-- Display settings components
-- Profile/public profile — phone/WhatsApp display
-- Experience entry components — "Wrong yacht?" action
-- `supabase/migrations/` — whatsapp_number column (if migration slot available)
+- `app/(protected)/app/profile/settings/page.tsx` — visibility sublabels
+- Display settings components — view mode polish only
+- All page files with back navigation — contextual back labels
+- All new Session 3-6 components — skeleton loading states
+- Shared skeleton component if created
 
 **Forbidden files:**
-- Network/Insights/Photo pages (other sessions)
+- Network/Insights/Photo page logic (other sessions own those)
+- `supabase/migrations/*` (no migration needed for this lane)
 - CV wizard (Session 6 Lane 1)
-
----
-
-## /Grill-Me Questions for Sessions 6-7
-
-### Cert Registry
-- **Q6.1:** Admin moderation for crowdsourced entries — auto-approve after N user confirmations, or manual review?
-- **Q6.2:** Migrate existing `certification_type_id` to new registry, or keep both and merge later?
-- **Q6.3:** Regional cert variants (AMSA vs MCA naming) — handle as aliases or separate entries?
-
-### Reporting
-- **Q6.4:** Report categories — are (fake_profile, false_attachment, inappropriate_content, harassment, spam, other) the right set?
-- **Q6.5:** Admin workflow — Supabase dashboard for now, or build a simple admin page?
-
-### Roadmap + Feedback
-- **Q7.1:** Canny (external, fast to ship) vs in-app build (more integrated, more work)?
-- **Q7.2:** What features to show on public roadmap? (See curated list in Lane 2)
-- **Q7.3:** Pro users get weighted votes? Or equal voting?
-
-### Settings
-- **Q7.4:** Display settings — confirm: remove scrim/accent/template pickers, keep view mode only?
-- **Q7.5:** Phone/WhatsApp — two separate fields, or single field with type selector (Phone/WhatsApp/Both)?
-- **Q7.6:** Attachment transfer — should it trigger a re-match of endorsements tied to that yacht? Or just move the experience entry?
 
 ---
 
@@ -326,10 +322,12 @@ Examples:
 
 - All key pages render properly at 1024px, 1280px, 1440px, 1920px
 - Public profile looks polished on desktop (not stretched mobile)
-- Roadmap page shows curated upcoming features with feedback mechanism
-- Users can submit feature ideas and bug reports
+- In-app roadmap with 3 tabs (Roadmap / Feature Requests / Released) is functional
+- Users can submit feature ideas with title + description + category
+- Users can upvote feature requests (equal weight, one vote per user)
+- Roadmap tab populated with Phase 2 + Phase 3 features
 - Visibility toggles have clear sublabels
-- Display settings simplified (view mode only)
-- Phone and WhatsApp are separate fields
-- "Wrong yacht?" correction flow works on experience entries
+- 3 view modes retained (Profile, Portfolio, Rich Portfolio)
+- All back buttons show contextual destination labels ("← Network", not "← Back")
+- All new Session 3-6 components have section-colored skeleton loading states
 - All settings changes persist correctly

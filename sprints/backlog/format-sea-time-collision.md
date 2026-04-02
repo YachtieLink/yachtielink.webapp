@@ -1,13 +1,13 @@
 # formatSeaTime: Naming Collision Between Two Files
 
-**Status:** idea
+**Status:** shipped
 **Priority guess:** P3 (tech debt)
 **Date captured:** 2026-04-02
-**Source:** Lane 2 reviewer (worktree session)
+**Shipped in:** Rally 009 Session 2, Lane 2 (fix/sea-time-overlap) — 2026-04-03
 
 ## Summary
-`lib/profile-summaries.ts` and `lib/sea-time.ts` both export `formatSeaTime` with different signatures. Naming collision — consolidate into one canonical version.
+`lib/profile-summaries.ts` and `lib/sea-time.ts` both exported `formatSeaTime` with different signatures. `formatSeaTimeCompact` deleted; `profile-summaries.ts` now uses canonical `formatSeaTime().displayShort` from `lib/sea-time.ts`.
 
 ## Scope
-- Pick canonical location, update all imports
-- ~2-3 files
+- ~~Pick canonical location, update all imports~~
+- Resolved — `formatSeaTimeCompact` removed, canonical version used everywhere

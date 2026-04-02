@@ -26,9 +26,84 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-03 | Rally 009 Session 2 | Land experience end-to-end (DB + wizard + profile + public). Sea time union-based calculation + overlap detection. 14 review fixes (L1) + 5 review fixes (L2). 3 QA fixes. 3 backlog items captured. |
+| 2026-04-02 | Rally 009 restructure + Rally 010 | Restructured all 7 session specs post-grill-me. 2 design guide audits (18 issues fixed). Thumb-zone + cold-state audit. Rally 010 created: frontend UX, guidance, cold states. |
 | 2026-04-02 | Rally 009 /grill-me | Design interview: 42 Qs resolved, 5-tab UX audit, 9 additional fixes confirmed. All sessions unblocked. |
 | 2026-04-02 | Rally 009 Session 1 | 3-lane: mobile UX tab-bar padding + CV preview canonical query, P2 bugs (saved sea time, yacht prefix null guard, PDF home-country toggle), tech debt sweep (social icons dedup, formatSeaTime, EndorsementsSection) |
 | 2026-04-02 | Rally 009 planning | Full pre-MVP backlog triage: 30 items across 7 sessions specced into lane-ready build plans. 42 /grill-me questions prepped. 7 backlog items closed as resolved. Junior sprints updated. |
+
+## 2026-04-03 — Rally 009 Session 2 (Opus 4.6, CLI) — Master
+
+### Done
+- **Lane 1 (feat/land-experience):** Full land-based employment support end-to-end. New `land_experience` table + migration with RLS. CV parser integration saves parsed shore-side roles. New wizard step (`StepLandExperience`) for reviewing/editing land jobs. Integrated reverse-chronological career timeline on private + public profile (yacht=anchor icon, shore=briefcase icon). Fixed 4 CV re-parse data integrity issues: `trackOverwrite` on 5 scalar fields (UX6a), education dedup (UX6b), languages merge (UX6c), travel docs union merge (UX6d). Review round: 14 fixes including GDPR export gap, land experience dedup on re-parse, subdomain route, returnToReview step bug, totalItems/celebration counts, date display, type consolidation, industry field, cache wrapping, button count, debug log, back-button skip, React key stability. QA round: fixed experience detail page, merged Career+SeaTime card (collapsible), null-date sort order. (branch: feat/land-experience)
+- **Lane 2 (fix/sea-time-overlap):** Union-based sea time calculation via 3 new utilities in `lib/sea-time.ts` (`mergeOverlappingRanges`, `calculateSeaTimeDays`, `detectOverlaps`). Replaced naive month sum in `StepExperience.tsx` and `profile-summaries.ts`. Added overlap detection with two-tier warning UI (info <28d, amber ≥28d) + amber ring on overlapping cards. Review round: 5 fixes — generic `detectOverlaps<T>`, deleted `formatSeaTimeCompact` (divisor mismatch), NaN guard on `parseCVDate`, inverted range guard, all-cards overlap highlight. (branch: fix/sea-time-overlap)
+
+### Context
+- 2-lane parallel worktree session. Both lanes passed review (round 2) and QA.
+- Land experience is a new feature — first non-yachting data type in the system.
+- Sea time overlap fixes are client-side only. The `get_sea_time()` SQL RPC still uses a naive sum — highest-priority post-merge fix.
+- QA tester merged Career into SeaTime card and added collapsible "Show N more" on the private profile.
+
+### Next
+1. Push + PR for both lanes (merge order: Lane 2 first, Lane 1 second)
+2. Rally 009 Sessions 3-7 — all specs restructured, ready to build
+3. Fix `get_sea_time()` SQL RPC to use union-based calculation (backlog: sea-time-sql-rpc-overlap)
+
+### Flags
+- ⚠️ Lane 1 has a migration (`20260403000001_land_experience.sql`). Must run before deploy.
+- ⚠️ `get_sea_time()` SQL RPC still double-counts overlapping stints. Profile hero card and SeaTimeSummary affected. Captured in backlog.
+- ⚠️ No CRUD UI for land experience outside the wizard. Users can't edit/delete shore-side roles independently. Captured in backlog.
+- ⚠️ StepExperience.tsx is now ~900 LOC. Pre-existing hotspot, flagged by both lanes.
+
+### Backlog captured
+- sea-time-sql-rpc-overlap: `get_sea_time()` + detail page + saved profiles use naive sums (from Lane 2 worker + reviewer)
+- land-experience-crud: No edit/delete UI for shore-side roles outside CV wizard (from Lane 1 worker + reviewer)
+- land-experience-rls-visibility: `section_visibility` not checked for `land_experience` RLS public read (from Lane 1 reviewer)
+
+---
+
+## 2026-04-02 — Rally 009 Restructure + Rally 010 (Opus 4.6, CLI)
+
+### Done
+- **Rally 009 restructured** — all 7 session specs updated to incorporate 42 grill-me decisions, 9 UX audit items, and frontend design guide requirements. Removed all stale "BLOCKED" headers. Added Lane 3 to Session 2 (CV restore gaps UX6a-d). Updated README with new session plan, backlog table, exit criteria.
+- **Frontend design guide promoted** — copied from rally folder to `docs/design-system/patterns/frontend-design-guide.md`. Updated design-system README.md and CLAUDE.md required reading list.
+- **Audit 1: Design guide accuracy** — Opus agent cross-referenced guide against 8 source files. Found 18 issues, fixed all 10 critical ones: Profile Strength position, missing non-yachting experience rules, missing photo management decisions, CV restore gaps, motion preset usage types, endorsement re-nudge limit, section-colors feature mapping, sand token note, feature request voting rule. Fixed stale `style-guide.md` card pattern (removed left border stripe option).
+- **Audit 2: Thumb zone + cold state** — Opus agent mapped every CTA on 375px screen across all 5 tabs. Found 4 critical issues (primary CTAs in red zone on Profile, CV, Network). Proposed `<StickyBottomBar>` component, cold-state wireframes, destructive action demotion. Saved to `docs/design-system/patterns/ux-thumb-zone-audit.md`.
+- **Codebase guidance audit** — Found: onboarding wizard (good), empty states (decent), endorsement banner (excellent), tooltip component (built but ZERO imports). Missing: product tour, contextual tooltips, feature explanation cards, per-tab first-visit education, coaching beyond endorsements.
+- **Rally 010 created** — `sprints/rallies/rally-010-frontend-ux-guidance/README.md`. 4 sessions (~14h): tooling + StickyBottomBar, cold states for all tabs, Onborda product tour, tooltip activation + coaching nudges. Updated rallies index.
+
+### Context
+- No code was written this session — all planning, spec, and audit work
+- Rally 009 Session 1 still has 3 branches ready to push (unchanged from prior session)
+- Rally 010 runs after Rally 009 completes
+
+### Next
+1. **Push Rally 009 Session 1** — 3 branches still waiting
+2. **Rally 009 Session 2** — data integrity + CV restore gaps (Lane 3 is new)
+3. **Rally 009 Sessions 3-7** — all unblocked, specs updated
+4. **Rally 010** — after Rally 009 completes
+
+### Flags
+- ⚠️ `style-guide.md` had stale "coloured left border" card option that contradicted the hard rejection — fixed this session. Watch for other stale patterns in style-guide.md.
+- ⚠️ Tooltip component (`components/ui/tooltip.tsx`) is built, exported, and has zero imports anywhere. Quick win for Rally 010.
+
+### Files
+- `sprints/rallies/rally-009-premvp-polish/README.md` — rewritten
+- `sprints/rallies/rally-009-premvp-polish/session-2-data-integrity.md` — added Lane 3 (CV restore)
+- `sprints/rallies/rally-009-premvp-polish/session-3-tab-redesigns.md` — rewritten with all grill-me decisions
+- `sprints/rallies/rally-009-premvp-polish/session-4-insights-photos.md` — rewritten (new metrics, AI photo, CV tab)
+- `sprints/rallies/rally-009-premvp-polish/session-5-endorsement-flow.md` — updated (colleague-first, locked decisions)
+- `sprints/rallies/rally-009-premvp-polish/session-6-quality-safety.md` — updated (duplicate flagging, transfer, dormancy)
+- `sprints/rallies/rally-009-premvp-polish/session-7-polish-feedback.md` — updated (in-app roadmap, removed done items, cross-cutting)
+- `docs/design-system/patterns/frontend-design-guide.md` — **NEW** (promoted from rally)
+- `docs/design-system/patterns/ux-thumb-zone-audit.md` — **NEW** (thumb zone + cold state audit)
+- `docs/design-system/README.md` — added design guide + thumb zone references
+- `docs/design-system/style-guide.md` — fixed stale card pattern (removed left border)
+- `CLAUDE.md` — added design guide to required reading
+- `sprints/rallies/rally-010-frontend-ux-guidance/README.md` — **NEW** rally
+- `sprints/rallies/README.md` — added Rally 010 to active rallies
+
+---
 
 ## 2026-04-02 — Rally 009 /grill-me (Opus, Desktop + Chrome MCP)
 

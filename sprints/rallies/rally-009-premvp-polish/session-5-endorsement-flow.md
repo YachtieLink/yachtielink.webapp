@@ -1,7 +1,8 @@
 # Session 5 — Endorsement Flow + LLM
 
 **Rally:** 009 Pre-MVP Polish
-**Status:** BLOCKED — needs /grill-me for endorsement request redesign
+**Status:** Ready (all grill-me decisions resolved)
+**Grill-me decisions applied:** §6 (Q6.1–Q6.4)
 **Estimated time:** ~6 hours across 2 Opus workers
 **Dependencies:** Sessions 1-2 merged (tech debt clean)
 
@@ -75,7 +76,16 @@ Create shared LLM safety utilities that all current and future LLM features use.
 ## Lane 2: Endorsement Request Redesign (Opus, high)
 
 **Branch:** `feat/endorsement-request-redesign`
-**Objective:** Restructure endorsement request page to prioritize external invites (growth) and group on-platform colleagues by yacht.
+**Objective:** Restructure endorsement request page to show a colleague-first view — all colleagues grouped by yacht — with ghost suggestions inline and per-yacht invite CTAs.
+
+### Locked Decisions (from grill-me §6)
+
+| Q | Topic | Decision |
+|---|-------|----------|
+| Q6.1 | External invite | **Create ghost profile** on external invite. Pre-linked to endorsement request. Already built. |
+| Q6.2 | Flow structure | **Colleague-first.** See all colleagues grouped by yacht, pick from there. |
+| Q6.3 | Ghost suggestions | **Inline within yacht groups,** tagged as "not on platform." Most natural placement. |
+| Q6.4 | Re-nudge limits | **1 reminder after 7 days.** Gentle, respectful. No more than one. |
 
 ### Current State
 - `app/(protected)/app/endorsement/request/RequestEndorsementClient.tsx` — flat colleague list
@@ -88,64 +98,77 @@ Create shared LLM safety utilities that all current and future LLM features use.
 │ Request an Endorsement      navy │
 ├──────────────────────────────────┤
 │                                  │
-│ INVITE A FORMER COLLEAGUE        │  ← Primary CTA (growth action)
-│ ┌──────────────────────────────┐ │
-│ │ Name: [                    ] │ │
-│ │ Email or phone: [          ] │ │
-│ │ [Send invitation]            │ │
-│ │                              │ │
-│ │ or share via:                │ │
-│ │ [WhatsApp] [Copy Link]      │ │
-│ └──────────────────────────────┘ │
+│ YOUR COLLEAGUES                  │  ← Primary view (colleague-first)
 │                                  │
-│ YOUR COLLEAGUES                  │  ← Secondary (on-platform)
-│                                  │
-│ ▼ M/Y Serenity (2024-2025)     │  ← Yacht accordion
+│ ▼ M/Y Serenity (2024-2025)     │  ← Most recent yacht expanded
 │   ├ John Smith  Chief Officer   │
 │   │ Overlapped: Jan-Jun 2024   │
 │   │ [Request Endorsement]      │
-│   └ Jane Doe    2nd Stewardess │
-│     [Request Endorsement]      │
+│   ├ Jane Doe    2nd Stewardess │
+│   │ [Request Endorsement]      │
+│   │                             │
+│   │ ── not on platform ──      │  ← Ghost suggestions inline (Q6.3)
+│   ├ Mike Chen (ghost)           │
+│   │ [Invite to endorse]        │
+│   │                             │
+│   └ [Invite someone from       │  ← Per-yacht invite CTA
+│      M/Y Serenity]             │
 │                                  │
 │ ▶ S/Y Athena (2022-2024)  3 crew│  ← Collapsed (older)
 │                                  │
-│ SUGGESTED (not on YachtieLink)  │  ← Ghost profiles
+│ INVITE A FORMER COLLEAGUE        │  ← Generic invite (no yacht context)
 │ ┌──────────────────────────────┐ │
-│ │ Mike Chen — worked with you  │ │
-│ │ on M/Y Serenity              │ │
-│ │ [Invite to endorse]          │ │
+│ │ Name: [                    ] │ │
+│ │ Email or phone: [          ] │ │
+│ │ [Send invitation]            │ │  ← Creates ghost profile (Q6.1)
+│ │                              │ │
+│ │ or share via:                │ │
+│ │ [WhatsApp] [Copy Link]      │ │
 │ └──────────────────────────────┘ │
 └──────────────────────────────────┘
 ```
 
 ### Tasks
 
-#### Task 1: External Invite Section (Top Priority)
-- Name + email/phone input form
-- "Send invitation" generates endorsement invite token + sends email/SMS
-- Share buttons below (WhatsApp, Copy Link)
-- This is the growth engine — every external invite is a signup funnel entry
-
-#### Task 2: Yacht-Grouped Colleagues
+#### Task 1: Yacht-Grouped Colleagues (Primary View)
+- Colleague-first layout: all colleagues grouped by shared yacht (Q6.2)
 - Reuse accordion pattern from Network tab (Session 3)
-- Group colleagues by shared yacht
 - Show: name, role, date overlap with requester
 - One-tap "Request Endorsement" per colleague
 - Most recent yacht expanded, older collapsed
 - Same colleague on multiple yachts: show under each
 
-#### Task 3: Yacht Context After Selection
+#### Task 2: Inline Ghost Suggestions Per Yacht
+- Query ghost profiles created from user's yacht crew data
+- Display inline within each yacht group, below on-platform colleagues (Q6.3)
+- Tagged as "not on platform" — visually distinct but not separated into own section
+- "Invite to endorse" sends claim link + endorsement request
+- Creates ghost profile if not already present (Q6.1)
+- Ties into Ghost Profiles Wave 1 (already shipped)
+
+#### Task 3: Per-Yacht Invite CTA
+- Each yacht accordion section ends with an "Invite someone from [yacht name]" CTA
+- Opens inline form (name + email/phone) pre-tagged with yacht context
+- Creates ghost profile pre-linked to that yacht and endorsement request (Q6.1)
+
+#### Task 4: Generic External Invite Section (Below Colleagues)
+- Name + email/phone input form for inviting someone not tied to a specific yacht
+- "Send invitation" generates endorsement invite token + sends email/SMS
+- Creates ghost profile on send (Q6.1)
+- Share buttons below (WhatsApp, Copy Link)
+
+#### Task 5: Reminder Logic
+- If someone was already requested and hasn't responded, show "Remind" button
+- 1 reminder allowed after 7 days from original request (Q6.4)
+- After reminder sent, button disabled permanently — no further nudges
+- Show reminder state: "Reminded on [date]" or "Remind available in X days"
+
+#### Task 6: Yacht Context After Selection
 - After user selects a yacht for endorsement context, show:
   - Yacht card: name, type, dates
   - Crew who overlapped with user's dates (primary targets)
   - Current crew (no end date) as secondary
 - Date-overlap query: extend `get_colleagues` RPC or add new query
-
-#### Task 4: Ghost Profile Suggestions
-- Query ghost profiles created from user's yacht crew data
-- Show as "Suggested — not on YachtieLink" section
-- "Invite to endorse" sends claim link + endorsement request
-- Ties into Ghost Profiles Wave 1 (already shipped)
 
 **Allowed files:**
 - `app/(protected)/app/endorsement/request/` — page + client component rewrite
@@ -159,21 +182,12 @@ Create shared LLM safety utilities that all current and future LLM features use.
 
 ---
 
-## /Grill-Me Questions for This Session
-
-### Endorsement Request Redesign
-- **Q5.1:** External invite — should it create a ghost profile if the person isn't on the platform? Or just send a generic invite link?
-- **Q5.2:** Yacht context after selection — should user pick a yacht FIRST (then see crew), or see all colleagues grouped by yacht and request from there?
-- **Q5.3:** Ghost profile suggestions — how prominent? Above or below on-platform colleagues?
-- **Q5.4:** Re-nudge UX — if someone was already requested and hasn't responded, show "Remind" button? How many reminders?
-
----
-
 ## Exit Criteria
 
 - Endorsement writing assist generates contextual drafts in <3 seconds
 - All LLM inputs sanitized, outputs validated, no injection vectors
-- Endorsement request page leads with external invite (growth action)
-- On-platform colleagues grouped by yacht with date overlap context
-- Ghost profile suggestions surface invitable contacts
+- Endorsement request page leads with colleague-first yacht-grouped view (Q6.2)
+- Ghost suggestions appear inline within yacht groups, tagged "not on platform" (Q6.3)
+- External invite creates ghost profile pre-linked to endorsement request (Q6.1)
+- Reminder: 1 after 7 days, no more (Q6.4)
 - Rate limiting on both assist API and invite sends

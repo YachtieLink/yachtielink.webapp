@@ -65,7 +65,8 @@ Multi-agent, multi-angle review of the whole app.
 
 | Slug | Status | Scope |
 |------|--------|-------|
-| [rally-009-premvp-polish](./rally-009-premvp-polish/) | 🔧 Building | Pre-MVP polish — 4 sessions, 18 items: bugs, tech debt, data integrity, tab redesigns |
+| [rally-009-premvp-polish](./rally-009-premvp-polish/) | 🔧 Building | Pre-MVP polish — 7 sessions, 35+ items: bugs, tech debt, data integrity, tab redesigns |
+| [rally-010-frontend-ux-guidance](./rally-010-frontend-ux-guidance/) | 📋 Spec Complete | Frontend UX, user guidance & cold states — 4 sessions: tooling, cold states, product tour, tooltips |
 | [rally-003-codebase-bugs](./rally-003-codebase-bugs/) | 🔍 In Progress | Full codebase bug audit — 6 agents, schema/RLS/logic/UX/API/perf |
 
 ---

@@ -1,6 +1,6 @@
 ---
 module: profile
-updated: 2026-04-02
+updated: 2026-04-03
 status: shipped
 phase: 1B
 ---
@@ -85,6 +85,10 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 - [x] Bump MAX_PHOTOS_PRO 9 → 15 (Sprint 11c — shipped PR #107)
 
 ## Recent Activity
+
+**2026-04-03** — Rally 009 Session 2, Lane 1 (feat/land-experience): New `CareerTimeline` component showing yacht (anchor icon) + shore-side (briefcase icon) entries in reverse-chronological order. Career section merged into SeaTime card on private profile (collapsible, "Show N more"). `getLandExperience` query added to `lib/queries/profile.ts` (cached). `LandExperienceEntry` type added to `lib/queries/types.ts`. Land experience integrated into profile page, public profile, and subdomain route. GDPR export includes `land_experience` table.
+
+**2026-04-03** — Rally 009 Session 2, Lane 2 (fix/sea-time-overlap): `computeSeaTime` in `lib/profile-summaries.ts` now uses union-based `calculateSeaTimeDays` instead of naive sum. Deleted `formatSeaTimeCompact` — uses canonical `formatSeaTime().displayShort`.
 
 **2026-04-02** — Worktree lanes 1+3 (pending push): ghost_endorser join added to `getProfileSections` and `getCvSections` — private dashboard + CV now resolve ghost endorser names. `CvEndorsement` type updated. `SocialLinksRow` extended with optional `editable`/`onDelete` props. Full Social Links section added to profile settings (load/add/delete/save via `/api/profile/social-links` PATCH). Visibility toggle sublabels added to all 4 settings toggles. SVG wireframe thumbnails added to layout selector buttons. `content-start` fix on `HobbiesTile` for interests chip layout at wide viewports.
 

@@ -31,6 +31,7 @@ BUILD → /yl-review → /yl-shipslog → WAIT FOR FOUNDER → commit + push →
 When building or modifying **anything the user sees**, read these before writing code:
 
 1. **`docs/design-system/patterns/page-layout.md`** — Mobile-first layout, thumb zones, section color wayfinding, state transitions, compact lists, stat cards, inline editable forms, copy standards. **This is the most important design doc.**
+1b. **`docs/design-system/patterns/frontend-design-guide.md`** — Per-tab redesign specs (Rally 009), component patterns, universal principles, quality bar. **Read this for any tab redesign work.**
 2. **`docs/design-system/philosophy.md`** — The "why" behind design choices. Five principles.
 3. **`docs/design-system/style-guide.md`** — Colours, typography, components, CSS tokens.
 4. **`docs/design-system/decisions/README.md`** — Every design choice and rejection. Check before proposing something that may have been tried.

@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-02 (Rally 009 Session 1 complete: 3 lanes shipped — mobile UX, P2 bugs, tech debt sweep. /grill-me done: all sessions unblocked. Branches ready to push.)
+**Last updated:** 2026-04-03 (Session 2 complete — land experience + sea time overlap. Both lanes passed review + QA. Ready for commit + push.)
 
 ---
 
@@ -16,9 +16,10 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Sprint | Phase | Status | Focus |
 |--------|-------|--------|-------|
+| Rally 009 | 1B | 🔧 Session 2 complete, pending push | Pre-MVP polish — 7 sessions, 35+ items. Session 2: land experience + sea time overlap — built, reviewed, QA'd. |
 | Sprint 13 | 1B | 🔧 Code Complete | SEO/sitemap/OG/cookie/robots merged (PR #130). Ops + legal blocked on founder. |
 
-**Next action:** Rally 007 — Launch QA full checklist, then deploy in invite mode.
+**Next action:** Push + PR for Session 2 lanes (merge order: Lane 2 first, Lane 1 second).
 
 ---
 
@@ -26,27 +27,24 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
+| Rally 009 Session 2 — land experience + sea time overlap | 2026-04-03 | Land experience end-to-end (DB + wizard + profile + public), sea time union-based calc + overlap detection, 19 review fixes, 3 QA fixes |
 | Rally 009 Session 1 — mobile UX + P2 bugs + tech debt | 2026-04-02 | Tab-bar padding, CV preview canonical query, saved sea time, yacht prefix null guard, PDF home-country toggle, social icons dedup, formatSeaTime canonical, EndorsementsSection cleanup |
 | Skill hardening — review, tester, file ownership | 2026-04-02 | /yl-review zero-tolerance + two-step, /yl-tester agent, file ownership rules, cwd conventions, 7 chain gaps fixed |
 | Ghost join fix + ghost flow fixes | 2026-04-02 | ghost_endorser join, page-load check, auto-claim, phone dedup, migration (PR #148) |
 | Display polish — endorsement context + yacht prefix | 2026-04-02 | Endorser role+yacht on cards, M/Y S/Y prefix, toggle sublabels (PR #149) |
 | Social links + interests + layout thumbnails | 2026-04-02 | Social links in settings, CV review socials, interests chip fix, layout thumbnails (PR #150) |
 | Inner-page-header redesign | 2026-04-02 | Sticky back bar + standalone title row, section-color border, onBack support, 3 double-px-4 fixes, BackButton deleted (PR #144) |
-| Ghost Profiles verify + GhostEndorserBadge | 2026-04-02 | RLS public SELECT policy (critical fix), badge wired into all 6 endorsement display surfaces (PR #143) |
-| Custom 404 + nationality flag | 2026-04-02 | Branded 404 page, SVG flag toggle on public profile hero + settings (PR #142) |
-| Bugfix sweep + Rally 006 close | 2026-04-01 | 4 lanes: onboarding name trigger, colleague display names, country ISO resolution, DatePicker text+calendar + tick stagger (PRs #135–138). Rally 006 closed. |
-| /yl-worktree skill + bottleneck fixes | 2026-04-01 | /yl-worktree orchestrator skill, logger role, worker self-validation, model/effort matrix, master bottleneck prevention |
 
 ---
 
 ## Up Next (ordered)
 
-1. **Commit + push Rally 009 Session 1** — 3 branches ready (`fix/mobile-ux-fixes`, `fix/p2-bug-fixes`, `chore/tech-debt-sweep`). No merge order constraint.
-2. **Rally 009 Session 2** — CV restore data integrity (trackOverwrite, education dedup, etc.). After Session 1 merged.
-3. **Rally 009 Sessions 3-4** — Now unblocked by /grill-me decisions. See `rally-009-premvp-polish/grill-me-decisions-2026-04-02.md`.
-3. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
-4. **Rally 007 — Launch QA** — full checklist (after Rally 009 completes)
-5. **Deploy** — invite mode, 20-50 crew, 24h monitoring
+1. **Rally 009 Session 2** — Push + PR (Lane 2 first, Lane 1 second). Migration: `20260403000001_land_experience.sql`.
+2. **Rally 009 Sessions 3-7** — All specs restructured with grill-me decisions. Ready to build sequentially.
+4. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
+5. **Rally 010 — Frontend UX & Guidance** — Product tour (Onborda), cold states, StickyBottomBar, tooltips, coaching nudges. After Rally 009 completes.
+6. **Rally 007 — Launch QA** — full checklist (after Rally 009 + 010 complete)
+7. **Deploy** — invite mode, 20-50 crew, 24h monitoring
 
 ---
 
@@ -65,9 +63,18 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | PR | Branch | Status | Notes |
 |----|--------|--------|-------|
-| pending | fix/mobile-ux-fixes | ready to push | Lane 1: tab-bar padding + CV preview canonical query |
-| pending | fix/p2-bug-fixes | ready to push | Lane 2: saved sea time, yacht prefix null guard, PDF home-country toggle |
-| pending | chore/tech-debt-sweep | ready to push | Lane 3: social icons dedup, formatSeaTime, EndorsementsSection cleanup |
+| #152 | chore/rally009-session1-context | ✅ Merged | Session 1 context |
+| #153 | fix/mobile-ux-fixes | ✅ Merged | Tab-bar padding + CV preview query |
+| #154 | fix/p2-bug-fixes | ✅ Merged | Saved sea time, yacht prefix null, home country |
+| #155 | chore/tech-debt-sweep | ✅ Merged | Social dedup, formatSeaTime, EndorsementsSection |
+
+---
+
+## Draft Rallies
+
+| Rally | Status | Scope |
+|-------|--------|-------|
+| [Rally 010 — Frontend UX & Guidance](sprints/rallies/rally-010-frontend-ux-guidance/) | 📋 Spec Complete | 4 sessions: tooling + StickyBottomBar, cold states, Onborda product tour, tooltips + coaching. Runs after Rally 009. |
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 module: employment
-updated: 2026-03-21
+updated: 2026-04-03
 status: shipped
 phase: 1A
 ---
@@ -63,6 +63,10 @@ One-line: Yacht entities as shared graph nodes, employment attachments linking c
 - [ ] Yacht merge tooling (Phase 2, per D-006)
 
 ## Recent Activity
+
+**2026-04-03** — Rally 009 Session 2, Lane 1 (feat/land-experience): New `land_experience` table (migration `20260403000001`). RLS: owner full access + public read for completed profiles. CV parser saves `employment_land` data via `save-parsed-cv-data.ts` with dedup on company+role. `industry` field saved. Land experience integrated into GDPR data export. New wizard step `StepLandExperience` for reviewing/editing shore-side roles. 4 CV re-parse data integrity fixes (trackOverwrite, education dedup, languages merge, travel docs union).
+
+**2026-04-03** — Rally 009 Session 2, Lane 2 (fix/sea-time-overlap): New `lib/sea-time.ts` utilities: `mergeOverlappingRanges`, `calculateSeaTimeDays`, `detectOverlaps` (generic). Union-based sea time calculation replaces naive sum in `StepExperience.tsx`. Overlap detection with two-tier warning UI + amber ring highlights on overlapping cards. `parseCVDate` NaN guard added. Inverted range filter added.
 
 **2026-03-23** — CV Parse Sprint: Attachment edit — 4 new fields (employment_type, yacht_program, description w/ 2000 char counter, cruising_area). Cert edit — issuing_body field. 5-step CV import wizard with yacht cards, skip/edit, celebration screen. `saveConfirmedImport()` with yacht search→create, cert type matching, batch operations. PDF templates enhanced with builder, program, description, cruising area per employment + issuing body per cert.
 **2026-03-21** — Sprint 10.3: CV page bento button hierarchy — Share primary, Generate/Upload secondary, QR/Edit ghost; lock icons on Pro templates; `router.push` replacing `window.location.href`.
