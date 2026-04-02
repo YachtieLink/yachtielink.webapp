@@ -29,6 +29,8 @@ interface SavedProfile {
   saved_user: SavedUser | null
   isColleague: boolean
   topCerts: string[]
+  seaTimeDays: number
+  yachtCount: number
 }
 
 interface Folder {
@@ -260,6 +262,8 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
               user={u}
               isColleague={entry.isColleague}
               topCerts={entry.topCerts}
+              seaTimeDays={entry.seaTimeDays}
+              yachtCount={entry.yachtCount}
               folders={folders}
               onUpdate={updateProfile}
               onUnsave={unsave}
