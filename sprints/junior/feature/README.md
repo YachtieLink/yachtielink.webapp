@@ -10,10 +10,7 @@ Keep them tight. If a feature sprint starts growing, it probably belongs in the 
 
 | Slug | Started | Summary |
 |------|---------|---------|
-| feature-pro-subdomain-link | 2026-03-22 | Pro custom subdomain (`{handle}.yachtie.link`) with reserved upsell page |
-| feature-cv-sharing-rework | 2026-03-22 | Full CV & Sharing page rework — always-on QR, share modal, CV toggle |
-| feature-saved-profiles-rework | 2026-03-22 | Saved profiles rework — notes, availability watch, relationship context, folders |
-| feature-two-pass-cv-parse | 2026-03-23 | Split CV parse into fast personal + background full parse for better UX |
+| feature-pro-subdomain-link | 2026-03-22 | Pro custom subdomain (`{handle}.yachtie.link`) with reserved upsell page (Phase 2+ — post-launch) |
 
 ---
 
@@ -50,4 +47,6 @@ How do we know it's done and working?
 
 | Slug | Completed | Summary |
 |------|-----------|---------|
-| — | — | None yet |
+| feature-two-pass-cv-parse | 2026-03-23 | Shipped — two-pass CV parse with fast personal + background full parse |
+| feature-cv-sharing-rework | Deferred to Phase 2+ per PHASE1-CLOSEOUT.md | Deferred to Phase 2+ per PHASE1-CLOSEOUT.md |
+| feature-saved-profiles-rework | Deferred to Phase 2+ per PHASE1-CLOSEOUT.md | Deferred to Phase 2+ per PHASE1-CLOSEOUT.md |

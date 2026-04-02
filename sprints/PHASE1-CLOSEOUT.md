@@ -19,9 +19,12 @@ Sprint 13 W0+1 ✅ Public header/footer, cookie banner
 Rally 005      ✅ Auth resilience (12 fixes)
 QA fixes       ✅ Settings IA, bug sweep, mobile fixes, stale cookies
 
-→ NOW: Rally 006 nearly done (date pickers + tick timing). Sprint 13 code complete (PR #130 merged). Ghost Profiles W1 in review (PR #133).
-→ THEN: Merge PRs #132 + #133, run migrations, close Rally 006
-→ THEN: Launch QA (Rally 007) + ops config + legal
+→ Rally 006: COMPLETE. All items shipped (PRs #132-150).
+→ Sprint 13: Code complete. Ops + legal blocked on founder.
+→ Ghost Profiles W1: Shipped (PRs #133, #143, #148). Claim flow needs E2E verification.
+→ NOW: Rally 009 — Pre-MVP Polish (4 sessions, 18 items). Session 1 ready to launch.
+→ THEN: Rally 007 — Launch QA full checklist
+→ THEN: Ops config + legal sign-off (founder)
 → THEN: 🚀 Invite mode
 ```
 
@@ -67,6 +70,60 @@ See `sprints/rallies/rally-006-prelaunch/README.md` for full spec.
 - [x] CV wizard Steps 2-3 UX rework — StepExperience amber states, StepQualifications two-state rework (PR #132, 2026-04-01)
 - [x] Date pickers — text + calendar on mobile (done in PR #138; checkbox corrected 2026-04-02)
 - [x] Progress tick timing — vary delays for natural feel (done in PR #138; checkbox corrected 2026-04-02)
+
+---
+
+### 1b. Rally 009: Pre-MVP Polish (NEW — 2026-04-02)
+
+See `sprints/rallies/rally-009-premvp-polish/README.md` for full spec. **7 sessions, 30 items.**
+
+**Session 1 — Bugs + Tech Debt (no deps, start immediately):**
+- [ ] Tab bar padding — content hidden behind bottom nav on ALL app pages
+- [ ] Interests chips responsive — verify PR #150 fix, fix if still broken
+- [ ] CV preview ghost join — verify PR #148 fix, fix if still broken
+- [ ] SavedProfileCard wiring — seaTimeDays + yachtCount props
+- [ ] Yacht prefix null type — "M/Y Unknown yacht" for null type
+- [ ] Ghost endorser card layout — asymmetry between ghost/non-ghost
+- [ ] Show home country on CV — wire toggle to CV output
+- [ ] Social platform config dedup — consolidate 2 configs
+- [ ] Social icons dedup — extract shared TikTok/X icons
+- [ ] formatSeaTime collision — consolidate 2 exports
+- [ ] EndorsementsSection dead code — fix types, remove dead code
+
+**Session 2 — Data Integrity (after Session 1):**
+- [ ] Non-yachting experience — new table, save parsed data, wizard step, profile section
+- [ ] Overlapping yacht dates — union-based sea time, CV import validation
+- [ ] More tab IA prep — reorganize into 6 groups, sand wayfinding
+
+**Session 3 — Tab Redesigns (needs /grill-me):**
+- [ ] Network tab Phase 1 — unified yacht-grouped view, endorsement summary, empty states
+- [ ] Profile page redesign (issues 1-4) — teal wayfinding, compact list, empty states, grouped IA
+
+**Session 4 — Insights + Photo (needs /grill-me):**
+- [ ] Insights tab Layer 1 — real analytics dashboard, move cert manager + subscription out
+- [ ] Photo management unification — merge 3 pages, focal point 3-format preview
+- [ ] More tab completion — receive cert manager + subscription, finalize IA
+
+**Session 5 — Endorsement Flow + LLM (needs /grill-me):**
+- [ ] Endorsement writing assist — LLM draft generation from both-sides context
+- [ ] LLM prompt injection defense — sanitize inputs, validate outputs, harden prompts
+- [ ] Endorsement request redesign — yacht-grouped, external-first, ghost suggestions
+
+**Session 6 — Data Quality + Safety (needs /grill-me):**
+- [ ] CV cert matching registry — 60 seed certs, fuzzy match, green/amber/blue tiers
+- [ ] Reporting/flagging foundation — report button on profiles, yachts, endorsements
+- [ ] Bug reporter form — in-app bug report page in More tab
+- [ ] Pro upsell consistency — standard component, retrofit across app
+
+**Session 7 — Polish + Feedback + Settings (needs /grill-me):**
+- [ ] Desktop responsiveness audit — fix all pages at 1024-1920px
+- [ ] Roadmap + feedback mechanism — enhance roadmap, add Canny or voting
+- [ ] Visibility toggle clarity — sublabels explaining what each toggle controls
+- [ ] Display settings cleanup — remove scrim/accent/template pickers
+- [ ] Phone/WhatsApp split — separate fields for phone and WhatsApp
+- [ ] Attachment transfer — "Wrong yacht?" correction flow
+
+**Grill-me:** One 60-min browser session covers ALL topics. See `rally-009-premvp-polish/GRILL-ME-AGENT-PROMPT.md` for the agent prompt. Run during Sessions 1-2 build time.
 
 ---
 

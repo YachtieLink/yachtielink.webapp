@@ -26,6 +26,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-02 | Rally 009 planning | Full pre-MVP backlog triage: 30 items across 7 sessions specced into lane-ready build plans. 42 /grill-me questions prepped. 7 backlog items closed as resolved. Junior sprints updated. |
 | 2026-04-02 | Skill hardening | Worktree system overhaul: /yl-review hardened (zero-tolerance, two-step Sonnet→Opus, cleanup gaps), /yl-tester created (dedicated QA agent), file ownership rules, cwd conventions, 7 chain gaps fixed |
 | 2026-04-02 | Worktree session | 3-lane: ghost join fix + ghost flow fixes (Opus, migration), endorsement + yacht display polish, interests + social links UX (PRs #148–150) |
 | 2026-04-02 | Worktree session | 3-lane: inner-page-header redesign, ghost profiles verify + GhostEndorserBadge, custom 404 + nationality flag (PRs #142–144) |
@@ -116,6 +117,31 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 | 2026-03-09 | Planning | 5yr plan, yl_build_plan.md canonical Phase 1A sprint plan created |
 | 2026-03-08 | Planning | Planning set rewritten: yacht graph wedge, Phase 1A/1B/1C split |
 | 2026-03-08 | Project setup | Consolidated docs, CLAUDE.md + CHANGELOG.md created, project structure |
+
+## 2026-04-02 — Rally 009 Planning: Pre-MVP Backlog Triage + Session Specs
+
+**Done:**
+- Full backlog triage: reviewed all 81 items, categorized into must-fix / should-fix / post-launch
+- Created Rally 009 with 7 worktree sessions, 30 items, lane-ready build plans
+- Wrote 42 /grill-me questions organized by topic with recommendations
+- Created GRILL-ME-AGENT-PROMPT.md for Desktop app Opus agent (Chrome MCP + localhost:3000)
+- Closed 7 backlog items as RESOLVED (inner-page-header, custom-404, interests-chips, endorsement-share-button, safari-links, nationality-flag, endorsement-share-button)
+- Marked avatar-thumbnail as PARTIALLY RESOLVED (SavedProfileCard needs object-top)
+- Updated 5 stale junior sprints (1 shipped, 2 deferred, 1 Phase 2+, 1 superseded)
+- Updated PHASE1-CLOSEOUT.md, STATUS.md, sprints/README.md, rallies/README.md
+
+**Context:**
+- Sessions 1-2: no /grill-me needed, start immediately
+- Sessions 3-7: blocked on design interview (running now in parallel Desktop app session)
+- New items added: endorsement writing assist, LLM defense, endorsement request redesign, cert registry, reporting/flagging, bug reporter, roadmap+feedback, pro upsell consistency, desktop audit, visibility toggles, display settings cleanup, phone/WhatsApp split, attachment transfer
+
+**Next:**
+- Session 1 worktree launch (3 Sonnet lanes: mobile UX, P2 bugs, tech debt)
+- /grill-me decisions feed into Sessions 3-7 build plans
+
+**Flags:** None
+
+---
 
 ## 2026-04-02 — Skill Hardening: Review System, Tester Agent, Worktree File Ownership
 

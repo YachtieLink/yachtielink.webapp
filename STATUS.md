@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-02 (Skill hardening: /yl-review zero-tolerance + two-step, /yl-tester created, file ownership rules, cwd conventions. Code PRs #148-150 pushed + rebased.)
+**Last updated:** 2026-04-02 (Rally 009 planned: 4 sessions, 18 pre-MVP items specced into lane-ready build plans. PRs #148-150 merged. 7 backlog items closed as resolved. /grill-me prep doc written.)
 
 ---
 
@@ -40,12 +40,11 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Merge PRs #148 → #149 → #150** — founder merges in order, rebase between each
-2. **Regenerate Supabase types** — migration `20260402000002` already applied
-4. **Wire SavedProfileCard** — `seaTimeDays`/`yachtCount` props need wiring from `SavedProfilesClient.tsx`
-5. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
-6. **Rally 007 — Launch QA** — full checklist
-7. **Deploy** — invite mode, 20-50 crew, 24h monitoring
+1. **Rally 009 — Pre-MVP Polish** — 4 sessions, 18 items. Session 1 ready to launch (bugs + tech debt). See `sprints/rallies/rally-009-premvp-polish/README.md`
+2. **/grill-me sessions** — 3 design interviews needed to unblock Sessions 3-4 (Network, Profile, Insights, Photo redesigns). See `rally-009-premvp-polish/grill-me-prep.md`
+3. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
+4. **Rally 007 — Launch QA** — full checklist (after Rally 009 completes)
+5. **Deploy** — invite mode, 20-50 crew, 24h monitoring
 
 ---
 
@@ -64,9 +63,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | PR | Branch | Status | Notes |
 |----|--------|--------|-------|
-| #148 | fix/ghost-closeout | Ready to merge | Ghost join gap + ghost flow fixes (page-load check, auto-claim, phone dedup) + migration |
-| #149 | fix/display-polish | Ready to merge | Endorsement context, yacht prefix, toggle sublabels, prefixedYachtName guard |
-| #150 | fix/interests-socials | Ready to merge | Interests chips fix, social links in settings, CV review socials, layout thumbnails |
+| — | — | No open PRs | PRs #148–150 merged. Rally 009 Session 1 queued. |
 
 ---
 

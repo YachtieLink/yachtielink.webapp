@@ -1,5 +1,7 @@
 # Interests Chips — Broken at Wider Viewports
 
+**Status: RESOLVED** — Fixed in PR #150 (flex-wrap + content-start alignment, 2026-04-02)
+
 **Status:** idea
 **Priority guess:** P2 (visible on every public profile with interests)
 **Date captured:** 2026-04-01

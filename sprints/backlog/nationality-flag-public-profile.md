@@ -1,5 +1,7 @@
 # Nationality Flag on Public Profile Photo
 
+**Status: RESOLVED** — Shipped in PR #142 (SVG flag toggle wired in hero + settings, 2026-04-02)
+
 **Status:** proposed
 **Priority guess:** P3 (nice-to-have)
 **Date captured:** 2026-03-27

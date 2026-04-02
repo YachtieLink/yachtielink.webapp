@@ -1,5 +1,7 @@
 # Safari: Public Profile Links Not Clickable
 
+**Status: RESOLVED** — Verified working, pointer-events-none on scrim overlay (2026-03-30)
+
 **Status:** idea
 **Priority guess:** P1 (critical)
 **Date captured:** 2026-03-26

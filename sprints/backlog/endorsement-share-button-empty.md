@@ -1,5 +1,7 @@
 # Empty Share Button on Endorsement Request Page
 
+**Status: RESOLVED** — Button has icon + text, verified working (2026-04-02)
+
 **Status:** idea
 **Priority guess:** P3 (nice-to-have)
 **Date captured:** 2026-03-29
