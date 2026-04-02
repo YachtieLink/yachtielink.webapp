@@ -26,6 +26,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-02 | Worktree session | 3-lane: ghost join fix, endorsement + yacht display polish, interests + social links UX (pending push) |
 | 2026-04-02 | Worktree session | 3-lane: inner-page-header redesign, ghost profiles verify + GhostEndorserBadge, custom 404 + nationality flag (PRs #142–144) |
 | 2026-04-01 | Bugfix sweep | 4-lane worktree: onboarding name trigger, colleague display names, country ISO resolution, DatePicker text mode + tick stagger (PRs #135–138) |
 | 2026-04-01 | Worktree infra | /yl-worktree skill, logger role, worker self-validation, master bottleneck fixes, model/effort matrix |
@@ -114,6 +115,33 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 | 2026-03-09 | Planning | 5yr plan, yl_build_plan.md canonical Phase 1A sprint plan created |
 | 2026-03-08 | Planning | Planning set rewritten: yacht graph wedge, Phase 1A/1B/1C split |
 | 2026-03-08 | Project setup | Consolidated docs, CLAUDE.md + CHANGELOG.md created, project structure |
+
+## 2026-04-02 — Worktree Session: Ghost Join Fix + Display Polish + Social Links UX
+
+### Done
+
+- **Lane 1 — fix/ghost-closeout (WARNING → merge as-is)**: Added `ghost_endorser:ghost_endorser_id` join to `getProfileSections` and `getCvSections` in `lib/queries/profile.ts` — private dashboard and CV views now resolve ghost endorser names instead of showing "Anonymous". Updated `CvEndorsement` type in `lib/queries/types.ts`. Updated name-resolution chains in `components/profile/EndorsementsSection.tsx` and `components/cv/CvPreview.tsx`. Ticked 3 completed-but-unchecked PHASE1-CLOSEOUT items (date pickers, tick timing, GhostEndorserBadge wiring — all done in earlier PRs).
+- **Lane 2 — fix/display-polish (PASS)**: Endorsement cards show endorser role + yacht context ("Second Engineer on Driftwood") across `components/public/EndorsementCard.tsx`, `EndorsementsTile.tsx`, and private `EndorsementsSection.tsx`. Yacht type prefix (M/Y, S/Y) applied via `prefixedYachtName` helper across `ExperienceSection`, `ExperienceTile`, `YachtsSection`. `SavedProfileCard` gains `seaTimeDays`/`yachtCount` props for richer detail line (not yet wired from caller — falls back gracefully to role + departments). Visibility toggle sublabels added to all 4 toggles in settings.
+- **Lane 3 — fix/interests-socials (PASS after Round 1 fixes)**: Fixed interests chip responsive bug (`content-start` on `HobbiesTile`). Added full Social Links section to profile settings (load, add/delete, save via `/api/profile/social-links`). Added Social Links review card to `StepReview` with Edit-back-to-step-4 navigation. Added SVG wireframe thumbnails to layout selector buttons. Round 1 reviewer fixes: CV import button disabled-state fix, social links write routed through `/api/profile/social-links` PATCH (not direct Supabase), add-link cap raised 3 → 7.
+
+### Context
+
+- All 3 lanes: /yl-review PASS (Lane 1: WARNING, merge as-is). No scope creep, no lane boundary violations.
+- Branches have uncommitted changes in worktrees — not yet pushed. Logging before commit per updated flow.
+- Open warnings: (1) Stale inline endorsements query in `app/(protected)/app/cv/preview/page.tsx` — no ghost join, pre-existing, captured in backlog. (2) `SavedProfileCard` sea-time props inert until wired from `SavedProfilesClient.tsx`. (3) Duplicate icon components (TikTokIcon × 3, XIcon × 2, PLATFORM_CONFIG) across socials files — deferred.
+
+### Next
+
+1. Commit + push all 3 branches, create PRs, merge
+2. Wire `SavedProfileCard` sea-time/yacht-count props from `SavedProfilesClient.tsx`
+3. Replace stale inline endorsements query in `app/(protected)/app/cv/preview/page.tsx` with `getCvSections()` call
+4. Extract duplicate icon components to `components/icons/`
+
+### Flags
+
+- SavedProfileCard `seaTimeDays`/`yachtCount` props are implemented but inert — needs follow-up wiring before feature is live.
+
+---
 
 ## 2026-04-02 — Parallel Worktree Session: Header Redesign + Ghost Profiles + Quick Wins
 

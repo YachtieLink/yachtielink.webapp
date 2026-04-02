@@ -37,6 +37,40 @@ Use both: the smoke checklist catches regressions, the test backlog catches whet
 
 ## Untested Changes
 
+### fix/ghost-closeout + fix/display-polish + fix/interests-socials — Ghost Join Fix + Display Polish + Social Links UX
+Date: 2026-04-02 (pending push — test after PRs merge)
+
+#### Ghost join fix — Lane 1 (fix/ghost-closeout)
+
+- [ ] Log in as the profile owner → view own profile's Endorsements section → ghost endorser names show (not "Anonymous")
+- [ ] View own CV preview → ghost endorsements show endorser name correctly
+- [ ] Non-ghost endorsements unaffected
+
+#### Endorsement + yacht display polish — Lane 2 (fix/display-polish)
+
+- [ ] Visit a public profile with endorsements → endorsement cards show "Role on Yacht" context line below endorser name
+- [ ] Endorsement cards: date appears on its own line (not inline with role/yacht)
+- [ ] Visit a public profile → experience section shows yacht names with type prefix (M/Y Driftwood, S/Y Horizon, etc.)
+- [ ] Profile tab → Yachts section → yacht names show type prefix
+- [ ] Profile Settings → Personal section → visibility toggles all have descriptive sublabels explaining what each controls
+- [ ] Saved profiles page → saved profile cards show role + departments (sea-time/yacht-count fallback — full feature pending wiring)
+
+#### Social links + interests UX — Lane 3 (fix/interests-socials)
+
+- [ ] Visit a public profile with many interests → chips pack correctly at wider viewports (no tall empty rectangles)
+- [ ] Profile Settings → social links section present → existing links listed with × delete button each
+- [ ] With < 3 links: platform suggestion chips appear (dashed teal border) — tap a chip → inline URL input shows
+- [ ] Add a link via input → tap Add → link appears in list → tap Save → link persists on reload
+- [ ] With 3+ links: suggestion chips disappear when all 7 platforms added
+- [ ] CV review step (StepReview) → Social Links card present when social links were parsed → Edit button navigates back to step 4
+- [ ] Profile Settings → Layout section → each layout option (Profile / Portfolio / Rich Portfolio) shows SVG wireframe thumbnail above label
+
+#### General
+- [ ] `npm run build` passes
+- [ ] Type-check clean: `npx tsc --noEmit`
+
+---
+
 ### PRs #142–144 — Inner-page-header + Ghost Profiles Verify + Custom 404 + Nationality Flag
 Date: 2026-04-02
 

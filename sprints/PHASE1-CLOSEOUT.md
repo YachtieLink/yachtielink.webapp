@@ -65,8 +65,8 @@ See `sprints/rallies/rally-006-prelaunch/README.md` for full spec.
 - [x] Code review fixes — stale closure, rate limit bucket split, Pro gate expiry check, redirect loop fix (2026-04-01)
 - [x] Migration: skills_summary + interests_summary columns on users table (2026-04-01)
 - [x] CV wizard Steps 2-3 UX rework — StepExperience amber states, StepQualifications two-state rework (PR #132, 2026-04-01)
-- [ ] Date pickers — text + calendar on mobile (remaining)
-- [ ] Progress tick timing — vary delays for natural feel (remaining)
+- [x] Date pickers — text + calendar on mobile (done in PR #138; checkbox corrected 2026-04-02)
+- [x] Progress tick timing — vary delays for natural feel (done in PR #138; checkbox corrected 2026-04-02)
 
 ---
 
@@ -95,10 +95,10 @@ Sprint 13 Wave 0+1 (public infrastructure) is merged. Remaining:
 
 Design is complete (24 decisions resolved). Core viral loop — when a user adds a yacht, ghost profiles are created for crew they name. Those ghosts become claimable accounts when the real person signs up.
 
-- [ ] Ghost Profiles Wave 1 built — ghost_profiles table + RLS, 3 migrations, non-auth endorsement flow, claim flow, /endorse/[token] + /claim/[id] pages (PR #133, 2026-04-01, reviewer pending — check box when merged)
+- [x] Ghost Profiles Wave 1 built — ghost_profiles table + RLS, 3 migrations, non-auth endorsement flow, claim flow, /endorse/[token] + /claim/[id] pages (PR #133 merged 2026-04-01; GhostEndorserBadge wired + RLS fixed PR #143 2026-04-02)
 - [ ] Verify claim flow end-to-end (after PR #133 merge + migration run)
 - [ ] Verify ghost → real profile data merge (after PR #133 merge + migration run)
-- [ ] Wire GhostEndorserBadge into profile views (ghost endorsements show endorser: null until this is done)
+- [x] Wire GhostEndorserBadge into profile views (done in PR #143; checkbox corrected 2026-04-02)
 - [ ] Wave 2: phone OTP claim, signup shortcut onboarding bypass
 
 ---

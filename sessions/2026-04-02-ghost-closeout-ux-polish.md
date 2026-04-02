@@ -10,9 +10,9 @@ Parallel worktree session: 3 lanes. Ghost profiles closeout, endorsement/yacht d
 ## Lanes
 | Lane | Branch | Worktree | Model | Effort | Status |
 |------|--------|----------|-------|--------|--------|
-| 1 | fix/ghost-closeout | yl-wt-1 | Sonnet | medium | queued |
-| 2 | fix/display-polish | yl-wt-2 | Sonnet | high | queued |
-| 3 | fix/interests-socials | yl-wt-3 | Sonnet | high | queued |
+| 1 | fix/ghost-closeout | yl-wt-1 | Sonnet | medium | reviewed (WARNING → merge as-is) |
+| 2 | fix/display-polish | yl-wt-2 | Sonnet | high | reviewed (PASS) |
+| 3 | fix/interests-socials | yl-wt-3 | Sonnet | high | reviewed (PASS after Round 1 fixes) |
 
 ## Merge Order
 1. Lane 1 (query changes, cleanest)

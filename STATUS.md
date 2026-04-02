@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-02 (3-lane worktree: inner-page-header redesign, ghost profiles verify + GhostEndorserBadge, custom 404 + nationality flag. PRs #142–144 merged.)
+**Last updated:** 2026-04-02 (3-lane worktree: ghost join fix in private dashboard/CV, display polish — endorsement context + yacht prefix + saved card + visibility sublabels, interests chips fix + social links in settings + CV review. Pending push.)
 
 ---
 
@@ -26,6 +26,9 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
+| Ghost join fix (private dashboard + CV) | 2026-04-02 | ghost_endorser join added to getProfileSections + getCvSections; private profile + CV now show ghost names (pending push) |
+| Display polish — endorsement context + yacht prefix | 2026-04-02 | Endorser role+yacht on cards, M/Y S/Y prefix on experience, visibility toggle sublabels, SavedProfileCard detail line (pending push) |
+| Social links in settings + CV review | 2026-04-02 | Social links section in profile settings, editable socials in StepReview, layout selector thumbnails, interests chip fix (pending push) |
 | Inner-page-header redesign | 2026-04-02 | Sticky back bar + standalone title row, section-color border, onBack support, 3 double-px-4 fixes, BackButton deleted (PR #144) |
 | Ghost Profiles verify + GhostEndorserBadge | 2026-04-02 | RLS public SELECT policy (critical fix), badge wired into all 6 endorsement display surfaces (PR #143) |
 | Custom 404 + nationality flag | 2026-04-02 | Branded 404 page, SVG flag toggle on public profile hero + settings (PR #142) |
@@ -36,12 +39,13 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Apply migrations** — `20260401000005_nationality_flag` + `20260402000001_ghost_profiles_public_read` (founder runs on Supabase)
-2. **Ghost join gap** — private profile dashboard + CV queries still show "Anonymous" for ghost endorsements; add `ghost_endorser` join to `getProfileSections` + `getCvSections` (post-merge warning from Lane 2)
+1. **Push lanes 1–3** — commit + push 3 worktree branches, create PRs, merge
+2. **Apply migrations** — `20260401000005_nationality_flag` + `20260402000001_ghost_profiles_public_read` (founder runs on Supabase)
 3. **Regenerate Supabase types** — after migrations run
-4. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
-5. **Rally 007 — Launch QA** — full checklist
-6. **Deploy** — invite mode, 20-50 crew, 24h monitoring
+4. **Wire SavedProfileCard** — `seaTimeDays`/`yachtCount` props need wiring from `SavedProfilesClient.tsx`
+5. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
+6. **Rally 007 — Launch QA** — full checklist
+7. **Deploy** — invite mode, 20-50 crew, 24h monitoring
 
 ---
 

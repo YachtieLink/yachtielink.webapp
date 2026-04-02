@@ -62,6 +62,7 @@ Small, targeted fixes. All have a clear owner and a contained scope.
 | BUG-02 | `overlapping-yacht-dates.md` | M | Overlapping yacht date ranges cause sea-time double-counting |
 | BUG-03 | `colleague-display-names.md` | S | Colleague dedup — same person appearing under multiple name variants |
 | BUG-04 | `non-yachting-experience.md` | M | Non-yachting experience blocks onboarding completion; folded into SP-02 |
+| BUG-05 | `cv-preview-ghost-join.md` | S | Stale inline endorsements query in cv/preview/page.tsx — no ghost join, owner sees "Anonymous" in CV preview |
 
 ---
 
@@ -79,6 +80,13 @@ Self-contained, ship-in-a-session improvements. Good candidates for a polish ral
 | `cv-parse-pro-upsell.md` | S | Upsell to Pro when free user hits CV parse rate limit |
 | `settings-preview-ux.md` | S | Settings cosmetics — show live preview of visibility toggles |
 | `visibility-toggle-clarity.md` | S | Clarify what each visibility toggle controls (label copy + tooltip) |
+| `ghost-endorser-card-layout.md` | S | EndorsementCard ghost path uses old layout — visual asymmetry with non-ghost cards |
+| `saved-profile-card-wiring.md` | S | Wire seaTimeDays/yachtCount props from SavedProfilesClient to SavedProfileCard |
+| `yacht-prefix-null-type.md` | S | prefixedYachtName returns "M/Y Unknown yacht" when yacht_type is null — misleading fallback |
+| `endorsements-section-dead-code.md` | S | Private EndorsementsSection: non-nullable types mismatch, dead isOwn check, no active callers |
+| `format-sea-time-collision.md` | S | formatSeaTime exported from two files with different signatures — naming collision |
+| `social-icons-dedup.md` | S | TikTokIcon duplicated 3×, XIcon duplicated 2× — extract to components/icons/ |
+| `social-platform-config-dedup.md` | S | SOCIAL_PLATFORM_CONFIG duplicated across StepReview + SocialLinksRow + settings page |
 
 ---
 

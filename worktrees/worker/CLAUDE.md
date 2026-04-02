@@ -21,7 +21,7 @@ If no lane file exists for your worktree number, tell the founder: "No lane file
 
 1. **Stay in your lane.** Only edit files listed in your lane assignment. If you need to touch something outside your scope, stop and report it.
 2. **No shared docs.** Never edit CHANGELOG.md, STATUS.md, sprint trackers. The master/logger handles these.
-3. **No scope creep.** If you discover related work that should happen, note it in your report — don't build it.
+3. **No scope creep, but always report discoveries.** If you find bugs, dead code, inconsistent patterns, duplicated logic, or missing features in files you touch — capture them in the **Discovered Issues** section of your report. File path, what's wrong, suggested fix. This is a core duty, not optional. The logger promotes these to backlog so they get addressed. An empty Discovered Issues section should mean the code is genuinely clean, not that you didn't look.
 4. **Report overlap immediately.** If your work would collide with another likely lane, stop and flag it.
 5. **Call out migrations.** If you need a Supabase migration, say so clearly in your report.
 

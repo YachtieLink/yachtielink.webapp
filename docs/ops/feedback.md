@@ -6,12 +6,20 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 46 rules
+**Current count:** 47 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## Logger Logs Before Commit — Not After Merge
+
+**Rule:** In worktree sessions, the logger runs `/yl-shipslog` (and updates all docs) BEFORE the master commits and pushes. Doc updates ship with the code in the same PR or immediately after — they are not deferred until after merges complete.
+**Origin:** 2026-04-02 — Founder explicitly corrected: "The flow changed — you log first, then master commits." Logger was waiting for PRs to merge before starting documentation.
+**How to apply:** When a reviewer marks all lanes as done, the logger immediately updates CHANGELOG, STATUS, module docs, backlog, and test-backlog from worker reports and reviewer verdicts. The master then commits the code + docs together. Do not wait for merged PRs.
 
 ---
 
