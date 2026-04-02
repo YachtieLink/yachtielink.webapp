@@ -108,6 +108,7 @@ export async function getProfileSections(userId: string) {
       .select(`
         id, content, created_at, yacht_id,
         endorser:endorser_id ( display_name, full_name, handle ),
+        ghost_endorser:ghost_endorser_id ( id, full_name, primary_role ),
         yachts ( name )
       `)
       .eq('recipient_id', userId)
@@ -313,6 +314,7 @@ export async function getCvSections(userId: string) {
       .select(`
         id, content, created_at,
         endorser:endorser_id ( display_name, full_name ),
+        ghost_endorser:ghost_endorser_id ( full_name ),
         yacht:yachts!yacht_id ( id, name )
       `)
       .eq('recipient_id', userId)

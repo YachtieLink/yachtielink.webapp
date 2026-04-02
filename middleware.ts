@@ -67,6 +67,23 @@ export async function middleware(request: NextRequest) {
         staleAuthCookies.forEach(c => auth.response.cookies.delete(c.name))
       }
     }
+
+    // One-time ghost claim: auto-merge ghost endorsements on first authenticated navigation.
+    // Covers password login (which skips /auth/callback) and all other auth paths.
+    if (user && !request.cookies.has('yl_ghost_checked')) {
+      try {
+        const { error: claimErr } = await auth.supabase.rpc('claim_ghost_profile')
+        if (claimErr) console.error('[middleware] ghost claim:', claimErr.message)
+      } catch (e) {
+        console.error('[middleware] ghost claim failed:', e instanceof Error ? e.message : e)
+      }
+      auth.response.cookies.set('yl_ghost_checked', '1', {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 365,
+      })
+    }
   }
 
   // ── Subdomain detection ──────────────────────────────────────────────

@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/admin'
 import { GhostEndorseForm } from '@/components/ghost/GhostEndorseForm'
 import Link from 'next/link'
 
@@ -134,6 +135,58 @@ export default async function EndorsePage({ params }: PageProps) {
   }
 
   if (!request.requester || !request.yacht) return notFound()
+
+  // ── Existing-user check (Bug 1+3) ─────────────────────────────────────────
+  // If recipient_email or recipient_phone matches an existing user, show a
+  // sign-in prompt instead of the ghost form. Prevents wasted effort.
+  // Admin client for user-existence check — prevents account enumeration via anon RLS
+  const admin = createServiceClient()
+  let existingUserFound = false
+  if (request.recipient_email) {
+    const { data } = await admin
+      .from('users')
+      .select('id')
+      .eq('email', request.recipient_email)
+      .single()
+    if (data) existingUserFound = true
+  }
+  if (!existingUserFound && request.recipient_phone) {
+    const { data } = await admin
+      .from('users')
+      .select('id')
+      .eq('phone', request.recipient_phone)
+      .single()
+    if (data) existingUserFound = true
+  }
+
+  if (existingUserFound) {
+    const name = requesterDisplayName(request.requester)
+    return (
+      <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
+        <div className="max-w-sm mx-auto">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-raised)] px-4 py-4 mb-6">
+            <p className="text-xs text-[var(--color-text-tertiary)] mb-1">Endorsement request from</p>
+            <p className="text-base font-bold text-[var(--color-text-primary)]">{name}</p>
+            <p className="text-sm text-[var(--color-text-secondary)]">{request.yacht.name}</p>
+          </div>
+
+          <h1 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
+            You already have an account
+          </h1>
+          <p className="text-sm text-[var(--color-text-secondary)] mb-6 leading-relaxed">
+            Sign in to write this endorsement with your full profile — your name, photo, and credentials will be linked automatically.
+          </p>
+
+          <Link
+            href={`/login?returnTo=${encodeURIComponent(`/r/${token}`)}`}
+            className="flex h-12 items-center justify-center rounded-xl bg-[var(--color-interactive)] text-white text-sm font-semibold w-full"
+          >
+            Sign in to endorse
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   const requesterName = requesterDisplayName(request.requester)
   const yachtName = request.yacht.name

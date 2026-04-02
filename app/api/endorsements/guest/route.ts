@@ -81,14 +81,15 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // ── 5. Block if recipient_email already belongs to a real user ─────────────
-    // The ghost flow isn't needed — redirect them to sign in instead.
+    // ── 5. Block if recipient already belongs to a real user ──────────────────
+    // Uses admin client to prevent account enumeration via anon RLS leaks.
+    const admin = createServiceClient()
     const recipientEmail = request.recipient_email
     const recipientPhone = request.recipient_phone
     const sentVia = request.sent_via
 
     if (recipientEmail) {
-      const { data: existingUser } = await supabase
+      const { data: existingUser } = await admin
         .from('users')
         .select('id')
         .eq('email', recipientEmail)
@@ -97,6 +98,24 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             error: 'An account with this email already exists. Please sign in to write this endorsement.',
+            code: 'user_exists',
+          },
+          { status: 409 }
+        )
+      }
+    }
+
+    // Phone dedup: catch existing users contacted via WhatsApp
+    if (recipientPhone) {
+      const { data: existingUser } = await admin
+        .from('users')
+        .select('id')
+        .eq('phone', recipientPhone)
+        .single()
+      if (existingUser) {
+        return NextResponse.json(
+          {
+            error: 'An account with this phone number already exists. Please sign in to write this endorsement.',
             code: 'user_exists',
           },
           { status: 409 }
@@ -129,7 +148,6 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 8. Create or reuse ghost profile (admin client bypasses RLS) ──────────
-    const admin = createServiceClient()
     let ghostId: string
 
     if (ghostEmail) {
@@ -222,6 +240,27 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to create profile.' }, { status: 500 })
       }
       ghostId = created.id
+    }
+
+    // ── 8b. Self-endorsement guard ─────────────────────────────────────────
+    // Prevent users from endorsing themselves via the ghost flow.
+    {
+      const { data: requester } = await admin
+        .from('users')
+        .select('email, phone')
+        .eq('id', request.requester_id)
+        .single()
+      if (requester) {
+        const isSelf =
+          (ghostEmail && requester.email === ghostEmail) ||
+          (ghostPhone && requester.phone === ghostPhone)
+        if (isSelf) {
+          return NextResponse.json(
+            { error: 'You cannot endorse yourself.', code: 'self_endorsement' },
+            { status: 422 }
+          )
+        }
+      }
     }
 
     // ── 9. Insert endorsement with ghost_endorser_id ──────────────────────────

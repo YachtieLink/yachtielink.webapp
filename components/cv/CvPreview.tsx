@@ -154,7 +154,7 @@ export function CvPreview({ mode, user, attachments, certifications, endorsement
             {endorsements.slice(0, 3).map((end: any) => (
               <div key={end.id} className="border-l-2 border-gray-200 pl-3">
                 <p className="text-sm text-gray-600 italic break-words">&ldquo;{end.content.slice(0, 200)}&rdquo;</p>
-                <p className="text-xs text-gray-400 mt-0.5">— {end.endorser?.display_name ?? end.endorser?.full_name ?? 'Anonymous'}</p>
+                <p className="text-xs text-gray-400 mt-0.5">— {end.endorser?.display_name ?? end.endorser?.full_name ?? end.ghost_endorser?.full_name ?? 'Anonymous'}</p>
               </div>
             ))}
           </div>
