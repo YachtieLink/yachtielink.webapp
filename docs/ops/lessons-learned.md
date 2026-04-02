@@ -6,13 +6,23 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 79 lessons
-<!-- Note: was 78, added 1 entry on 2026-04-02 (ghost profiles RLS — public SELECT policy) -->
+**Current count:** 80 lessons
+<!-- Note: was 79, added 1 entry on 2026-04-02 (worktree artifacts committed to two branches) -->
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## Worktree Artifacts Committed to Two Branches Causes Merge Conflicts
+
+**What happened:** Worker reports and review files were committed to both the main repo session branch (via a context commit) AND each lane branch (via worktree commits). When the session PR merged first, main got the files. Lane PRs then had add/add conflicts on every shared file. Three rebases needed.
+**Root cause:** No rule existed for which branch owns report/review files. The logger copied them to main, and the push skill committed them from worktrees — both added the same files.
+**Fix applied:** Established file ownership rule: reports and reviews are committed ONLY in lane branches, never copied to main. Logger reads from worktrees at runtime. Rule enforced in 5 skills (`/yl-push`, `/yl-logger`, `/yl-worker`, `/yl-reviewer-bootstrap`, `/yl-worktree`). Feedback memory saved.
+**Lesson:** In a multi-branch worktree workflow, every artifact must have exactly one owning branch. If two branches can add the same file, they will conflict.
+**Sprint:** Worktree hardening | **Caught by:** Master + founder | **Date:** 2026-04-02
 
 ---
 

@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-02 (3-lane worktree: ghost join fix in private dashboard/CV, display polish — endorsement context + yacht prefix + saved card + visibility sublabels, interests chips fix + social links in settings + CV review. Pending push.)
+**Last updated:** 2026-04-02 (Skill hardening: /yl-review zero-tolerance + two-step, /yl-tester created, file ownership rules, cwd conventions. Code PRs #148-150 pushed + rebased.)
 
 ---
 
@@ -26,9 +26,10 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
-| Ghost join fix (private dashboard + CV) | 2026-04-02 | ghost_endorser join added to getProfileSections + getCvSections; private profile + CV now show ghost names (pending push) |
-| Display polish — endorsement context + yacht prefix | 2026-04-02 | Endorser role+yacht on cards, M/Y S/Y prefix on experience, visibility toggle sublabels, SavedProfileCard detail line (pending push) |
-| Social links in settings + CV review | 2026-04-02 | Social links section in profile settings, editable socials in StepReview, layout selector thumbnails, interests chip fix (pending push) |
+| Skill hardening — review, tester, file ownership | 2026-04-02 | /yl-review zero-tolerance + two-step, /yl-tester agent, file ownership rules, cwd conventions, 7 chain gaps fixed |
+| Ghost join fix + ghost flow fixes | 2026-04-02 | ghost_endorser join, page-load check, auto-claim, phone dedup, migration (PR #148) |
+| Display polish — endorsement context + yacht prefix | 2026-04-02 | Endorser role+yacht on cards, M/Y S/Y prefix, toggle sublabels (PR #149) |
+| Social links + interests + layout thumbnails | 2026-04-02 | Social links in settings, CV review socials, interests chip fix, layout thumbnails (PR #150) |
 | Inner-page-header redesign | 2026-04-02 | Sticky back bar + standalone title row, section-color border, onBack support, 3 double-px-4 fixes, BackButton deleted (PR #144) |
 | Ghost Profiles verify + GhostEndorserBadge | 2026-04-02 | RLS public SELECT policy (critical fix), badge wired into all 6 endorsement display surfaces (PR #143) |
 | Custom 404 + nationality flag | 2026-04-02 | Branded 404 page, SVG flag toggle on public profile hero + settings (PR #142) |
@@ -39,9 +40,8 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Push lanes 1–3** — commit + push 3 worktree branches, create PRs, merge
-2. **Apply migrations** — `20260401000005_nationality_flag` + `20260402000001_ghost_profiles_public_read` (founder runs on Supabase)
-3. **Regenerate Supabase types** — after migrations run
+1. **Merge PRs #148 → #149 → #150** — founder merges in order, rebase between each
+2. **Regenerate Supabase types** — migration `20260402000002` already applied
 4. **Wire SavedProfileCard** — `seaTimeDays`/`yachtCount` props need wiring from `SavedProfilesClient.tsx`
 5. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
 6. **Rally 007 — Launch QA** — full checklist
@@ -64,7 +64,9 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | PR | Branch | Status | Notes |
 |----|--------|--------|-------|
-| — | — | No open PRs | PRs #142–144 merged this session |
+| #148 | fix/ghost-closeout | Ready to merge | Ghost join gap + ghost flow fixes (page-load check, auto-claim, phone dedup) + migration |
+| #149 | fix/display-polish | Ready to merge | Endorsement context, yacht prefix, toggle sublabels, prefixedYachtName guard |
+| #150 | fix/interests-socials | Ready to merge | Interests chips fix, social links in settings, CV review socials, layout thumbnails |
 
 ---
 
