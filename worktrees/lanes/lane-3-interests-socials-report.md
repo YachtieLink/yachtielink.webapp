@@ -72,6 +72,30 @@ None — reviewer marked verdict WARNING (no hard blocks).
 | 4 | LOW: Non-editable SocialLinksRow wrapped links in extra `<div>` | Fixed: conditional render — editable renders `<div>` wrapper with × button, non-editable renders bare `<Link>` (original DOM shape preserved) | `components/profile/SocialLinksRow.tsx` |
 | 5 | LOW: Duplicate TikTokIcon / XIcon / PLATFORM_CONFIG across files | Deferred — extracting to `components/icons/` requires creating files outside the lane's allowed list. Flagged for follow-up sprint. | — |
 
+---
+
+## Review Fixes — Round 2
+
+Reviewer verdict: BLOCK (9 items)
+
+### Blockers Fixed
+
+| # | Item | Fix Applied | Files Touched |
+|---|------|-------------|---------------|
+| 1 | HeroSection.tsx out of scope + behavioral regression (homeCountryFlag removed) | Reverted: `git checkout main -- components/public/HeroSection.tsx` | `components/public/HeroSection.tsx` |
+| 2 | CountryFlag.tsx out of scope + accessibility regression (`alt=""`) | Reverted: `git checkout main -- components/ui/CountryFlag.tsx` | `components/ui/CountryFlag.tsx` |
+| 3+4 | TikTokIcon + XIcon defined in 3 / 2 places | Extracted to `components/ui/social-icons.tsx`. All three consumers now import from there. Local definitions removed. | `components/ui/social-icons.tsx` (new), `components/profile/SocialLinksRow.tsx`, `components/cv/steps/StepReview.tsx`, `app/(protected)/app/profile/settings/page.tsx` |
+| 5 | Duplicate SOCIAL_PLATFORM_CONFIG | Created `lib/social-platforms.ts` with shared `SocialPlatform` type, `ALL_PLATFORMS`, and `SOCIAL_PLATFORM_META` (label, hoverColor, placeholder). Both consumers derive their config from it, adding their own size-specific icons. | `lib/social-platforms.ts` (new), `components/profile/SocialLinksRow.tsx`, `app/(protected)/app/profile/settings/page.tsx` |
+| 6 | Non-atomic save — misleading error on partial failure | Error toast changed to "Profile saved, but social links failed — please try again." | `app/(protected)/app/profile/settings/page.tsx` |
+| 7 | homeCountryFlag dead prop — resolved by fix #1 | No action required | — |
+| 8 | SocialLinksRow editable/onDelete — dead code (no caller uses it) | Removed: props stripped, SocialLinksRow restored to display-only. Re-add when a caller needs it. | `components/profile/SocialLinksRow.tsx` |
+| 9 | Settings page sublabel tweaks (flag-related, out-of-scope) | Reverted both sublabel strings to match main | `app/(protected)/app/profile/settings/page.tsx` |
+
+### Validation (post-fix)
+- Type check: pass
+- Drift check: pass (0 new warnings)
+- Self-review: clean — net -92 lines (deletions dominate, correct for a cleanup round)
+
 ### Validation (post-fix)
 - Type check: pass
 - Drift check: pass

@@ -15,6 +15,9 @@ import { normalizeCountry } from '@/lib/constants/country-normalize'
 import { RESERVED_HANDLES } from '@/lib/constants/reserved-handles'
 import { isProFromRecord } from '@/lib/stripe/pro-shared'
 import { User, Phone, Mail, MapPin, Calendar, Globe, LayoutGrid, Instagram, Linkedin, Youtube, Facebook, Link2, Plus, X } from 'lucide-react'
+import { TikTokIcon, XIcon } from '@/components/ui/social-icons'
+import { ALL_PLATFORMS, SOCIAL_PLATFORM_META } from '@/lib/social-platforms'
+import type { SocialPlatform } from '@/lib/social-platforms'
 
 const DEPARTMENTS = [
   'Deck', 'Interior', 'Engineering', 'Galley',
@@ -23,42 +26,21 @@ const DEPARTMENTS = [
 
 const HANDLE_RE = /^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$/
 
-type SocialPlatform = 'instagram' | 'linkedin' | 'tiktok' | 'youtube' | 'x' | 'facebook' | 'website'
-
 interface SocialLinkItem {
   platform: SocialPlatform
   url: string
 }
 
-// Custom TikTok icon (no Lucide equivalent)
-function TikTokIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07Z" />
-    </svg>
-  )
-}
-
-// Custom X (Twitter) icon
-function XIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.74l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  )
-}
-
+// Platform config for settings UI — merges shared metadata with icons at size 16
 const SOCIAL_PLATFORM_CONFIG: Record<SocialPlatform, { label: string; icon: React.ReactNode; placeholder: string }> = {
-  instagram: { label: 'Instagram', icon: <Instagram size={16} />, placeholder: 'https://instagram.com/yourhandle' },
-  linkedin:  { label: 'LinkedIn',  icon: <Linkedin size={16} />,   placeholder: 'https://linkedin.com/in/yourname' },
-  tiktok:    { label: 'TikTok',    icon: <TikTokIcon size={16} />, placeholder: 'https://tiktok.com/@yourhandle' },
-  youtube:   { label: 'YouTube',   icon: <Youtube size={16} />,    placeholder: 'https://youtube.com/@yourchannel' },
-  x:         { label: 'X',         icon: <XIcon size={16} />,      placeholder: 'https://x.com/yourhandle' },
-  facebook:  { label: 'Facebook',  icon: <Facebook size={16} />,   placeholder: 'https://facebook.com/yourprofile' },
-  website:   { label: 'Website',   icon: <Globe size={16} />,      placeholder: 'https://yourwebsite.com' },
+  instagram: { label: SOCIAL_PLATFORM_META.instagram.label, icon: <Instagram size={16} />, placeholder: SOCIAL_PLATFORM_META.instagram.placeholder },
+  linkedin:  { label: SOCIAL_PLATFORM_META.linkedin.label,  icon: <Linkedin size={16} />,  placeholder: SOCIAL_PLATFORM_META.linkedin.placeholder },
+  tiktok:    { label: SOCIAL_PLATFORM_META.tiktok.label,    icon: <TikTokIcon size={16} />, placeholder: SOCIAL_PLATFORM_META.tiktok.placeholder },
+  youtube:   { label: SOCIAL_PLATFORM_META.youtube.label,   icon: <Youtube size={16} />,   placeholder: SOCIAL_PLATFORM_META.youtube.placeholder },
+  x:         { label: SOCIAL_PLATFORM_META.x.label,         icon: <XIcon size={16} />,     placeholder: SOCIAL_PLATFORM_META.x.placeholder },
+  facebook:  { label: SOCIAL_PLATFORM_META.facebook.label,  icon: <Facebook size={16} />,  placeholder: SOCIAL_PLATFORM_META.facebook.placeholder },
+  website:   { label: SOCIAL_PLATFORM_META.website.label,   icon: <Globe size={16} />,     placeholder: SOCIAL_PLATFORM_META.website.placeholder },
 }
-
-const ALL_PLATFORMS: SocialPlatform[] = ['instagram', 'linkedin', 'tiktok', 'youtube', 'x', 'facebook', 'website']
 
 interface Role {
   id: string
@@ -310,7 +292,7 @@ export default function ProfileSettingsPage() {
       })
       if (!socialRes.ok) {
         const body = await socialRes.json().catch(() => ({}))
-        toast((body as { error?: string }).error ?? 'Failed to save social links.', 'error')
+        toast('Profile saved, but social links failed — please try again.', 'error')
         return
       }
 
