@@ -368,21 +368,21 @@ export default function ProfileSettingsPage() {
       <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-3">
         <div className="flex flex-col gap-1">
           <Input label="Phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+44 7700 900000" />
-          <ToggleRow label="Show on profile" checked={showPhone} onChange={setShowPhone} />
+          <ToggleRow label="Show on profile" sublabel="Your phone number will appear on your public profile" checked={showPhone} onChange={setShowPhone} />
         </div>
 
         <hr className="border-[var(--color-border)]" />
 
         <div className="flex flex-col gap-1">
           <Input label="WhatsApp" type="tel" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="+44 7700 900000" />
-          <ToggleRow label="Show on profile" checked={showWhatsapp} onChange={setShowWhatsapp} />
+          <ToggleRow label="Show on profile" sublabel="Your WhatsApp number will appear on your public profile" checked={showWhatsapp} onChange={setShowWhatsapp} />
         </div>
 
         <hr className="border-[var(--color-border)]" />
 
         <div className="flex flex-col gap-1">
           <Input label="Contact email" type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="you@example.com" hint="Shown on your profile and CV. Your login email is in Account settings." />
-          <ToggleRow label="Show on profile" checked={showEmail} onChange={setShowEmail} />
+          <ToggleRow label="Show on profile" sublabel="Your contact email will appear on your public profile" checked={showEmail} onChange={setShowEmail} />
         </div>
 
         <hr className="border-[var(--color-border)]" />
@@ -392,7 +392,7 @@ export default function ProfileSettingsPage() {
             <SearchableSelect label="Country" value={locationCountry} onChange={setLocationCountry} options={ALL_COUNTRIES.map((c) => ({ value: c, label: c }))} pinnedOptions={PINNED_COUNTRIES.map((c) => ({ value: c, label: c }))} placeholder="Search countries..." clearable clearLabel="No country" className="flex-1" />
             <Input label="City" type="text" value={locationCity} onChange={(e) => setLocationCity(e.target.value)} placeholder="City" className="flex-1" />
           </div>
-          <ToggleRow label="Show on profile" checked={showLocation} onChange={setShowLocation} />
+          <ToggleRow label="Show on profile" sublabel="Your current location will appear on your public profile" checked={showLocation} onChange={setShowLocation} />
         </div>
       </div>
 
@@ -405,14 +405,14 @@ export default function ProfileSettingsPage() {
       <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-3">
         <div className="flex flex-col gap-1">
           <DatePicker label="Date of Birth" value={dob || null} onChange={(v) => setDob(v ?? '')} includeDay maxYear={new Date().getFullYear() - 16} minYear={1940} />
-          <ToggleRow label="Show age on profile" sublabel="Calculated from date of birth" checked={showDob} onChange={setShowDob} />
+          <ToggleRow label="Show age on profile" sublabel="Your age (not date of birth) will appear on your public profile" checked={showDob} onChange={setShowDob} />
         </div>
 
         <hr className="border-[var(--color-border)]" />
 
         <div className="flex flex-col gap-1">
           <SearchableSelect label="Home Country" value={homeCountry} onChange={setHomeCountry} options={ALL_COUNTRIES.map((c) => ({ value: c, label: c }))} pinnedOptions={PINNED_COUNTRIES.map((c) => ({ value: c, label: c }))} placeholder="Search countries..." clearable clearLabel="No country" />
-          <ToggleRow label="Show home country on profile" checked={showHomeCountry} onChange={setShowHomeCountry} />
+          <ToggleRow label="Show home country on profile" sublabel="Your home country will appear on your public profile" checked={showHomeCountry} onChange={setShowHomeCountry} />
           <ToggleRow
             label="Show nationality flag on profile"
             sublabel={homeCountry ? 'Displays your country flag next to your name (replaces home country flag)' : 'Set a home country above to enable'}

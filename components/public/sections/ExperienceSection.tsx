@@ -3,6 +3,7 @@ import { ProfileAccordion } from '@/components/profile/ProfileAccordion'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
 import { formatSeaTime } from '@/lib/sea-time'
 import { formatDate } from '@/lib/format-date'
+import { prefixedYachtName } from '@/lib/yacht-prefix'
 import type { PublicAttachment } from '@/lib/queries/types'
 
 interface ExperienceSectionProps {
@@ -39,10 +40,10 @@ export function ExperienceSection({ attachments, sharedYachtIdSet, seaTimeTotalD
                   <p className="text-sm font-medium text-[var(--color-text-primary)]">
                     {att.yachts?.id && onNavigate ? (
                       <button onClick={() => onNavigate(`/app/yacht/${att.yachts!.id}`, att.yachts!.name ?? 'Yacht')} className="hover:text-[var(--accent-500,#0f9b8e)] text-left transition-colors">
-                        {att.yachts.name ?? 'Unknown Yacht'}
+                        {prefixedYachtName(att.yachts.name ?? 'Unknown Yacht', att.yachts.yacht_type)}
                       </button>
                     ) : (
-                      <>{att.yachts?.name ?? 'Unknown Yacht'}</>
+                      <>{prefixedYachtName(att.yachts?.name ?? 'Unknown Yacht', att.yachts?.yacht_type)}</>
                     )}
                     {att.role_label && <span className="font-normal text-[var(--color-text-secondary)]"> — {att.role_label}</span>}
                     {isShared && <span className="ml-2 text-xs text-[var(--color-interactive)]">You worked here</span>}

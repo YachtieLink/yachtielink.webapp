@@ -16,19 +16,18 @@ Polished endorsement and yacht display across the app. Endorsement cards now sho
 
 ```
 components/public/EndorsementCard.tsx
-components/public/sections/EndorsementsSection.tsx       (no change needed — uses EndorsementCard)
 components/public/bento/tiles/EndorsementsTile.tsx
-components/profile/EndorsementsSection.tsx
 components/public/sections/ExperienceSection.tsx
 components/public/bento/tiles/ExperienceTile.tsx
-components/profile/YachtsSection.tsx
 components/network/SavedProfileCard.tsx
 app/(protected)/app/profile/settings/page.tsx
+lib/yacht-prefix.ts
 ```
 
 Note: `components/yacht/YachtMatchCard.tsx` was already using `prefixedYachtName` — no change required.
-Note: `components/public/sections/EndorsementsSection.tsx` was not modified directly — it delegates to `EndorsementCard` which was updated.
+Note: `components/public/sections/EndorsementsSection.tsx` was not modified directly — it delegates to `EndorsementCard`.
 Note: `lib/utils.ts` was not modified — `prefixedYachtName` already exists in `lib/yacht-prefix.ts`.
+Note: `components/profile/EndorsementsSection.tsx` and `components/profile/YachtsSection.tsx` reverted — dead components, not in any active route.
 
 ## Migrations
 
@@ -37,23 +36,49 @@ Note: `lib/utils.ts` was not modified — `prefixedYachtName` already exists in 
 ## Tests
 
 - [x] Type check passed (`npx tsc --noEmit` — clean, no output)
-- [x] Drift check passed (`npm run drift-check` — PASS, 0 new warnings)
+- [x] Drift check passed (`npm run drift-check` — PASS, 0 new warnings, 9 files scanned)
 - [ ] /yl-review passed (run by reviewer)
 - Manual QA notes:
-  - Verified `prefixedYachtName` handles null yacht_type gracefully (defaults to "M/Y" per existing lib logic)
-  - EndorsementCard: if only role present → shows role alone; if only yacht → shows yacht alone; if both → "Role on Yacht"; neither → section hidden
-  - SavedProfileCard: seaTimeDays/yachtCount props are optional — existing callers unchanged; display falls back to role+departments when props absent
+  - `prefixedYachtName('')` now returns `''` (guard added) — no longer produces "M/Y "
+  - EndorsementCard ghost path: yacht on own line ("on Driftwood"), date on separate line — mirrors non-ghost restructure
+  - EndorsementCard non-ghost: role + yacht combined ("Second Engineer on Driftwood"), date on separate line
+  - SavedProfileCard: reverted to original subtitle — seaTimeDays/yachtCount backlogged until query wiring ready
 
 ## Risks
 
-**SavedProfileCard wiring incomplete** — the new `seaTimeDays` and `yachtCount` props are implemented but not yet wired from the calling code. `app/(protected)/app/network/saved/page.tsx` and `SavedProfilesClient.tsx` are not in Lane 2's allowed files. The display falls back gracefully to the existing subtitle (role + departments) until a follow-up wires the data. The page.tsx already queries attachment data for colleague detection — extending it to compute sea time and yacht count per saved user is the remaining work.
-
-**components/profile/EndorsementsSection.tsx** — this component is not currently imported in any active route (only referenced in archive docs). The `role_label` prop added is optional; existing callers are unaffected. Improvement is ready for when it's re-used.
+**SavedProfileCard detail line (backlogged)** — "6y 7m at sea · 2 yachts" feature removed per reviewer. Needs `app/(protected)/app/network/saved/page.tsx` + `SavedProfilesClient.tsx` updates to compute and pass sea time data. `page.tsx` already queries attachments for colleague detection — extending it is straightforward when the sprint is ready.
 
 ## Overlap Detected
 
-- [x] None — all changes within Lane 2 allowed files
+- [x] None — all changes within Lane 2 allowed files (plus `lib/yacht-prefix.ts` as reviewer-requested fix)
 
 ## Recommended Merge Order
 
 Lane 2 is self-contained (pure display polish, no schema changes, no shared state). Can merge in any order.
+
+---
+
+## Review Fixes — Round 1
+
+Reviewer verdict: 5 BLOCK, 1 DISMISSED
+
+### Blockers Fixed
+
+| # | Blocker | Fix Applied | Files Touched |
+|---|---------|-------------|---------------|
+| 1 | Ghost path in EndorsementCard partial refactor | Restructured ghost right-side to `div` with "on {yacht}" + date on separate lines, matching non-ghost pattern | `components/public/EndorsementCard.tsx` |
+| 2 | SavedProfileCard dead feature props (seaTimeDays/yachtCount) | Removed props, formatSeaTime import, and IIFE; restored original `subtitle` variable | `components/network/SavedProfileCard.tsx` |
+| 3 | profile/EndorsementsSection dead code modifications | Reverted role_label prop + display changes to original state | `components/profile/EndorsementsSection.tsx` |
+| 4 | profile/YachtsSection dead code modifications | Reverted prefixedYachtName import + yacht_type display to original state | `components/profile/YachtsSection.tsx` |
+| 6 | prefixedYachtName empty string guard | Added `if (!name.trim()) return name` guard | `lib/yacht-prefix.ts` |
+
+### Warnings Addressed
+
+| # | Warning | Action | Files Touched |
+|---|---------|--------|---------------|
+| 5 | DOB sublabel regression | Dismissed by reviewer — new copy "Your age (not date of birth)..." accepted | none |
+
+### Validation (post-fix)
+- Type check: pass
+- Drift check: pass (0 new warnings)
+- Self-review: clean — no dead code, no debug artifacts

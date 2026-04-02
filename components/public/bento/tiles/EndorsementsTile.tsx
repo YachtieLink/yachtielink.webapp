@@ -91,7 +91,9 @@ export function EndorsementsTile({ endorsements, handle }: EndorsementsTileProps
           <p className="text-xs font-semibold text-[var(--color-text-primary)]">{endorserName}</p>
           {(endorserRole || yachtName) && (
             <p className="text-[10px] text-[var(--color-text-secondary)]">
-              {endorserRole}{endorserRole && yachtName ? ' · ' : ''}{yachtName}
+              {endorserRole}
+              {endorserRole && yachtName && ' on '}
+              {yachtName}
             </p>
           )}
         </div>
