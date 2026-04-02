@@ -6,12 +6,29 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 47 rules
+**Current count:** 50 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
 - `sessions/YYYY-MM-DD-<slug>.md` — log when and how the correction happened
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
+
+---
+
+## Reviewer Must Fix Everything, Not Recommend "Merge As-Is"
+**Rule:** Every finding from a code review is a mandatory fix. No "merge as-is with follow-up." No WARNING verdict. PASS (zero findings) or BLOCK (fix list). The reviewer's job is to find every problem and send the worker back with a clear numbered fix list.
+**Origin:** 2026-04-02. Reviewer recommended "merge as-is" for Lane 1 with a HIGH finding (password login gap). Founder: "why would we not fix everything?"
+**How to apply:** `/yl-review` and `/yl-reviewer-bootstrap` enforce this. Every severity level (CRITICAL, HIGH, MEDIUM, LOW) gets fixed before shipping. Pre-existing issues on main are the only exception — those go to backlog.
+
+## Never Compress or Skip the QA Presentation
+**Rule:** After QA testing, present the full structured report to the founder in chat with every section present. Do not compress, summarize, or skip sections. The founder decides what to skim — the agent does not decide for them.
+**Origin:** 2026-04-02. Master skipped the structured QA presentation format and gave a compressed summary instead.
+**How to apply:** `/yl-test` and `/yl-tester` both have mandatory presentation sections. Every section must appear even if empty ("None.").
+
+## Worktree Artifacts Have Exactly One Owning Branch
+**Rule:** Worker reports and review files are committed ONLY in their lane branch. Never copy or commit them to the main repo branch. The logger reads them from worktrees at runtime.
+**Origin:** 2026-04-02. Reports committed to both main and lane branches caused add/add conflicts on all 3 PRs.
+**How to apply:** Enforced in `/yl-push` (don't stage reports on main), `/yl-logger` (read from worktrees, never copy), `/yl-worker` (reports committed with lane code), `/yl-reviewer-bootstrap` (reviews stay in worktree).
 
 ---
 

@@ -26,7 +26,8 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
-| 2026-04-02 | Worktree session | 3-lane: ghost join fix + ghost flow fixes (Opus, migration), endorsement + yacht display polish, interests + social links UX (pending push) |
+| 2026-04-02 | Skill hardening | Worktree system overhaul: /yl-review hardened (zero-tolerance, two-step Sonnet→Opus, cleanup gaps), /yl-tester created (dedicated QA agent), file ownership rules, cwd conventions, 7 chain gaps fixed |
+| 2026-04-02 | Worktree session | 3-lane: ghost join fix + ghost flow fixes (Opus, migration), endorsement + yacht display polish, interests + social links UX (PRs #148–150) |
 | 2026-04-02 | Worktree session | 3-lane: inner-page-header redesign, ghost profiles verify + GhostEndorserBadge, custom 404 + nationality flag (PRs #142–144) |
 | 2026-04-01 | Bugfix sweep | 4-lane worktree: onboarding name trigger, colleague display names, country ISO resolution, DatePicker text mode + tick stagger (PRs #135–138) |
 | 2026-04-01 | Worktree infra | /yl-worktree skill, logger role, worker self-validation, master bottleneck fixes, model/effort matrix |
@@ -115,6 +116,45 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 | 2026-03-09 | Planning | 5yr plan, yl_build_plan.md canonical Phase 1A sprint plan created |
 | 2026-03-08 | Planning | Planning set rewritten: yacht graph wedge, Phase 1A/1B/1C split |
 | 2026-03-08 | Project setup | Consolidated docs, CLAUDE.md + CHANGELOG.md created, project structure |
+
+## 2026-04-02 — Skill Hardening: Review System, Tester Agent, Worktree File Ownership
+
+### Done
+
+- **`/yl-review` hardened:** Zero-tolerance reviewer standards (every finding is a fix, PASS or BLOCK only). Two-step Sonnet→Opus review with shared context (main agent pre-reads files, injects into both). Opus does independent Part B review to avoid anchoring on Sonnet's findings. Cleanup gaps section restored (dead code, debug residue, partial refactors). Canonical owners + drift-check loaded from `docs/ops/canonical-owners/`.
+- **`/yl-tester` created:** Dedicated browser QA agent on Desktop app with Chrome MCP. 8-step testing protocol (input/output, toggle matrix, copy coherence, visual consistency, journey tracing, architecture smell, cross-lane, fix-as-you-go). Writes `worktrees/qa-report.md` for logger. Captures founder feedback as findings/backlog. Master moves to CLI, freeing it for backlog/planning during QA.
+- **File ownership rules:** Worker reports and review files committed ONLY in lane branches, never copied to main repo. Prevents add/add merge conflicts (root cause of PR #148-150 conflicts this session). Enforced in 5 skills: `/yl-push`, `/yl-logger`, `/yl-worker`, `/yl-reviewer-bootstrap`, `/yl-worktree`.
+- **cwd conventions documented:** Reviewer + logger launch from `/Users/ari/Developer/` (parent). Tester + master from `yachtielink.webapp/`. Workers from `yl-wt-N/`. Reference table in `/yl-worktree`. No more hardcoded absolute paths.
+- **7 chain simulation gaps fixed:** (1) Multiple reports per lane — read all, most recent is current. (2) `worker/CLAUDE.md` synced with SKILL.md (slug in report name, fix-round amend). (3) Reviewer append warning at write step. (4) Lane spec split noted in tester/reviewer. (5) `modules_touched` in session template. (6) Loop range clarification. (7) cwd conventions table.
+- **`.supabase` symlink added to worktree setup** — `supabase db push` now works from any worktree.
+- **`/yl-reviewer-bootstrap` aligned** with `/yl-review` — no WARNING verdict, no "merge as-is", every finding is a fix.
+- **SNIPPETS.md updated** — reviewer + logger launch from parent dir, yltester snippet added.
+- **CLAUDE.md mandatory chain updated** — solo vs worktree chains, tester in worktree chain.
+- **All 3 code PRs pushed and rebased** — #148 ghost closeout, #149 display polish, #150 interests/socials. Migration applied. Conflicts resolved (caused by report duplication — now prevented).
+
+### Context
+
+This session started as QA + push for the 3-lane worktree session but evolved into a full worktree system hardening after reviewing the reviewer's soft report on Lane 1. The code PRs (#148-150) are pushed and ready to merge. The skill improvements are in `~/.claude/skills/` (not in the repo — they're Claude Code config).
+
+### Next
+
+1. Founder merges PRs #148 → #149 → #150 (in order)
+2. Next worktree session uses the new tester role — first real test of the split
+3. Backlog items from this session: `show-home-country-on-cv.md`, `/r/{token}` accepted-status guard, `socialLinksSchema` javascript: URL validation
+4. Sprint 13 ops/legal still blocked on founder
+
+### Flags
+
+- PRs may need rebase after each merge (sequential merge order: #148 first, then #149, then #150)
+- The `/yl-tester` skill is new and untested in a real session — first real run will surface any remaining gaps
+- `/yl-review` two-step Sonnet→Opus flow is new — monitor token usage and quality on first run
+
+### Backlog captured
+
+- `show-home-country-on-cv.md` — from QA (already existed)
+- No new backlog items from this skill hardening session
+
+---
 
 ## 2026-04-02 — Worktree Session: Ghost Join Fix + Ghost Flow Fixes + Display Polish + Social Links UX
 
