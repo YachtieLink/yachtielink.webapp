@@ -49,6 +49,8 @@ These items are done. Files remain for reference but are candidates for removal 
 | — | `subdomain-cookie-auth-audit.md` | PR #101 | Subdomain cookie and auth edge-case audit |
 | — | `ux-audit-mobile-2026-03-29.md` | Rally 006 | Mobile UX/UI audit |
 | — | `cv-upload-modes.md` | Sprint CV-Parse | CV upload mode selection (Step 0 of import wizard) |
+| — | `non-yachting-experience.md` | Rally 009 S2 | Land experience end-to-end (DB + wizard + profile) |
+| — | `format-sea-time-collision.md` | Rally 009 S2 | formatSeaTimeCompact deleted, canonical version used |
 
 ---
 
@@ -59,9 +61,9 @@ Small, targeted fixes. All have a clear owner and a contained scope.
 | ID | File | Effort | Summary |
 |----|------|--------|---------|
 | BUG-01 | `onboarding-name-from-email.md` | S | Name field not pre-filled from email during onboarding trigger |
-| BUG-02 | `overlapping-yacht-dates.md` | M | Overlapping yacht date ranges cause sea-time double-counting |
+| BUG-02 | `overlapping-yacht-dates.md` | M | Overlapping yacht date ranges cause sea-time double-counting (client-side: shipped R009 S2; SQL RPC: see `sea-time-sql-rpc-overlap.md`) |
 | BUG-03 | `colleague-display-names.md` | S | Colleague dedup — same person appearing under multiple name variants |
-| BUG-04 | `non-yachting-experience.md` | M | Non-yachting experience blocks onboarding completion; folded into SP-02 |
+| BUG-04 | `non-yachting-experience.md` | M | ~~Non-yachting experience blocks onboarding completion~~ **SHIPPED** Rally 009 S2 |
 | BUG-05 | `cv-preview-ghost-join.md` | S | Stale inline endorsements query in cv/preview/page.tsx — no ghost join, owner sees "Anonymous" in CV preview |
 
 ---
@@ -84,7 +86,10 @@ Self-contained, ship-in-a-session improvements. Good candidates for a polish ral
 | `saved-profile-card-wiring.md` | S | Wire seaTimeDays/yachtCount props from SavedProfilesClient to SavedProfileCard |
 | `yacht-prefix-null-type.md` | S | prefixedYachtName returns "M/Y Unknown yacht" when yacht_type is null — misleading fallback |
 | `endorsements-section-dead-code.md` | S | Private EndorsementsSection: non-nullable types mismatch, dead isOwn check, no active callers |
-| `format-sea-time-collision.md` | S | formatSeaTime exported from two files with different signatures — naming collision |
+| `format-sea-time-collision.md` | S | ~~formatSeaTime exported from two files with different signatures~~ **SHIPPED** Rally 009 S2 |
+| `sea-time-sql-rpc-overlap.md` | M | `get_sea_time()` SQL RPC + detail page + saved profiles use naive sums — double-counts overlaps |
+| `land-experience-crud.md` | M | No CRUD for land experience outside CV wizard — no edit/delete for shore-side roles |
+| `land-experience-rls-visibility.md` | S | `land_experience` RLS public read ignores `section_visibility` (systemic — same as attachments) |
 | `social-icons-dedup.md` | S | TikTokIcon duplicated 3×, XIcon duplicated 2× — extract to components/icons/ |
 | `social-platform-config-dedup.md` | S | SOCIAL_PLATFORM_CONFIG duplicated across StepReview + SocialLinksRow + settings page |
 

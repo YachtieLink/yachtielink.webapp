@@ -1,7 +1,8 @@
 # Non-Yachting Experience
 
-**Created:** 2026-03-30
+**Status:** shipped
 **Priority:** HIGH — Pre-launch blocker (founder confirmed: will block some users from completing onboarding)
+**Shipped in:** Rally 009 Session 2, Lane 1 (feat/land-experience) — 2026-04-03
 **Scope:** All users
 **Effort:** Medium
 

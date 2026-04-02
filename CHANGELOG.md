@@ -26,10 +26,41 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-03 | Rally 009 Session 2 | Land experience end-to-end (DB + wizard + profile + public). Sea time union-based calculation + overlap detection. 14 review fixes (L1) + 5 review fixes (L2). 3 QA fixes. 3 backlog items captured. |
 | 2026-04-02 | Rally 009 restructure + Rally 010 | Restructured all 7 session specs post-grill-me. 2 design guide audits (18 issues fixed). Thumb-zone + cold-state audit. Rally 010 created: frontend UX, guidance, cold states. |
 | 2026-04-02 | Rally 009 /grill-me | Design interview: 42 Qs resolved, 5-tab UX audit, 9 additional fixes confirmed. All sessions unblocked. |
 | 2026-04-02 | Rally 009 Session 1 | 3-lane: mobile UX tab-bar padding + CV preview canonical query, P2 bugs (saved sea time, yacht prefix null guard, PDF home-country toggle), tech debt sweep (social icons dedup, formatSeaTime, EndorsementsSection) |
 | 2026-04-02 | Rally 009 planning | Full pre-MVP backlog triage: 30 items across 7 sessions specced into lane-ready build plans. 42 /grill-me questions prepped. 7 backlog items closed as resolved. Junior sprints updated. |
+
+## 2026-04-03 — Rally 009 Session 2 (Opus 4.6, CLI) — Master
+
+### Done
+- **Lane 1 (feat/land-experience):** Full land-based employment support end-to-end. New `land_experience` table + migration with RLS. CV parser integration saves parsed shore-side roles. New wizard step (`StepLandExperience`) for reviewing/editing land jobs. Integrated reverse-chronological career timeline on private + public profile (yacht=anchor icon, shore=briefcase icon). Fixed 4 CV re-parse data integrity issues: `trackOverwrite` on 5 scalar fields (UX6a), education dedup (UX6b), languages merge (UX6c), travel docs union merge (UX6d). Review round: 14 fixes including GDPR export gap, land experience dedup on re-parse, subdomain route, returnToReview step bug, totalItems/celebration counts, date display, type consolidation, industry field, cache wrapping, button count, debug log, back-button skip, React key stability. QA round: fixed experience detail page, merged Career+SeaTime card (collapsible), null-date sort order. (branch: feat/land-experience)
+- **Lane 2 (fix/sea-time-overlap):** Union-based sea time calculation via 3 new utilities in `lib/sea-time.ts` (`mergeOverlappingRanges`, `calculateSeaTimeDays`, `detectOverlaps`). Replaced naive month sum in `StepExperience.tsx` and `profile-summaries.ts`. Added overlap detection with two-tier warning UI (info <28d, amber ≥28d) + amber ring on overlapping cards. Review round: 5 fixes — generic `detectOverlaps<T>`, deleted `formatSeaTimeCompact` (divisor mismatch), NaN guard on `parseCVDate`, inverted range guard, all-cards overlap highlight. (branch: fix/sea-time-overlap)
+
+### Context
+- 2-lane parallel worktree session. Both lanes passed review (round 2) and QA.
+- Land experience is a new feature — first non-yachting data type in the system.
+- Sea time overlap fixes are client-side only. The `get_sea_time()` SQL RPC still uses a naive sum — highest-priority post-merge fix.
+- QA tester merged Career into SeaTime card and added collapsible "Show N more" on the private profile.
+
+### Next
+1. Push + PR for both lanes (merge order: Lane 2 first, Lane 1 second)
+2. Rally 009 Sessions 3-7 — all specs restructured, ready to build
+3. Fix `get_sea_time()` SQL RPC to use union-based calculation (backlog: sea-time-sql-rpc-overlap)
+
+### Flags
+- ⚠️ Lane 1 has a migration (`20260403000001_land_experience.sql`). Must run before deploy.
+- ⚠️ `get_sea_time()` SQL RPC still double-counts overlapping stints. Profile hero card and SeaTimeSummary affected. Captured in backlog.
+- ⚠️ No CRUD UI for land experience outside the wizard. Users can't edit/delete shore-side roles independently. Captured in backlog.
+- ⚠️ StepExperience.tsx is now ~900 LOC. Pre-existing hotspot, flagged by both lanes.
+
+### Backlog captured
+- sea-time-sql-rpc-overlap: `get_sea_time()` + detail page + saved profiles use naive sums (from Lane 2 worker + reviewer)
+- land-experience-crud: No edit/delete UI for shore-side roles outside CV wizard (from Lane 1 worker + reviewer)
+- land-experience-rls-visibility: `section_visibility` not checked for `land_experience` RLS public read (from Lane 1 reviewer)
+
+---
 
 ## 2026-04-02 — Rally 009 Restructure + Rally 010 (Opus 4.6, CLI)
 

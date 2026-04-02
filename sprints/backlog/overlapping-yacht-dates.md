@@ -1,9 +1,12 @@
 # Overlapping Yacht Date Handling
 
+**Status:** partially shipped
 **Created:** 2026-03-30
 **Priority:** Medium
+**Shipped:** Client-side calculation + overlap detection (Rally 009 Session 2, Lane 2 — 2026-04-03)
+**Remaining:** `get_sea_time()` SQL RPC still uses naive sum. See `sea-time-sql-rpc-overlap.md`.
 **Scope:** CV import + profile display + sea service calculation
-**Effort:** Medium
+**Effort:** Medium (remaining: S — SQL migration only)
 
 ## Problem
 
