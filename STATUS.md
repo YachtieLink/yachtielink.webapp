@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-03 (Session 2 complete — land experience + sea time overlap. Both lanes passed review + QA. Ready for commit + push.)
+**Last updated:** 2026-04-03 (Session 4 complete — Insights dashboard, unified photos, CV output-only, Settings IA. Chain branch: chain/rally-009. Moving to Session 5.)
 
 ---
 
@@ -16,10 +16,10 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Sprint | Phase | Status | Focus |
 |--------|-------|--------|-------|
-| Rally 009 | 1B | 🔧 Session 2 complete, pending push | Pre-MVP polish — 7 sessions, 35+ items. Session 2: land experience + sea time overlap — built, reviewed, QA'd. |
+| Rally 009 | 1B | 🔧 Session 4 complete (chain) | Pre-MVP polish — 7 sessions. Sessions 2-4 complete on chain/rally-009. Session 5 next. |
 | Sprint 13 | 1B | 🔧 Code Complete | SEO/sitemap/OG/cookie/robots merged (PR #130). Ops + legal blocked on founder. |
 
-**Next action:** Push + PR for Session 2 lanes (merge order: Lane 2 first, Lane 1 second).
+**Next action:** Build Session 5 (Endorsement flow + LLM defense), then push chain + create PR.
 
 ---
 
@@ -27,6 +27,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
+| Rally 009 Sessions 3-4 (chain) | 2026-04-03 | Network tab Phase 1, Profile redesign, Insights dashboard, Unified photos, CV output-only, Settings IA — all on chain/rally-009 |
 | Rally 009 Session 2 — land experience + sea time overlap | 2026-04-03 | Land experience end-to-end (DB + wizard + profile + public), sea time union-based calc + overlap detection, 19 review fixes, 3 QA fixes |
 | Rally 009 Session 1 — mobile UX + P2 bugs + tech debt | 2026-04-02 | Tab-bar padding, CV preview canonical query, saved sea time, yacht prefix null guard, PDF home-country toggle, social icons dedup, formatSeaTime canonical, EndorsementsSection cleanup |
 | Skill hardening — review, tester, file ownership | 2026-04-02 | /yl-review zero-tolerance + two-step, /yl-tester agent, file ownership rules, cwd conventions, 7 chain gaps fixed |

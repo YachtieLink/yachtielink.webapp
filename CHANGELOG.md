@@ -26,11 +26,51 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-03 | Rally 009 Session 4 | Insights dashboard (coral wayfinding, metric cards, career snapshot, WhoViewedYou). Unified photo management (3-format preview, focal point). CV output-only + Settings 5-group IA. |
+| 2026-04-03 | Rally 009 Session 3 | Network tab Phase 1 (yacht accordion, navy wayfinding, endorsement cards). Profile page redesign (4-group list, tap-to-edit hero, strength ring). |
 | 2026-04-03 | Rally 009 Session 2 | Land experience end-to-end (DB + wizard + profile + public). Sea time union-based calculation + overlap detection. 14 review fixes (L1) + 5 review fixes (L2). 3 QA fixes. 3 backlog items captured. |
 | 2026-04-02 | Rally 009 restructure + Rally 010 | Restructured all 7 session specs post-grill-me. 2 design guide audits (18 issues fixed). Thumb-zone + cold-state audit. Rally 010 created: frontend UX, guidance, cold states. |
 | 2026-04-02 | Rally 009 /grill-me | Design interview: 42 Qs resolved, 5-tab UX audit, 9 additional fixes confirmed. All sessions unblocked. |
 | 2026-04-02 | Rally 009 Session 1 | 3-lane: mobile UX tab-bar padding + CV preview canonical query, P2 bugs (saved sea time, yacht prefix null guard, PDF home-country toggle), tech debt sweep (social icons dedup, formatSeaTime, EndorsementsSection) |
 | 2026-04-02 | Rally 009 planning | Full pre-MVP backlog triage: 30 items across 7 sessions specced into lane-ready build plans. 42 /grill-me questions prepped. 7 backlog items closed as resolved. Junior sprints updated. |
+
+## 2026-04-03 — Rally 009 Session 4 (Opus 4.6, CLI) — Chain
+
+### Done
+- **Lane 1 (feat/insights-layer1):** Insights dashboard rewrite. Pro users: TimeRangeSelector (7d/30d/All), MetricCard grid (hero Profile Views + Downloads/Shares/Saves with sparklines), WhoViewedYou (viewer rows with avatar/name/role/time). Free users: CareerSnapshot (3 stat cards), Profile Strength coaching ring (coral SVG), blurred analytics + blurred WhoViewedYou, upgrade CTA. Coral wayfinding throughout. New components: MetricCard, TimeRangeSelector, CareerSnapshot, WhoViewedYou. (branch: feat/insights-layer1)
+- **Lane 2 (feat/unified-photos):** Unified photo management page. Profile Photo section at top (large preview, focal point picker, 3-format live preview: avatar circle/hero 16:9/CV square). Work Gallery section below (drag-reorder grid). New component: PhotoFormatPreview. Pro contextual assignment UI shell. Fixed stale links: /profile/photo and /profile/gallery → /profile/photos. Teal wayfinding. (branch: feat/unified-photos)
+- **Lane 3 (chore/cv-settings-final):** CV tab output-only — removed CvDetailsCard, added education card linking to Profile. Re-parse confirmation dialog (UX5). Renamed "Visitor Downloads" → "Sharing". Collapsed template picker to "Standard · Change" single line. Settings page rewritten with 5-group IA: Account (login, cert docs, GDPR export), Plan (Pro value display), App (appearance, notifications), Community (roadmap, report), Legal. Sign-out as quiet text link. Delete account isolated in danger zone. Sand wayfinding with icons. (branch: chore/cv-settings-final)
+
+### Context
+- Chain branch: `chain/rally-009`. All 3 lanes merged cleanly, no conflicts.
+- AI photo enhancement (Lane 2 Task 5) deferred — requires external API integration (Claid.ai or similar). UI shell present with "Coming in a future update" messaging.
+- Contextual photo assignment (Lane 2 Task 4) deferred — UI shell present, no backend support yet.
+- Photo migration (Lane 2 Task 7) skipped — `user_photos` table already handles roles via sort_order convention.
+
+### Next
+- Session 5: Endorsement flow + LLM defense
+- Push chain branch + create PR
+
+### Flags
+- 🏴 Photo AI enhancement and contextual assignment are UI shells only — need backend work in a future session
+- 🏴 CvDetailsCard still exists as a component file — not deleted, just unused from CV page (data moved to Profile)
+
+---
+
+## 2026-04-03 — Rally 009 Session 3 (Opus 4.6, CLI) — Chain
+
+### Done
+- **Lane 1 (feat/network-phase1):** Network tab redesign Phase 1. Yacht-grouped accordion view (YachtAccordion with easeGentle animation, navy wayfinding). ColleagueRow with endorsement status indicators. EndorsementSummaryCard + EndorsementCTACard. NetworkUnifiedView orchestrator with embedded YachtSearch. Server component fetches colleagues RPC, endorsements, ghost profiles. Navy wayfinding. (branch: feat/network-phase1)
+- **Lane 2 (feat/profile-redesign):** Profile page redesign. 4-group compact list layout (About Me, Personal Details, Career, Media) with ProfileSectionGroup + ProfileSectionList. ProfileHeroCard rewrite with InlineEditField (tap-to-edit name/role, saves to Supabase), CompactStrengthRing (teal SVG), coaching prompts. Visibility toggles on section rows. Removed "Edit profile" and "Saved Profiles" from More page. (branch: feat/profile-redesign)
+
+### Context
+- Chain branch: `chain/rally-009`. Both lanes merged cleanly.
+- Removed "Profile" and "Saved" sections from More page (moved to Profile tab and Network tab respectively).
+
+### Next
+- Session 4: Insights + Photos + CV tab + Settings IA
+
+---
 
 ## 2026-04-03 — Rally 009 Session 2 (Opus 4.6, CLI) — Master
 
