@@ -160,8 +160,8 @@ export default async function NetworkPage() {
           endorsementsReceivedCount={endorsementsReceived.length}
           endorsementsGivenCount={endorsementsGivenCount}
           pendingRequestsCount={pendingRequests.length}
-          endorsedColleagueIds={endorsedColleagueIds}
-          pendingColleagueIds={pendingColleagueIds}
+          endorsedColleagueIds={Array.from(endorsedColleagueIds)}
+          pendingColleagueIds={Array.from(pendingColleagueIds)}
           ghostSuggestions={ghostSuggestions}
         />
       </div>

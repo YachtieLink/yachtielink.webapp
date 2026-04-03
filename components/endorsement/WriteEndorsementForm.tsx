@@ -105,60 +105,64 @@ export function WriteEndorsementForm({
     if (!minMet || charCount > maxAllowed) return
     setSubmitting(true)
 
-    if (isEditMode && existingEndorsement) {
-      const res = await fetch(`/api/endorsements/${existingEndorsement.id}`, {
-        method: 'PUT',
+    try {
+      if (isEditMode && existingEndorsement) {
+        const res = await fetch(`/api/endorsements/${existingEndorsement.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content,
+            endorser_role_label: endorserRole || undefined,
+            recipient_role_label: recipientRole || undefined,
+            worked_together_start: startDate || undefined,
+            worked_together_end: endDate || undefined,
+          }),
+        })
+        if (!res.ok) {
+          const data = await res.json() as { error?: string }
+          toast(data.error ?? 'Failed to save changes. Please try again.', 'error')
+          return
+        }
+        toast('Endorsement updated.', 'success')
+        onSuccess()
+        return
+      }
+
+      const res = await fetch('/api/endorsements', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          recipient_id: recipientId,
+          yacht_id: yachtId,
           content,
           endorser_role_label: endorserRole || undefined,
           recipient_role_label: recipientRole || undefined,
           worked_together_start: startDate || undefined,
           worked_together_end: endDate || undefined,
+          request_token: requestToken,
         }),
       })
-      setSubmitting(false)
+
       if (!res.ok) {
         const data = await res.json() as { error?: string }
-        toast(data.error ?? 'Failed to save changes. Please try again.', 'error')
+        if (res.status === 409) {
+          toast("You've already endorsed this person for this yacht.", 'error')
+          return
+        }
+        if (res.status === 403) {
+          toast('You can only endorse people you have worked with on this yacht.', 'error')
+          return
+        }
+        toast(data.error ?? 'Failed to submit endorsement. Please try again.', 'error')
         return
       }
-      toast('Endorsement updated.', 'success')
-      onSuccess()
-      return
+
+      setSucceeded(true)
+    } catch {
+      toast('Could not connect. Please try again.', 'error')
+    } finally {
+      setSubmitting(false)
     }
-
-    const res = await fetch('/api/endorsements', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        recipient_id: recipientId,
-        yacht_id: yachtId,
-        content,
-        endorser_role_label: endorserRole || undefined,
-        recipient_role_label: recipientRole || undefined,
-        worked_together_start: startDate || undefined,
-        worked_together_end: endDate || undefined,
-        request_token: requestToken,
-      }),
-    })
-    setSubmitting(false)
-
-    if (!res.ok) {
-      const data = await res.json() as { error?: string }
-      if (res.status === 409) {
-        toast("You've already endorsed this person for this yacht.", 'error')
-        return
-      }
-      if (res.status === 403) {
-        toast('You can only endorse people you have worked with on this yacht.', 'error')
-        return
-      }
-      toast(data.error ?? 'Failed to submit endorsement. Please try again.', 'error')
-      return
-    }
-
-    setSucceeded(true)
   }
 
   if (succeeded) {

@@ -1,9 +1,8 @@
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import Image from 'next/image'
 import {
   User, Briefcase, Award, Anchor, Heart, Wrench, Camera, Globe,
-  BookOpen, FileText, Phone, Shield, Clock, ImageIcon
+  FileText, Phone, Shield, Clock, ImageIcon
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getUserById, getProfileSections, getExtendedProfileSections, getLandExperience } from '@/lib/queries/profile'

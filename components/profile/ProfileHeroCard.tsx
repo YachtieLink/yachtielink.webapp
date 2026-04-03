@@ -189,19 +189,27 @@ export function ProfileHeroCard({
 
   async function copyUrl() {
     if (!handle) return
-    await navigator.clipboard.writeText(`https://yachtie.link/u/${handle}`)
-    setCopied(true)
-    toast('Profile link copied!', 'success')
-    setTimeout(() => setCopied(false), 2000)
-    trackShare()
+    try {
+      await navigator.clipboard.writeText(`https://yachtie.link/u/${handle}`)
+      setCopied(true)
+      toast('Profile link copied!', 'success')
+      setTimeout(() => setCopied(false), 2000)
+      trackShare()
+    } catch {
+      toast('Could not copy link', 'error')
+    }
   }
 
   async function copyProUrl() {
     if (!handle) return
-    await navigator.clipboard.writeText(`https://${handle}.yachtie.link`)
-    setCopiedPro(true)
-    toast(isPro ? 'Pro link copied!' : 'Link copied — upgrade to Pro to activate', isPro ? 'success' : 'info')
-    setTimeout(() => setCopiedPro(false), 2000)
+    try {
+      await navigator.clipboard.writeText(`https://${handle}.yachtie.link`)
+      setCopiedPro(true)
+      toast(isPro ? 'Pro link copied!' : 'Link copied — upgrade to Pro to activate', isPro ? 'success' : 'info')
+      setTimeout(() => setCopiedPro(false), 2000)
+    } catch {
+      toast('Could not copy link', 'error')
+    }
   }
 
   async function shareProfile() {

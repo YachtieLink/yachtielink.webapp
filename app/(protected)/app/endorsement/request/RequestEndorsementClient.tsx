@@ -20,7 +20,7 @@ interface ColleagueOption {
   alreadyEndorsed: boolean
   isGhost: boolean
   requestCreatedAt: string | null
-  remindedAt: string | null
+  requestId: string | null
 }
 
 interface YachtGroup {
@@ -72,8 +72,8 @@ function formatDateRange(start: string | null, end: string | null): string {
   return end ? `${fmt(start)} – ${fmt(end)}` : `${fmt(start)} – Present`
 }
 
-function canRemind(createdAt: string | null, remindedAt: string | null): 'available' | 'too_soon' | 'already_sent' {
-  if (remindedAt) return 'already_sent'
+// TODO: Reminder feature deferred — needs `reminded_at` column migration + /api/endorsement-requests/[id]/remind endpoint
+function canRemind(createdAt: string | null): 'available' | 'too_soon' {
   if (!createdAt) return 'too_soon'
   const daysSince = (Date.now() - new Date(createdAt).getTime()) / 86400000
   return daysSince >= 7 ? 'available' : 'too_soon'
@@ -103,6 +103,7 @@ export function RequestEndorsementClient({
   yachtGroups,
   remaining: initialRemaining,
   limit,
+  userId: _userId,
 }: RequestEndorsementClientProps) {
   const { toast } = useToast()
   const [remaining, setRemaining] = useState(initialRemaining)
@@ -110,7 +111,7 @@ export function RequestEndorsementClient({
     return new Set(yachtGroups.length > 0 ? [yachtGroups[0].id] : [])
   })
   const [colleagueStates, setColleagueStates] = useState<Record<string, 'idle' | 'sending' | 'sent' | 'error'>>({})
-  const [reminderStates, setReminderStates] = useState<Record<string, 'idle' | 'sending' | 'sent'>>({})
+  const [reminderStates, setReminderStates] = useState<Record<string, 'idle' | 'sending' | 'sent' | 'error'>>({})
 
   // Per-yacht invite forms
   const [yachtInviteForms, setYachtInviteForms] = useState<Record<string, boolean>>({})
@@ -359,8 +360,8 @@ export function RequestEndorsementClient({
                           const state = colleagueStates[key] ?? 'idle'
                           const isActionable = !colleague.alreadyEndorsed && colleague.existingRequestStatus !== 'accepted'
                           const isPending = colleague.existingRequestStatus === 'pending'
-                          const reminderStatus = canRemind(colleague.requestCreatedAt, colleague.remindedAt)
-                          const reminderState = reminderStates[key] ?? 'idle'
+                          const reminderStatus = canRemind(colleague.requestCreatedAt)
+                          const reminderState = colleague.requestId ? (reminderStates[colleague.requestId] ?? 'idle') : 'idle'
 
                           return (
                             <div key={colleague.id} className="flex items-center gap-3 py-3">
@@ -397,10 +398,10 @@ export function RequestEndorsementClient({
                                 ) : isPending ? (
                                   <div className="flex items-center gap-1.5">
                                     <StatusPill status="pending" />
-                                    {reminderStatus === 'available' && reminderState !== 'sent' && (
+                                    {reminderStatus === 'available' && colleague.requestId && reminderState !== 'sent' && (
                                       <button
                                         type="button"
-                                        onClick={() => sendReminder(key, colleague.name)}
+                                        onClick={() => sendReminder(colleague.requestId!, colleague.name)}
                                         disabled={reminderState === 'sending'}
                                         className="text-[10px] text-[var(--color-interactive)] font-medium"
                                       >
@@ -412,7 +413,7 @@ export function RequestEndorsementClient({
                                         Remind in {daysUntilRemind(colleague.requestCreatedAt)}d
                                       </span>
                                     )}
-                                    {(reminderStatus === 'already_sent' || reminderState === 'sent') && (
+                                    {reminderState === 'sent' && (
                                       <span className="text-[10px] text-[var(--color-text-tertiary)]">Reminded</span>
                                     )}
                                   </div>
@@ -495,7 +496,11 @@ export function RequestEndorsementClient({
                     {!showInviteForm ? (
                       <button
                         type="button"
-                        onClick={() => setYachtInviteForms((prev) => ({ ...prev, [yacht.id]: true }))}
+                        onClick={() => {
+                          setInviteName('')
+                          setInviteContact('')
+                          setYachtInviteForms((prev) => ({ ...prev, [yacht.id]: true }))
+                        }}
                         className="flex items-center gap-2 mt-3 text-xs font-medium text-[var(--color-interactive)]"
                       >
                         <UserPlus size={14} />

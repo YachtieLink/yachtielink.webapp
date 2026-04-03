@@ -233,8 +233,16 @@ export default function ProfilePhotosPage() {
 
   async function deletePhoto(photo: Photo) {
     if (!confirm('Delete this photo?')) return
-    const res = await fetch(`/api/user-photos/${photo.id}`, { method: 'DELETE' })
-    if (res.ok) setPhotos((prev) => prev.filter((p) => p.id !== photo.id))
+    try {
+      const res = await fetch(`/api/user-photos/${photo.id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setPhotos((prev) => prev.filter((p) => p.id !== photo.id))
+      } else {
+        toast('Failed to delete photo', 'error')
+      }
+    } catch {
+      toast('Failed to delete photo', 'error')
+    }
   }
 
   if (loading) {

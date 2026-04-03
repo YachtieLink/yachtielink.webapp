@@ -33,46 +33,37 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'recipient_id and yacht_id are required' }, { status: 400 })
   }
 
-  // Fetch endorsee info
-  const { data: endorsee } = await supabase
-    .from('users')
-    .select('full_name, primary_role')
-    .eq('id', recipient_id)
-    .single()
+  // Fetch endorsee info + yacht + endorser attachment in parallel
+  const [endorseeRes, yachtRes, endorserAttachmentRes] = await Promise.all([
+    supabase
+      .from('users')
+      .select('full_name, primary_role, bio')
+      .eq('id', recipient_id)
+      .single(),
+    supabase
+      .from('yachts')
+      .select('name')
+      .eq('id', yacht_id)
+      .single(),
+    supabase
+      .from('attachments')
+      .select('role_title')
+      .eq('user_id', user.id)
+      .eq('yacht_id', yacht_id)
+      .is('deleted_at', null)
+      .order('start_date', { ascending: false })
+      .limit(1)
+      .single(),
+  ])
 
+  const endorsee = endorseeRes.data
   if (!endorsee) {
     return NextResponse.json({ error: 'Recipient not found' }, { status: 404 })
   }
 
-  // Fetch yacht name
-  const { data: yacht } = await supabase
-    .from('yachts')
-    .select('name')
-    .eq('id', yacht_id)
-    .single()
-
-  // Fetch endorser's role on this yacht (from attachments)
-  const { data: endorserAttachment } = await supabase
-    .from('attachments')
-    .select('role_title')
-    .eq('user_id', user.id)
-    .eq('yacht_id', yacht_id)
-    .is('deleted_at', null)
-    .order('start_date', { ascending: false })
-    .limit(1)
-    .single()
-
-  // Optionally fetch endorsee's CV summary (if available)
-  let endorseeCvSummary: string | undefined
-  const { data: endorseeProfile } = await supabase
-    .from('users')
-    .select('bio')
-    .eq('id', recipient_id)
-    .single()
-
-  if (endorseeProfile?.bio) {
-    endorseeCvSummary = endorseeProfile.bio
-  }
+  const yacht = yachtRes.data
+  const endorserAttachment = endorserAttachmentRes.data
+  const endorseeCvSummary = endorsee.bio ?? undefined
 
   // Build prompt
   const { system, user: userMessage } = buildEndorsementAssistPrompt({

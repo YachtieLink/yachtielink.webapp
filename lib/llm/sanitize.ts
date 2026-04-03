@@ -15,6 +15,9 @@ const SCRIPT_PATTERN = /(<script[\s>]|javascript:|on\w+\s*=)/gi
  */
 export function sanitizeInput(text: string, maxLength = 5000): string {
   let clean = text
+    // Strip delimiter tokens (prevent fake boundary injection)
+    .replace(/<<<USER_CONTENT_START>>>/g, '')
+    .replace(/<<<USER_CONTENT_END>>>/g, '')
     // Strip HTML tags
     .replace(HTML_TAG, '')
     // Remove script injection attempts

@@ -16,8 +16,6 @@ import { WhoViewedYou } from '@/components/insights/WhoViewedYou'
 import { UpgradeCTA } from '@/components/insights/UpgradeCTA'
 import { InsightsUpgradedToast } from '@/components/insights/InsightsUpgradedToast'
 import { PageTransition } from '@/components/ui/PageTransition'
-import { formatSeaTime } from '@/lib/sea-time'
-
 type TimeRange = '7' | '30' | 'all'
 
 interface Props {

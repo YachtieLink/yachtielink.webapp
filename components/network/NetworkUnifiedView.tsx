@@ -72,8 +72,8 @@ interface NetworkUnifiedViewProps {
   endorsementsReceivedCount: number
   endorsementsGivenCount: number
   pendingRequestsCount: number
-  endorsedColleagueIds: Set<string>
-  pendingColleagueIds: Set<string>
+  endorsedColleagueIds: string[]
+  pendingColleagueIds: string[]
   ghostSuggestions: GhostSuggestion[]
 }
 
@@ -246,9 +246,9 @@ export function NetworkUnifiedView({
                 const name = profile.display_name ?? profile.full_name
 
                 let endorsementStatus: 'endorsed' | 'pending' | null = null
-                if (endorsedColleagueIds.has(entry.colleague_id)) {
+                if (endorsedColleagueIds.includes(entry.colleague_id)) {
                   endorsementStatus = 'endorsed'
-                } else if (pendingColleagueIds.has(entry.colleague_id)) {
+                } else if (pendingColleagueIds.includes(entry.colleague_id)) {
                   endorsementStatus = 'pending'
                 }
 
