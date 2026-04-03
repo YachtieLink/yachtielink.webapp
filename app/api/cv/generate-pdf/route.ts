@@ -79,6 +79,7 @@ export async function POST(req: NextRequest) {
         `)
         .eq('recipient_id', user.id)
         .is('deleted_at', null)
+        .or('is_dormant.is.null,is_dormant.eq.false')
         .order('created_at', { ascending: false })
         .limit(3),
       supabase.from('user_education').select('id, institution, qualification, field_of_study, started_at, ended_at').eq('user_id', user.id).order('sort_order'),

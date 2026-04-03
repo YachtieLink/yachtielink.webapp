@@ -42,12 +42,14 @@ export default async function NetworkPage() {
       .from('endorsements')
       .select('id, endorser:users!endorser_id(id), yacht:yachts!yacht_id(id)')
       .eq('recipient_id', user.id)
-      .is('deleted_at', null),
+      .is('deleted_at', null)
+      .or('is_dormant.is.null,is_dormant.eq.false'),
     supabase
       .from('endorsements')
       .select('recipient_id')
       .eq('endorser_id', user.id)
-      .is('deleted_at', null),
+      .is('deleted_at', null)
+      .or('is_dormant.is.null,is_dormant.eq.false'),
     supabase
       .from('endorsement_requests')
       .select('id, recipient_user_id, status, cancelled_at, yacht:yachts!yacht_id(name)')

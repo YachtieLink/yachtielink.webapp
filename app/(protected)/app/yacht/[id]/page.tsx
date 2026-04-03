@@ -76,6 +76,7 @@ export default async function YachtDetailPage({ params }: PageProps) {
           endorser:users!endorser_id(id, display_name, full_name, profile_photo_url, handle),
           recipient:users!recipient_id(id, display_name, full_name, profile_photo_url, handle)`)
         .eq('yacht_id', id).is('deleted_at', null)
+        .or('is_dormant.is.null,is_dormant.eq.false')
         .order('created_at', { ascending: false })
         .limit(10),
 
@@ -92,7 +93,8 @@ export default async function YachtDetailPage({ params }: PageProps) {
       supabase.from('endorsements')
         .select('id, endorser_id, recipient_id')
         .or(`endorser_id.eq.${user.id},recipient_id.eq.${user.id}`)
-        .is('deleted_at', null),
+        .is('deleted_at', null)
+        .or('is_dormant.is.null,is_dormant.eq.false'),
     ])
 
   const yacht = yachtRes.data

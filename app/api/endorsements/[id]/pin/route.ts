@@ -16,7 +16,7 @@ export async function PATCH(
   // Verify the endorsement exists and belongs to this user (as recipient)
   const { data: endorsement } = await supabase
     .from('endorsements')
-    .select('id, recipient_id, is_pinned')
+    .select('id, recipient_id, is_pinned, is_dormant')
     .eq('id', id)
     .single()
 
@@ -28,6 +28,10 @@ export async function PATCH(
     return NextResponse.json({ error: 'Only the recipient can pin endorsements' }, { status: 403 })
   }
 
+  if (isPinned && endorsement.is_dormant === true) {
+    return NextResponse.json({ error: 'Cannot pin a dormant endorsement' }, { status: 400 })
+  }
+
   // If pinning, check max 3 pinned
   if (isPinned) {
     const { count } = await supabase
@@ -35,6 +39,7 @@ export async function PATCH(
       .select('id', { count: 'exact', head: true })
       .eq('recipient_id', user.id)
       .eq('is_pinned', true)
+      .or('is_dormant.is.null,is_dormant.eq.false')
       .neq('id', id)
 
     if ((count ?? 0) >= 3) {

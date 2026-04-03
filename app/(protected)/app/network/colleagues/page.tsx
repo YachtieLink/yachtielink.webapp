@@ -59,7 +59,8 @@ export default async function ColleaguesPage() {
       .select('id, endorser_id, recipient_id, yacht_id')
       .or(`endorser_id.eq.${user.id},recipient_id.eq.${user.id}`)
       .not('endorser_id', 'is', null)  // exclude ghost endorsements (null endorser_id)
-      .is('deleted_at', null),
+      .is('deleted_at', null)
+      .or('is_dormant.is.null,is_dormant.eq.false'),
   ])
 
   const colleagueRows = (colleaguesRes.data as ColleagueRow[]) ?? []

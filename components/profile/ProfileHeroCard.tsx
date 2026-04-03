@@ -94,7 +94,7 @@ function InlineEditField({
 
   if (editing) {
     return (
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1.5 min-w-0 max-w-full">
         <input
           ref={inputRef}
           value={text}
@@ -103,7 +103,7 @@ function InlineEditField({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={saving}
-          className={`bg-transparent border-b border-[var(--color-teal-700)] outline-none ${className ?? ''}`}
+          className={`bg-transparent border-b border-[var(--color-teal-700)] outline-none min-w-0 ${className ?? ''}`}
         />
       </div>
     )
@@ -112,7 +112,7 @@ function InlineEditField({
   return (
     <button
       onClick={() => setEditing(true)}
-      className={`group flex items-center gap-1 text-left hover:opacity-80 transition-opacity ${className ?? ''}`}
+      className={`group flex items-center gap-1 text-left hover:opacity-80 transition-opacity min-w-0 max-w-full ${className ?? ''}`}
     >
       <span className="truncate">{text || placeholder}</span>
       {saved ? (
