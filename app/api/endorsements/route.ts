@@ -135,6 +135,7 @@ export async function GET(req: NextRequest) {
     `)
     .eq('recipient_id', userId)
     .is('deleted_at', null)
+    .or('is_dormant.is.null,is_dormant.eq.false')
     .order('created_at', { ascending: false })
 
   if (error) return NextResponse.json({ error: 'Failed to fetch endorsements' }, { status: 500 })

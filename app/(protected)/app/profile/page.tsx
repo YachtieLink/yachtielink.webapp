@@ -289,7 +289,7 @@ export default async function ProfilePage() {
         {/* Integrated career timeline */}
         {((attachments?.length ?? 0) > 0 || landExperience.length > 0) && (
           <div className="px-4 py-3">
-            <CareerTimeline attachments={attachments ?? []} landExperience={landExperience} />
+            <CareerTimeline attachments={attachments ?? []} landExperience={landExperience} userId={user.id} />
           </div>
         )}
       </ProfileSectionGroup>

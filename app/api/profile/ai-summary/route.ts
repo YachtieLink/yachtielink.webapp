@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const [profileRes, attachRes, endorseRes] = await Promise.all([
       supabase.from('users').select('bio, primary_role, ai_summary_edited').eq('id', user.id).single(),
       supabase.from('attachments').select('role_label, started_at, ended_at, yachts ( name )').eq('user_id', user.id).is('deleted_at', null).order('started_at', { ascending: false }).limit(5),
-      supabase.from('endorsements').select('content').eq('recipient_id', user.id).is('deleted_at', null).order('created_at', { ascending: false }).limit(3),
+      supabase.from('endorsements').select('content').eq('recipient_id', user.id).is('deleted_at', null).or('is_dormant.is.null,is_dormant.eq.false').order('created_at', { ascending: false }).limit(3),
     ])
 
     const profile = profileRes.data

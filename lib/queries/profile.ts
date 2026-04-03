@@ -113,6 +113,7 @@ export async function getProfileSections(userId: string) {
       `)
       .eq('recipient_id', userId)
       .is('deleted_at', null)
+      .or('is_dormant.is.null,is_dormant.eq.false')
       .order('created_at', { ascending: false }),
   ])
   return {
@@ -283,6 +284,7 @@ export async function getPublicProfileSections(userId: string) {
       `)
       .eq('recipient_id', userId)
       .is('deleted_at', null)
+      .or('is_dormant.is.null,is_dormant.eq.false')
       .order('is_pinned', { ascending: false })
       .order('created_at', { ascending: false }),
   ])
@@ -329,6 +331,7 @@ export async function getCvSections(userId: string) {
       `)
       .eq('recipient_id', userId)
       .is('deleted_at', null)
+      .or('is_dormant.is.null,is_dormant.eq.false')
       .order('created_at', { ascending: false })
       .limit(3),
     supabase

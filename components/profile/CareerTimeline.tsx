@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Anchor, Briefcase, ChevronDown, ChevronRight } from 'lucide-react'
 import type { LandExperienceEntry } from '@/lib/queries/types'
+import { TransferExperienceButton } from '@/components/experience/TransferExperienceButton'
 
 type YachtInfo = { id: string; name: string; yacht_type: string | null; flag_state: string | null }
 
@@ -55,9 +56,10 @@ const COLLAPSED_COUNT = 3
 interface CareerTimelineProps {
   attachments: YachtAttachment[]
   landExperience: LandExperienceEntry[]
+  userId?: string
 }
 
-export function CareerTimeline({ attachments, landExperience }: CareerTimelineProps) {
+export function CareerTimeline({ attachments, landExperience, userId }: CareerTimelineProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [showAll, setShowAll] = useState(false)
 
@@ -140,9 +142,19 @@ export function CareerTimeline({ attachments, landExperience }: CareerTimelinePr
                           View yacht page
                         </Link>
                       )}
-                      <Link href={`/app/attachment/${att.id}/edit`} className="text-xs text-[var(--color-text-secondary)] hover:underline">
-                        Edit
-                      </Link>
+                      <div className="flex items-center gap-3">
+                        <Link href={`/app/attachment/${att.id}/edit`} className="text-xs text-[var(--color-text-secondary)] hover:underline">
+                          Edit
+                        </Link>
+                        {userId && yacht && (
+                          <TransferExperienceButton
+                            attachmentId={att.id}
+                            currentYachtName={yacht.name}
+                            roleLabel={att.role_label}
+                            userId={userId}
+                          />
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { recalculateEndorsementDormancy } from '@/lib/endorsements/visibility'
+import { rebuildColleagueConnections } from '@/lib/network/colleague-rebuild'
 
 const transferSchema = z.object({
   attachmentId: z.string().uuid(),
@@ -57,6 +59,10 @@ export async function POST(req: Request) {
         { status: 400 }
       )
     }
+
+    // Recalculate endorsement dormancy and rebuild colleague connections
+    await recalculateEndorsementDormancy(user.id)
+    rebuildColleagueConnections()
 
     return NextResponse.json(result)
   } catch (err) {
