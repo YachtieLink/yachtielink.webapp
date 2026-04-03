@@ -1,14 +1,15 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
-import { PageHeader } from '@/components/ui/PageHeader'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { uploadUserPhoto } from '@/lib/storage/upload'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/skeleton'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { PhotoFormatPreview } from '@/components/profile/PhotoFormatPreview'
+import { FocalPointPicker } from '@/components/profile/FocalPointPicker'
 import {
   DndContext,
   closestCenter,
@@ -24,7 +25,6 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { FocalPointPicker } from '@/components/profile/FocalPointPicker'
 
 interface Photo {
   id: string
@@ -32,11 +32,15 @@ interface Photo {
   sort_order: number
   focal_x?: number
   focal_y?: number
+  is_avatar?: boolean
+  is_hero?: boolean
+  is_cv?: boolean
 }
 
 const MAX_PHOTOS_FREE = 3
 const MAX_PHOTOS_PRO = 15
 
+// ── Sortable gallery photo ────────────────────────────────────────
 function SortablePhoto({
   photo,
   index,
@@ -78,11 +82,6 @@ function SortablePhoto({
         fill
         className="object-cover pointer-events-none"
       />
-      {index === 0 && (
-        <span className="absolute top-1 left-1 bg-black/50 text-white text-[10px] px-1.5 py-0.5 rounded-full">
-          Main
-        </span>
-      )}
       <button
         onClick={(e) => {
           e.stopPropagation()
@@ -109,22 +108,25 @@ function SortablePhoto({
   )
 }
 
+// ── Main page ─────────────────────────────────────────────────────
 export default function ProfilePhotosPage() {
-  const router = useRouter()
   const { toast } = useToast()
   const [photos, setPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
-  const [isPro, setIsPro] = useState(true) // Default to Pro so paid users aren't penalised if plan lookup fails
+  const [isPro, setIsPro] = useState(false)
   const [focalPhoto, setFocalPhoto] = useState<Photo | null>(null)
   const [focalX, setFocalX] = useState(50)
   const [focalY, setFocalY] = useState(50)
   const [savingFocal, setSavingFocal] = useState(false)
+  const [savingContext, setSavingContext] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const galleryInputRef = useRef<HTMLInputElement>(null)
 
   const maxPhotos = isPro ? MAX_PHOTOS_PRO : MAX_PHOTOS_FREE
+  const profilePhoto = photos.length > 0 ? photos[0] : null
+  const galleryPhotos = photos.slice(1)
 
-  // Require a small drag distance before starting to avoid accidental drags
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
   )
@@ -143,7 +145,6 @@ export default function ProfilePhotosPage() {
           if (!error && profile) {
             setIsPro(profile.subscription_status === 'pro')
           }
-          // On error, keep default (Pro) so paid users aren't penalised — server enforces real limit on upload
         }
         const res = await fetch('/api/user-photos')
         const d = await res.json()
@@ -167,8 +168,6 @@ export default function ProfilePhotosPage() {
 
     const reordered = arrayMove(photos, oldIndex, newIndex)
     const previous = photos
-
-    // Optimistic update
     setPhotos(reordered)
 
     try {
@@ -185,14 +184,16 @@ export default function ProfilePhotosPage() {
     }
   }
 
-  async function handleMultiUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleUpload(e: React.ChangeEvent<HTMLInputElement>, isProfile = false) {
     const fileList = e.target.files
     if (!fileList || fileList.length === 0) return
 
     const remaining = maxPhotos - photos.length
     let files = Array.from(fileList)
 
-    if (files.length > remaining) {
+    if (isProfile) {
+      files = files.slice(0, 1)
+    } else if (files.length > remaining) {
       toast(`You can only add ${remaining} more photo${remaining === 1 ? '' : 's'}. Extra files were skipped.`, 'error')
       files = files.slice(0, remaining)
     }
@@ -213,10 +214,11 @@ export default function ProfilePhotosPage() {
           continue
         }
 
+        const sortOrder = isProfile ? 0 : photos.length + i
         const res = await fetch('/api/user-photos', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ photo_url: result.url, sort_order: photos.length + i }),
+          body: JSON.stringify({ photo_url: result.url, sort_order: sortOrder }),
         })
         if (!res.ok) {
           const d = await res.json()
@@ -224,29 +226,66 @@ export default function ProfilePhotosPage() {
           break
         }
         const { photo } = await res.json()
-        setPhotos((prev) => [...prev, photo])
+        setPhotos((prev) => isProfile ? [photo, ...prev] : [...prev, photo])
       }
     } finally {
       setUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ''
+      if (galleryInputRef.current) galleryInputRef.current.value = ''
     }
   }
 
   async function deletePhoto(photo: Photo) {
     if (!confirm('Delete this photo?')) return
-    const res = await fetch(`/api/user-photos/${photo.id}`, { method: 'DELETE' })
-    if (res.ok) setPhotos((prev) => prev.filter((p) => p.id !== photo.id))
+    try {
+      const res = await fetch(`/api/user-photos/${photo.id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setPhotos((prev) => prev.filter((p) => p.id !== photo.id))
+      } else {
+        toast('Failed to delete photo', 'error')
+      }
+    } catch {
+      toast('Failed to delete photo', 'error')
+    }
+  }
+
+  async function toggleContext(photo: Photo, context: 'is_avatar' | 'is_hero' | 'is_cv') {
+    const currentValue = photo[context] ?? false
+    const newValue = !currentValue
+    setSavingContext(`${photo.id}-${context}`)
+    try {
+      const res = await fetch(`/api/user-photos/${photo.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [context]: newValue }),
+      })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+        toast((d as { error?: string }).error ?? 'Failed to update', 'error')
+        return
+      }
+      // Update local state — if assigning, clear from other photos
+      setPhotos((prev) => prev.map((p) => {
+        if (p.id === photo.id) return { ...p, [context]: newValue }
+        if (newValue) return { ...p, [context]: false }
+        return p
+      }))
+      const labels = { is_avatar: 'Avatar', is_hero: 'Hero', is_cv: 'CV' }
+      toast(`${labels[context]} ${newValue ? 'assigned' : 'cleared'}`, 'success')
+    } catch {
+      toast('Failed to update', 'error')
+    } finally {
+      setSavingContext(null)
+    }
   }
 
   if (loading) {
     return (
-      <div className="flex flex-col gap-4 pb-24">
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-9 w-9 rounded-xl" />
-          <Skeleton className="h-6 w-24" />
-        </div>
+      <div className="flex flex-col gap-4 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-teal-50)]">
+        <PageHeader backHref="/app/profile" title="Your Photos" />
+        <Skeleton className="aspect-[3/4] rounded-2xl" />
         <div className="grid grid-cols-3 gap-2">
-          {[...Array(6)].map((_, i) => (
+          {[...Array(3)].map((_, i) => (
             <Skeleton key={i} className="aspect-square rounded-xl" />
           ))}
         </div>
@@ -255,75 +294,224 @@ export default function ProfilePhotosPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4 pb-24">
-      <PageHeader backHref="/app/profile" title="Photos" />
+    <div className="flex flex-col gap-4 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-teal-50)]">
+      <PageHeader backHref="/app/profile" title="Your Photos" />
 
-      {/* Downgrade notice — photos exist beyond free limit */}
+      {/* Downgrade notice */}
       {!isPro && photos.length > MAX_PHOTOS_FREE && (
         <div className="rounded-xl border border-[var(--color-warning-border,var(--color-border))] bg-[var(--color-warning-bg,var(--color-surface-overlay))] p-3 text-sm text-[var(--color-text-secondary)]">
           You have {photos.length} photos but your free plan shows {MAX_PHOTOS_FREE}. Your extra photos are safe — upgrade to Pro to make them visible again.
         </div>
       )}
 
-      <p className="text-sm text-[var(--color-text-secondary)]">
-        Your first photo is your main profile picture.{!isPro && photos.length > MAX_PHOTOS_FREE ? '' : ' Drag to reorder.'} {Math.min(photos.length, maxPhotos)}/{maxPhotos} photos visible{!isPro && photos.length <= MAX_PHOTOS_FREE ? ` · Upgrade to Pro for up to ${MAX_PHOTOS_PRO}` : ''}.
-      </p>
+      {/* ── PROFILE PHOTO ──────────────────────────────────────────── */}
+      <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-3">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-teal-700)]">
+          Profile Photo
+        </h2>
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={photos.slice(0, maxPhotos).map((p) => p.id)} strategy={rectSortingStrategy}>
-          <div className="grid grid-cols-3 gap-2">
-            {photos.slice(0, maxPhotos).map((photo, idx) => (
-              <SortablePhoto
-                key={photo.id}
-                photo={photo}
-                index={idx}
-                onDelete={deletePhoto}
-                onFocalPoint={(p) => {
-                  setFocalPhoto(p)
-                  setFocalX(Number(p.focal_x) || 50)
-                  setFocalY(Number(p.focal_y) || 50)
+        {profilePhoto ? (
+          <>
+            {/* Large preview */}
+            <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[var(--color-surface-raised)]">
+              <Image
+                src={profilePhoto.photo_url}
+                alt="Profile photo"
+                fill
+                className="object-cover"
+                style={{
+                  objectPosition: `${profilePhoto.focal_x ?? 50}% ${profilePhoto.focal_y ?? 50}%`,
                 }}
               />
-            ))}
+            </div>
 
-            {photos.length < maxPhotos && (
+            {/* Actions */}
+            <div className="flex items-center gap-2">
               <button
+                type="button"
+                onClick={() => {
+                  setFocalPhoto(profilePhoto)
+                  setFocalX(Number(profilePhoto.focal_x) || 50)
+                  setFocalY(Number(profilePhoto.focal_y) || 50)
+                }}
+                className="text-sm font-medium text-[var(--color-interactive)]"
+              >
+                Set focal point
+              </button>
+              <span className="text-[var(--color-text-tertiary)]">&middot;</span>
+              <button
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="aspect-square rounded-xl border-2 border-dashed border-[var(--color-border)] flex flex-col items-center justify-center text-[var(--color-text-secondary)] hover:border-[var(--color-interactive)] hover:text-[var(--color-interactive)] transition-colors disabled:opacity-50"
+                className="text-sm font-medium text-[var(--color-interactive)] disabled:opacity-50"
               >
-                <span className="text-2xl">{uploading ? '...' : '+'}</span>
-                <span className="text-xs mt-1">{uploading ? 'Uploading...' : 'Add photo'}</span>
+                {uploading ? 'Uploading…' : 'Replace'}
               </button>
+            </div>
+
+            {/* 3-format preview */}
+            <div className="pt-2 border-t border-[var(--color-border)]">
+              <p className="text-xs text-[var(--color-text-tertiary)] mb-2">Preview</p>
+              <PhotoFormatPreview
+                photoUrl={profilePhoto.photo_url}
+                focalX={Number(profilePhoto.focal_x) || 50}
+                focalY={Number(profilePhoto.focal_y) || 50}
+              />
+            </div>
+
+            {/* Contextual assignment — Pro only */}
+            {isPro ? (
+              <div className="pt-2 border-t border-[var(--color-border)]">
+                <div className="flex items-center gap-2 mb-2">
+                  <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wide">
+                    Context Assignment
+                  </p>
+                  <span className="text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded bg-[var(--color-teal-100)] text-[var(--color-teal-700)]">
+                    Pro
+                  </span>
+                </div>
+                <p className="text-xs text-[var(--color-text-secondary)] mb-2">
+                  Choose where this photo appears:
+                </p>
+                <div className="flex gap-2">
+                  {(['is_avatar', 'is_hero', 'is_cv'] as const).map((ctx) => {
+                    const labels = { is_avatar: 'Avatar', is_hero: 'Hero', is_cv: 'CV' }
+                    const isActive = profilePhoto[ctx] ?? false
+                    const isSaving = savingContext === `${profilePhoto.id}-${ctx}`
+                    return (
+                      <button
+                        key={ctx}
+                        type="button"
+                        onClick={() => toggleContext(profilePhoto, ctx)}
+                        disabled={isSaving}
+                        className={`flex-1 text-xs font-medium py-1.5 rounded-lg border transition-colors disabled:opacity-50 ${
+                          isActive
+                            ? 'border-[var(--color-teal-700)] bg-[var(--color-teal-100)] text-[var(--color-teal-700)]'
+                            : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-teal-300)]'
+                        }`}
+                      >
+                        {isSaving ? '...' : labels[ctx]}
+                        {isActive && ' ✓'}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="pt-2 border-t border-[var(--color-border)]">
+                <p className="text-xs text-[var(--color-text-secondary)]">
+                  1 photo for all contexts. <span className="text-[var(--color-interactive)]">Upgrade to Pro</span> for context-specific photos.
+                </p>
+              </div>
             )}
-          </div>
-        </SortableContext>
-      </DndContext>
+          </>
+        ) : (
+          /* No profile photo yet */
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+            className="aspect-[3/4] rounded-xl border-2 border-dashed border-[var(--color-teal-300)] flex flex-col items-center justify-center gap-2 text-[var(--color-text-secondary)] hover:border-[var(--color-teal-500)] transition-colors disabled:opacity-50"
+          >
+            <span className="text-3xl">+</span>
+            <span className="text-sm font-medium">
+              {uploading ? 'Uploading…' : 'Add profile photo'}
+            </span>
+            <span className="text-xs text-[var(--color-text-tertiary)]">
+              This will be your main profile picture
+            </span>
+          </button>
+        )}
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        multiple
-        className="hidden"
-        onChange={handleMultiUpload}
-      />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => handleUpload(e, true)}
+        />
+      </div>
 
-      {/* Focal Point Modal */}
+      {/* ── WORK GALLERY ───────────────────────────────────────────── */}
+      <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-teal-700)]">
+            Work Gallery
+          </h2>
+          <p className="text-xs text-[var(--color-text-tertiary)]">
+            {Math.min(galleryPhotos.length, maxPhotos - 1)}/{maxPhotos - 1} photos
+            {!isPro && <span> &middot; <span className="text-[var(--color-interactive)]">Upgrade for {MAX_PHOTOS_PRO - 1}</span></span>}
+          </p>
+        </div>
+
+        <p className="text-xs text-[var(--color-text-secondary)]">
+          Show off your work on yachts. Drag to reorder.
+        </p>
+
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={galleryPhotos.map((p) => p.id)} strategy={rectSortingStrategy}>
+            <div className="grid grid-cols-3 gap-2">
+              {galleryPhotos.map((photo, idx) => (
+                <SortablePhoto
+                  key={photo.id}
+                  photo={photo}
+                  index={idx + 1}
+                  onDelete={deletePhoto}
+                  onFocalPoint={(p) => {
+                    setFocalPhoto(p)
+                    setFocalX(Number(p.focal_x) || 50)
+                    setFocalY(Number(p.focal_y) || 50)
+                  }}
+                />
+              ))}
+
+              {photos.length < maxPhotos && (
+                <button
+                  onClick={() => galleryInputRef.current?.click()}
+                  disabled={uploading}
+                  className="aspect-square rounded-xl border-2 border-dashed border-[var(--color-border)] flex flex-col items-center justify-center text-[var(--color-text-secondary)] hover:border-[var(--color-interactive)] hover:text-[var(--color-interactive)] transition-colors disabled:opacity-50"
+                >
+                  <span className="text-2xl">{uploading ? '...' : '+'}</span>
+                  <span className="text-xs mt-1">{uploading ? 'Uploading...' : 'Add'}</span>
+                </button>
+              )}
+            </div>
+          </SortableContext>
+        </DndContext>
+
+        <input
+          ref={galleryInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={(e) => handleUpload(e, false)}
+        />
+      </div>
+
+      {/* ── Focal Point Modal ──────────────────────────────────────── */}
       {focalPhoto && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-[var(--color-surface)] rounded-2xl p-5 max-w-sm w-full flex flex-col gap-4">
             <h3 className="text-base font-semibold text-[var(--color-text-primary)]">Set Focal Point</h3>
-            <p className="text-xs text-[var(--color-text-secondary)]">Tap or drag to set the focal point. This determines how the photo is cropped in the hero and grid.</p>
+            <p className="text-xs text-[var(--color-text-secondary)]">
+              Tap or drag to set the focal point. This determines how the photo is cropped across avatar, hero, and CV.
+            </p>
             <FocalPointPicker
               imageUrl={focalPhoto.photo_url}
               focalX={focalX}
               focalY={focalY}
               onChange={(x, y) => { setFocalX(x); setFocalY(y) }}
+            />
+            {/* Live 3-format preview inside modal */}
+            <PhotoFormatPreview
+              photoUrl={focalPhoto.photo_url}
+              focalX={focalX}
+              focalY={focalY}
             />
             <div className="flex gap-3">
               <Button

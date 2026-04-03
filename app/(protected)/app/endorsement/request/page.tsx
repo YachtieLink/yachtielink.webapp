@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { RequestEndorsementClient } from './RequestEndorsementClient'
 
@@ -24,15 +23,24 @@ interface EndorsementRequest {
   status: string
   expires_at: string
   cancelled_at: string | null
+  created_at: string
+  reminded_at: string | null
+  yacht_id: string
 }
 
-interface ExistingEndorsement {
-  recipient_id: string
+interface GhostProfile {
+  id: string
+  full_name: string
+  primary_role: string | null
+  yacht_id: string
 }
 
 interface Attachment {
   id: string
   yacht_id: string
+  started_at: string | null
+  ended_at: string | null
+  role_label: string | null
   yachts: { id: string; name: string; yacht_type: string | null; cover_photo_url: string | null } | null
 }
 
@@ -44,91 +52,32 @@ function buildColleagueName(fullName: string, displayName: string | null): strin
   return rest ? `${firstName} '${displayName}' ${rest}` : `${firstName} '${displayName}'`
 }
 
-export default async function RequestEndorsementPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ yacht_id?: string; colleague_id?: string }>
-}) {
+export default async function RequestEndorsementPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/welcome')
 
-  const { yacht_id, colleague_id } = await searchParams
-
-  // If no yacht_id, show a yacht picker
-  if (!yacht_id) {
-    const { data: attachments } = await supabase
-      .from('attachments')
-      .select('id, yacht_id, yachts ( id, name, yacht_type, cover_photo_url )')
-      .eq('user_id', user.id)
-      .is('deleted_at', null)
-      .order('started_at', { ascending: false })
-
-    const yachts = (attachments as unknown as Attachment[])?.filter((a) => a.yachts) ?? []
-
-    if (yachts.length === 0) {
-      redirect('/app/attachment/new')
-    }
-
-    if (yachts.length === 1) {
-      redirect(`/app/endorsement/request?yacht_id=${yachts[0].yachts!.id}`)
-    }
-
-    return (
-      <div className="min-h-screen bg-[var(--color-surface)] px-4 pt-8 pb-24">
-        <h1 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
-          Request endorsements
-        </h1>
-        <p className="text-sm text-[var(--color-text-secondary)] mb-6">
-          Which yacht would you like endorsements for?
-        </p>
-        <div className="flex flex-col gap-3">
-          {yachts.map((att) => (
-            <Link
-              key={att.id}
-              href={`/app/endorsement/request?yacht_id=${att.yachts!.id}`}
-              className="bg-[var(--color-surface)] rounded-2xl p-4 flex items-center gap-3 hover:bg-[var(--color-surface-raised)] transition-colors"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-sm text-[var(--color-text-primary)]">
-                  {att.yachts!.name}
-                </p>
-                {att.yachts!.yacht_type && (
-                  <p className="text-xs text-[var(--color-text-secondary)]">
-                    {att.yachts!.yacht_type}
-                  </p>
-                )}
-              </div>
-              <svg className="h-5 w-5 text-[var(--color-text-tertiary)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-              </svg>
-            </Link>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  // Yacht-specific request page
+  // Fetch all data in parallel
   const [
-    yachtRes,
+    attachmentsRes,
     colleagueRowsRes,
     existingRequestsRes,
     endorsementsGivenRes,
     todayCountRes,
     userSubRes,
+    ghostsRes,
   ] = await Promise.all([
     supabase
-      .from('yachts')
-      .select('id, name, yacht_type, cover_photo_url')
-      .eq('id', yacht_id)
-      .single(),
+      .from('attachments')
+      .select('id, yacht_id, started_at, ended_at, role_label, yachts ( id, name, yacht_type, cover_photo_url )')
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .order('started_at', { ascending: false }),
     supabase.rpc('get_colleagues', { p_user_id: user.id }),
     supabase
       .from('endorsement_requests')
-      .select('id, recipient_user_id, recipient_email, status, expires_at, cancelled_at')
-      .eq('requester_id', user.id)
-      .eq('yacht_id', yacht_id),
+      .select('id, recipient_user_id, recipient_email, status, expires_at, cancelled_at, created_at, reminded_at, yacht_id')
+      .eq('requester_id', user.id),
     supabase
       .from('endorsements')
       .select('recipient_id')
@@ -140,82 +89,170 @@ export default async function RequestEndorsementPage({
       .select('subscription_status')
       .eq('id', user.id)
       .single(),
+    supabase
+      .from('ghost_profiles')
+      .select('id, full_name, primary_role, yacht_id')
+      .eq('created_by', user.id)
+      .eq('account_status', 'ghost'),
   ])
 
-  const yacht = yachtRes.data
-  if (!yacht) redirect('/app/network')
+  const attachments = (attachmentsRes.data as unknown as Attachment[]) ?? []
+  const yachtAttachments = attachments.filter((a) => a.yachts)
 
-  // Filter colleagues to those who share this yacht
+  if (yachtAttachments.length === 0) {
+    redirect('/app/attachment/new')
+  }
+
+  // Build yacht list (ordered by most recent)
+  const yachtMap = new Map<string, {
+    id: string
+    name: string
+    yachtType: string | null
+    coverPhotoUrl: string | null
+    startDate: string | null
+    endDate: string | null
+    userRole: string | null
+  }>()
+  for (const att of yachtAttachments) {
+    if (!att.yachts) continue
+    if (!yachtMap.has(att.yachts.id)) {
+      yachtMap.set(att.yachts.id, {
+        id: att.yachts.id,
+        name: att.yachts.name,
+        yachtType: att.yachts.yacht_type,
+        coverPhotoUrl: att.yachts.cover_photo_url,
+        startDate: att.started_at,
+        endDate: att.ended_at,
+        userRole: att.role_label,
+      })
+    }
+  }
+  const yachts = Array.from(yachtMap.values())
+
+  // Build colleague data grouped by yacht
   const allColleagueRows = (colleagueRowsRes.data as ColleagueRow[]) ?? []
-  const relevantColleagueIds = allColleagueRows
-    .filter((r) => r.shared_yachts.includes(yacht_id))
-    .map((r) => r.colleague_id)
+  const allColleagueIds = [...new Set(allColleagueRows.map((r) => r.colleague_id))]
 
-  // Fetch profiles for relevant colleagues (including email for direct requests)
-  const profilesRes =
-    relevantColleagueIds.length > 0
-      ? await supabase
-          .from('users')
-          .select('id, display_name, full_name, email, profile_photo_url, primary_role')
-          .in('id', relevantColleagueIds)
-      : { data: [] }
+  const profilesRes = allColleagueIds.length > 0
+    ? await supabase
+        .from('users')
+        .select('id, display_name, full_name, email, profile_photo_url, primary_role')
+        .in('id', allColleagueIds)
+    : { data: [] }
+
+  const profileMap = new Map<string, UserProfile>()
+  for (const p of (profilesRes.data as UserProfile[]) ?? []) {
+    profileMap.set(p.id, p)
+  }
 
   const existingRequests = (existingRequestsRes.data as EndorsementRequest[]) ?? []
-  const endorsementsGiven = (endorsementsGivenRes.data as ExistingEndorsement[]) ?? []
+  const endorsedRecipientIds = new Set(
+    ((endorsementsGivenRes.data as { recipient_id: string }[]) ?? []).map((e) => e.recipient_id)
+  )
+  const ghosts = (ghostsRes.data as GhostProfile[]) ?? []
+
   const todayCount = (todayCountRes.data as number | null) ?? 0
   const subscriptionStatus = userSubRes.data?.subscription_status as string | undefined
-
   const limit = subscriptionStatus === 'pro' ? 20 : 10
   const remaining = Math.max(0, limit - todayCount)
 
-  const endorsedRecipientIds = new Set(endorsementsGiven.map((e) => e.recipient_id))
+  // Build yacht groups with colleagues
+  type ColleagueOption = {
+    id: string
+    name: string
+    email: string | null
+    profilePhotoUrl: string | null
+    primaryRole: string | null
+    existingRequestStatus: 'pending' | 'accepted' | 'expired' | 'cancelled' | null
+    alreadyEndorsed: boolean
+    isGhost: boolean
+    requestCreatedAt: string | null
+    requestId: string | null
+    remindedAt: string | null
+  }
 
-  // Build colleague options with status info
-  const colleagues = ((profilesRes.data as UserProfile[]) ?? []).map((profile) => {
-    const name = buildColleagueName(profile.full_name, profile.display_name)
-    const alreadyEndorsed = endorsedRecipientIds.has(profile.id)
+  type YachtGroup = {
+    id: string
+    name: string
+    yachtType: string | null
+    coverPhotoUrl: string | null
+    startDate: string | null
+    endDate: string | null
+    userRole: string | null
+    colleagues: ColleagueOption[]
+  }
 
-    // Check for existing request to this colleague (by user_id or email)
-    let existingRequestStatus: 'pending' | 'accepted' | 'expired' | 'cancelled' | null = null
-    const matchedReq = existingRequests.find(
-      (r) => r.recipient_user_id === profile.id || r.recipient_email === profile.email
+  function getRequestStatus(
+    colleagueId: string,
+    colleagueEmail: string | null,
+    yachtId: string
+  ): { status: 'pending' | 'accepted' | 'expired' | 'cancelled' | null; createdAt: string | null; requestId: string | null; remindedAt: string | null } {
+    const req = existingRequests.find(
+      (r) => r.yacht_id === yachtId && (r.recipient_user_id === colleagueId || (colleagueEmail && r.recipient_email === colleagueEmail))
     )
-    if (matchedReq) {
-      if (matchedReq.cancelled_at) {
-        existingRequestStatus = 'cancelled'
-      } else if (matchedReq.status === 'accepted') {
-        existingRequestStatus = 'accepted'
-      } else if (new Date(matchedReq.expires_at) < new Date()) {
-        existingRequestStatus = 'expired'
-      } else {
-        existingRequestStatus = 'pending'
-      }
-    }
+    if (!req) return { status: null, createdAt: null, requestId: null, remindedAt: null }
+    if (req.cancelled_at) return { status: 'cancelled', createdAt: req.created_at, requestId: req.id, remindedAt: req.reminded_at }
+    if (req.status === 'accepted') return { status: 'accepted', createdAt: req.created_at, requestId: req.id, remindedAt: req.reminded_at }
+    if (new Date(req.expires_at) < new Date()) return { status: 'expired', createdAt: req.created_at, requestId: req.id, remindedAt: req.reminded_at }
+    return { status: 'pending', createdAt: req.created_at, requestId: req.id, remindedAt: req.reminded_at }
+  }
+
+  const yachtGroups: YachtGroup[] = yachts.map((yacht) => {
+    // Real colleagues on this yacht
+    const yachtColleagueIds = allColleagueRows
+      .filter((r) => r.shared_yachts.includes(yacht.id))
+      .map((r) => r.colleague_id)
+
+    const realColleagues: ColleagueOption[] = yachtColleagueIds
+      .map((cid) => {
+        const profile = profileMap.get(cid)
+        if (!profile) return null
+        const reqInfo = getRequestStatus(profile.id, profile.email, yacht.id)
+        return {
+          id: profile.id,
+          name: buildColleagueName(profile.full_name, profile.display_name),
+          email: profile.email as string | null,
+          profilePhotoUrl: profile.profile_photo_url,
+          primaryRole: profile.primary_role,
+          existingRequestStatus: reqInfo.status,
+          alreadyEndorsed: endorsedRecipientIds.has(profile.id),
+          isGhost: false as const,
+          requestCreatedAt: reqInfo.createdAt,
+          requestId: reqInfo.requestId,
+          remindedAt: reqInfo.remindedAt,
+        } satisfies ColleagueOption
+      })
+      .filter((c): c is NonNullable<typeof c> => c !== null)
+
+    // Ghost colleagues on this yacht
+    const yachtGhosts: ColleagueOption[] = ghosts
+      .filter((g) => g.yacht_id === yacht.id)
+      .map((g) => ({
+        id: g.id,
+        name: g.full_name,
+        email: null,
+        profilePhotoUrl: null,
+        primaryRole: g.primary_role,
+        existingRequestStatus: null,
+        alreadyEndorsed: false,
+        isGhost: true,
+        requestCreatedAt: null,
+        requestId: null,
+        remindedAt: null,
+      }))
 
     return {
-      id: profile.id,
-      name,
-      email: profile.email,
-      profile_photo_url: profile.profile_photo_url,
-      primary_role: profile.primary_role,
-      existingRequestStatus,
-      alreadyEndorsed,
+      ...yacht,
+      colleagues: [...realColleagues, ...yachtGhosts],
     }
   })
 
   return (
     <RequestEndorsementClient
-      yacht={{
-        id: yacht.id,
-        name: yacht.name,
-        yacht_type: yacht.yacht_type as string | null,
-        cover_photo_url: yacht.cover_photo_url as string | null,
-      }}
-      colleagues={colleagues}
+      yachtGroups={yachtGroups}
       remaining={remaining}
       limit={limit}
       userId={user.id}
-      initialColleagueId={colleague_id}
     />
   )
 }

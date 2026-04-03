@@ -86,6 +86,8 @@ One-line: Private profile hub with photo upload, identity card, strength meter, 
 
 ## Recent Activity
 
+**2026-04-03** — Rally 009 Review + QA: Removed duplicate "Career" heading from `CareerTimeline` (was rendered both by section group and inside component). Experience sublabel now uses same `seaTimeTotalDays` RPC source as hero card (was mismatched: union-based vs RPC). `CareerTimeline` typed properly — `YachtInfo | YachtInfo[] | null` with `resolveYacht()` helper replacing runtime cast. Photo context columns (`is_avatar`/`is_hero`/`is_cv`) stored via Pro-gated PATCH with exclusive assignment. `isPro` default fixed from `true` to `false` on photos page. Clipboard copy wrapped in try/catch on ProfileHeroCard.
+
 **2026-04-03** — Rally 009 Session 2, Lane 1 (feat/land-experience): New `CareerTimeline` component showing yacht (anchor icon) + shore-side (briefcase icon) entries in reverse-chronological order. Career section merged into SeaTime card on private profile (collapsible, "Show N more"). `getLandExperience` query added to `lib/queries/profile.ts` (cached). `LandExperienceEntry` type added to `lib/queries/types.ts`. Land experience integrated into profile page, public profile, and subdomain route. GDPR export includes `land_experience` table.
 
 **2026-04-03** — Rally 009 Session 2, Lane 2 (fix/sea-time-overlap): `computeSeaTime` in `lib/profile-summaries.ts` now uses union-based `calculateSeaTimeDays` instead of naive sum. Deleted `formatSeaTimeCompact` — uses canonical `formatSeaTime().displayShort`.

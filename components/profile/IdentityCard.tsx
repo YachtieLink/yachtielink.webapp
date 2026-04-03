@@ -91,7 +91,7 @@ export function IdentityCard({
     <div className="bg-[var(--color-surface)] rounded-2xl p-5 flex flex-col gap-4">
       {/* Photo + name row */}
       <div className="flex items-center gap-4">
-        <Link href="/app/profile/photo" className="relative shrink-0">
+        <Link href="/app/profile/photos" className="relative shrink-0">
           {photoUrl ? (
             <Image
               src={photoUrl}

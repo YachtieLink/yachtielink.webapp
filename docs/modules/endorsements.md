@@ -1,6 +1,6 @@
 ---
 module: endorsements
-updated: 2026-04-02
+updated: 2026-04-03
 status: shipped
 phase: 1A
 ---
@@ -33,11 +33,14 @@ One-line: Endorsement requests, endorsement creation with coworker gating and co
 - Endorsement deletion: working — soft delete via DELETE to `/api/endorsements/[id]` (sets `deleted_at`); tracked via analytics event
 - Endorsement received notification: working — HTML email sent to recipient with excerpt; non-fatal
 - Request-to-endorsement link: working — when endorsement is created via deep link with `request_token`, the request status is updated to `accepted`
-- Endorsement request UI: working at `/app/endorsement/request` — yacht picker (auto-skips if only one yacht), then shows:
-  - Share section (WhatsApp, copy link, native share) using shareable link
-  - Colleague list from `get_colleagues` RPC filtered to shared yacht, with per-colleague request button and status pills (Pending, Endorsed, Expired, Cancelled)
-  - Manual invite by email or phone with contact chip input
-  - Rate limit counter
+- Endorsement request UI: working at `/app/endorsement/request` — yacht-grouped accordion view showing all yachts at once:
+  - Per-yacht accordion with colleague list from `get_colleagues` RPC, request buttons, status pills (Pending, Endorsed, Expired, Cancelled)
+  - Inline ghost suggestions tagged "not on platform" with invite buttons
+  - Per-yacht "Invite someone from [yacht]" inline form
+  - Generic external invite section with WhatsApp/Copy Link
+  - Reminder logic: 1 reminder after 7 days (atomic CAS), then disabled
+  - Writing assist: "Help me start/finish writing" button using gpt-4o-mini via `POST /api/endorsements/assist`
+  - LLM defense: input sanitization (strip HTML/zero-width/scripts/delimiter tokens), output validation (length/plaintext), prompt guard with safety preamble
 - Endorsement edit UI: working at `/app/endorsement/[id]/edit`
 - Retraction visibility: per D-005, retractions (deletions) are never visible in UI; backend only
 - Absence is neutral: per D-011, zero endorsements is not a negative signal
@@ -61,6 +64,10 @@ One-line: Endorsement requests, endorsement creation with coworker gating and co
 | Share link API | `app/api/endorsement-requests/share-link/route.ts` |
 | Endorsements API | `app/api/endorsements/route.ts` |
 | Endorsement by ID API | `app/api/endorsements/[id]/route.ts` |
+| Reminder API | `app/api/endorsement-requests/[id]/remind/route.ts` |
+| Writing assist API | `app/api/endorsements/assist/route.ts` |
+| LLM sanitizer | `lib/llm/sanitize.ts` |
+| LLM prompt guard | `lib/llm/prompt-guard.ts` |
 | Validation schemas | `lib/validation/schemas.ts` |
 | AI moderation | `lib/ai/moderation.ts` |
 | Rate limit config | `lib/rate-limit/helpers.ts` |
@@ -94,6 +101,8 @@ One-line: Endorsement requests, endorsement creation with coworker gating and co
 **2025-11-15** — D-001: Crew are privileged in trust conflicts. Crew are the mobile, vulnerable party — asymmetric protection prevents the system from becoming a tool for employer control. — Ari
 
 ## Recent Activity
+
+**2026-04-03** — Rally 009 Review + QA: Fixed endorsement request page column name mismatches (`start_date`→`started_at`, `end_date`→`ended_at`, `role_title`→`role_label`). Fixed assist API same column issue + relaxed output validation (`maxSentences` removed, `maxLength` bumped to 2000). Assist now fetches endorsee's yacht-specific attachment (role + dates) instead of generic `primary_role`. Prompt changed to "800-1000 characters". `recipient_name` wired into request schema + migration. Reminder endpoint built with atomic CAS. Writing assist submit wrapped in try/catch. Ghost invite button now opens invite form instead of failing silently.
 
 **2026-04-02** — Worktree lane 1 (pending push): ghost_endorser join added to `getProfileSections` + `getCvSections` — private dashboard and CV now show ghost endorser names. Name-resolution chain updated in `EndorsementsSection.tsx` (private) and `CvPreview.tsx`. Ghost flow fixes: guest form now blocked at page-load for existing users (admin client email+phone check); self-endorsement guard added to `claim_ghost_profile()` RPC (Step A soft-deletes endorsements where `recipient_id = claiming_user`); phone-only dedup closed — API submit also checks `recipient_phone`. Migration `20260402000002` adds partial index `users_phone_idx` and extends RPC for phone-based claim matching.
 **2026-04-02** — Worktree lane 2 (pending push): `EndorsementCard.tsx` restructured to show endorser role + yacht on one line ("Second Engineer on Driftwood") with date on separate line. Applied across `EndorsementsTile.tsx` and private `EndorsementsSection.tsx`. Note: ghost endorser path in EndorsementCard still uses old layout format — follow-up fix captured in backlog.
@@ -134,5 +143,6 @@ One-line: Endorsement requests, endorsement creation with coworker gating and co
 
 - [ ] Endorsement signals (agree/disagree) from users with overlapping attachment (D-019)
 - [ ] In-app notification for endorsement received (currently email only)
-- [ ] Endorsement request reminder/nudge flow
+- [x] Endorsement request reminder/nudge flow (built: 1 reminder after 7 days, atomic CAS)
+- [x] Writing assist via gpt-4o-mini with LLM defense layer (sanitize + prompt-guard)
 - [ ] Phone-based notification for endorsement requests (WhatsApp or SMS)

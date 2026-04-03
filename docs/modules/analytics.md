@@ -1,6 +1,6 @@
 ---
 module: analytics
-updated: 2026-03-21
+updated: 2026-04-03
 status: shipped
 phase: 1A
 ---
@@ -36,7 +36,10 @@ One-line: PostHog event tracking (client + server) plus a Pro-gated Insights das
 | Bar chart component | `components/insights/AnalyticsChart.tsx` |
 | Upgrade CTA (free users) | `components/insights/UpgradeCTA.tsx` |
 | Post-upgrade toast | `components/insights/InsightsUpgradedToast.tsx` |
-| Manage subscription button | `components/insights/ManagePortalButton.tsx` |
+| Metric card | `components/insights/MetricCard.tsx` |
+| Time range selector | `components/insights/TimeRangeSelector.tsx` |
+| Career snapshot (free) | `components/insights/CareerSnapshot.tsx` |
+| Who Viewed You (Pro) | `components/insights/WhoViewedYou.tsx` |
 | Cert expiry cron | `app/api/cron/cert-expiry/route.ts` |
 | Analytics nudge cron | `app/api/cron/analytics-nudge/route.ts` |
 | Nudge email template | `lib/email/analytics-nudge.ts` |
@@ -90,6 +93,10 @@ Both crons verify `CRON_SECRET` bearer token and use the service role Supabase c
 **2026-01-31** — D-023: Profile analytics included in Crew Pro tier (€12/month). Free tier has no analytics. — Ari
 
 ## Recent Activity
+
+**2026-04-03** — Rally 009 QA: Fixed `WhoViewedYou` hardcoded "30 days" copy — now accepts `range` prop and dynamically shows "last 7 days" / "last 30 days" / "last 12 months". Deleted dead `ManagePortalButton` component.
+
+**2026-04-03** — Rally 009 Session 4: Insights dashboard rewrite. Pro: `TimeRangeSelector` (7d/30d/All), `MetricCard` grid (hero Profile Views + Downloads/Shares/Saves), `WhoViewedYou` viewer rows. Free: `CareerSnapshot` (3 stat cards), Profile Strength coaching ring, blurred analytics + upgrade CTA. Coral wayfinding. New components: MetricCard, TimeRangeSelector, CareerSnapshot, WhoViewedYou.
 
 **2026-03-21** — Sprint 10.3: Insights page — Crew Pro CTA as sticky bottom overlay with expandable feature list; bento grid for Pro analytics (profile views hero + 2-col metrics); error toast on checkout failure; removed blur on teaser cards, readable text with inline Pro badge.
 **2026-03-21** — Sprint 10.3: Bug fix — `expiry_date` → `expires_at` column mismatch fixed in insights, cron, and certs.

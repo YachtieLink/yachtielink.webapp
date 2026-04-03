@@ -62,69 +62,107 @@ export function WriteEndorsementForm({
   const [showDetails, setShowDetails] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [succeeded, setSucceeded] = useState(false)
+  const [assisting, setAssisting] = useState(false)
+  const [assistUsed, setAssistUsed] = useState(false)
 
   const charCount = content.length
   const minMet = charCount >= 10
   const maxAllowed = 2000
 
+  async function handleAssist() {
+    setAssisting(true)
+    try {
+      const res = await fetch('/api/endorsements/assist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          recipient_id: recipientId,
+          yacht_id: yachtId,
+          partial_text: content || undefined,
+        }),
+      })
+      if (res.status === 429) {
+        toast('You\u2019ve used all your writing assists for now. Try again later.', 'info')
+        return
+      }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        toast((data as { error?: string }).error ?? 'Could not generate a draft. Try again.', 'error')
+        return
+      }
+      const { draft } = await res.json() as { draft: string }
+      setContent(content ? `${content} ${draft}` : draft)
+      setAssistUsed(true)
+      toast('Draft inserted — edit it to add your personal touch', 'success')
+    } catch {
+      toast('Could not connect to writing assist.', 'error')
+    } finally {
+      setAssisting(false)
+    }
+  }
+
   async function handleSubmit() {
     if (!minMet || charCount > maxAllowed) return
     setSubmitting(true)
 
-    if (isEditMode && existingEndorsement) {
-      const res = await fetch(`/api/endorsements/${existingEndorsement.id}`, {
-        method: 'PUT',
+    try {
+      if (isEditMode && existingEndorsement) {
+        const res = await fetch(`/api/endorsements/${existingEndorsement.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content,
+            endorser_role_label: endorserRole || undefined,
+            recipient_role_label: recipientRole || undefined,
+            worked_together_start: startDate || undefined,
+            worked_together_end: endDate || undefined,
+          }),
+        })
+        if (!res.ok) {
+          const data = await res.json() as { error?: string }
+          toast(data.error ?? 'Failed to save changes. Please try again.', 'error')
+          return
+        }
+        toast('Endorsement updated.', 'success')
+        onSuccess()
+        return
+      }
+
+      const res = await fetch('/api/endorsements', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          recipient_id: recipientId,
+          yacht_id: yachtId,
           content,
           endorser_role_label: endorserRole || undefined,
           recipient_role_label: recipientRole || undefined,
           worked_together_start: startDate || undefined,
           worked_together_end: endDate || undefined,
+          request_token: requestToken,
         }),
       })
-      setSubmitting(false)
+
       if (!res.ok) {
         const data = await res.json() as { error?: string }
-        toast(data.error ?? 'Failed to save changes. Please try again.', 'error')
+        if (res.status === 409) {
+          toast("You've already endorsed this person for this yacht.", 'error')
+          return
+        }
+        if (res.status === 403) {
+          toast('You can only endorse people you have worked with on this yacht.', 'error')
+          return
+        }
+        toast(data.error ?? 'Failed to submit endorsement. Please try again.', 'error')
         return
       }
-      toast('Endorsement updated.', 'success')
-      onSuccess()
-      return
+
+      setSucceeded(true)
+    } catch {
+      toast('Could not connect. Please try again.', 'error')
+    } finally {
+      setSubmitting(false)
     }
-
-    const res = await fetch('/api/endorsements', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        recipient_id: recipientId,
-        yacht_id: yachtId,
-        content,
-        endorser_role_label: endorserRole || undefined,
-        recipient_role_label: recipientRole || undefined,
-        worked_together_start: startDate || undefined,
-        worked_together_end: endDate || undefined,
-        request_token: requestToken,
-      }),
-    })
-    setSubmitting(false)
-
-    if (!res.ok) {
-      const data = await res.json() as { error?: string }
-      if (res.status === 409) {
-        toast("You've already endorsed this person for this yacht.", 'error')
-        return
-      }
-      if (res.status === 403) {
-        toast('You can only endorse people you have worked with on this yacht.', 'error')
-        return
-      }
-      toast(data.error ?? 'Failed to submit endorsement. Please try again.', 'error')
-      return
-    }
-
-    setSucceeded(true)
   }
 
   if (succeeded) {
@@ -175,15 +213,33 @@ export function WriteEndorsementForm({
           className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-interactive)] focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20 resize-none"
         />
         <div className="flex items-center justify-between mt-1">
-          {!minMet ? (
-            <p className="text-xs text-[var(--color-text-secondary)]">10 characters minimum</p>
-          ) : (
-            <span />
+          {!isEditMode && (
+            <button
+              type="button"
+              onClick={handleAssist}
+              disabled={assisting}
+              className="text-xs text-[var(--color-interactive)] font-medium hover:underline disabled:opacity-50"
+            >
+              {assisting
+                ? 'Writing…'
+                : content.length > 0
+                ? 'Help me finish this'
+                : 'Help me start writing'}
+            </button>
           )}
+          {isEditMode && !minMet && (
+            <p className="text-xs text-[var(--color-text-secondary)]">10 characters minimum</p>
+          )}
+          {!isEditMode && !minMet && content.length === 0 && <span />}
           <p className={`text-xs ml-auto ${charCount > maxAllowed ? 'text-red-500' : 'text-[var(--color-text-secondary)]'}`}>
             {charCount} / {maxAllowed}
           </p>
         </div>
+        {assistUsed && (
+          <p className="text-xs text-[var(--color-text-tertiary)] -mt-0.5">
+            Edit this to add your personal touch
+          </p>
+        )}
       </div>
 
       {/* Collapsible details */}

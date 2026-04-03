@@ -2,7 +2,7 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-03 (Session 2 complete — land experience + sea time overlap. Both lanes passed review + QA. Ready for commit + push.)
+**Last updated:** 2026-04-03 (Sessions 2-5 reviewed + QA passed. 21 review fixes + 9 tester fixes applied. PR #159 ready for merge.)
 
 ---
 
@@ -16,10 +16,10 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Sprint | Phase | Status | Focus |
 |--------|-------|--------|-------|
-| Rally 009 | 1B | 🔧 Session 2 complete, pending push | Pre-MVP polish — 7 sessions, 35+ items. Session 2: land experience + sea time overlap — built, reviewed, QA'd. |
+| Rally 009 | 1B | ✅ Sessions 2-5 reviewed + QA passed | Pre-MVP polish — 7 sessions. Sessions 2-5 on chain/rally-009. PR #159 ready for merge. |
 | Sprint 13 | 1B | 🔧 Code Complete | SEO/sitemap/OG/cookie/robots merged (PR #130). Ops + legal blocked on founder. |
 
-**Next action:** Push + PR for Session 2 lanes (merge order: Lane 2 first, Lane 1 second).
+**Next action:** Founder merges PR #159. Then Rally 009 Sessions 6-7 or Rally 010.
 
 ---
 
@@ -27,6 +27,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
+| Rally 009 Sessions 2-5 — reviewed + QA passed | 2026-04-03 | Land experience, Network tab, Profile redesign, Insights, Photos, CV, Settings, LLM defense, Endorsement flow. 21 review fixes + 9 tester fixes. PR #159 ready for merge. |
 | Rally 009 Session 2 — land experience + sea time overlap | 2026-04-03 | Land experience end-to-end (DB + wizard + profile + public), sea time union-based calc + overlap detection, 19 review fixes, 3 QA fixes |
 | Rally 009 Session 1 — mobile UX + P2 bugs + tech debt | 2026-04-02 | Tab-bar padding, CV preview canonical query, saved sea time, yacht prefix null guard, PDF home-country toggle, social icons dedup, formatSeaTime canonical, EndorsementsSection cleanup |
 | Skill hardening — review, tester, file ownership | 2026-04-02 | /yl-review zero-tolerance + two-step, /yl-tester agent, file ownership rules, cwd conventions, 7 chain gaps fixed |
@@ -39,12 +40,12 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Rally 009 Session 2** — Push + PR (Lane 2 first, Lane 1 second). Migration: `20260403000001_land_experience.sql`.
-2. **Rally 009 Sessions 3-7** — All specs restructured with grill-me decisions. Ready to build sequentially.
-4. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
-5. **Rally 010 — Frontend UX & Guidance** — Product tour (Onborda), cold states, StickyBottomBar, tooltips, coaching nudges. After Rally 009 completes.
-6. **Rally 007 — Launch QA** — full checklist (after Rally 009 + 010 complete)
-7. **Deploy** — invite mode, 20-50 crew, 24h monitoring
+1. **Merge PR #159** — Rally 009 Sessions 2-5. Founder merges.
+2. **Rally 009 Sessions 6-7** — remaining sessions (if planned)
+3. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
+4. **Rally 010 — Frontend UX & Guidance** — Product tour (Onborda), cold states, StickyBottomBar, tooltips, coaching nudges. After Rally 009 completes.
+5. **Rally 007 — Launch QA** — full checklist (after Rally 009 + 010 complete)
+6. **Deploy** — invite mode, 20-50 crew, 24h monitoring
 
 ---
 
@@ -63,6 +64,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | PR | Branch | Status | Notes |
 |----|--------|--------|-------|
+| #159 | chain/rally-009 | 🔍 QA Passed | Sessions 2-5: land exp, network, profile, insights, photos, CV, settings, LLM, endorsements. 30 fixes applied. Ready for merge. |
 | #152 | chore/rally009-session1-context | ✅ Merged | Session 1 context |
 | #153 | fix/mobile-ux-fixes | ✅ Merged | Tab-bar padding + CV preview query |
 | #154 | fix/p2-bug-fixes | ✅ Merged | Saved sea time, yacht prefix null, home country |

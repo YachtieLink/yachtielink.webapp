@@ -26,11 +26,110 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-03 | Rally 009 Review + QA | Review fixes (21 total): RSC serialization, LLM safety, Pro gate, clipboard, dead code. Tester QA (9 fixes): column mismatches, land exp on public profile, WhoViewedYou dynamic range, assist quality. 5 backlog items. |
+| 2026-04-03 | Rally 009 Session 5 | LLM defense layer (sanitize + prompt-guard). Endorsement writing assist (gpt-4o-mini). Endorsement request redesign (yacht-grouped, ghost inline, reminders). |
+| 2026-04-03 | Rally 009 Session 4 | Insights dashboard (coral wayfinding, metric cards, career snapshot, WhoViewedYou). Unified photo management (3-format preview, focal point). CV output-only + Settings 5-group IA. |
+| 2026-04-03 | Rally 009 Session 3 | Network tab Phase 1 (yacht accordion, navy wayfinding, endorsement cards). Profile page redesign (4-group list, tap-to-edit hero, strength ring). |
 | 2026-04-03 | Rally 009 Session 2 | Land experience end-to-end (DB + wizard + profile + public). Sea time union-based calculation + overlap detection. 14 review fixes (L1) + 5 review fixes (L2). 3 QA fixes. 3 backlog items captured. |
 | 2026-04-02 | Rally 009 restructure + Rally 010 | Restructured all 7 session specs post-grill-me. 2 design guide audits (18 issues fixed). Thumb-zone + cold-state audit. Rally 010 created: frontend UX, guidance, cold states. |
 | 2026-04-02 | Rally 009 /grill-me | Design interview: 42 Qs resolved, 5-tab UX audit, 9 additional fixes confirmed. All sessions unblocked. |
 | 2026-04-02 | Rally 009 Session 1 | 3-lane: mobile UX tab-bar padding + CV preview canonical query, P2 bugs (saved sea time, yacht prefix null guard, PDF home-country toggle), tech debt sweep (social icons dedup, formatSeaTime, EndorsementsSection) |
 | 2026-04-02 | Rally 009 planning | Full pre-MVP backlog triage: 30 items across 7 sessions specced into lane-ready build plans. 42 /grill-me questions prepped. 7 backlog items closed as resolved. Junior sprints updated. |
+
+## 2026-04-03 — Rally 009 Review + QA (Opus 4.6, CLI) — Post-Chain
+
+### Done
+- **Review round 1 (3-agent parallel scan):** Fixed P0 `Set<string>` RSC serialization in Network page (endorsement badges never displayed). Fixed LLM delimiter injection (`<<<USER_CONTENT_START>>>` strippable in user input). Fixed sentence counter false positives on abbreviations. Added try/catch + error toast to WriteEndorsementForm submit + ProfileHeroCard clipboard. Merged duplicate endorsee queries into `Promise.all`. Added yacht attachment authorization check on assist endpoint. Removed dead `ManagePortalButton`. Removed console.debug + unused imports.
+- **Built deferred in-scope items:** Reminder endpoint (`POST /api/endorsement-requests/[id]/remind`) with auth, ownership check, 7-day cooldown, atomic CAS (`reminded_at IS NULL`), HTML email. Photo context assignment (`is_avatar`/`is_hero`/`is_cv` on `user_photos`) with Pro gate via `getProStatus()`, exclusive assignment (setting one clears others). `recipient_name` wired into endorsement request schema + DB + insert.
+- **3 new migrations applied to remote Supabase DB:** `20260403000002_endorsement_request_reminded`, `20260403000003_user_photo_contexts`, `20260403000004_endorsement_request_recipient_name`. (Total 4 migrations on chain including Session 2's `000001_land_experience`.)
+- **Formal /yl-review (Sonnet+Opus):** 12 additional findings fixed — CRITICAL `isPro` defaulting to `true` on photos page, duplicate timeline sort logic, ghost invite silent failure (now opens invite form), comment inaccuracies, typing improvements.
+- **Drift-check fix:** Photo context PATCH was using inline `subscription_status` check — replaced with `getProStatus()`.
+- **/yl-tester QA (28 test cases, all 4 sessions):** 9 issues found and fixed:
+  - HIGH: Endorsement request page used wrong column names (`start_date`/`end_date`/`role_title` vs `started_at`/`ended_at`/`role_label`) — query returned empty, page redirected to /app/attachment/new
+  - HIGH: Public profile "See all N positions" excluded land experience entries — added `landExperience` prop through PortfolioLayout → RichPortfolioLayout → ExperienceTile, fixed counts
+  - MEDIUM: Sea time mismatch between hero card (RPC) and experience sublabel (union-based) — sublabel now uses same RPC source
+  - MEDIUM: Duplicate "Career" heading (one from section group, one inside CareerTimeline) — removed redundant h3 + Add link from CareerTimeline
+  - MEDIUM: WhoViewedYou "No profile viewers in the last 30 days" hardcoded regardless of time range — added `range` prop, copy now matches selected range
+  - MEDIUM: Assist API had same column name mismatch as request page — fixed to `role_label`, `started_at`
+  - MEDIUM: `maxSentences: 5` in output validation rejected valid 907-char drafts — removed sentence limit, bumped maxLength to 2000
+  - LOW: Prompt asked for "2-4 sentences" (too short for endorsement) — changed to "800-1000 characters (roughly 4-6 sentences)"
+  - LOW: Assist only got endorsee's `primary_role` instead of yacht-specific role — now fetches their attachment on the specific yacht
+
+### Context
+- All work on `chain/rally-009` branch. PR #159 updated. 4 total migrations applied to remote Supabase DB (1 from Session 2 + 3 from this session).
+- Type-check and drift-check both pass.
+- Photo context columns stored but not yet consumed downstream (CV PDF, OG image, avatar selection) — Phase 2 feature hook.
+
+### Next
+1. Founder merges PR #159
+2. Rally 009 Sessions 6-7 (if planned) or Rally 010
+
+### Flags
+- ⚠️ 3 LOW items deferred to founder's call: WhoViewedYou empty for Pro (known placeholder data), ProfileHeroCard inline edit no `router.refresh()` (stale until nav), duplicate timeline sort logic (CareerTimeline vs ExperienceSection)
+- ⚠️ Overnight chain only wrote code — skipped reviews, testing, docs, deferred in-scope items. All review/fix/test work done during founder's daytime. Feedback captured in `docs/ops/feedback.md` and memory.
+
+### Backlog captured
+- role-context-data-layer: Add `description` to `attachments` table (HIGH — foundation for rich endorsements, expandable career entries, CV output)
+- career-entry-detail-expand: Expandable career entries with role descriptions + yacht links (depends on above)
+- unsolicited-endorsements: Allow endorsing a colleague without a request
+- trending-yachts-discovery: High-activity yachts as graph entry point
+- social-links-crud: Add/remove social links from Profile page
+
+---
+
+## 2026-04-03 — Rally 009 Session 5 (Opus 4.6, CLI) — Chain
+
+### Done
+- **Lane 1 (feat/endorsement-assist):** LLM defense layer + endorsement writing assist. New `lib/llm/sanitize.ts`: sanitizeInput (strip HTML/zero-width/scripts), validateOutput (plaintext enforcement, sentence limits), wrapUserContent (delimiter tokens for injection resistance). New `lib/llm/prompt-guard.ts`: hardened system prompt builder with safety preamble. New `POST /api/endorsements/assist`: contextual draft generation via gpt-4o-mini with input sanitization, output validation, moderation. WriteEndorsementForm: "Help me start/finish writing" button with loading state + hint. (branch: feat/endorsement-assist)
+- **Lane 2 (feat/endorsement-request-redesign):** Endorsement request page rewrite to colleague-first yacht-grouped view (Q6.2). All yachts shown at once with accordion expand/collapse. Inline ghost suggestions tagged "not on platform" (Q6.3). Per-yacht "Invite someone from [yacht]" inline form. Generic external invite section with WhatsApp/Copy Link. Reminder logic: 1 reminder after 7 days, then disabled (Q6.4). Server page fetches all yachts + colleagues + ghosts in parallel. (branch: feat/endorsement-request-redesign)
+
+### Context
+- Chain branch: `chain/rally-009`. Both lanes merged cleanly.
+- Reminder API endpoint (`/api/endorsement-requests/[id]/remind`) assumed to exist — may need creation if not already built.
+- LLM assist uses `aiSummary` rate limit bucket (10/hr/user) — no new bucket needed.
+
+### Next
+- Push chain branch + create PR + morning summary
+
+---
+
+## 2026-04-03 — Rally 009 Session 4 (Opus 4.6, CLI) — Chain
+
+### Done
+- **Lane 1 (feat/insights-layer1):** Insights dashboard rewrite. Pro users: TimeRangeSelector (7d/30d/All), MetricCard grid (hero Profile Views + Downloads/Shares/Saves with sparklines), WhoViewedYou (viewer rows with avatar/name/role/time). Free users: CareerSnapshot (3 stat cards), Profile Strength coaching ring (coral SVG), blurred analytics + blurred WhoViewedYou, upgrade CTA. Coral wayfinding throughout. New components: MetricCard, TimeRangeSelector, CareerSnapshot, WhoViewedYou. (branch: feat/insights-layer1)
+- **Lane 2 (feat/unified-photos):** Unified photo management page. Profile Photo section at top (large preview, focal point picker, 3-format live preview: avatar circle/hero 16:9/CV square). Work Gallery section below (drag-reorder grid). New component: PhotoFormatPreview. Pro contextual assignment UI shell. Fixed stale links: /profile/photo and /profile/gallery → /profile/photos. Teal wayfinding. (branch: feat/unified-photos)
+- **Lane 3 (chore/cv-settings-final):** CV tab output-only — removed CvDetailsCard, added education card linking to Profile. Re-parse confirmation dialog (UX5). Renamed "Visitor Downloads" → "Sharing". Collapsed template picker to "Standard · Change" single line. Settings page rewritten with 5-group IA: Account (login, cert docs, GDPR export), Plan (Pro value display), App (appearance, notifications), Community (roadmap, report), Legal. Sign-out as quiet text link. Delete account isolated in danger zone. Sand wayfinding with icons. (branch: chore/cv-settings-final)
+
+### Context
+- Chain branch: `chain/rally-009`. All 3 lanes merged cleanly, no conflicts.
+- AI photo enhancement (Lane 2 Task 5) deferred — requires external API integration (Claid.ai or similar). UI shell present with "Coming in a future update" messaging.
+- Contextual photo assignment (Lane 2 Task 4) deferred — UI shell present, no backend support yet.
+- Photo migration (Lane 2 Task 7) skipped — `user_photos` table already handles roles via sort_order convention.
+
+### Next
+- Session 5: Endorsement flow + LLM defense
+- Push chain branch + create PR
+
+### Flags
+- 🏴 Photo AI enhancement and contextual assignment are UI shells only — need backend work in a future session
+- 🏴 CvDetailsCard still exists as a component file — not deleted, just unused from CV page (data moved to Profile)
+
+---
+
+## 2026-04-03 — Rally 009 Session 3 (Opus 4.6, CLI) — Chain
+
+### Done
+- **Lane 1 (feat/network-phase1):** Network tab redesign Phase 1. Yacht-grouped accordion view (YachtAccordion with easeGentle animation, navy wayfinding). ColleagueRow with endorsement status indicators. EndorsementSummaryCard + EndorsementCTACard. NetworkUnifiedView orchestrator with embedded YachtSearch. Server component fetches colleagues RPC, endorsements, ghost profiles. Navy wayfinding. (branch: feat/network-phase1)
+- **Lane 2 (feat/profile-redesign):** Profile page redesign. 4-group compact list layout (About Me, Personal Details, Career, Media) with ProfileSectionGroup + ProfileSectionList. ProfileHeroCard rewrite with InlineEditField (tap-to-edit name/role, saves to Supabase), CompactStrengthRing (teal SVG), coaching prompts. Visibility toggles on section rows. Removed "Edit profile" and "Saved Profiles" from More page. (branch: feat/profile-redesign)
+
+### Context
+- Chain branch: `chain/rally-009`. Both lanes merged cleanly.
+- Removed "Profile" and "Saved" sections from More page (moved to Profile tab and Network tab respectively).
+
+### Next
+- Session 4: Insights + Photos + CV tab + Settings IA
+
+---
 
 ## 2026-04-03 — Rally 009 Session 2 (Opus 4.6, CLI) — Master
 

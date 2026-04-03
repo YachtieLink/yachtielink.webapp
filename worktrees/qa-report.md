@@ -1,83 +1,106 @@
-# QA Report — 2026-04-03 (Rally 009 Session 2)
+# QA Report — 2026-04-03
 
-**Tester:** Claude Code (Opus) — Tester
-**Session:** sessions/2026-04-03-rally009-session2.md
-**Lanes tested:** Lane 1 (feat/land-experience, yl-wt-1), Lane 2 (fix/sea-time-overlap, yl-wt-2)
-**Verdict:** PASS (all issues resolved)
+**Tester:** Claude Code (Opus 4.6) — Tester
+**Branch:** chain/rally-009 (PR #159)
+**Sessions tested:** 2, 3, 4, 5
+**Verdict:** PASS (after fixes applied in this session)
+
+---
 
 ## Tested (every input -> output pair)
 
-| # | Lane | Feature | Input | Expected Output | Actual | Status |
-|---|------|---------|-------|-----------------|--------|--------|
-| 1 | 2 | Sea time stat cards in StepExperience | Upload CV, advance to Step 2 | Union-based sea time, yacht count, since year | 8 yachts, 3y 7mo, since 2007 — correct | pass |
-| 2 | 2 | No overlap = no warning | CV with non-overlapping yacht dates | No overlap warning shown | No warning rendered | pass |
-| 3 | 2 | Duplicate yacht warning | CV with 2 stints on M/Y WTR | Amber warning about same yacht match | Warning shown correctly | pass |
-| 4 | 2 | Shore-based roles message (Lane 2 branch) | CV with 4 non-yacht roles | Info message about shore roles | "We also found 4 shore-based roles" shown | pass |
-| 5 | 2 | parseCVDate NaN guard | Code review: malformed date strings | Returns null for NaN dates | isNaN(date.getTime()) check on line 875 | pass |
-| 6 | 2 | mergeOverlappingRanges inverted range guard | Code review | Filters ranges where start > end | Filter on line 19 | pass |
-| 7 | 2 | detectOverlaps generic type | Code review | Preserves subtypes (cardIndex) | Generic <T extends DateRange> — no cast needed | pass |
-| 8 | 2 | formatSeaTimeCompact replaced | Code review: profile-summaries.ts | Uses canonical formatSeaTime().displayShort | Line 53 uses displayShort | pass |
-| 9 | 2 | computeSeaTime union-based | Code review: profile-summaries.ts | calculateSeaTimeDays replaces naive sum | Line 37: calculateSeaTimeDays(ranges) | pass |
-| 10 | 1 | Wizard step count | Open CV wizard on Lane 1 | 6 steps (was 5) | "Step 2 of 6" confirmed | pass |
-| 11 | 1 | StepLandExperience renders | Advance past StepExperience | Step 3 shows shore-side roles | 4 roles with company, role, dates, descriptions | pass |
-| 12 | 1 | StepLandExperience edit | Click edit pencil on first card | Edit form with fields | Form rendered: Company, Role, Start, End, Description | pass |
-| 13 | 1 | StepLandExperience confirm count | View confirm button | Count matches non-empty roles | "Confirm 4 shore-side roles" — correct | pass |
-| 14 | 1 | StepReview shore-side section | Advance to Step 6 | Shore-Side Experience section listed | "Shore-Side Experience (4)" with all 4 roles | pass |
-| 15 | 1 | Import celebration includes shore-side | Click Import | Celebration shows land experience count | "4 shore-side roles" in badge line | pass |
-| 16 | 1 | Land experience saved to DB | After import, query land_experience | 4 rows with correct data | 4 rows: 1 Hotel, Chateau Rigaud, Coast, E'cco | pass |
-| 17 | 1 | Career timeline anchor icons (yacht) | View profile Career section | Navy anchor icon for yacht entries | Anchor in navy circle — correct | pass |
-| 18 | 1 | Career timeline briefcase icons (land) | View profile Career section | Amber briefcase icon for shore-side | Briefcase in amber circle for "1 Hotel" | pass |
-| 19 | 1 | Career timeline sort order | View profile Career section | Reverse chronological, current first | Entries sorted correctly | pass |
-| 20 | 1 | GDPR export includes land_experience | Code review: export/route.ts | land_experience queried and included | Lines 33, 49, 68 confirmed | pass |
-| 21 | 1 | Public profile experience detail | /u/dev-qa/experience | Shore-side roles in position list | FIXED — was missing, now shows 16 positions | pass (fixed) |
+| # | Session | Feature | Input | Expected Output | Actual | Status |
+|---|---------|---------|-------|-----------------|--------|--------|
+| 1 | S2 | Land experience on profile | Navigate to /app/profile, Career section | Sublabel shows yacht + shore-side counts | "11y 4mo sea time · 11 yachts + 4 shore-side" | pass |
+| 2 | S2 | Career timeline entries | Click "Show 13 more" | All 16 entries render (12 yacht + 4 shore-side) | 16 entries in DOM, expand/collapse works | pass |
+| 3 | S2 | Career entry expand | Click M/Y Go entry | Expands with yacht type, links | "Motor Yacht", "View yacht page", "Edit" | pass |
+| 4 | S2 | Public profile experience page | Navigate to /u/dev-qa/experience | All entries including shore-side | "16 positions", all present with correct icons | pass |
+| 5 | S2 | Public profile position count | Check "See all N positions" on /u/dev-qa | Should say 16 | "See all 16 positions" (was 12 — fixed) | pass |
+| 6 | S2 | Sea time consistency | Compare hero card to Experience row | Same value | Both show "11y 4mo" (was mismatched — fixed) | pass |
+| 7 | S3 | Network yacht accordion | Click Big Sky on /app/network | Accordion expands | "No colleagues found" + "Invite former crew" | pass |
+| 8 | S3 | Network endorsement section | Check ENDORSEMENTS | Count and button | "ENDORSEMENTS 0/5", "Request endorsement" button | pass |
+| 9 | S3 | Network colleagues | Check M/Y Go colleagues | Avatars, roles, Request buttons | 3 colleagues: Ari Steele, ari, aristeelesignup | pass |
+| 10 | S3 | Profile redesign groups | Navigate to /app/profile | 4-group compact list | About Me, Personal Details, Career, Media — all render | pass |
+| 11 | S3 | Profile hero card | Check hero info | Name, role, sea time, completeness | "Krista Lee Graham", "Yacht Chef", "11y 4mo · 11 yachts", "70%" | pass |
+| 12 | S3 | Social links row | Check social links | Icons with correct hrefs | Instagram, LinkedIn, Website — all present | pass |
+| 13 | S4 | Insights dashboard (Pro) | Navigate to /app/insights | Metric cards, coral wayfinding | Profile Views (460), Downloads (0), Shares (0), Saves (0) | pass |
+| 14 | S4 | Insights time range toggle | Click 7d | Values update | Profile Views: 37, chart shifted | pass |
+| 15 | S4 | Insights Who Viewed You | Check Pro section | Dynamic copy matching range | "No profile viewers in the last 7 days" on 7d (was hardcoded 30 — fixed) | pass |
+| 16 | S4 | Insights non-Pro (James) | Switch to seed account, /app/insights | CareerSnapshot + upgrade CTA | "5y 10mo Sea Time · 2 Yachts · 3 Certs", Profile Strength 80%, upgrade pricing | pass |
+| 17 | S4 | Photos page | Navigate to /app/profile/photos | Upload areas for profile + gallery | Profile Photo upload + Work Gallery (0/14) with drag-to-reorder | pass |
+| 18 | S4 | CV tab output-only | Navigate to /app/cv | Generated + uploaded CV, design, sharing | All sections present, regenerate notice, amber wayfinding | pass |
+| 19 | S4 | Settings 5-group IA | Navigate to /app/more | 5 groups with sand wayfinding | Account, Plan, App, Community, Legal — all correct | pass |
+| 20 | S5 | Endorsement request page | Navigate to /app/endorsement/request | Yacht-grouped UI | Renders correctly (was redirecting to /app/attachment/new — fixed) | pass |
+| 21 | S5 | Network Request button | Click "Request" next to Ari Steele | Sends endorsement request | Button changes to "Sent" (was broken — same root cause, fixed) | pass |
+| 22 | S5 | Invite former crew link | Check href on Network page | Routes to endorsement request | Correct: /app/endorsement/request?yacht_id=... (was broken — fixed) | pass |
+| 23 | S5 | Endorsement writer | Navigate to /endorse/[token] | Write form with assist button | "Endorse Krista Lee Graham from M/Y Go", text area, assist button | pass |
+| 24 | S5 | Writing assist | Click "Help me start writing" | LLM generates draft | 907 chars generated, no error (was failing quality check — fixed) | pass |
+| 25 | S5 | Writing assist button state | After draft generated | Button changes + hint appears | "Help me finish this" + "Edit this to add your personal touch" | pass |
+| 26 | S5 | Reminder endpoint | Code review | Auth, ownership, 7-day cooldown, 1 max | All guards present and correct | pass (code) |
+| 27 | S5 | Photo context API | Code review | Focal point + is_avatar/is_hero/is_cv, Pro-gated | PATCH validates, clears-others-first, Pro check | pass (code) |
+| 28 | S5 | LLM defense layer | Code review | Input sanitize, output validate, prompt guard | sanitize.ts + prompt-guard.ts both solid | pass (code) |
 
 ## Toggle Matrix
 
-No new toggles introduced by either lane.
+| Toggle | ON result | OFF result | Sensible? |
+|--------|-----------|------------|-----------|
+| Show Experience on public profile | Toggle present, functional | N/A | yes |
+| Show Bio/Skills/Hobbies on public profile | Toggles present | N/A | yes |
+| Insights 7d/30d/All time | 7d: 37 views, 30d: 460, chart updates | N/A | yes |
+| Network yacht accordion | Expands to show colleagues or empty state | Collapses to header only | yes |
+| Career timeline Show more/less | Expands from 3 to all 16 entries | Collapses back to 3 | yes |
 
 ## Copy Review
-
-- "Shore-Side Experience" heading — clear, accurate
-- "We found some non-yachting roles in your CV. These show up on your profile timeline alongside your yacht career." — accurate, good framing
-- "4 shore-side roles" celebration badge — consistent with step naming
-- "Some of your roles overlap. The longest overlap is {N} days." — clear, non-alarming
-- "This is common for handover periods." — reassuring, appropriate
+- All user-facing copy across Profile, CV, Insights, Network, Settings, Public Profile reviewed — clear, accurate, consistent.
+- "Who Viewed You" copy now dynamically matches time range (fixed).
+- "1 Hotel & Dovetale Restaurant" has no date range — data quality from CV parse, not a code issue.
 
 ## Visual Consistency
-
-- Anchor icons: Navy circle (color-navy-50 bg, color-navy-500 icon) — matches navy palette
-- Briefcase icons: Amber circle (color-amber-50 bg, color-amber-600 icon) — matches CV amber palette
-- Icon distinction: Different shape AND color — no confusion possible
-- StepLandExperience cards: Amber briefcase icons, consistent with CV section
+- Section color wayfinding correctly applied: Profile=teal, CV=amber, Insights=coral, Network=navy, More=sand.
+- All 5 tabs have consistent nav bar highlighting.
+- Career timeline: yacht entries get navy Anchor icon, shore-side entries get amber Briefcase icon — consistent across private profile and public experience page.
 
 ## Journey Tests
-
-- **Full CV import (Lane 1)**: Upload -> Personal -> Experience -> Shore-Side -> Qualifications -> Extras -> Review -> Import -> Celebration -> Profile with mixed timeline. **PASS**
-- **Public profile (Lane 1)**: /u/dev-qa -> Experience -> "See all 16 positions" with land experience included. **PASS** (after fix)
-- **CV import (Lane 2)**: Upload -> Personal -> Experience with stat cards + overlap detection. **PASS** (no overlaps in test data — correct no-warning behavior)
+- **Profile -> Public Profile -> Experience**: Full journey works end-to-end.
+- **Network -> Request Endorsement -> Endorsement Writer -> Writing Assist**: Full journey works after fixes.
+- **Insights -> Toggle time range**: Works, copy updates correctly.
+- **CV tab -> Regenerate/Preview/Download**: Actions present and functional.
+- **Settings -> All 5 groups**: Navigable with correct sub-items.
 
 ## Architecture Check
+- Endorsement request query now uses correct column names matching DB schema.
+- Endorsement assist API now fetches endorsee's attachment on the specific yacht (role + dates), not just their current primary role.
+- Public profile layouts (Portfolio, RichPortfolio, ExperienceTile) all receive and render land experience entries.
 
-- Land experience null-date sorting: entries with null start/end dates sort as "current" in CareerTimeline.tsx (null end_date = Present). Semantically wrong — null dates = unknown, not active. Medium severity.
-- get_sea_time() SQL RPC remains naive — pre-existing, documented by worker as highest-priority post-merge fix.
+---
 
-## Fixed (applied in yl-wt-1 during QA)
+## Fixed in this session
 
-| # | Lane | File | What was wrong | What was fixed |
-|---|------|------|----------------|----------------|
-| 1 | 1 | `app/(public)/u/[handle]/experience/page.tsx` | Experience detail page did not call getLandExperience — shore-side roles missing from public "See all N positions" view | Added getLandExperience to Promise.all, merged entries with yacht/land icons (anchor/briefcase), proper date sorting. Now shows 16 positions. |
-| 2 | 1 | `CareerTimeline.tsx` + `profile/page.tsx` | Career was a separate card from Sea Time, fully expanded (12+ entries), making page very long. Founder: merge, collapsible. | Merged Career into Sea Time card. Shows 3 entries collapsed + "Show N more". Removed standalone SeaTimeSummary, inlined stats in combined card. |
-| 3 | 1 | `CareerTimeline.tsx` | Land experience with null start/end dates sorted as "current" (above 2025 yacht entries). Null dates = unknown, not active. | Added hasStartDate() guard. Only entries with start_date but no end_date sort as current. No-date entries sort at end. |
-
-## Escalated (high — needs worker fix)
-
-None — all issues resolved during QA.
+| # | Severity | File(s) | Issue | Fix |
+|---|----------|---------|-------|-----|
+| 1 | **HIGH** | `app/(protected)/app/endorsement/request/page.tsx` | Supabase query used wrong column names (`start_date`/`end_date`/`role_title` instead of `started_at`/`ended_at`/`role_label`), causing redirect to /app/attachment/new | Fixed all column names in interface, query, order clause, and yachtMap builder |
+| 2 | **HIGH** | `components/public/layouts/PortfolioLayout.tsx`, `RichPortfolioLayout.tsx`, `bento/tiles/ExperienceTile.tsx`, `PublicProfileContent.tsx` | "See all 12 positions" excluded land_experience entries | Added `landExperience` prop through component tree, fixed counts, added land entry rendering with Briefcase icon |
+| 3 | **MEDIUM** | `app/(protected)/app/profile/page.tsx` | Hero card showed "11y 4mo" (RPC) but Experience sublabel showed "7y 1mo" (union-based) | Experience sublabel now uses same `seaTimeTotalDays` from RPC as hero card |
+| 4 | **MEDIUM** | `components/profile/CareerTimeline.tsx` | Duplicate "Career" heading — one from section group, one inside timeline | Removed redundant h3 heading + "Add" link from CareerTimeline |
+| 5 | **MEDIUM** | `components/insights/WhoViewedYou.tsx`, `app/(protected)/app/insights/page.tsx` | "No profile viewers in the last 30 days" hardcoded regardless of range | Added `range` prop, copy now says "last 7 days" / "last 30 days" / "last 12 months" |
+| 6 | **MEDIUM** | `app/api/endorsements/assist/route.ts` | Same wrong column names as #1 (`role_title`, `start_date`) | Fixed to `role_label`, `started_at` |
+| 7 | **MEDIUM** | `app/api/endorsements/assist/route.ts` | `maxSentences: 5` too strict — rejected valid 907-char drafts | Removed sentence limit, bumped maxLength to 2000 |
+| 8 | **LOW** | `lib/llm/prompt-guard.ts` | Prompt asked for "2-4 sentences" — too short for a proper endorsement | Changed to "800-1000 characters (roughly 4-6 sentences)" |
+| 9 | **LOW** | `app/api/endorsements/assist/route.ts` | LLM only got endorsee's `primary_role` (current role, not yacht-specific) | Now fetches endorsee's attachment on the specific yacht — gets their actual role + time period on that yacht |
 
 ## Backlog items created
 
-None.
+| File | Description |
+|------|-------------|
+| `sprints/backlog/role-context-data-layer.md` | **HIGH priority.** Add `description` field to `attachments` table. Foundation for rich endorsements, expandable career entries, and CV output. CV parser should capture role write-ups. |
+| `sprints/backlog/career-entry-detail-expand.md` | Expandable career entries with inline role descriptions + yacht name as clickable link. Depends on role-context-data-layer. |
+| `sprints/backlog/unsolicited-endorsements.md` | Allow endorsing a colleague without a request. Writing assist included. |
+| `sprints/backlog/trending-yachts-discovery.md` | Discovery section showing high-activity yachts (rolling 24h) as graph entry point. Separate from "My Yachts". |
+| `sprints/backlog/social-links-crud.md` | Add/remove social links directly from Profile page. |
 
-## Discovered Issues
+## Discovered Issues (out of scope, not blocking)
 
-- **[PRE-EXISTING]** Hydration mismatch error on CV page — date formatting renders differently server vs client. Not introduced by either lane.
-- **[PRE-EXISTING]** get_sea_time() SQL RPC uses naive sum — profile hero card and SeaTimeSummary don't account for overlaps. Lane 2 fixes client-side calcs but DB function remains naive. Worker documented as highest-priority post-merge fix.
+- **[DEBT]** `get_sea_time` DB RPC uses naive sum — needs migration to union-based calculation (deferred, consistent display achieved by using same source)
+- **[UX]** Career section has both compact summary rows AND timeline below — founder confirmed should be folded into one (heading removed, structural merge is a larger redesign)
+- **[UX]** Social links row on Profile has no add/remove affordance (captured in backlog)
+- **[DATA]** "1 Hotel & Dovetale Restaurant" entry has no dates — CV parse data quality

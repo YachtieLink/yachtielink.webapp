@@ -37,6 +37,21 @@ Use both: the smoke checklist catches regressions, the test backlog catches whet
 
 ## Untested Changes
 
+### chain/rally-009 (PR #159) — Sessions 2-5 — QA PASSED by /yl-tester
+Date: 2026-04-03
+**28 test cases executed, all passing.** Full QA report in `worktrees/qa-report.md`.
+
+Sessions covered: S2 (land experience + sea time), S3 (network + profile redesign), S4 (insights + photos + CV + settings), S5 (endorsement flow + LLM defense).
+
+9 issues found and fixed during QA. 21 issues found and fixed during review rounds. All fixes included in branch.
+
+Remaining LOW items (founder's call):
+- [ ] WhoViewedYou shows empty for Pro (placeholder data — no real viewers in dev)
+- [ ] ProfileHeroCard inline edit doesn't `router.refresh()` (stale data on same page until nav)
+- [ ] Duplicate timeline sort logic between CareerTimeline and ExperienceSection
+
+---
+
 ### fix/ghost-closeout + fix/display-polish + fix/interests-socials — Ghost Join Fix + Display Polish + Social Links UX
 Date: 2026-04-02 (pending push — test after PRs merge)
 
