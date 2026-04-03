@@ -86,8 +86,15 @@ export function CvImportCard({ hasUploadedCv, cvParsedAt }: CvImportCardProps) {
 
   // ── No CV imported yet ────────────────────────────────────────────
   return (
-    <div className="rounded-2xl border-2 border-dashed border-[var(--color-amber-300)] bg-[var(--color-amber-50)]/50 p-5 flex flex-col gap-4">
-      <div>
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => router.push('/app/cv/upload')}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') router.push('/app/cv/upload') }}
+      className="rounded-2xl border-2 border-dashed border-[var(--color-amber-300)] bg-[var(--color-amber-50)]/50 p-8 flex flex-col items-center gap-3 cursor-pointer hover:border-[var(--color-amber-400)] hover:bg-[var(--color-amber-50)] transition-colors"
+    >
+      <Upload size={32} className="text-[var(--color-amber-400)]" />
+      <div className="text-center">
         <h2 className="text-lg font-serif tracking-tight text-[var(--color-text-primary)]">
           Got a CV? Let us do the typing.
         </h2>
@@ -96,19 +103,8 @@ export function CvImportCard({ hasUploadedCv, cvParsedAt }: CvImportCardProps) {
           and qualifications — your profile fills itself in seconds.
         </p>
       </div>
-
-      <Button
-        onClick={() => router.push('/app/cv/upload')}
-        className="w-full gap-2"
-        size="lg"
-      >
-        <Upload size={16} />
-        Build profile from CV
-      </Button>
-
-      <p className="text-[11px] text-[var(--color-text-tertiary)] text-center leading-relaxed">
-        PDF or DOCX. Your file is stored securely and will also be available
-        for captains and agents to download from your profile.
+      <p className="text-xs text-[var(--color-text-tertiary)]">
+        PDF or DOCX · Max 10 MB
       </p>
     </div>
   )

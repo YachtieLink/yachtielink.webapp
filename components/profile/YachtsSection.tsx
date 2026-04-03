@@ -61,7 +61,7 @@ export function YachtsSection({ attachments }: YachtsSectionProps) {
             const yacht = att.yachts
 
             return (
-              <li key={att.id} className="py-3 pl-3 border-l-4 border-[var(--color-navy-500)]">
+              <li key={att.id} className="py-3">
                 <button
                   className="w-full flex items-start justify-between gap-2 text-left"
                   onClick={() => setExpanded(isExpanded ? null : att.id)}

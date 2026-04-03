@@ -113,7 +113,7 @@ export function CertsClient({
         </div>
       ) : (
         filtered.map(({ cert, status }) => (
-          <div key={cert.id} className="bg-[var(--color-surface)] rounded-2xl p-4 border-l-4 border-[var(--color-amber-500)]">
+          <div key={cert.id} className="bg-[var(--color-surface)] rounded-2xl p-4 border border-[var(--color-border)]">
             <div className="flex items-start justify-between gap-2 mb-1">
               <div className="flex-1">
                 <p className="text-sm font-semibold text-[var(--color-text-primary)]">

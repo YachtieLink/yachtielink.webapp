@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
+import { ProUpsellCard } from '@/components/ui/ProUpsellCard'
 import { Download, Eye, EyeOff, Upload, FileText, Sparkles, RefreshCw, ChevronDown } from 'lucide-react'
 
 interface CvActionsProps {
@@ -351,14 +352,11 @@ export function CvActions({
             })}
 
             {!isPro && (
-              <Button
-                variant="link"
-                size="sm"
-                onClick={() => router.push('/app/settings/plan')}
-                className="mt-1 text-xs text-center"
-              >
-                Upgrade to Pro for premium templates
-              </Button>
+              <ProUpsellCard
+                variant="inline"
+                feature="premium CV templates"
+                context="cv"
+              />
             )}
           </div>
         )}

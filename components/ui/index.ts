@@ -34,3 +34,7 @@ export { ProfileAvatar } from "./ProfileAvatar";
 
 /* Rally 006 — shared page header */
 export { PageHeader } from "./PageHeader";
+
+/* Rally 009 Session 6 — Pro upsell consistency */
+export { ProUpsellCard } from "./ProUpsellCard";
+export type { ProUpsellCardProps } from "./ProUpsellCard";

@@ -66,7 +66,7 @@ export function CertsSection({ certs }: CertsSectionProps) {
             const status = expiryStatus(cert.expires_at)
 
             return (
-              <li key={cert.id} className="py-3 pl-3 flex items-start justify-between gap-3 border-l-4 border-[var(--color-amber-500)]">
+              <li key={cert.id} className="py-3 flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{name}</p>
                   {cert.issued_at && (
