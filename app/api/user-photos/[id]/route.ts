@@ -13,14 +13,51 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const body = await req.json()
     const focalX = typeof body.focal_x === 'number' ? Math.min(100, Math.max(0, body.focal_x)) : undefined
     const focalY = typeof body.focal_y === 'number' ? Math.min(100, Math.max(0, body.focal_y)) : undefined
+    const isAvatar = typeof body.is_avatar === 'boolean' ? body.is_avatar : undefined
+    const isHero = typeof body.is_hero === 'boolean' ? body.is_hero : undefined
+    const isCv = typeof body.is_cv === 'boolean' ? body.is_cv : undefined
 
-    if (focalX === undefined && focalY === undefined) {
+    const hasContextUpdate = isAvatar !== undefined || isHero !== undefined || isCv !== undefined
+
+    if (focalX === undefined && focalY === undefined && !hasContextUpdate) {
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
     }
 
-    const update: Record<string, number> = {}
+    // Context assignment is Pro-only
+    if (hasContextUpdate) {
+      const { data: profile } = await supabase
+        .from('users')
+        .select('subscription_status')
+        .eq('id', user.id)
+        .single()
+      if (profile?.subscription_status !== 'pro') {
+        return NextResponse.json({ error: 'Context assignment requires Pro' }, { status: 403 })
+      }
+    }
+
+    const update: Record<string, number | boolean> = {}
     if (focalX !== undefined) update.focal_x = focalX
     if (focalY !== undefined) update.focal_y = focalY
+
+    // When assigning a context to this photo, clear it from all others first
+    if (isAvatar === true) {
+      await supabase.from('user_photos').update({ is_avatar: false }).eq('user_id', user.id).neq('id', id)
+      update.is_avatar = true
+    } else if (isAvatar === false) {
+      update.is_avatar = false
+    }
+    if (isHero === true) {
+      await supabase.from('user_photos').update({ is_hero: false }).eq('user_id', user.id).neq('id', id)
+      update.is_hero = true
+    } else if (isHero === false) {
+      update.is_hero = false
+    }
+    if (isCv === true) {
+      await supabase.from('user_photos').update({ is_cv: false }).eq('user_id', user.id).neq('id', id)
+      update.is_cv = true
+    } else if (isCv === false) {
+      update.is_cv = false
+    }
 
     const { error } = await supabase
       .from('user_photos')

@@ -21,6 +21,7 @@ interface ColleagueOption {
   isGhost: boolean
   requestCreatedAt: string | null
   requestId: string | null
+  remindedAt: string | null
 }
 
 interface YachtGroup {
@@ -72,8 +73,8 @@ function formatDateRange(start: string | null, end: string | null): string {
   return end ? `${fmt(start)} – ${fmt(end)}` : `${fmt(start)} – Present`
 }
 
-// TODO: Reminder feature deferred — needs `reminded_at` column migration + /api/endorsement-requests/[id]/remind endpoint
-function canRemind(createdAt: string | null): 'available' | 'too_soon' {
+function canRemind(createdAt: string | null, remindedAt: string | null): 'available' | 'too_soon' | 'already_sent' {
+  if (remindedAt) return 'already_sent'
   if (!createdAt) return 'too_soon'
   const daysSince = (Date.now() - new Date(createdAt).getTime()) / 86400000
   return daysSince >= 7 ? 'available' : 'too_soon'
@@ -360,7 +361,7 @@ export function RequestEndorsementClient({
                           const state = colleagueStates[key] ?? 'idle'
                           const isActionable = !colleague.alreadyEndorsed && colleague.existingRequestStatus !== 'accepted'
                           const isPending = colleague.existingRequestStatus === 'pending'
-                          const reminderStatus = canRemind(colleague.requestCreatedAt)
+                          const reminderStatus = canRemind(colleague.requestCreatedAt, colleague.remindedAt)
                           const reminderState = colleague.requestId ? (reminderStates[colleague.requestId] ?? 'idle') : 'idle'
 
                           return (
@@ -413,7 +414,7 @@ export function RequestEndorsementClient({
                                         Remind in {daysUntilRemind(colleague.requestCreatedAt)}d
                                       </span>
                                     )}
-                                    {reminderState === 'sent' && (
+                                    {(reminderStatus === 'already_sent' || reminderState === 'sent') && (
                                       <span className="text-[10px] text-[var(--color-text-tertiary)]">Reminded</span>
                                     )}
                                   </div>

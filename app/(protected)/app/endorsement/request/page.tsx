@@ -24,6 +24,7 @@ interface EndorsementRequest {
   expires_at: string
   cancelled_at: string | null
   created_at: string
+  reminded_at: string | null
   yacht_id: string
 }
 
@@ -75,7 +76,7 @@ export default async function RequestEndorsementPage() {
     supabase.rpc('get_colleagues', { p_user_id: user.id }),
     supabase
       .from('endorsement_requests')
-      .select('id, recipient_user_id, recipient_email, status, expires_at, cancelled_at, created_at, yacht_id')
+      .select('id, recipient_user_id, recipient_email, status, expires_at, cancelled_at, created_at, reminded_at, yacht_id')
       .eq('requester_id', user.id),
     supabase
       .from('endorsements')
@@ -167,6 +168,7 @@ export default async function RequestEndorsementPage() {
     isGhost: boolean
     requestCreatedAt: string | null
     requestId: string | null
+    remindedAt: string | null
   }
 
   type YachtGroup = {
@@ -184,15 +186,15 @@ export default async function RequestEndorsementPage() {
     colleagueId: string,
     colleagueEmail: string | null,
     yachtId: string
-  ): { status: 'pending' | 'accepted' | 'expired' | 'cancelled' | null; createdAt: string | null; requestId: string | null } {
+  ): { status: 'pending' | 'accepted' | 'expired' | 'cancelled' | null; createdAt: string | null; requestId: string | null; remindedAt: string | null } {
     const req = existingRequests.find(
       (r) => r.yacht_id === yachtId && (r.recipient_user_id === colleagueId || (colleagueEmail && r.recipient_email === colleagueEmail))
     )
-    if (!req) return { status: null, createdAt: null, requestId: null }
-    if (req.cancelled_at) return { status: 'cancelled', createdAt: req.created_at, requestId: req.id }
-    if (req.status === 'accepted') return { status: 'accepted', createdAt: req.created_at, requestId: req.id }
-    if (new Date(req.expires_at) < new Date()) return { status: 'expired', createdAt: req.created_at, requestId: req.id }
-    return { status: 'pending', createdAt: req.created_at, requestId: req.id }
+    if (!req) return { status: null, createdAt: null, requestId: null, remindedAt: null }
+    if (req.cancelled_at) return { status: 'cancelled', createdAt: req.created_at, requestId: req.id, remindedAt: req.reminded_at }
+    if (req.status === 'accepted') return { status: 'accepted', createdAt: req.created_at, requestId: req.id, remindedAt: req.reminded_at }
+    if (new Date(req.expires_at) < new Date()) return { status: 'expired', createdAt: req.created_at, requestId: req.id, remindedAt: req.reminded_at }
+    return { status: 'pending', createdAt: req.created_at, requestId: req.id, remindedAt: req.reminded_at }
   }
 
   const yachtGroups: YachtGroup[] = yachts.map((yacht) => {
@@ -217,6 +219,7 @@ export default async function RequestEndorsementPage() {
           isGhost: false as const,
           requestCreatedAt: reqInfo.createdAt,
           requestId: reqInfo.requestId,
+          remindedAt: reqInfo.remindedAt,
         } satisfies ColleagueOption
       })
       .filter((c): c is NonNullable<typeof c> => c !== null)
@@ -235,6 +238,7 @@ export default async function RequestEndorsementPage() {
         isGhost: true,
         requestCreatedAt: null,
         requestId: null,
+        remindedAt: null,
       }))
 
     return {

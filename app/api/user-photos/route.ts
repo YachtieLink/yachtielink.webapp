@@ -16,7 +16,7 @@ export async function GET() {
 
     const { data } = await supabase
       .from('user_photos')
-      .select('id, photo_url, sort_order, focal_x, focal_y, created_at')
+      .select('id, photo_url, sort_order, focal_x, focal_y, is_avatar, is_hero, is_cv, created_at')
       .eq('user_id', user.id)
       .order('sort_order')
 

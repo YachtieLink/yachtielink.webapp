@@ -32,6 +32,9 @@ interface Photo {
   sort_order: number
   focal_x?: number
   focal_y?: number
+  is_avatar?: boolean
+  is_hero?: boolean
+  is_cv?: boolean
 }
 
 const MAX_PHOTOS_FREE = 3
@@ -116,6 +119,7 @@ export default function ProfilePhotosPage() {
   const [focalX, setFocalX] = useState(50)
   const [focalY, setFocalY] = useState(50)
   const [savingFocal, setSavingFocal] = useState(false)
+  const [savingContext, setSavingContext] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
 
@@ -245,6 +249,36 @@ export default function ProfilePhotosPage() {
     }
   }
 
+  async function toggleContext(photo: Photo, context: 'is_avatar' | 'is_hero' | 'is_cv') {
+    const currentValue = photo[context] ?? false
+    const newValue = !currentValue
+    setSavingContext(`${photo.id}-${context}`)
+    try {
+      const res = await fetch(`/api/user-photos/${photo.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [context]: newValue }),
+      })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+        toast((d as { error?: string }).error ?? 'Failed to update', 'error')
+        return
+      }
+      // Update local state — if assigning, clear from other photos
+      setPhotos((prev) => prev.map((p) => {
+        if (p.id === photo.id) return { ...p, [context]: newValue }
+        if (newValue) return { ...p, [context]: false }
+        return p
+      }))
+      const labels = { is_avatar: 'Avatar', is_hero: 'Hero', is_cv: 'CV' }
+      toast(`${labels[context]} ${newValue ? 'assigned' : 'cleared'}`, 'success')
+    } catch {
+      toast('Failed to update', 'error')
+    } finally {
+      setSavingContext(null)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex flex-col gap-4 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-teal-50)]">
@@ -337,8 +371,31 @@ export default function ProfilePhotosPage() {
                   </span>
                 </div>
                 <p className="text-xs text-[var(--color-text-secondary)] mb-2">
-                  Assign different photos for avatar, hero, and CV. Coming in a future update.
+                  Use this photo as your:
                 </p>
+                <div className="flex gap-2">
+                  {(['is_avatar', 'is_hero', 'is_cv'] as const).map((ctx) => {
+                    const labels = { is_avatar: 'Avatar', is_hero: 'Hero', is_cv: 'CV' }
+                    const isActive = profilePhoto[ctx] ?? false
+                    const isSaving = savingContext === `${profilePhoto.id}-${ctx}`
+                    return (
+                      <button
+                        key={ctx}
+                        type="button"
+                        onClick={() => toggleContext(profilePhoto, ctx)}
+                        disabled={isSaving}
+                        className={`flex-1 text-xs font-medium py-1.5 rounded-lg border transition-colors disabled:opacity-50 ${
+                          isActive
+                            ? 'border-[var(--color-teal-700)] bg-[var(--color-teal-100)] text-[var(--color-teal-700)]'
+                            : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-teal-300)]'
+                        }`}
+                      >
+                        {isSaving ? '...' : labels[ctx]}
+                        {isActive && ' ✓'}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
             ) : (
               <div className="pt-2 border-t border-[var(--color-border)]">
