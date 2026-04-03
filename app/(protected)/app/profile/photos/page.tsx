@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { PhotoFormatPreview } from '@/components/profile/PhotoFormatPreview'
 import { FocalPointPicker } from '@/components/profile/FocalPointPicker'
+import { ProUpsellCard } from '@/components/ui/ProUpsellCard'
 import {
   DndContext,
   closestCenter,
@@ -399,9 +400,11 @@ export default function ProfilePhotosPage() {
               </div>
             ) : (
               <div className="pt-2 border-t border-[var(--color-border)]">
-                <p className="text-xs text-[var(--color-text-secondary)]">
-                  1 photo for all contexts. <span className="text-[var(--color-interactive)]">Upgrade to Pro</span> for context-specific photos.
-                </p>
+                <ProUpsellCard
+                  variant="inline"
+                  feature="context-specific photos — a different photo for your avatar, hero, and CV"
+                  context="profile"
+                />
               </div>
             )}
           </>
@@ -434,14 +437,22 @@ export default function ProfilePhotosPage() {
 
       {/* ── WORK GALLERY ───────────────────────────────────────────── */}
       <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between gap-3">
           <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-teal-700)]">
             Work Gallery
           </h2>
-          <p className="text-xs text-[var(--color-text-tertiary)]">
-            {Math.min(galleryPhotos.length, maxPhotos - 1)}/{maxPhotos - 1} photos
-            {!isPro && <span> &middot; <span className="text-[var(--color-interactive)]">Upgrade for {MAX_PHOTOS_PRO - 1}</span></span>}
-          </p>
+          <div className="text-right">
+            <p className="text-xs text-[var(--color-text-tertiary)]">
+              {Math.min(galleryPhotos.length, maxPhotos - 1)}/{maxPhotos - 1} photos
+            </p>
+            {!isPro && (
+              <ProUpsellCard
+                variant="inline"
+                feature={`${MAX_PHOTOS_PRO - 1} gallery photos`}
+                context="profile"
+              />
+            )}
+          </div>
         </div>
 
         <p className="text-xs text-[var(--color-text-secondary)]">

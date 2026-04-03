@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { getProStatus } from '@/lib/stripe/pro';
 import { CertsClient } from '@/components/certs/CertsClient';
+import { ProUpsellCard } from '@/components/ui/ProUpsellCard';
 
 export default async function CertsPage() {
   const supabase = await createClient();
@@ -46,17 +47,12 @@ export default async function CertsPage() {
       </div>
 
       {!proStatus.isPro && (
-        <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-2xl px-4 py-3 flex items-start justify-between gap-3">
-          <p className="text-sm text-amber-800 dark:text-amber-300">
-            Upgrade to Pro for expiry tracking and email reminders.
-          </p>
-          <Link
-            href="/app/settings/plan"
-            className="text-xs font-semibold text-amber-800 dark:text-amber-300 underline flex-shrink-0"
-          >
-            Upgrade
-          </Link>
-        </div>
+        <ProUpsellCard
+          variant="banner"
+          feature="cert expiry tracking and email reminders"
+          description="Know before your tickets lapse — automated alerts keep you compliant and ready for the next contract"
+          context="certs"
+        />
       )}
 
       <CertsClient

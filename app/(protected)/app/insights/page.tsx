@@ -230,21 +230,6 @@ export default async function InsightsPage({ searchParams }: Props) {
           {/* Blurred Who Viewed You */}
           <WhoViewedYou viewers={[]} totalCount={0} blurred range={range} />
 
-          {/* Upgrade CTA */}
-          <div className="card-soft rounded-2xl p-4 text-center">
-            <p className="text-sm font-medium text-[var(--color-text-primary)] mb-1">
-              See who&apos;s viewing your profile and what&apos;s working
-            </p>
-            <p className="text-xs text-[var(--color-text-secondary)] mb-3">
-              Real analytics help you stand out to captains and agents
-            </p>
-            <Link href="/app/settings/plan">
-              <span className="inline-block px-5 py-2.5 rounded-xl bg-[var(--color-teal-700)] text-white text-sm font-medium hover:bg-[var(--color-teal-700)]/90 transition-colors">
-                Upgrade to Crew Pro
-              </span>
-            </Link>
-          </div>
-
           <UpgradeCTA foundingSlotsLeft={foundingSlotsLeft} />
         </>
       )}

@@ -287,3 +287,64 @@ Every user interaction is an opportunity to improve the database. When users inp
 - Text contrast: follow `--color-text-*` tokens (already accessible)
 - Interactive elements: must have visible focus states
 - Buttons vs links: buttons for actions, links for navigation. Never a `<div onClick>`.
+
+---
+
+## Pro Upsell Pattern — `<ProUpsellCard>`
+
+All Pro upgrade CTAs use the shared `ProUpsellCard` component (`components/ui/ProUpsellCard.tsx`). Never build bespoke upsell UI.
+
+### Variants
+
+| Variant | When to use | Example |
+|---------|------------|---------|
+| `inline` | Inside a paragraph, form row, or compact header — minimal footprint | Gallery photo counter, context-photo row |
+| `banner` | Full-width between page sections — needs to stand out | Certs page, features not yet used |
+| `card` | Inside a content area where a card already fits | Insights tab free-tier teaser |
+
+### Copy formula
+
+**Do:** `"Unlock {feature} with Crew Pro"` — lead with the benefit.
+**Don't:** `"Get Pro"`, `"Go Pro"` (sounds like GoPro), or `"Crew Pro gives you {feature}"`.
+
+The CTA button always reads **"Upgrade to Crew Pro"** — no exceptions.
+
+### Section colors
+
+Pass the `context` prop so the card uses the right section color for its surroundings:
+
+| context | Section | Color |
+|---------|---------|-------|
+| `insights` | Insights | Coral |
+| `profile` / `photos` | Profile, Gallery | Teal |
+| `network` | Network | Navy |
+| `cv` / `certs` | CV, Certifications | Amber |
+
+### Usage
+
+```tsx
+import { ProUpsellCard } from '@/components/ui'
+
+// Inline — drops into any paragraph or compact row
+<ProUpsellCard
+  variant="inline"
+  feature="15 gallery photos"
+  context="profile"
+/>
+
+// Banner — full-width between sections
+<ProUpsellCard
+  variant="banner"
+  feature="cert expiry tracking and email reminders"
+  description="Know before your tickets lapse — automated alerts keep you compliant and ready for the next contract"
+  context="certs"
+/>
+
+// Card — in-page content area
+<ProUpsellCard
+  variant="card"
+  feature="detailed analytics"
+  description="See who views your profile and what's working — real data that helps you stand out to captains and agents"
+  context="insights"
+/>
+```
