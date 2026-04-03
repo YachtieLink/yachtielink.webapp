@@ -7,6 +7,7 @@ import { Pin } from 'lucide-react'
 import { cardHover } from '@/lib/motion'
 import { ProfileAvatar } from '@/components/ui/ProfileAvatar'
 import { GhostEndorserBadge } from '@/components/ghost/GhostEndorserBadge'
+import { ReportButton } from '@/components/ui/ReportButton'
 
 interface EndorsementCardProps {
   endorserName: string
@@ -25,6 +26,8 @@ interface EndorsementCardProps {
   onPin?: (isPinned: boolean) => void
   /** When provided, navigation to endorser/yacht profiles goes through a confirmation callback instead of direct links */
   onNavigate?: (url: string, label: string) => void
+  /** When provided, shows a report button for this endorsement */
+  endorsementId?: string | null
 }
 
 const TRUNCATE_LENGTH = 150
@@ -44,6 +47,7 @@ export function EndorsementCard({
   isPinned,
   onPin,
   onNavigate,
+  endorsementId,
 }: EndorsementCardProps) {
   const [expanded, setExpanded] = useState(false)
   const needsTruncation = content.length > TRUNCATE_LENGTH
@@ -166,6 +170,12 @@ export function EndorsementCard({
         >
           {expanded ? 'Show less' : 'Read more'}
         </button>
+      )}
+
+      {endorsementId && (
+        <div className="mt-2 flex justify-end">
+          <ReportButton targetType="endorsement" targetId={endorsementId} />
+        </div>
       )}
     </motion.div>
   )

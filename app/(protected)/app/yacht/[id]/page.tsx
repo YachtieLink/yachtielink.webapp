@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { CrewCard } from '@/components/yacht/CrewCard'
 import { YachtEndorsements } from '@/components/yacht/YachtEndorsements'
 import { formatTenure } from '@/lib/sea-time'
+import { ReportButton } from '@/components/ui/ReportButton'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -231,11 +232,16 @@ export default async function YachtDetailPage({ params }: PageProps) {
           backHref="/app/profile"
           title={yacht.name}
           subtitle={metaParts.length > 0 ? metaParts.join(' · ') : undefined}
-          actions={yacht.is_established ? (
-            <span className="shrink-0 text-xs bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-2 py-0.5 rounded-full font-medium">
-              Established
-            </span>
-          ) : undefined}
+          actions={
+            <div className="flex items-center gap-2">
+              {yacht.is_established && (
+                <span className="shrink-0 text-xs bg-[var(--color-interactive)]/10 text-[var(--color-interactive)] px-2 py-0.5 rounded-full font-medium">
+                  Established
+                </span>
+              )}
+              <ReportButton targetType="yacht" targetId={id} />
+            </div>
+          }
         />
 
         {/* Stats row */}

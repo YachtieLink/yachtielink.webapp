@@ -49,7 +49,7 @@ export function YachtEndorsements({ endorsements, totalCount }: YachtEndorsement
         Endorsements between crew on this yacht ({totalCount})
       </h2>
       <div className="bg-[var(--color-surface)] rounded-2xl divide-y divide-[var(--color-border)]">
-        {visible.map((e) => {
+        {visible.filter((e) => e.endorser && e.recipient).map((e) => {
           const endorserName = e.endorser.display_name || e.endorser.full_name
           const date = new Date(e.created_at).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })
 

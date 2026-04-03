@@ -22,6 +22,7 @@ import {
   Lock,
   LogOut,
   Trash2,
+  Bug,
 } from 'lucide-react'
 
 function SettingsRow({
@@ -247,8 +248,14 @@ export default function MorePage() {
           icon={Map}
         />
         <SettingsRow
-          label="Report a problem"
-          href="mailto:hello@yachtie.link?subject=Bug report"
+          label="Report a bug"
+          href="/app/more/report-bug"
+          sublabel="Something broken? Let us know"
+          icon={Bug}
+        />
+        <SettingsRow
+          label="Contact us"
+          href="mailto:hello@yachtie.link?subject=YachtieLink feedback"
           sublabel="hello@yachtie.link"
           icon={MessageCircle}
         />
