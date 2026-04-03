@@ -33,6 +33,8 @@ export interface SectionRowItem {
   visible?: boolean
   /** Positive empty state message — shown when count is 0 */
   emptyPrompt?: string
+  /** Sublabel explaining what the toggle shows/hides on public profile */
+  visibilityLabel?: string
 }
 
 interface ProfileSectionListProps {
@@ -88,6 +90,9 @@ export function ProfileSectionList({ sections, initialVisibility }: ProfileSecti
                   ? section.emptyPrompt
                   : section.summary}
               </p>
+              {showToggle && section.visibilityLabel && (
+                <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">{section.visibilityLabel}</p>
+              )}
             </div>
             {showToggle && (
               <button
