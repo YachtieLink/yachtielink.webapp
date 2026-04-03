@@ -1,18 +1,19 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Heart, Wrench, Camera } from 'lucide-react'
+import {
+  User, Briefcase, Award, Anchor, Heart, Wrench, Camera, Globe,
+  BookOpen, FileText, Phone, Shield, Clock, ImageIcon
+} from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getUserById, getProfileSections, getExtendedProfileSections, getLandExperience } from '@/lib/queries/profile'
 import { getProStatus } from '@/lib/stripe/pro'
 import { ProfileHeroCard } from '@/components/profile/ProfileHeroCard'
-import { ProfileStrength } from '@/components/profile/ProfileStrength'
-import { ProfileSectionGrid, type SectionItem } from '@/components/profile/ProfileSectionGrid'
+import { ProfileSectionGroup } from '@/components/profile/ProfileSectionGroup'
+import { ProfileSectionList, type SectionRowItem } from '@/components/profile/ProfileSectionList'
 import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
-import { PersonalDetailsCard } from '@/components/profile/PersonalDetailsCard'
 import { CareerTimeline } from '@/components/profile/CareerTimeline'
 import { formatSeaTime } from '@/lib/sea-time'
-import { EmptyState } from '@/components/ui/EmptyState'
 import { PageTransition } from '@/components/ui/PageTransition'
 import {
   aboutSummary,
@@ -75,160 +76,170 @@ export default async function ProfilePage() {
     hasSocialLink: Array.isArray(profile.social_links) && (profile.social_links as any[]).length > 0,
   })
 
-  // Smart CTA for profile strength card
   const strengthCta = (() => {
-    if (!profile.profile_photo_url) return { label: 'Add profile photos', href: '/app/profile/photos' }
+    if (!profile.profile_photo_url) return { label: 'Add photos', href: '/app/profile/photos' }
     if (!profile.bio) return { label: 'Write your bio', href: '/app/about/edit' }
-    if ((endorsements?.length ?? 0) === 0) return { label: 'Request an endorsement', href: '/app/endorsement/request' }
+    if ((endorsements?.length ?? 0) === 0) return { label: 'Request endorsement', href: '/app/endorsement/request' }
     if ((certs?.length ?? 0) === 0) return { label: 'Add certifications', href: '/app/certification/new' }
     return undefined
   })()
 
   const displayName = profile.display_name ?? profile.full_name
   const departments = (profile.departments ?? []) as string[]
+  const langCount = Array.isArray(profile.languages) ? (profile.languages as any[]).length : 0
+  const langSummary = langCount > 0
+    ? (profile.languages as any[]).map((l: any) => l?.language ?? String(l)).join(', ')
+    : ''
 
-  // Section grid data
-  const sectionGridItems: SectionItem[] = [
+  // CV details summary
+  const cvDetailParts = [
+    profile.smoke_pref ? (profile.smoke_pref === 'non_smoker' ? 'Non-smoker' : profile.smoke_pref) : null,
+    profile.appearance_note ? 'Tattoos' : null,
+    profile.license_info ? 'DL' : null,
+  ].filter(Boolean)
+  const cvDetailsSummary = cvDetailParts.length > 0 ? cvDetailParts.join(', ') : ''
+
+  // ── 4-Group Section Data ─────────────────────────────────────────────────
+
+  const aboutMeSections: SectionRowItem[] = [
     {
       key: 'about',
-      label: 'About',
+      label: 'Bio',
       summary: aboutSummary(profile.ai_summary, profile.bio),
       count: profile.bio ? 1 : 0,
-      visible: sectionVisibility.about ?? true,
+      icon: <User size={18} />,
       editHref: '/app/about/edit',
+      visibilityKey: 'about',
+      emptyPrompt: 'Tell your story — captains want to know who you are',
     },
     {
-      key: 'experience',
-      label: 'Experience',
-      summary: experienceSummary(attachments ?? []) + (landExperience.length > 0 ? ` + ${landExperience.length} shore-side` : ''),
-      count: (attachments?.length ?? 0) + landExperience.length,
-      visible: sectionVisibility.experience ?? true,
-      editHref: '/app/attachment',
-    },
-    {
-      key: 'endorsements',
-      label: 'Endorsements',
-      summary: endorsementsSummary(endorsements?.length ?? 0, 0),
-      count: endorsements?.length ?? 0,
-      visible: sectionVisibility.endorsements ?? true,
-      editHref: '/app/endorsement/request',
-    },
-    {
-      key: 'certifications',
-      label: 'Certifications',
-      summary: certificationsSummary(certs?.length ?? 0, expiringCount),
-      count: certs?.length ?? 0,
-      visible: sectionVisibility.certifications ?? true,
-      editHref: '/app/certification/new',
-    },
-    {
-      key: 'education',
-      label: 'Education',
-      summary: educationSummary(extended.education),
-      count: extended.education.length,
-      visible: sectionVisibility.education ?? true,
-      editHref: '/app/education/new',
-      itemLinks: extended.education.map((edu: { id: string; institution: string }) => ({
-        label: edu.institution,
-        href: `/app/education/${edu.id}/edit`,
-      })),
+      key: 'skills',
+      label: 'Skills',
+      summary: skillsSummary(extended.skills),
+      count: extended.skills.length,
+      icon: <Wrench size={18} />,
+      editHref: '/app/skills/edit',
+      visibilityKey: 'skills',
+      emptyPrompt: 'Add skills that set you apart from the crew',
     },
     {
       key: 'hobbies',
       label: 'Hobbies',
       summary: hobbiesSummary(extended.hobbies),
       count: extended.hobbies.length,
-      visible: sectionVisibility.hobbies ?? true,
+      icon: <Heart size={18} />,
       editHref: '/app/hobbies/edit',
-      chips: extended.hobbies.map((h: { name: string; emoji?: string }) => h.emoji ? `${h.emoji} ${h.name}` : h.name),
+      visibilityKey: 'hobbies',
+      emptyPrompt: 'Show your personality beyond the deck',
     },
     {
-      key: 'skills',
-      label: 'Extra Skills',
-      summary: skillsSummary(extended.skills),
-      count: extended.skills.length,
-      visible: sectionVisibility.skills ?? true,
-      editHref: '/app/skills/edit',
-      chips: extended.skills.map((s: { name: string }) => s.name),
+      key: 'languages',
+      label: 'Languages',
+      summary: langSummary,
+      count: langCount,
+      icon: <Globe size={18} />,
+      editHref: '/app/languages/edit',
+      emptyPrompt: 'Add languages — multilingual crew are in demand',
     },
+  ]
+
+  const personalDetailsSections: SectionRowItem[] = [
+    {
+      key: 'personal',
+      label: 'Personal Info',
+      summary: [
+        profile.dob ? `Age ${Math.floor((Date.now() - new Date(profile.dob).getTime()) / 31557600000)}` : null,
+        profile.home_country,
+      ].filter(Boolean).join(', ') || 'Add your details',
+      count: profile.dob || profile.home_country ? 1 : 0,
+      icon: <User size={18} />,
+      editHref: '/app/profile/settings',
+      emptyPrompt: 'Add personal details for a complete profile',
+    },
+    {
+      key: 'contact',
+      label: 'Contact & Visibility',
+      summary: 'Manage who can see your info',
+      count: 1,
+      icon: <Phone size={18} />,
+      editHref: '/app/profile/settings',
+    },
+    {
+      key: 'cv_details',
+      label: 'CV Details',
+      summary: cvDetailsSummary || 'Tattoos, driving licence, smoking',
+      count: cvDetailParts.length,
+      icon: <FileText size={18} />,
+      editHref: '/app/profile/settings',
+      emptyPrompt: 'Complete your CV details — agents check these first',
+    },
+  ]
+
+  const careerSections: SectionRowItem[] = [
+    {
+      key: 'experience',
+      label: 'Experience',
+      summary: experienceSummary(attachments ?? []) + (landExperience.length > 0 ? ` + ${landExperience.length} shore-side` : ''),
+      count: (attachments?.length ?? 0) + landExperience.length,
+      icon: <Anchor size={18} />,
+      editHref: '/app/attachment',
+      visibilityKey: 'experience',
+      emptyPrompt: 'Add a yacht to start building your graph',
+    },
+    {
+      key: 'certifications',
+      label: 'Certifications',
+      summary: certificationsSummary(certs?.length ?? 0, expiringCount),
+      count: certs?.length ?? 0,
+      icon: <Award size={18} />,
+      editHref: '/app/certification/new',
+      visibilityKey: 'certifications',
+      emptyPrompt: 'Add certifications — captains search by certs first',
+    },
+    {
+      key: 'sea_time',
+      label: 'Sea Time',
+      summary: seaTimeTotalDays > 0
+        ? `${formatSeaTime(seaTimeTotalDays).displayShort} across ${seaTimeYachtCount} yacht${seaTimeYachtCount === 1 ? '' : 's'}`
+        : 'No sea time recorded',
+      count: seaTimeTotalDays > 0 ? 1 : 0,
+      icon: <Clock size={18} />,
+      editHref: '/app/profile/sea-time',
+    },
+  ]
+
+  const mediaSections: SectionRowItem[] = [
     {
       key: 'photos',
-      label: 'Photos',
+      label: 'Profile Photo',
       summary: (profilePhotos?.length ?? 0) > 0 ? `${profilePhotos!.length} photo${profilePhotos!.length === 1 ? '' : 's'}` : 'No photos yet',
       count: profilePhotos?.length ?? 0,
-      visible: sectionVisibility.photos ?? true,
+      icon: <Camera size={18} />,
       editHref: '/app/profile/photos',
+      visibilityKey: 'photos',
+      emptyPrompt: 'Add a photo to make it yours',
     },
     {
       key: 'gallery',
       label: 'Work Gallery',
       summary: gallerySummary(extended.gallery.length),
       count: extended.gallery.length,
-      visible: sectionVisibility.gallery ?? true,
+      icon: <ImageIcon size={18} />,
       editHref: '/app/profile/gallery',
+      visibilityKey: 'gallery',
+      emptyPrompt: 'Show your work environment',
     },
   ]
 
   return (
-    <PageTransition className="flex flex-col gap-4 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-teal-50)]">
+    <PageTransition className="flex flex-col gap-2 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-teal-50)]">
 
       {/* Page title */}
       <div className="flex items-center justify-between px-1 pt-4">
         <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">My Profile</h1>
       </div>
 
-      {/* Photo strip — compact editing view */}
-      <div className="bg-[var(--color-surface)] rounded-2xl p-4 flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-[var(--color-text-primary)]">Photos</span>
-          <Link
-            href="/app/profile/photos"
-            className="text-xs text-[var(--color-interactive)] hover:underline"
-          >
-            {(profilePhotos?.length ?? 0) > 0 ? 'Edit photos' : 'Add photos'}
-          </Link>
-        </div>
-        {(profilePhotos?.length ?? 0) > 0 ? (
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {(profilePhotos ?? []).map((p, i) => (
-              <div key={p.id} className="relative shrink-0 w-[72px] h-[72px] rounded-xl overflow-hidden bg-[var(--color-surface-raised)]">
-                <Image
-                  src={p.photo_url}
-                  alt={`Photo ${i + 1}`}
-                  fill
-                  className="object-cover"
-                />
-                {i === 0 && (
-                  <div className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[9px] text-center py-0.5 font-medium">
-                    Main
-                  </div>
-                )}
-              </div>
-            ))}
-            <Link
-              href="/app/profile/photos"
-              className="shrink-0 w-[72px] h-[72px] rounded-xl border-2 border-dashed border-[var(--color-border)] flex items-center justify-center text-[var(--color-text-secondary)] hover:border-[var(--color-interactive)] hover:text-[var(--color-interactive)] transition-colors"
-            >
-              <span className="text-xl">+</span>
-            </Link>
-          </div>
-        ) : (
-          <Link
-            href="/app/profile/photos"
-            className="flex items-center gap-3 p-1 rounded-xl hover:bg-[var(--color-surface-raised)] transition-colors"
-          >
-            <div className="w-12 h-12 shrink-0 rounded-xl bg-[var(--color-surface-raised)] flex items-center justify-center text-2xl">
-              👤
-            </div>
-            <div>
-              <p className="text-sm font-medium text-[var(--color-text-primary)]">Add profile photos</p>
-              <p className="text-xs text-[var(--color-text-secondary)]">Show the crew who you are</p>
-            </div>
-          </Link>
-        )}
-      </div>
-
-      {/* Hero Card — identity + share/preview */}
+      {/* Hero Card — identity + tap-to-edit + embedded strength ring */}
       <ProfileHeroCard
         displayName={displayName}
         handle={profile.handle}
@@ -240,112 +251,72 @@ export default async function ProfilePage() {
         seaTimeTotalDays={seaTimeTotalDays}
         seaTimeYachtCount={seaTimeYachtCount}
         isPro={proStatus.isPro}
+        strengthScore={score}
+        strengthLabel={label}
+        strengthNextPrompt={nextPrompt}
+        strengthCtaHref={strengthCta?.href}
+        strengthCtaLabel={strengthCta?.label}
       />
 
-      {/* Sea time + career — one card */}
-      {(seaTimeTotalDays > 0 || (attachments?.length ?? 0) > 0 || landExperience.length > 0) && (
-        <div className="bg-[var(--color-surface-raised)] rounded-2xl p-5">
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">&#9875; Sea Time</h3>
-              {seaTimeTotalDays > 0 && (
-                <>
-                  <p className="text-lg font-bold text-[var(--color-text-primary)]">
-                    {formatSeaTime(seaTimeTotalDays).displayLong} at sea
-                  </p>
-                  <p className="text-sm text-[var(--color-text-secondary)]">
-                    across {seaTimeYachtCount} {seaTimeYachtCount === 1 ? 'yacht' : 'yachts'}
-                  </p>
-                </>
-              )}
-            </div>
-            <Link
-              href="/app/profile/sea-time"
-              className="text-sm text-[var(--color-interactive)] hover:underline shrink-0 mt-1"
-            >
-              View &#9656;
-            </Link>
-          </div>
-          <CareerTimeline attachments={attachments ?? []} landExperience={landExperience} />
-        </div>
-      )}
+      {/* ── ABOUT ME ──────────────────────────────────────────── */}
+      <ProfileSectionGroup title="About Me" icon={<User size={16} />}>
+        <ProfileSectionList
+          sections={aboutMeSections}
+          initialVisibility={sectionVisibility}
+        />
+      </ProfileSectionGroup>
 
-      {/* Social links */}
+      {/* Social links inline */}
       {Array.isArray(profile.social_links) && (profile.social_links as any[]).length > 0 && (
         <div className="bg-[var(--color-surface)] rounded-2xl p-4">
           <SocialLinksRow links={profile.social_links as any} />
         </div>
       )}
 
-      {/* Languages */}
-      <div className="bg-[var(--color-surface)] rounded-2xl px-4 py-3 flex items-center justify-between gap-3">
-        {Array.isArray(profile.languages) && (profile.languages as any[]).length > 0 ? (
-          <p className="text-sm text-[var(--color-text-secondary)] flex-1">
-            {(profile.languages as any[]).map((l: any) => l?.language ? `${l.language} (${l.proficiency})` : String(l)).join(' · ')}
-          </p>
-        ) : (
-          <p className="text-sm text-[var(--color-text-tertiary)] flex-1">No languages added yet</p>
+      {/* ── PERSONAL DETAILS ──────────────────────────────────── */}
+      <ProfileSectionGroup title="Personal Details" icon={<Shield size={16} />}>
+        <ProfileSectionList
+          sections={personalDetailsSections}
+          initialVisibility={sectionVisibility}
+        />
+      </ProfileSectionGroup>
+
+      {/* ── CAREER ────────────────────────────────────────────── */}
+      <ProfileSectionGroup title="Career" icon={<Anchor size={16} />}>
+        <ProfileSectionList
+          sections={careerSections}
+          initialVisibility={sectionVisibility}
+        />
+        {/* Integrated career timeline */}
+        {((attachments?.length ?? 0) > 0 || landExperience.length > 0) && (
+          <div className="px-4 py-3">
+            <CareerTimeline attachments={attachments ?? []} landExperience={landExperience} />
+          </div>
         )}
-        <Link
-          href="/app/languages/edit"
-          className="text-xs font-medium text-[var(--color-interactive)] hover:underline shrink-0"
-        >
-          {Array.isArray(profile.languages) && (profile.languages as any[]).length > 0 ? 'Edit' : 'Add languages'}
-        </Link>
-      </div>
+      </ProfileSectionGroup>
 
-      {/* Personal Details Card */}
-      <PersonalDetailsCard
-        dob={profile.dob}
-        homeCountry={profile.home_country}
-        smokePref={profile.smoke_pref}
-        appearanceNote={profile.appearance_note}
-        licenseInfo={profile.license_info}
-        travelDocs={(profile.travel_docs as string[]) ?? []}
-      />
-
-      {/* Profile Strength */}
-      <ProfileStrength
-        score={score}
-        label={label}
-        nextPrompt={nextPrompt}
-        nextHref={strengthCta?.href}
-        ctaLabel={strengthCta?.label}
-      />
-
-      {/* Section Grid */}
-      <ProfileSectionGrid sections={sectionGridItems} />
-
-      {/* Empty-state prompts for key missing sections */}
-      {extended.hobbies.length === 0 && (
-        <EmptyState
-          icon={<Heart size={24} />}
-          title="Hobbies"
-          description="Show your personality beyond the deck"
-          actionLabel="Add hobbies"
-          actionHref="/app/hobbies/edit"
+      {/* ── MEDIA ─────────────────────────────────────────────── */}
+      <ProfileSectionGroup title="Media" icon={<Camera size={16} />}>
+        <ProfileSectionList
+          sections={mediaSections}
+          initialVisibility={sectionVisibility}
         />
-      )}
-
-      {extended.skills.length === 0 && (
-        <EmptyState
-          icon={<Wrench size={24} />}
-          title="Extra Skills"
-          description="Highlight your extra skills"
-          actionLabel="Add skills"
-          actionHref="/app/skills/edit"
-        />
-      )}
-
-      {extended.gallery.length === 0 && (
-        <EmptyState
-          icon={<Camera size={24} />}
-          title="Work Gallery"
-          description="Show your work environment"
-          actionLabel="Add photos"
-          actionHref="/app/profile/gallery"
-        />
-      )}
+        {/* Photo strip preview */}
+        {(profilePhotos?.length ?? 0) > 0 && (
+          <div className="px-4 py-3 flex gap-2 overflow-x-auto">
+            {(profilePhotos ?? []).slice(0, 5).map((p, i) => (
+              <div key={p.id} className="relative shrink-0 w-[56px] h-[56px] rounded-xl overflow-hidden bg-[var(--color-surface-raised)]">
+                <Image
+                  src={p.photo_url}
+                  alt={`Photo ${i + 1}`}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            ))}
+          </div>
+        )}
+      </ProfileSectionGroup>
 
     </PageTransition>
   )

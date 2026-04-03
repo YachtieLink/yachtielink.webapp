@@ -129,22 +129,6 @@ export default function MorePage() {
         <p className="text-sm text-[var(--color-text-secondary)]">Dark mode coming soon</p>
       </div>
 
-      {/* ── Profile ────────────────────────────────── */}
-      <SectionHeader title="Profile" />
-      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
-        <SettingsRow
-          label="Edit profile & contact info"
-          href="/app/profile/settings"
-          sublabel="Name, handle, role, contact details, visibility"
-        />
-      </div>
-
-      {/* ── Saved ──────────────────────────────────── */}
-      <SectionHeader title="Saved" />
-      <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
-        <SettingsRow href="/app/network/saved" label="Saved Profiles" sublabel="View your saved profiles" />
-      </div>
-
       {/* ── Account ────────────────────────────────── */}
       <SectionHeader title="Account" />
       <div className="bg-[var(--color-surface)] rounded-2xl overflow-hidden divide-y divide-[var(--color-border)]">
