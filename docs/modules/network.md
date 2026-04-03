@@ -105,6 +105,8 @@ Then fetches colleague profiles and yacht names in a second parallel batch. All 
 
 ## Recent Activity
 
+**2026-04-03** — Rally 009 Session 6, Lane 3 (feat/experience-transfer): Network page and colleagues page updated to filter dormant endorsements. `.or('is_dormant.is.null,is_dormant.eq.false')` appended to queries in `app/(protected)/app/network/page.tsx` and `app/(protected)/app/network/colleagues/page.tsx`. Multiple `.or()` calls are ANDed in PostgREST (produces expected SQL: `WHERE (...) AND (is_dormant IS NULL OR is_dormant = false)`).
+
 **2026-04-03** — Rally 009 Session 3: Full Network tab redesign. Replaced tabbed interface with yacht-grouped accordion view (`NetworkUnifiedView` orchestrator). New components: `YachtAccordion` (navy wayfinding, easeGentle animation), `ColleagueRow` (endorsement status indicators), `EndorsementSummaryCard`, `EndorsementCTACard`. Server component fetches colleagues RPC, endorsements, ghost profiles in parallel. Navy section color wayfinding throughout.
 
 **2026-04-03** — Rally 009 Review: Fixed `Set<string>` RSC serialization bug — `endorsedColleagueIds` and `pendingColleagueIds` converted from `Set` to `string[]` before crossing server→client boundary. `NetworkUnifiedView` props updated to match.

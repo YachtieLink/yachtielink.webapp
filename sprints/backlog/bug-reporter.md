@@ -1,6 +1,6 @@
 # Bug Reporter
 
-**Status:** fleshed-out
+**Status:** promoted — shipped in Rally 009 Session 6, Lane 2 (feat/reporting-bugs)
 **Priority guess:** P2 (important)
 **Date captured:** 2026-03-22
 

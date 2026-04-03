@@ -1,10 +1,10 @@
 # Session 7 — Desktop Polish + Roadmap + Settings + Cross-Cutting
 
 **Rally:** 009 Pre-MVP Polish
-**Status:** Ready (all grill-me decisions resolved)
+**Status:** Ready (all grill-me decisions resolved, including desktop layout — 2026-04-03)
 **Estimated time:** ~6 hours across 3 workers
 **Dependencies:** Sessions 1-6 merged (all features built, this is final polish)
-**Grill-me decisions applied:** §9 (Q9.1–Q9.3), §10 (Q10.1–Q10.3), Platform-Wide Rules
+**Grill-me decisions applied:** §9 (Q9.1–Q9.3), §10 (Q10.1–Q10.3), Platform-Wide Rules, Desktop Layout (2026-04-03)
 
 ---
 
@@ -13,50 +13,66 @@
 **Branch:** `fix/desktop-responsiveness`
 **Objective:** Audit all key pages at desktop breakpoints and fix layout issues. Development has been mobile-first — desktop likely has stretched content, awkward whitespace, and misaligned grids.
 
+### Desktop Layout Decisions (founder, 2026-04-03)
+
+| # | Question | Decision |
+|---|----------|----------|
+| D1 | App layout — single column or sidebar + content? | **iPad-first responsive.** Design for iPad dimensions. Desktop gets the same layout centered on screen with persistent sidebar. No separate desktop layout for Phase 1. |
+| D2 | Public profile — expand bento to 3-4 columns on desktop? | **No.** Keep it looking good on iPad, carry the same responsiveness to desktop. Future phase may spec richer desktop when captains use it more for hiring. |
+| D3 | Authenticated pages — full width or stay narrow? | **Stay narrow.** Same as iPad. Centered content on larger screens. Don't over-complicate. |
+| D4 | Sidebar nav — persistent or collapsible on desktop? | **Persistent left panel** on desktop. Enough screen real estate to keep it always visible. |
+| D5 | Cards — multi-column at desktop widths? | **No.** Leave cards single-column for now. Don't over-complicate Phase 1. |
+
+**Strategy:** Design for iPad (768-1024px), ensure it looks good. Desktop (1280px+) inherits the same layout centered with persistent sidebar and extra whitespace on the sides. This means we only test responsiveness up to iPad level — desktop works by inheritance.
+
 ### Task 1: Audit
 
-Test at these breakpoints: **1024px** (iPad landscape / small laptop), **1280px** (standard laptop), **1440px** (large laptop), **1920px** (desktop monitor).
+Test at these breakpoints: **768px** (iPad portrait), **1024px** (iPad landscape — **primary target**), **1280px** (laptop — verify it inherits cleanly).
 
 **Pages to audit (priority order):**
 
-1. **Public profile** (`/u/:handle`) — This is what agents/captains see on desktop. Must look polished.
-2. **Profile page** (`/app/profile`) — Landing page
-3. **Network tab** (`/app/network`) — After Session 3 redesign
-4. **Insights tab** (`/app/insights`) — After Session 4 redesign
-5. **CV preview** (`/app/cv/preview`) — PDF preview should look great on desktop
-6. **More/Settings** (`/app/more`) — Utility page
-7. **Endorsement request** (`/app/endorsement/request`) — After Session 5 redesign
-8. **Onboarding flow** — New users may start on desktop
-9. **Marketing/welcome page** (`/welcome`) — First impression
+1. **Public profile** (`/u/:handle`) — what agents/captains see. Must look polished on iPad.
+2. **Profile page** (`/app/profile`) — landing page
+3. **Network tab** (`/app/network`) — yacht accordion view from Session 3
+4. **Insights tab** (`/app/insights`) — dashboard from Session 4
+5. **CV preview** (`/app/cv/preview`) — PDF preview
+6. **More/Settings** (`/app/more`) — utility page
+7. **Endorsement request** (`/app/endorsement/request`) — Session 5 redesign
+8. **Onboarding flow** — new users may start on iPad/desktop
+9. **Marketing/welcome page** (`/welcome`) — first impression
 10. **Auth pages** (login, signup, verify)
 
 **For each page, check:**
-- Content width: is `max-w-2xl` (672px) too narrow on 1920px? Should some pages go wider?
-- Grid layouts: do 2-column grids become awkwardly wide? Should they go 3-4 column on desktop?
-- Card sizes: do cards stretch too wide?
-- Typography: is the 28px serif title appropriate at desktop scale?
-- Whitespace: does centered narrow content create too much dead space?
-- Images: do photos scale properly? Any stretching/distortion?
-- Navigation: sidebar (`SidebarNav`) visible and functional at md+ breakpoints?
-- Modals/sheets: do they center properly on large screens?
+- Content renders cleanly at 1024px (iPad landscape) — no overflow, no cramped layouts
+- Sidebar nav is persistent and functional at `md:` (768px+)
+- Cards don't stretch too wide — maintain readable line lengths
+- Typography scales appropriately
+- Images don't distort
+- Modals/sheets center properly
+- No horizontal scroll at any breakpoint
+- On 1280px+: content stays centered, whitespace on sides is acceptable (not broken)
 
 ### Task 2: Fix Issues
 
-**Common patterns likely needed:**
-- `max-w-4xl` or `max-w-5xl` for wider content on desktop (override `max-w-2xl` at `lg:` breakpoint)
-- Multi-column grids at `lg:` breakpoint (e.g., `lg:grid-cols-3` where mobile is single column)
-- Card max-width constraints so they don't stretch to full container width
-- Sidebar navigation polish (it exists but may need visual refinement)
-- Image containers with `max-w` constraints
+**Keep it simple — iPad-first fixes only:**
+- Ensure `max-w-2xl` or equivalent keeps content readable on wide screens
+- Sidebar nav (`SidebarNav.tsx`) persistent at `md:` breakpoint — verify it's visible and styled
+- Content wrapper in app layout adds proper `md:pl-16` (or sidebar width) offset
+- Any overflow or cramping at 768-1024px gets fixed
+- Public profile bento grid: verify it's clean at iPad widths, don't add more columns
 
-**Public profile is highest priority** — this is the page external people (agents, captains, recruiters) will view on desktop. It must look intentional, not like a stretched mobile app.
+**Do NOT:**
+- Widen layouts beyond what iPad needs
+- Add multi-column card grids
+- Create desktop-specific components
+- Over-engineer for 1920px — it just inherits iPad layout centered
 
 ### Task 3: Breakpoint Consistency
 
-Verify that all responsive breakpoints use the same Tailwind `md:` and `lg:` conventions:
-- `md:` (768px) — tablet / sidebar appears
-- `lg:` (1024px) — desktop layout adjustments
-- `xl:` (1280px) — wide desktop refinements
+Verify all responsive breakpoints use consistent Tailwind conventions:
+- `md:` (768px) — sidebar appears, iPad portrait adjustments
+- `lg:` (1024px) — iPad landscape, primary desktop target
+- No `xl:` overrides needed for Phase 1
 
 **Allowed files:**
 - Any page.tsx or component that needs responsive fixes

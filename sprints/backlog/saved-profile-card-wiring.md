@@ -1,6 +1,6 @@
 # SavedProfileCard: Sea Time + Yacht Count Props Not Wired
 
-**Status:** idea
+**Status:** merged into saved-profile-card-detail-line.md
 **Priority guess:** P2 (bug — feature incomplete)
 **Date captured:** 2026-04-02
 **Source:** Lane 2 worker + reviewer (worktree session)

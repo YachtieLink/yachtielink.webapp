@@ -1,6 +1,6 @@
 # SOCIAL_PLATFORM_CONFIG: Duplicated Between Settings + SocialLinksRow
 
-**Status:** idea
+**Status:** merged into social-links-add-prompt.md
 **Priority guess:** P3 (tech debt)
 **Date captured:** 2026-04-02
 **Source:** Lane 3 worker + reviewer (worktree session)

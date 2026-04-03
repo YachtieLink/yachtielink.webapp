@@ -26,6 +26,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-03 | Rally 009 Session 6 | 4-lane worktree: cert matching registry (green/amber/blue), reporting/flagging/bug-reporter (trust infra), experience transfer + endorsement dormancy, ProUpsellCard consistency. 1 extra migration (RLS update policy). 26 review fixes. 6 backlog items. |
 | 2026-04-03 | Rally 009 Review + QA | Review fixes (21 total): RSC serialization, LLM safety, Pro gate, clipboard, dead code. Tester QA (9 fixes): column mismatches, land exp on public profile, WhoViewedYou dynamic range, assist quality. 5 backlog items. |
 | 2026-04-03 | Rally 009 Session 5 | LLM defense layer (sanitize + prompt-guard). Endorsement writing assist (gpt-4o-mini). Endorsement request redesign (yacht-grouped, ghost inline, reminders). |
 | 2026-04-03 | Rally 009 Session 4 | Insights dashboard (coral wayfinding, metric cards, career snapshot, WhoViewedYou). Unified photo management (3-format preview, focal point). CV output-only + Settings 5-group IA. |
@@ -35,6 +36,38 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 | 2026-04-02 | Rally 009 /grill-me | Design interview: 42 Qs resolved, 5-tab UX audit, 9 additional fixes confirmed. All sessions unblocked. |
 | 2026-04-02 | Rally 009 Session 1 | 3-lane: mobile UX tab-bar padding + CV preview canonical query, P2 bugs (saved sea time, yacht prefix null guard, PDF home-country toggle), tech debt sweep (social icons dedup, formatSeaTime, EndorsementsSection) |
 | 2026-04-02 | Rally 009 planning | Full pre-MVP backlog triage: 30 items across 7 sessions specced into lane-ready build plans. 42 /grill-me questions prepped. 7 backlog items closed as resolved. Junior sprints updated. |
+
+## 2026-04-03 — Rally 009 Session 6 (Opus 4.6) — Worktree
+
+### Done
+- **Lane 1 (feat/cert-registry):** Cert matching registry application layer on top of already-migrated `certifications_registry` table. New `lib/cv/cert-matching.ts`: `matchCertification()` against `search_certifications` RPC — returns green (≥0.6 similarity, auto-fill issuing authority), amber (0.3–0.59, "did you mean?" with top 3), blue (<0.3, manual fields). `StepQualifications.tsx` redesigned with 3 card states, blocks wizard continuation while amber matches are unresolved, smart expiry nudges from `typical_validity_years`. `CvImportWizard.tsx` typed end-to-end with `WizardCert`. Alias learning in `save-parsed-cv-data.ts` (persists confirmed matches back to registry). 1 extra migration required: `20260403100004_certifications_registry_update_policy.sql` — UPDATE policy so alias learning can write. 3 review fixes: RLS (CRITICAL), `WizardCert` type contract (HIGH), useEffect debounce to stop matching on every keystroke (MEDIUM). (branch: feat/cert-registry)
+- **Lane 2 (feat/reporting-bugs):** Full trust infrastructure. `POST /api/report`: auth, rate-limit 10/hr, Zod validation (profile/yacht/endorsement), category cross-check, self-report guard, HTML-escaped email alert via Resend. `POST /api/bug-reports`: auth, rate-limit 10/hr, user-agent capture, email notify, `page_url` max 500. `ReportButton` component: BottomSheet with radio categories, textarea, live yacht search (debounced 300ms, LIKE injection escaped), success inline state. `/app/more/report-bug` page with auto-populated referrer URL. Wired to: public profile (non-owner viewers only), yacht detail page, EndorsementCard (public viewers). More page replaced mailto "Report a problem" with structured "Report a bug" row + separate "Contact us". 12 review fixes including XSS escape (HIGH), self-report guard (HIGH), owner flag leak (HIGH), LIKE injection (MEDIUM), page_url unbounded (MEDIUM), unstable `createClient` ref (LOW). (branch: feat/reporting-bugs)
+- **Lane 3 (feat/experience-transfer):** Experience transfer + endorsement dormancy. `POST /api/transfer-experience`: moves attachment to another yacht, blocks if dest already has active attachment, logs to `experience_transfers`, calls dormancy recalc + colleague rebuild, returns `audit_logged` flag. `lib/endorsements/visibility.ts`: `recalculateEndorsementDormancy()` using service-role client (bypasses RLS). `lib/network/colleague-rebuild.ts`: `rebuildColleagueConnections()`. `TransferExperienceButton` in CareerTimeline. Applied `is_dormant` filter to all 12 endorsement display queries. Unified old `/api/attachment/transfer` endpoint to also call dormancy + rebuild (was incompatible). 7 review fixes: dual-endpoint conflict (CRITICAL), duplicate-attachment guard (HIGH), dormant endorsements pinnable (HIGH), service-role client (HIGH). (branch: feat/experience-transfer)
+- **Lane 4 (chore/pro-upsell-consistency):** `ProUpsellCard` component — 3 variants (`inline`/`banner`/`card`), respects section color wayfinding via `context` prop, enforces "Upgrade to Crew Pro" copy, links to `/app/settings/plan`. Retrofitted 4 upsell spots: photos (×2), certs, CvActions. Insights kept `UpgradeCTA` (handles checkout flow). `showFoundingBadge` dead code removed. Design system `page-layout.md` appended with Pro Upsell Pattern section. 3 review fixes: missing `Link` import build-breaker (CRITICAL), double CTA on insights free view (MEDIUM), dead `showFoundingBadge` prop (LOW). (branch: chore/pro-upsell-consistency)
+
+### Context
+- 4 lanes, 4 separate worktrees. Merge order: Lane 4 → Lane 1 → Lane 2 → Lane 3.
+- 4 pre-session migrations already applied (100001–100003). Lane 1 required a 5th migration (100004) added by master for RLS UPDATE policy on certifications_registry.
+- QA passed on all 4 lanes.
+
+### Next
+1. Master commits + pushes each lane branch → creates PRs
+2. Rally 009 Session 7 — desktop responsiveness, roadmap/feedback, settings polish, cross-cutting
+
+### Flags
+- ⚠️ `StepQualifications.tsx` is now a 934 LOC hotspot — consider extracting GreenCertCard/AmberCertCard/BlueCertCard in a future pass
+- ⚠️ Lane 3 introduces two transfer endpoints that now share dormancy semantics — old `/api/attachment/transfer` still exists for backward compatibility; confirm deprecation path before Session 7
+- ⚠️ `experience_transfers` table has no FK to `attachments(id)` and no indexes on `user_id`/`employment_id` — captured in backlog
+
+### Backlog captured
+- alias-moderation-granular: Per-alias review state (JSONB/table) so moderation is alias-level not row-level (Lane 1 worker)
+- duplicate-report-dedup: Prevent same user submitting identical reports up to rate limit (Lane 2 reviewer)
+- yachtpicker-render-effect: YachtPicker uses setTimeout in render body instead of useEffect — fires twice in StrictMode (Lane 3 worker)
+- yachtpicker-is-established-rpc: Add is_established to search_yachts RPC to eliminate a sequential round-trip per keystroke (Lane 3 worker)
+- experience-transfers-schema-hardening: FK constraint + indexes on experience_transfers table (Lane 3 reviewer)
+- upgrade-cta-hardcoded-features: UpgradeCTA feature list is hardcoded — extract to constant or config (Lane 4 worker)
+
+---
 
 ## 2026-04-03 — Rally 009 Review + QA (Opus 4.6, CLI) — Post-Chain
 

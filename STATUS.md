@@ -2,13 +2,13 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-03 (Sessions 2-5 reviewed + QA passed. 21 review fixes + 9 tester fixes applied. PR #159 ready for merge.)
+**Last updated:** 2026-04-03 (Session 6 complete — 4 lanes built, reviewed, QA passed. Logged. Ready for commit/push/PRs.)
 
 ---
 
 ## Current Phase
 
-**Phase 1B — final stretch.** All sprints (10-13) and Rally 006 complete. Ghost Profiles merged. QA rally + deploy between here and launch.
+**Phase 1B — final stretch.** All sprints (10-13) and Rally 006 complete. Ghost Profiles merged. Rally 009 Sessions 1-5 shipped. Session 6 in progress.
 
 ---
 
@@ -16,10 +16,10 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Sprint | Phase | Status | Focus |
 |--------|-------|--------|-------|
-| Rally 009 | 1B | ✅ Sessions 2-5 reviewed + QA passed | Pre-MVP polish — 7 sessions. Sessions 2-5 on chain/rally-009. PR #159 ready for merge. |
+| Rally 009 Session 6 | 1B | ✅ Logged — pending commit/push | Cert registry, reporting/flagging, experience transfer, Pro upsell. All 4 lanes built + reviewed + QA passed. |
 | Sprint 13 | 1B | 🔧 Code Complete | SEO/sitemap/OG/cookie/robots merged (PR #130). Ops + legal blocked on founder. |
 
-**Next action:** Founder merges PR #159. Then Rally 009 Sessions 6-7 or Rally 010.
+**Next action:** Commit + push each lane branch → create PRs → Session 7.
 
 ---
 
@@ -27,7 +27,8 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
-| Rally 009 Sessions 2-5 — reviewed + QA passed | 2026-04-03 | Land experience, Network tab, Profile redesign, Insights, Photos, CV, Settings, LLM defense, Endorsement flow. 21 review fixes + 9 tester fixes. PR #159 ready for merge. |
+| Rally 009 Session 6 — logged | 2026-04-03 | Cert matching (green/amber/blue), trust infra (report + bug report APIs + ReportButton), experience transfer + endorsement dormancy system, ProUpsellCard consistency. 26 review fixes. 4 PRs pending. |
+| Rally 009 Sessions 2-5 — merged | 2026-04-03 | Land experience, Network tab, Profile redesign, Insights, Photos, CV, Settings, LLM defense, Endorsement flow. 21 review fixes + 9 tester fixes. PR #159 merged. |
 | Rally 009 Session 2 — land experience + sea time overlap | 2026-04-03 | Land experience end-to-end (DB + wizard + profile + public), sea time union-based calc + overlap detection, 19 review fixes, 3 QA fixes |
 | Rally 009 Session 1 — mobile UX + P2 bugs + tech debt | 2026-04-02 | Tab-bar padding, CV preview canonical query, saved sea time, yacht prefix null guard, PDF home-country toggle, social icons dedup, formatSeaTime canonical, EndorsementsSection cleanup |
 | Skill hardening — review, tester, file ownership | 2026-04-02 | /yl-review zero-tolerance + two-step, /yl-tester agent, file ownership rules, cwd conventions, 7 chain gaps fixed |
@@ -40,12 +41,13 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Merge PR #159** — Rally 009 Sessions 2-5. Founder merges.
-2. **Rally 009 Sessions 6-7** — remaining sessions (if planned)
-3. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
-4. **Rally 010 — Frontend UX & Guidance** — Product tour (Onborda), cold states, StickyBottomBar, tooltips, coaching nudges. After Rally 009 completes.
-5. **Rally 007 — Launch QA** — full checklist (after Rally 009 + 010 complete)
-6. **Deploy** — invite mode, 20-50 crew, 24h monitoring
+1. **Rally 009 Session 6** — commit/push each branch, create 4 PRs (ready)
+2. **Rally 009 Session 7** — desktop responsiveness, roadmap/feedback, settings polish, cross-cutting
+3. **Rally 010 — Frontend UX & Guidance** — product tour (Onborda), cold states, StickyBottomBar, tooltips, coaching nudges
+4. **Ghost Profile claim flow E2E verification** — ⚠️ untested launch blocker
+5. **Rally 007 — Launch QA** — full checklist (⚠️ spec doesn't exist yet — needs creating)
+6. **Sprint 13 ops/legal** — Vercel env vars, Stripe webhook, business address, legal sign-off (all founder)
+7. **Deploy** — invite mode, 20-50 crew, 24h monitoring
 
 ---
 
@@ -64,7 +66,11 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | PR | Branch | Status | Notes |
 |----|--------|--------|-------|
-| #159 | chain/rally-009 | 🔍 QA Passed | Sessions 2-5: land exp, network, profile, insights, photos, CV, settings, LLM, endorsements. 30 fixes applied. Ready for merge. |
+| pending | feat/cert-registry | 🔧 Ready to push | Lane 1: cert matching registry, StepQualifications 3-state cards, alias learning, WizardCert types |
+| pending | feat/reporting-bugs | 🔧 Ready to push | Lane 2: report API, bug-report API, ReportButton, /more/report-bug page |
+| pending | feat/experience-transfer | 🔧 Ready to push | Lane 3: experience transfer, endorsement dormancy, is_dormant filter on 12 queries |
+| pending | chore/pro-upsell-consistency | 🔧 Ready to push | Lane 4: ProUpsellCard, 4 retrofits, design system docs |
+| #159 | chain/rally-009 | ✅ Merged | Sessions 2-5: land exp, network, profile, insights, photos, CV, settings, LLM, endorsements. 30 fixes applied. |
 | #152 | chore/rally009-session1-context | ✅ Merged | Session 1 context |
 | #153 | fix/mobile-ux-fixes | ✅ Merged | Tab-bar padding + CV preview query |
 | #154 | fix/p2-bug-fixes | ✅ Merged | Saved sea time, yacht prefix null, home country |

@@ -2,8 +2,9 @@
 
 **Status: PARTIALLY RESOLVED** — Most avatars fixed with object-top. SavedProfileCard still needs fix (folded into Rally 009 Session 1 Lane 2).
 
-**Status:** proposed
+**Status:** ready (mechanical fix — grep `rounded-full` + `object-cover`, apply `object-top`)
 **Priority guess:** P2 (visible UX bug)
+**Estimated effort:** 30 minutes (Sonnet, low effort)
 **Date captured:** 2026-03-27
 
 ## Problem
