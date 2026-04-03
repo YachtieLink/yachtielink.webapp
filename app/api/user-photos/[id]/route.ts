@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { handleApiError } from '@/lib/api/errors'
 import { extractStoragePath } from '@/lib/storage/upload'
+import { getProStatus } from '@/lib/stripe/pro'
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -25,12 +26,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     // Context assignment is Pro-only
     if (hasContextUpdate) {
-      const { data: profile } = await supabase
-        .from('users')
-        .select('subscription_status')
-        .eq('id', user.id)
-        .single()
-      if (profile?.subscription_status !== 'pro') {
+      const proStatus = await getProStatus(user.id)
+      if (!proStatus.isPro) {
         return NextResponse.json({ error: 'Context assignment requires Pro' }, { status: 403 })
       }
     }
