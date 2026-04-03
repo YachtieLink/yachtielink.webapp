@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
 
     const result = await validateBody(req, createEndorsementRequestSchema);
     if ('error' in result) return result.error;
-    const { yacht_id, recipient_email, recipient_phone, recipient_user_id: directRecipientId, yacht_name } = result.data;
+    const { yacht_id, recipient_email, recipient_phone, recipient_user_id: directRecipientId, yacht_name, recipient_name } = result.data;
 
     if (!recipient_email && !recipient_phone && !directRecipientId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -154,6 +154,7 @@ export async function POST(req: NextRequest) {
         recipient_email: recipient_email ? recipient_email.trim().toLowerCase() : null,
         recipient_phone: recipient_phone ?? null,
         recipient_user_id: recipientUserId,
+        recipient_name: recipient_name ?? null,
       })
       .select("id, token")
       .single();

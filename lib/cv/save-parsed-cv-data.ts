@@ -548,6 +548,5 @@ export async function saveConfirmedImport(
   // 8. Endorsement requests — not yet implemented
   // TODO: implement endorsement request sending when ready
 
-  console.debug('[saveConfirmedImport] stats:', JSON.stringify(stats))
   return stats
 }

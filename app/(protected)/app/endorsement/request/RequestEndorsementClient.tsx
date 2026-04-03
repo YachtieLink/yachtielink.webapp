@@ -477,9 +477,11 @@ export function RequestEndorsementClient({
                                     <Button
                                       variant="outline"
                                       size="sm"
-                                      onClick={() => sendToColleague(ghost, yacht.id, yacht.name)}
-                                      disabled={state === 'sending' || remaining === 0}
-                                      loading={state === 'sending'}
+                                      onClick={() => {
+                                        setInviteName(ghost.name)
+                                        setInviteContact('')
+                                        setYachtInviteForms((prev) => ({ ...prev, [yacht.id]: true }))
+                                      }}
                                       className="text-xs rounded-full border-[var(--color-text-tertiary)] text-[var(--color-text-secondary)]"
                                     >
                                       Invite

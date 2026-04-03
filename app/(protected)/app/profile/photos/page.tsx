@@ -114,7 +114,7 @@ export default function ProfilePhotosPage() {
   const [photos, setPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
-  const [isPro, setIsPro] = useState(true)
+  const [isPro, setIsPro] = useState(false)
   const [focalPhoto, setFocalPhoto] = useState<Photo | null>(null)
   const [focalX, setFocalX] = useState(50)
   const [focalY, setFocalY] = useState(50)
@@ -371,7 +371,7 @@ export default function ProfilePhotosPage() {
                   </span>
                 </div>
                 <p className="text-xs text-[var(--color-text-secondary)] mb-2">
-                  Use this photo as your:
+                  Choose where this photo appears:
                 </p>
                 <div className="flex gap-2">
                   {(['is_avatar', 'is_hero', 'is_cv'] as const).map((ctx) => {

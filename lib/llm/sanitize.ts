@@ -96,7 +96,7 @@ export function validateOutput(
   }
 
   if (maxSentences) {
-    const sentences = trimmed.split(/[.!?]+/).filter((s) => s.trim().length > 0)
+    const sentences = trimmed.split(/(?<=[.!?])\s+/).filter((s) => s.trim().length > 3)
     if (sentences.length > maxSentences) {
       return { valid: false, reason: `Output exceeds ${maxSentences} sentences` }
     }

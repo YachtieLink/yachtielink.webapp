@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Rate limit: 5 per hour per user (endorsement assist is moderately expensive)
+  // Rate limit: 10 per hour per user (aiSummary bucket — endorsement assist is moderately expensive)
   const rl = await applyRateLimit(req, 'aiSummary', user.id)
   if (rl) return rl
 
@@ -31,6 +31,18 @@ export async function POST(req: NextRequest) {
   const { recipient_id, yacht_id, partial_text } = body
   if (!recipient_id || !yacht_id) {
     return NextResponse.json({ error: 'recipient_id and yacht_id are required' }, { status: 400 })
+  }
+
+  // Verify the endorser has an attachment on this yacht
+  const { count: attachmentCount } = await supabase
+    .from('attachments')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .eq('yacht_id', yacht_id)
+    .is('deleted_at', null)
+
+  if (!attachmentCount || attachmentCount === 0) {
+    return NextResponse.json({ error: 'You must have worked on this yacht to use writing assist' }, { status: 403 })
   }
 
   // Fetch endorsee info + yacht + endorser attachment in parallel

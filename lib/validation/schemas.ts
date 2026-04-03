@@ -36,6 +36,7 @@ export const createEndorsementRequestSchema = z.object({
   recipient_phone: safeText(20).optional(),
   recipient_user_id: uuid.optional(),
   yacht_name: safeText(200).optional(),
+  recipient_name: safeText(200).optional(),
 });
 
 // --- CV ---

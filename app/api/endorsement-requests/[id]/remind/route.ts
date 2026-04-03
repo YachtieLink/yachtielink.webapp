@@ -50,14 +50,20 @@ export async function POST(
       return NextResponse.json({ error: `Too soon. Try again in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.` }, { status: 429 })
     }
 
-    // Mark as reminded
-    const { error: updateError } = await supabase
+    // Atomic CAS: only update if reminded_at is still null (prevents TOCTOU race)
+    const { data: updated, error: updateError } = await supabase
       .from('endorsement_requests')
       .update({ reminded_at: new Date().toISOString() })
       .eq('id', id)
+      .is('reminded_at', null)
+      .select('id')
 
     if (updateError) {
       return NextResponse.json({ error: 'Failed to update reminder status' }, { status: 500 })
+    }
+
+    if (!updated || updated.length === 0) {
+      return NextResponse.json({ error: 'Reminder already sent' }, { status: 409 })
     }
 
     // Send reminder email

@@ -5,22 +5,19 @@ import Link from 'next/link'
 import { Anchor, Briefcase, ChevronDown, ChevronRight } from 'lucide-react'
 import type { LandExperienceEntry } from '@/lib/queries/types'
 
+type YachtInfo = { id: string; name: string; yacht_type: string | null; flag_state: string | null }
+
 interface YachtAttachment {
   id: string
   role_label: string
   started_at: string
   ended_at: string | null
-  yachts: unknown
+  yachts: YachtInfo | YachtInfo[] | null
 }
 
-type YachtInfo = { id: string; name: string; yacht_type: string | null; flag_state: string | null }
-
-function extractYacht(raw: unknown): YachtInfo | null {
+function resolveYacht(raw: YachtInfo | YachtInfo[] | null): YachtInfo | null {
   if (!raw) return null
-  const obj = Array.isArray(raw) ? raw[0] : raw
-  if (!obj || typeof obj !== 'object') return null
-  const o = obj as Record<string, unknown>
-  return { id: o.id as string, name: o.name as string, yacht_type: (o.yacht_type as string) ?? null, flag_state: (o.flag_state as string) ?? null }
+  return Array.isArray(raw) ? raw[0] ?? null : raw
 }
 
 type TimelineEntry =
@@ -115,7 +112,7 @@ export function CareerTimeline({ attachments, landExperience }: CareerTimelinePr
 
           if (entry.type === 'yacht') {
             const att = entry.data
-            const yacht = extractYacht(att.yachts)
+            const yacht = resolveYacht(att.yachts)
             return (
               <li key={`y-${id}`} className="flex gap-3 py-2.5">
                 <div className="mt-0.5 shrink-0 h-7 w-7 rounded-lg bg-[var(--color-navy-50)] flex items-center justify-center">
