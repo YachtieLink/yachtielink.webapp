@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
-import { Download, Eye, EyeOff, Upload, FileText, Sparkles, RefreshCw } from 'lucide-react'
+import { Download, Eye, EyeOff, Upload, FileText, Sparkles, RefreshCw, ChevronDown } from 'lucide-react'
 
 interface CvActionsProps {
   hasGeneratedPdf: boolean
@@ -40,6 +40,7 @@ export function CvActions({
   const [pdfGeneratedAt, setPdfGeneratedAt] = useState(initialPdfGeneratedAt)
   const [pdfStale, setPdfStale] = useState(initialPdfStale)
   const [selectedTemplate, setSelectedTemplate] = useState<Template>('standard')
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false)
   const [previewingTemplate, setPreviewingTemplate] = useState<Template | null>(null)
   const [cvPublic, setCvPublic] = useState(initialCvPublic)
   const [cvPublicSource, setCvPublicSource] = useState(initialCvPublicSource)
@@ -152,6 +153,8 @@ export function CvActions({
     }
   }
 
+  const currentTemplateName = TEMPLATES.find((t) => t.id === selectedTemplate)?.label ?? 'Standard'
+
   return (
     <div className="flex flex-col gap-3">
       {/* ── 1. Your CV ────────────────────────────────────────────────── */}
@@ -229,7 +232,7 @@ export function CvActions({
           {hasUploadedCv ? (
             <>
               <p className="text-xs text-[var(--color-text-tertiary)] leading-relaxed">
-                Your uploaded file — use Visitor Downloads below to make it available on your profile.
+                Your uploaded file — use Sharing below to make it available on your profile.
               </p>
               <div className="flex gap-2">
                 <button
@@ -268,91 +271,106 @@ export function CvActions({
         </div>
       </div>
 
-      {/* ── 3. PDF Template ────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-[var(--color-amber-200)] bg-white/90 shadow-sm p-4 flex flex-col gap-3">
+      {/* ── 2. CV Design — Collapsed template picker ──────────────── */}
+      <div className="rounded-2xl border border-[var(--color-amber-200)] bg-white/90 shadow-sm p-4 flex flex-col gap-2">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-amber-500)]">
           CV Design
         </h2>
-        <p className="text-xs text-[var(--color-text-tertiary)] leading-relaxed">
-          Choose a design for your YachtieLink CV.
-        </p>
-        <div className="flex flex-col gap-2">
-          {TEMPLATES.map((t) => {
-            const locked = t.proOnly && !isPro
-            const selected = selectedTemplate === t.id
-            return (
-              <button
-                key={t.id}
-                onClick={() => {
-                  if (locked) {
-                    router.push('/app/settings/plan')
-                    toast('Upgrade to Pro for premium templates', 'info')
-                    return
-                  }
-                  setSelectedTemplate(t.id)
-                }}
-                className={`flex items-center gap-3 rounded-lg border p-3 transition-colors text-left ${
-                  selected
-                    ? 'border-[var(--color-amber-500)] border-2 bg-[var(--color-amber-50)]/50'
-                    : locked
-                    ? 'border-[var(--color-border)] bg-[var(--color-surface-overlay)] opacity-60'
-                    : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-overlay)]'
-                }`}
-              >
-                <div className={`h-4 w-4 rounded-full border-2 shrink-0 ${
-                  selected ? 'border-[var(--color-amber-500)] bg-[var(--color-amber-500)]' : 'border-[var(--color-border)]'
-                }`}>
-                  {selected && <div className="h-full w-full rounded-full border-2 border-white" />}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-1.5">
-                    {locked && (
-                      <svg className="h-3 w-3 text-[var(--color-text-tertiary)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                    )}
-                    <p className="text-sm font-medium text-[var(--color-text-primary)]">{t.label}</p>
-                  </div>
-                  <p className="text-xs text-[var(--color-text-tertiary)]">{t.sublabel}</p>
-                </div>
-                {!locked && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      previewTemplate(t.id)
-                    }}
-                    disabled={previewingTemplate !== null}
-                    className="flex items-center gap-1 text-xs text-[var(--color-interactive)] shrink-0"
-                  >
-                    <Eye size={12} />
-                    {previewingTemplate === t.id ? 'Loading…' : 'Preview'}
-                  </button>
-                )}
-              </button>
-            )
-          })}
-
-          {!isPro && (
-            <Button
-              variant="link"
-              size="sm"
-              onClick={() => router.push('/app/settings/plan')}
-              className="mt-1 text-xs text-center"
-            >
-              Upgrade to Pro for premium templates
-            </Button>
-          )}
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-[var(--color-text-primary)]">{currentTemplateName}</p>
+          <button
+            type="button"
+            onClick={() => setTemplatePickerOpen(!templatePickerOpen)}
+            className="flex items-center gap-1 text-sm font-medium text-[var(--color-interactive)]"
+          >
+            Change
+            <ChevronDown
+              size={14}
+              className={`transition-transform ${templatePickerOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
         </div>
+
+        {templatePickerOpen && (
+          <div className="flex flex-col gap-2 mt-1">
+            {TEMPLATES.map((t) => {
+              const locked = t.proOnly && !isPro
+              const selected = selectedTemplate === t.id
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => {
+                    if (locked) {
+                      router.push('/app/settings/plan')
+                      toast('Upgrade to Pro for premium templates', 'info')
+                      return
+                    }
+                    setSelectedTemplate(t.id)
+                    setTemplatePickerOpen(false)
+                  }}
+                  className={`flex items-center gap-3 rounded-lg border p-3 transition-colors text-left ${
+                    selected
+                      ? 'border-[var(--color-amber-500)] border-2 bg-[var(--color-amber-50)]/50'
+                      : locked
+                      ? 'border-[var(--color-border)] bg-[var(--color-surface-overlay)] opacity-60'
+                      : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:bg-[var(--color-surface-overlay)]'
+                  }`}
+                >
+                  <div className={`h-4 w-4 rounded-full border-2 shrink-0 ${
+                    selected ? 'border-[var(--color-amber-500)] bg-[var(--color-amber-500)]' : 'border-[var(--color-border)]'
+                  }`}>
+                    {selected && <div className="h-full w-full rounded-full border-2 border-white" />}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-1.5">
+                      {locked && (
+                        <svg className="h-3 w-3 text-[var(--color-text-tertiary)] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      )}
+                      <p className="text-sm font-medium text-[var(--color-text-primary)]">{t.label}</p>
+                    </div>
+                    <p className="text-xs text-[var(--color-text-tertiary)]">{t.sublabel}</p>
+                  </div>
+                  {!locked && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        previewTemplate(t.id)
+                      }}
+                      disabled={previewingTemplate !== null}
+                      className="flex items-center gap-1 text-xs text-[var(--color-interactive)] shrink-0"
+                    >
+                      <Eye size={12} />
+                      {previewingTemplate === t.id ? 'Loading…' : 'Preview'}
+                    </button>
+                  )}
+                </button>
+              )
+            })}
+
+            {!isPro && (
+              <Button
+                variant="link"
+                size="sm"
+                onClick={() => router.push('/app/settings/plan')}
+                className="mt-1 text-xs text-center"
+              >
+                Upgrade to Pro for premium templates
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* ── 4. What visitors can view & download ─────────────────────── */}
+      {/* ── 3. Sharing — who can download from your public profile ─── */}
       <div className="rounded-2xl border border-[var(--color-amber-200)] bg-white/90 shadow-sm p-4 flex flex-col gap-3">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-amber-500)]">
-          Visitor Downloads
+          Sharing
         </h2>
         <p className="text-xs text-[var(--color-text-tertiary)] leading-relaxed">
-          Choose which CV visitors can view and download from your public profile.
+          Who can download from your public profile?
         </p>
 
         <div className="flex flex-col gap-2">
