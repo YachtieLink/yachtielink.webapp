@@ -225,7 +225,7 @@ export default async function ProfilePage() {
       summary: gallerySummary(extended.gallery.length),
       count: extended.gallery.length,
       icon: <ImageIcon size={18} />,
-      editHref: '/app/profile/gallery',
+      editHref: '/app/profile/photos',
       visibilityKey: 'gallery',
       emptyPrompt: 'Show your work environment',
     },
