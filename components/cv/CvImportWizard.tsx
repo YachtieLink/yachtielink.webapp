@@ -87,11 +87,12 @@ import { StepPersonal } from '@/components/cv/steps/StepPersonal'
 import { StepExperience } from '@/components/cv/steps/StepExperience'
 import { StepLandExperience } from '@/components/cv/steps/StepLandExperience'
 import { StepQualifications } from '@/components/cv/steps/StepQualifications'
+import type { WizardCert } from '@/components/cv/steps/StepQualifications'
 import { StepExtras } from '@/components/cv/steps/StepExtras'
 import { StepReview } from '@/components/cv/steps/StepReview'
 import type {
   ParsedCvData, ParsedPersonal, ParsedLanguage, ParsedLandEmployment,
-  ConfirmedYacht, ConfirmedCert, ConfirmedEducation,
+  ConfirmedYacht, ConfirmedEducation,
   ConfirmedImportData, ConfirmedPersonal, SaveStats, ParsedSocialMedia,
 } from '@/lib/cv/types'
 
@@ -107,7 +108,7 @@ function buildImportData(opts: {
   confirmedLanguages: ParsedLanguage[]
   confirmedYachts: ConfirmedYacht[]
   confirmedLandJobs: ParsedLandEmployment[]
-  confirmedCerts: ConfirmedCert[]
+  confirmedCerts: WizardCert[]
   confirmedEducation: ConfirmedEducation[]
   skills: string[]
   hobbies: string[]
@@ -178,7 +179,7 @@ export function CvImportWizard({
   const [confirmedLanguages, setConfirmedLanguages] = useState<ParsedLanguage[]>([])
   const [confirmedYachts, setConfirmedYachts] = useState<ConfirmedYacht[]>([])
   const [confirmedLandJobs, setConfirmedLandJobs] = useState<ParsedLandEmployment[]>([])
-  const [confirmedCerts, setConfirmedCerts] = useState<ConfirmedCert[]>([])
+  const [confirmedCerts, setConfirmedCerts] = useState<WizardCert[]>([])
   const [confirmedEducation, setConfirmedEducation] = useState<ConfirmedEducation[]>([])
   const [skills, setSkills] = useState<string[]>(existingSkills)
   const [hobbies, setHobbies] = useState<string[]>(existingHobbies)
