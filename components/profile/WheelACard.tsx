@@ -21,7 +21,7 @@ const MILESTONE_CONFIG = [
   { key: 'hasYacht' as const, label: 'At least one yacht added',    href: '/app/profile' },
   { key: 'bioSet'   as const, label: 'Bio written',                 href: '/app/about/edit' },
   { key: 'hasCert'  as const, label: 'At least one certification',  href: '/app/certification/new' },
-  { key: 'hasPhoto' as const, label: 'Profile photo uploaded',      href: '/app/profile/photo' },
+  { key: 'hasPhoto' as const, label: 'Profile photo uploaded',      href: '/app/profile/photos' },
 ]
 
 export function WheelACard({ milestones }: WheelACardProps) {
