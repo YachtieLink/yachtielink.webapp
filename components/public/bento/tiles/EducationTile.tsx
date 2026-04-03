@@ -10,7 +10,7 @@ interface EducationTileProps {
 }
 
 export function EducationTile({ education, handle }: EducationTileProps) {
-  const shown = education.slice(0, 2)
+  const shown = education.slice(0, 4)
   const remaining = education.length - shown.length
 
   return (

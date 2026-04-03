@@ -185,7 +185,7 @@ export function PublicProfileContent({
   return (
     // ── Dual-mode layout with accent CSS vars ────────────────────────────
     <div
-      className="flex flex-col"
+      className="flex flex-col md:max-w-3xl md:mx-auto w-full"
       style={{
         '--accent-500': resolvedAccent[500],
         '--accent-600': resolvedAccent[600],
@@ -226,10 +226,12 @@ export function PublicProfileContent({
 
       {/* ── Mutual Colleagues (2nd-degree social proof) ─────────────── */}
       {isLoggedIn && !isOwnProfile && mutualColleagues.length > 0 && (
-        <MutualColleagues
-          profileFirstName={firstName}
-          mutuals={mutualColleagues}
-        />
+        <div className="max-w-[960px] mx-auto w-full">
+          <MutualColleagues
+            profileFirstName={firstName}
+            mutuals={mutualColleagues}
+          />
+        </div>
       )}
 
       {/* ── Content — switches based on active view mode ─────────────── */}

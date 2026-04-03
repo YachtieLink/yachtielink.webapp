@@ -28,20 +28,20 @@ export function ContactRow({
 
   if (!hasAny) return null
 
-  // Match Rich Portfolio styling exactly
-  const iconClass = "flex items-center justify-center w-10 h-10 rounded-full bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors"
+  const iconClass = "flex items-center justify-center gap-2 w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2.5 rounded-full md:rounded-xl bg-[var(--color-surface-raised)] text-[var(--color-text-secondary)] hover:text-[var(--accent-500,#14b8a6)] transition-colors"
+  const labelClass = "hidden md:inline text-sm font-medium"
 
   if (onTap) {
     return (
       <button onClick={onTap} className="flex gap-3">
         {showEmail && email && (
-          <span className={iconClass}><Mail size={18} /></span>
+          <span className={iconClass}><Mail size={18} /><span className={labelClass}>Email</span></span>
         )}
         {showPhone && phone && (
-          <span className={iconClass}><Phone size={18} /></span>
+          <span className={iconClass}><Phone size={18} /><span className={labelClass}>Phone</span></span>
         )}
         {showWhatsapp && whatsapp && (
-          <span className={iconClass}><WhatsAppIcon size={18} /></span>
+          <span className={iconClass}><WhatsAppIcon size={18} /><span className={labelClass}>WhatsApp</span></span>
         )}
       </button>
     )
@@ -55,12 +55,12 @@ export function ContactRow({
           className={iconClass}
           aria-label="Email"
         >
-          <Mail size={18} />
+          <Mail size={18} /><span className={labelClass}>Email</span>
         </a>
       )}
       {showPhone && phone && (
         <a href={`tel:${phone}`} className={iconClass} aria-label="Phone">
-          <Phone size={18} />
+          <Phone size={18} /><span className={labelClass}>Phone</span>
         </a>
       )}
       {showWhatsapp && whatsapp && (
@@ -71,7 +71,7 @@ export function ContactRow({
           className={iconClass}
           aria-label="WhatsApp"
         >
-          <WhatsAppIcon size={18} />
+          <WhatsAppIcon size={18} /><span className={labelClass}>WhatsApp</span>
         </a>
       )}
     </div>

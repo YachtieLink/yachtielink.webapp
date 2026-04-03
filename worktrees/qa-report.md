@@ -371,3 +371,173 @@ _None._
 - **[UX/pre-existing]** `components/cv/CvPreview.tsx:155` — `border-l-2` on CV endorsement excerpts. May be intentional for blockquote styling but should be reviewed.
 - **[DEBT]** `components/insights/UpgradeCTA.tsx` — Feature list is hardcoded; needs manual update if Pro features change.
 - **[UX/pre-existing]** `--color-teal-200` has no dark mode override — garish in dark mode.
+
+---
+
+## Session 7 — Lane 1 QA (fix/desktop-responsiveness)
+
+**Tester:** Claude Code (Opus) — Tester
+**Date:** 2026-04-04
+**Session:** sessions/rally-009-session-7
+**Lane tested:** Lane 1 (fix/desktop-responsiveness, yl-wt-1)
+**Verdict:** PASS
+
+### Worker changes (4 files)
+- `app/globals.css` — CSS variable fix for `--tab-bar-height`
+- `app/(protected)/app/more/page.tsx` — background color fix
+- `components/insights/UpgradeCTA.tsx` — max-width, pointer-events fix
+- `components/ui/BottomSheet.tsx` — desktop centering, padding fix
+
+### Tester fixes (7 files, directed by founder during live QA)
+- `components/public/HeroSection.tsx` — responsive hero: `center top` positioning, `md:!h-[calc(100vh-10rem)]`, `md:!max-h-[800px]`
+- `components/public/PublicProfileContent.tsx` — iPad-width constraint `md:max-w-3xl md:mx-auto`, mutual colleagues alignment
+- `components/public/ContactRow.tsx` — desktop labels (Email, Phone, WhatsApp text next to icons)
+- `components/public/bento/tiles/CertsTile.tsx` — chip stretching fix (`flex-1` to `content-start`), maxShow 4 to 6
+- `components/public/bento/tiles/EducationTile.tsx` — increased limit to 4
+- `lib/bento/templates/classic.ts` — staggered desktop grid areas (photo/content alternating sides)
+- `components/public/layouts/RichPortfolioLayout.tsx` — contact row `justify-between`
+
+### Tested (every input -> output pair)
+
+| # | Feature | Input | Expected Output | Actual | Status |
+|---|---------|-------|-----------------|--------|--------|
+| 1 | Hero image desktop | View Charlotte at 1280px | iPad-width hero, `center top`, no head crop | Hero centered, head fully visible, margins L/R | pass |
+| 2 | Hero image mobile | View Charlotte at 375px | Full-width hero, 70vh, face visible | Correct | pass |
+| 3 | Hero image tablet | View Charlotte at 768px | Full-width hero at iPad breakpoint | Correct, transitions to desktop height | pass |
+| 4 | Hero no-photo fallback | View James (no photo) | Gradient placeholder | Gray gradient, correct sizing | pass |
+| 5 | Bento grid stagger desktop | Charlotte rich portfolio 1280px | Content/photo tiles alternate L-R | About(L)+Photo(R), Photo(L)+Exp(R), Endorse(L)+Photo(R), Photo(L)+Edu(R), Skills(L)+Interests(R) | pass |
+| 6 | Bento grid mobile | Charlotte rich portfolio 375px | Single-column stack | All tiles stack vertically | pass |
+| 7 | Cert chips desktop | Charlotte certs 1280px | Inline chips, no stretching | 6 chips, proper sizing | pass |
+| 8 | Cert chips mobile | Charlotte certs 375px | Inline chips, no stretching | Proper sizing | pass |
+| 9 | Education limit | Charlotte education 1280px | Up to 4 entries | All 3 visible (WSET, Butler Academy, Cape Town) | pass |
+| 10 | Contact row desktop | Charlotte 1280px | Icons + text labels, justify-between | Email/Phone/WhatsApp with labels, spread | pass |
+| 11 | Contact row mobile | Charlotte 375px | Icon-only | Icons only, compact | pass |
+| 12 | Normal portfolio desktop | James 1280px | Single-column, constrained | Clean, no stretching | pass |
+| 13 | More/Settings page | /app/more at 1280px | Sand background, sidebar visible | Clean, sidebar persistent | pass |
+| 14 | UpgradeCTA pointer-events | Insights as non-Pro (Olivia) 1280px | CTA visible, sidebar clickable | CTA in content area, sidebar works | pass |
+| 15 | Sidebar navigation | Click Network from Insights | Navigate to /app/network | Works, not blocked | pass |
+
+### Fixed by tester
+
+| # | File | Severity | Issue | Fix applied |
+|---|------|----------|-------|-------------|
+| 1 | HeroSection.tsx | HIGH | Hero image head cropping on desktop | `center top`, `calc(100vh-10rem)` height, `max-h-[800px]` |
+| 2 | PublicProfileContent.tsx | HIGH | Content full-width on desktop | `md:max-w-3xl md:mx-auto` |
+| 3 | classic.ts | MED | Bento grid photos all on left | Staggered grid-template-areas |
+| 4 | CertsTile.tsx | MED | Cert chips stretched vertically | `flex-1` to `content-start` |
+| 5 | ContactRow.tsx | MED | Icon-only contact row sparse on desktop | Text labels on md+ |
+| 6 | EducationTile.tsx | LOW | Only 2 education entries | Limit to 4 |
+| 7 | CertsTile.tsx | LOW | Only 4 certs shown | maxShow to 6 |
+| 8 | RichPortfolioLayout.tsx | LOW | Contact row left-aligned | `justify-between` |
+
+### Console Errors
+None.
+
+### Backlog items created
+- `sprints/backlog/hero-dual-focal-point.md` — Per-breakpoint focal points + auto face detection
+
+---
+
+## Session 7 — Lane 3 QA (fix/settings-cross-cutting)
+
+**Tester:** Claude Code (Opus) — Tester
+**Date:** 2026-04-04
+**Session:** sessions/rally-009-session-7
+**Lane tested:** Lane 3 (fix/settings-cross-cutting, yl-wt-3)
+**Verdict:** PASS
+
+### Tested (every input -> output pair)
+
+| # | Feature | Input | Expected Output | Actual | Status |
+|---|---------|-------|-----------------|--------|--------|
+| 1 | Visibility sublabel — Bio | /app/profile, Bio toggle | "Your biography and summary on your public profile" | Correct | pass |
+| 2 | Visibility sublabel — Skills | /app/profile, Skills toggle | "Your skill tags on your public profile" | Correct | pass |
+| 3 | Visibility sublabel — Hobbies | /app/profile, Hobbies toggle | "Your interests and hobbies on your public profile" | Correct | pass |
+| 4 | Visibility sublabel — Experience | /app/profile, Experience toggle | "Your yacht positions and date ranges on your public profile" | Correct | pass |
+| 5 | Visibility sublabel — Certs | /app/profile, Certs toggle | "Your qualifications and expiry dates on your public profile" | Correct | pass |
+| 6 | Visibility sublabel — Profile Photo | /app/profile, Photo toggle | "Your profile photo visible to public visitors" | Correct | pass |
+| 7 | Visibility sublabel — Gallery | /app/profile, Gallery toggle | "Your work photos on your public profile" | Correct | pass |
+| 8 | Languages — no toggle | /app/profile, Languages row | No toggle (no DB gating) | Chevron only, no toggle — correct | pass |
+| 9 | Back nav — Settings sub-page | /app/more/account | "< Settings" back label | Correct | pass |
+| 10 | Back nav — Saved profiles | /app/network/saved | "< Network" back label | Correct | pass |
+| 11 | Back nav — Endorsement request | /app/endorsement/request | "< Network" back label | Correct | pass |
+| 12 | Skeleton — Network | loading.tsx review | Navy-200 accordion-shaped pulses | Content-shaped, navy-colored | pass |
+| 13 | Skeleton — Insights | loading.tsx review | Coral-200 metric card pulses | Content-shaped, coral-colored | pass |
+| 14 | Skeleton — More | loading.tsx review | Sand-300 settings row pulses | Content-shaped, sand-colored | pass |
+| 15 | Skeleton — Endorsement request | loading.tsx review (NEW file) | Navy-200 yacht accordion pulses | New file, content-shaped, navy-colored | pass |
+
+### Console Errors
+None.
+
+### Fixed by tester
+None needed — all worker changes clean.
+
+### Discovered Issues (pre-existing, from reviewer)
+- **[DEBT]** `ProfileSectionGrid.tsx`, `SectionManager.tsx` — dead code
+- **[DEBT]** Languages visibility toggle missing (no DB gating)
+- **[DEBT]** `/app/network/saved/loading.tsx` — generic skeleton, not navy-colored
+
+---
+
+## Session 7 — Cross-Lane Verification
+
+- Lanes 1 and 3 have no shared files — zero overlap confirmed
+- Lane 2 blocked on worker fixes — deferred
+- PageHeader label change in L3 (`more` to `Settings`) passively benefits L2 roadmap page
+- Ghost claim flow blocker: previously tested, confirmed by founder
+
+---
+
+## Session 7 — Lane 2 QA (feat/roadmap-feedback)
+
+**Tester:** Claude Code (Opus) — Tester
+**Date:** 2026-04-04
+**Session:** sessions/rally-009-session-7
+**Lane tested:** Lane 2 (feat/roadmap-feedback, yl-wt-2)
+**Verdict:** PASS (migration applied, all DB ops verified)
+
+### Tested (every input -> output pair)
+
+| # | Feature | Input | Expected Output | Actual | Status |
+|---|---------|-------|-----------------|--------|--------|
+| 1 | 3-tab layout | Navigate to /app/more/roadmap | Roadmap / Requests / Released tabs | All 3 tabs render, segment control works | pass |
+| 2 | Roadmap tab — In Progress | View Roadmap tab | 3 in-progress features | Endorsement writing assist, Smart cert matching, Network redesign | pass |
+| 3 | Roadmap tab — Next | View Roadmap tab | 2 next features | Crew search — Pro, Direct messaging | pass |
+| 4 | Roadmap tab — Committed | View Roadmap tab | 2 committed features | Yacht reviews, AI profile enhancement | pass |
+| 5 | Requests tab — empty state | Click Requests tab | CTA + empty state | "No feature requests yet" + "Submit a request" button | pass |
+| 6 | Requests tab — sort controls | View Requests tab | Most Voted / Newest | Both sort options visible | pass |
+| 7 | Suggest form — structure | Navigate to /app/more/roadmap/suggest | Title, Description, Category, Submit | All fields present with character counters (0/100, 0/1000) | pass |
+| 8 | Suggest form — validation | Empty title | Submit disabled | Button disabled until title >= 5 chars | pass |
+| 9 | Suggest form — category chips | View categories | 5 chips | Profile, Network, CV, Insights, General — General default | pass |
+| 10 | Suggest form — back nav | Check back link | "< Feature Roadmap" | Correct | pass |
+| 11 | Roadmap page — back nav | Check back link | "< More" | Shows "< More" (will become "< Settings" after L3 merge) | pass |
+| 12 | Feature submission | Insert via Supabase SDK | Row created with user_id | SUCCESS — row inserted, RLS enforced | pass |
+| 13 | Feature listing | SELECT from feature_suggestions | Return rows | SUCCESS — 0 rows (empty table), no errors | pass |
+| 14 | Voting — insert | Insert vote for suggestion | vote_count increments via trigger | SUCCESS — count went from 0 to 1 | pass |
+| 15 | Voting — remove | Delete vote for suggestion | vote_count decrements via trigger | SUCCESS — count went from 1 to 0 | pass |
+| 16 | Delete suggestion | Delete own suggestion | Row removed, RLS allows | SUCCESS — cleaned up | pass |
+| 17 | RLS — unauthenticated insert | Insert without auth | Rejected | RLS policy blocks correctly | pass |
+| 15 | Sand section color | All roadmap pages | Sand wayfinding | Correct throughout | pass |
+
+### DB Operations (post-migration)
+
+All DB operations verified via Supabase SDK:
+- **Insert suggestion:** SUCCESS — row created with correct user_id
+- **Auto-vote + trigger:** SUCCESS — vote_count incremented from 0 to 1
+- **Remove vote + trigger:** SUCCESS — vote_count decremented from 1 to 0
+- **Delete suggestion:** SUCCESS — cleanup works
+- **RLS enforcement:** Unauthenticated inserts correctly rejected
+
+### Console Errors
+None (after migration applied).
+
+### Fixed by tester
+None needed for UI code.
+
+---
+
+## Session 7 — Overall Verdict
+
+**Lane 1 (Desktop Responsiveness): PASS**
+**Lane 3 (Settings Cross-Cutting): PASS**
+**Lane 2 (Roadmap Feedback): PASS** — UI + DB operations verified after migration applied

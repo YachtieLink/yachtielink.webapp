@@ -280,6 +280,13 @@ html, body { overscroll-behavior: none; }
   padding-bottom: var(--safe-area-bottom);
 }
 
+/* Reset tab-bar-height on desktop — sidebar replaces bottom nav */
+@media (min-width: 768px) {
+  :root {
+    --tab-bar-height: 0rem;
+  }
+}
+
 /* Semi-transparent card for tinted page backgrounds */
 .card-soft {
   background: rgba(255, 255, 255, 0.65);

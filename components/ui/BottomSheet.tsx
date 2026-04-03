@@ -64,7 +64,7 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
                 ? { duration: 0 }
                 : springSnappy
             }
-            className="fixed bottom-0 left-0 right-0 z-50 flex max-h-[90dvh] flex-col rounded-t-2xl bg-[var(--color-surface)] shadow-xl"
+            className="fixed bottom-0 left-0 right-0 z-50 flex max-h-[90dvh] flex-col rounded-t-2xl bg-[var(--color-surface)] shadow-xl md:left-[calc(50%_-_248px)] md:right-auto md:w-[560px] md:rounded-2xl md:bottom-4"
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-3 pb-1">
@@ -89,7 +89,7 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
             )}
 
             {/* Scrollable content */}
-            <div className="overflow-y-auto pb-tab-bar px-4">
+            <div className="overflow-y-auto pb-6 px-4">
               {children}
               <div className="h-6" aria-hidden="true" />
             </div>

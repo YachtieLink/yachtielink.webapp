@@ -10,7 +10,7 @@ interface CertsTileProps {
 }
 
 export function CertsTile({ certifications, handle }: CertsTileProps) {
-  const maxShow = 4
+  const maxShow = 6
   const shown = certifications.slice(0, maxShow)
   const remaining = certifications.length - shown.length
 
@@ -20,7 +20,7 @@ export function CertsTile({ certifications, handle }: CertsTileProps) {
         <Shield size={14} className="text-amber-500" />
         <span className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">My Certifications</span>
       </div>
-      <div className="flex flex-wrap gap-1.5 flex-1">
+      <div className="flex flex-wrap gap-1.5 content-start">
         {shown.map((cert) => {
           const name = cert.certification_types?.name ?? cert.custom_cert_name ?? 'Certificate'
           return (
@@ -38,12 +38,14 @@ export function CertsTile({ certifications, handle }: CertsTileProps) {
           </span>
         )}
       </div>
-      <Link
-        href={`/u/${handle}/certifications`}
-        className="mt-2 text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:underline"
-      >
-        See all &rarr;
-      </Link>
+      {remaining > 0 && (
+        <Link
+          href={`/u/${handle}/certifications`}
+          className="mt-auto pt-2 text-xs font-medium text-[var(--accent-500,#14b8a6)] hover:underline"
+        >
+          +{remaining} more &rarr;
+        </Link>
+      )}
     </div>
   )
 }
