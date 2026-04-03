@@ -15,6 +15,7 @@ import {
 import type { ProfilePhoto, Hobby, Education, Skill, GalleryItem, MutualColleague } from '@/lib/queries/types'
 import { PublicProfileContent } from '@/components/public/PublicProfileContent'
 import { isProFromRecord } from '@/lib/stripe/pro-shared'
+import { ReportButton } from '@/components/ui/ReportButton'
 
 interface Props {
   params: Promise<{ handle: string }>
@@ -165,6 +166,11 @@ export default async function PublicProfilePage({ params }: Props) {
         age={age}
         viewerIsPro={viewerIsPro}
       />
+      {viewer && !viewerRelationship.isOwnProfile && (
+        <div className="max-w-[680px] mx-auto px-4 pb-28 flex justify-end">
+          <ReportButton targetType="profile" targetId={user.id} />
+        </div>
+      )}
     </div>
   )
 }

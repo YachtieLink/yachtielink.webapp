@@ -85,7 +85,7 @@ export function HeroSection({
     `}</style>
     {/* Animated hero — renders on all breakpoints (single-column layout) */}
     <motion.div
-      className="relative shrink-0 overflow-hidden"
+      className="relative shrink-0 overflow-hidden md:max-h-[28rem] lg:max-h-[32rem]"
       style={{ height: heroHeight, marginTop: 12, marginLeft: marginInline, marginRight: marginInline, borderRadius }}
     >
       {/* Single hero photo — primary profile photo only */}

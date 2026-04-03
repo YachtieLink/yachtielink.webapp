@@ -73,6 +73,7 @@ export function EndorsementsPageClient({ endorsements: initial, isOwner }: Endor
           content={end.content}
           isPinned={end.is_pinned}
           onPin={isOwner ? (pinned) => handlePin(end.id, pinned) : undefined}
+          endorsementId={isOwner ? null : end.id}
         />
       ))}
     </div>

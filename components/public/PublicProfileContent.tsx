@@ -458,7 +458,7 @@ function ProfileModeContent({
           {/* My Endorsements */}
           {sectionVisible(sectionVisibility, 'endorsements', endorsements.length > 0) && (
             <div id="section-endorsements">
-              <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} onNavigate={isLoggedIn ? (url, label) => setPendingNav({ url, label }) : undefined} />
+              <EndorsementsSection endorsements={endorsements} mutualEndorserCount={mutualEndorserCount} handle={user.handle} onNavigate={isLoggedIn ? (url, label) => setPendingNav({ url, label }) : undefined} isOwner={!isLoggedIn || isOwnProfile} />
             </div>
           )}
 

@@ -12,9 +12,11 @@ interface EndorsementsSectionProps {
   mutualEndorserCount: number
   handle: string
   onNavigate?: (url: string, label: string) => void
+  /** When true, report buttons are hidden (profile owner or logged-out viewer) */
+  isOwner?: boolean
 }
 
-export function EndorsementsSection({ endorsements, mutualEndorserCount, handle, onNavigate }: EndorsementsSectionProps) {
+export function EndorsementsSection({ endorsements, mutualEndorserCount, handle, onNavigate, isOwner }: EndorsementsSectionProps) {
   return (
     <ScrollReveal>
       <ProfileAccordion
@@ -39,6 +41,7 @@ export function EndorsementsSection({ endorsements, mutualEndorserCount, handle,
                 date={end.created_at}
                 content={end.content}
                 onNavigate={onNavigate}
+                endorsementId={isOwner ? null : end.id}
               />
             </StaggeredItem>
           ))}
