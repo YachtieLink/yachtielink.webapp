@@ -155,7 +155,7 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
   if (profiles.length === 0) {
     return (
       <>
-        <PageHeader backHref="/app/more" title="Saved Profiles" />
+        <PageHeader backHref="/app/network" title="Saved Profiles" />
         <EmptyState
           icon="🔖"
           title="No saved profiles yet"
@@ -167,7 +167,7 @@ export function SavedProfilesClient({ initialProfiles, initialFolders }: Props) 
 
   return (
     <>
-      <PageHeader backHref="/app/more" title="Saved Profiles" count={profiles.length} />
+      <PageHeader backHref="/app/network" title="Saved Profiles" count={profiles.length} />
 
       {/* Folder filter pills */}
       <div className="flex gap-2 overflow-x-auto pb-1">

@@ -231,7 +231,7 @@ export default async function YachtDetailPage({ params }: PageProps) {
 
       <div className="pt-5">
         <PageHeader
-          backHref="/app/profile"
+          backHref="/app/network"
           title={yacht.name}
           subtitle={metaParts.length > 0 ? metaParts.join(' · ') : undefined}
           actions={

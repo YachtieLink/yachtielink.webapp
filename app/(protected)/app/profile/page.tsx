@@ -109,6 +109,7 @@ export default async function ProfilePage() {
       icon: <User size={18} />,
       editHref: '/app/about/edit',
       visibilityKey: 'about',
+      visibilityLabel: 'Your biography and summary on your public profile',
       emptyPrompt: 'Tell your story — captains want to know who you are',
     },
     {
@@ -119,6 +120,7 @@ export default async function ProfilePage() {
       icon: <Wrench size={18} />,
       editHref: '/app/skills/edit',
       visibilityKey: 'skills',
+      visibilityLabel: 'Your skill tags on your public profile',
       emptyPrompt: 'Add skills that set you apart from the crew',
     },
     {
@@ -129,6 +131,7 @@ export default async function ProfilePage() {
       icon: <Heart size={18} />,
       editHref: '/app/hobbies/edit',
       visibilityKey: 'hobbies',
+      visibilityLabel: 'Your interests and hobbies on your public profile',
       emptyPrompt: 'Show your personality beyond the deck',
     },
     {
@@ -183,6 +186,7 @@ export default async function ProfilePage() {
       icon: <Anchor size={18} />,
       editHref: '/app/attachment',
       visibilityKey: 'experience',
+      visibilityLabel: 'Your yacht positions and date ranges on your public profile',
       emptyPrompt: 'Add a yacht to start building your graph',
     },
     {
@@ -193,6 +197,7 @@ export default async function ProfilePage() {
       icon: <Award size={18} />,
       editHref: '/app/certification/new',
       visibilityKey: 'certifications',
+      visibilityLabel: 'Your qualifications and expiry dates on your public profile',
       emptyPrompt: 'Add certifications — captains search by certs first',
     },
     {
@@ -216,6 +221,7 @@ export default async function ProfilePage() {
       icon: <Camera size={18} />,
       editHref: '/app/profile/photos',
       visibilityKey: 'photos',
+      visibilityLabel: 'Your profile photo visible to public visitors',
       emptyPrompt: 'Add a photo to make it yours',
     },
     {
@@ -226,6 +232,7 @@ export default async function ProfilePage() {
       icon: <ImageIcon size={18} />,
       editHref: '/app/profile/photos',
       visibilityKey: 'gallery',
+      visibilityLabel: 'Your work photos on your public profile',
       emptyPrompt: 'Show your work environment',
     },
   ]

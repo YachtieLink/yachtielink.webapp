@@ -34,7 +34,7 @@ const pathToLabel: Record<string, string> = {
   network: 'Network',
   cv: 'CV',
   insights: 'Insights',
-  more: 'More',
+  more: 'Settings',
   yacht: 'Yacht',
 }
 
