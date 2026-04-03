@@ -149,7 +149,7 @@ export default function MorePage() {
   }
 
   return (
-    <PageTransition className="flex flex-col pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-sand-50)]">
+    <PageTransition className="flex flex-col pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-sand-100)]">
       <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)] px-1 pt-2 pb-1">Settings</h1>
 
       {/* ── ACCOUNT ────────────────────────────────── */}

@@ -51,8 +51,8 @@ export function UpgradeCTA({ foundingSlotsLeft = null }: Props) {
   }
 
   return (
-    <div className="fixed bottom-[var(--tab-bar-height,64px)] left-0 right-0 z-40">
-      <div className="bg-white/95 dark:bg-[var(--color-surface)]/95 backdrop-blur-lg border-t border-[var(--color-border)] px-4 pb-[env(safe-area-inset-bottom,0px)]">
+    <div className="fixed bottom-[var(--tab-bar-height,64px)] left-0 right-0 z-40 pointer-events-none">
+      <div className="pointer-events-auto bg-white/95 dark:bg-[var(--color-surface)]/95 backdrop-blur-lg border-t border-[var(--color-border)] px-4 pb-[env(safe-area-inset-bottom,0px)] md:max-w-2xl md:mx-auto md:rounded-t-2xl md:border-x md:shadow-lg">
         {/* Founding member badge */}
         {hasFoundingSlots && (
           <p className="text-xs text-[var(--color-teal-700)] dark:text-[var(--color-teal-400)] text-center pt-2 font-medium">

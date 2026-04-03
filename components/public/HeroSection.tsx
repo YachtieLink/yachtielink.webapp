@@ -67,7 +67,7 @@ export function HeroSection({
   viewModeToggle,
   scrimPreset: scrimPresetKey,
   focalX = 50,
-  focalY = 30,
+  focalY = 15,
 }: HeroSectionProps) {
   const scrim = scrimPresets[scrimPresetKey ?? 'dark']
   const { scrollY } = useScroll()
@@ -83,9 +83,9 @@ export function HeroSection({
         90% { opacity: 1; box-shadow: 0 0 8px rgba(74,222,128,0.5); }
       }
     `}</style>
-    {/* Animated hero — renders on all breakpoints (single-column layout) */}
+    {/* Animated hero — iPad-width, centered on desktop */}
     <motion.div
-      className="relative shrink-0 overflow-hidden md:max-h-[28rem] lg:max-h-[32rem]"
+      className="relative shrink-0 overflow-hidden md:!h-[calc(100vh-10rem)] md:!max-h-[800px]"
       style={{ height: heroHeight, marginTop: 12, marginLeft: marginInline, marginRight: marginInline, borderRadius }}
     >
       {/* Single hero photo — primary profile photo only */}
@@ -98,7 +98,7 @@ export function HeroSection({
             priority
             sizes="100vw"
             className="object-cover"
-            style={{ objectPosition: `${focalX}% ${focalY}%` }}
+            style={{ objectPosition: 'center top' }}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-500" />
