@@ -1,6 +1,7 @@
 ---
 title: Social Links Add/Remove from Profile
-status: idea
+status: merged
+merged_into: social-links-add-prompt.md
 source: founder (QA session, 2026-04-03)
 priority: medium
 modules: [profile]

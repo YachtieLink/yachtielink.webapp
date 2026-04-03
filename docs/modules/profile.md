@@ -9,6 +9,10 @@ phase: 1B
 
 One-line: Private profile hub with photo upload, identity card, strength meter, section grid, AI summary, contact settings, social links, section visibility controls, and saved profiles with folders.
 
+## Recent Activity (most recent first)
+
+**2026-04-03** — Rally 009 Session 6, Lane 4 (chore/pro-upsell-consistency): Created `ProUpsellCard` — shared upgrade CTA component with 3 variants (`inline`/`banner`/`card`), respects section color wayfinding via `context` prop (`getSectionTokens`), enforces "Upgrade to Crew Pro" copy. Retrofitted photos page (×2), certs page, CvActions. Insights `UpgradeCTA` intentionally left as-is (handles Stripe checkout). Barrel export added to `components/ui/index.ts`. Design system `page-layout.md` appended with Pro Upsell Pattern section.
+
 ## Current State
 
 - Profile page: working — server-rendered dashboard at `/app/profile` showing hero card, photo strip, personal details card (age/nationality/smoking/tattoos/license/travel docs), strength meter, section grid with chip previews for skills/hobbies, and empty-state prompts

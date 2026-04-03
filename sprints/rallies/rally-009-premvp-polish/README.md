@@ -17,13 +17,13 @@
 
 | Session | Focus | Lanes | Effort | Deps | Status |
 |---------|-------|-------|--------|------|--------|
-| **1** | Bugs + tech debt + quick wins | 3 | ~4h | None — start immediately | ✅ Complete (branches ready to push) |
-| **2** | Data integrity + CV restore gaps | 3 | ~6h | Session 1 merged | Ready |
-| **3** | Network tab + Profile redesign | 2 | ~8h | Session 2 merged | Ready (grill-me done) |
-| **4** | Insights + Photos + CV tab + More tab | 3 | ~10h | Session 3 merged | Ready (grill-me done) |
-| **5** | Endorsement flow + LLM defense | 2 | ~6h | Session 2 merged | Ready (grill-me done) |
-| **6** | Cert registry + Reporting + Pro upsell | 3 | ~8h | Session 5 merged (LLM layer) | Ready (grill-me done) |
-| **7** | Desktop polish + Roadmap/feedback + Settings + Cross-cutting | 3 | ~8h | ALL prior sessions merged (final polish) | Ready (grill-me done) |
+| **1** | Bugs + tech debt + quick wins | 3 | ~4h | None | ✅ Complete (PR #155 chain) |
+| **2** | Data integrity + CV restore gaps | 3 | ~6h | Session 1 merged | ✅ Complete (PRs #156-158) |
+| **3** | Network tab + Profile redesign | 2 | ~8h | Session 2 merged | ✅ Complete (PR #159) |
+| **4** | Insights + Photos + CV tab + More tab | 3 | ~10h | Session 3 merged | ✅ Complete (PR #159) |
+| **5** | Endorsement flow + LLM defense | 2 | ~6h | Session 2 merged | ✅ Complete (PR #159) |
+| **6** | Cert registry + Reporting + Transfer + Pro upsell | 4 | ~8h | Session 5 merged | 🔧 In progress (4 lanes building) |
+| **7** | Desktop polish + Roadmap/feedback + Settings + Cross-cutting | 3 | ~8h | ALL prior sessions merged | Queued |
 
 **Total estimated effort:** ~50h of worker time across 7 sessions.
 
@@ -100,24 +100,26 @@ Major redesigns. All grill-me decisions resolved. **See `session-3-tab-redesigns
 ## Dependency Graph
 
 ```
-Session 1 (bugs + debt) ←── no deps, start immediately ✅ DONE
+Session 1 (bugs + debt)             ✅ PR #155 chain
     ↓ merged
-Session 2 (data integrity + CV restore)
+Session 2 (data integrity + CV)     ✅ PRs #156-158
     ↓ merged
-Session 3 (Network + Profile)
+Session 3 (Network + Profile)       ✅ PR #159
     ↓ merged
-Session 4 (Insights + Photo + CV tab + More)
+Session 4 (Insights + Photo + More) ✅ PR #159
     ↓ merged
-Session 5 (Endorsement flow + LLM) ←── can start after Session 2 (parallel with 3-4 if no file overlap)
+Session 5 (Endorsement + LLM)       ✅ PR #159
     ↓ merged
-Session 6 (Cert registry + Reporting + Pro upsell)
-    ↓ merged
-Session 7 (Desktop + Roadmap + Settings + Cross-cutting) ←── LAST (touches everything)
-    ↓ merged
-Rally 007 — Launch QA ✅
+Session 6 (Cert + Report + Transfer + Upsell) 🔧 IN PROGRESS (4 lanes)
+    ↓
+Session 7 (Desktop + Roadmap + Settings)      ⏳ QUEUED
+    ↓
+Rally 010 — Frontend UX & Guidance
+    ↓
+Rally 007 — Launch QA (⚠️ spec needed)
 ```
 
-**All grill-me decisions resolved.** No sessions are blocked. Execute sequentially starting from Session 2.
+**Sessions 1-5 shipped.** Session 6 in progress (4 lanes building). Session 7 needs /grill-me for desktop responsiveness before building.
 
 ---
 
@@ -136,31 +138,30 @@ Rally 007 — Launch QA ✅
 | Social icons dedup | 1 | 3 | ✅ |
 | formatSeaTime collision | 1 | 3 | ✅ |
 | EndorsementsSection dead code | 1 | 3 | ✅ |
-| Non-yachting experience | 2 | 1 | Ready |
-| Overlapping yacht dates | 2 | 2 | Ready |
-| CV restore: trackOverwrite 7 fields (UX6a) | 2 | 3 | Ready |
-| CV restore: education dedup (UX6b) | 2 | 3 | Ready |
-| CV restore: languages merge (UX6c) | 2 | 3 | Ready |
-| CV restore: travel docs merge (UX6d) | 2 | 3 | Ready |
-| Network tab overhaul Phase 1 | 3 | 1 | Ready |
-| Profile page redesign 1-4 | 3 | 2 | Ready |
-| Insights tab Layer 1 | 4 | 1 | Ready |
-| Photo management unified | 4 | 2 | Ready |
-| CV tab redesign (output-only) | 4 | 3 | Ready |
-| More tab completion | 4 | 3 | Ready |
-| Endorsement writing assist | 5 | 1 | Ready |
-| LLM prompt injection defense | 5 | 1 | Ready |
-| Endorsement request redesign | 5 | 2 | Ready |
-| CV cert matching registry | 6 | 1 | Ready |
-| Reporting/flagging + duplicate yacht tool | 6 | 2 | Ready |
-| Transfer experience (yacht re-match) | 6 | 2 | Ready |
-| Bug reporter form | 6 | 2 | Ready |
-| Pro upsell consistency | 6 | 3 | Ready |
-| Desktop responsiveness audit | 7 | 1 | Ready |
-| Roadmap + feedback (in-app 3-tab) | 7 | 2 | Ready |
-| Visibility toggle sublabels | 7 | 3 | Ready |
-| Back navigation platform-wide | 7 | 3 | Ready |
-| Skeleton loading (new components) | 7 | 3 | Ready |
+| Non-yachting experience | 2 | 1 | ✅ (PR #158) |
+| Overlapping yacht dates | 2 | 2 | ✅ (PR #157) |
+| CV restore: trackOverwrite 7 fields (UX6a) | 2 | 3 | ✅ (PR #159) |
+| CV restore: education dedup (UX6b) | 2 | 3 | ✅ (PR #159) |
+| CV restore: languages merge (UX6c) | 2 | 3 | ✅ (PR #159) |
+| CV restore: travel docs merge (UX6d) | 2 | 3 | ✅ (PR #159) |
+| Network tab overhaul Phase 1 | 3 | 1 | ✅ (PR #159) |
+| Profile page redesign 1-4 | 3 | 2 | ✅ (PR #159) |
+| Insights tab Layer 1 | 4 | 1 | ✅ (PR #159) |
+| Photo management unified | 4 | 2 | ✅ (PR #159) |
+| CV tab redesign (output-only) | 4 | 3 | ✅ (PR #159) |
+| More tab completion | 4 | 3 | ✅ (PR #159) |
+| Endorsement writing assist | 5 | 1 | ✅ (PR #159) |
+| LLM prompt injection defense | 5 | 1 | ✅ (PR #159) |
+| Endorsement request redesign | 5 | 2 | ✅ (PR #159) |
+| CV cert matching registry | 6 | 1 | 🔧 Review passed |
+| Reporting/flagging + bug reporter | 6 | 2 | 🔧 Testing |
+| Experience transfer + endorsement visibility | 6 | 3 | 🔧 Testing |
+| Pro upsell consistency | 6 | 4 | 🔧 Testing |
+| Desktop responsiveness audit | 7 | 1 | Queued |
+| Roadmap + feedback (in-app 3-tab) | 7 | 2 | Queued |
+| Visibility toggle sublabels | 7 | 3 | Queued |
+| Back navigation platform-wide | 7 | 3 | Queued |
+| Skeleton loading (new components) | 7 | 3 | Queued |
 
 ---
 

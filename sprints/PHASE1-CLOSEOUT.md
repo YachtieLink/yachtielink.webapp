@@ -4,7 +4,7 @@
 
 **How to use this file:** This is the single source of truth for what's left. Work top to bottom. Check boxes as items complete. Read this at session start.
 
-**Last updated:** 2026-04-01
+**Last updated:** 2026-04-03
 
 ---
 
@@ -18,13 +18,18 @@ Sprint 12      ✅ Yacht graph foundation (wiring, navigation, yachts tab)
 Sprint 13 W0+1 ✅ Public header/footer, cookie banner
 Rally 005      ✅ Auth resilience (12 fixes)
 QA fixes       ✅ Settings IA, bug sweep, mobile fixes, stale cookies
+Rally 006      ✅ All items shipped (PRs #132-150)
+Rally 009 S1   ✅ Bugs + tech debt (PR #155 chain)
+Rally 009 S2   ✅ Land experience, sea time overlap, CV restore (PRs #156-158)
+Rally 009 S3-5 ✅ Network, Profile, Insights, Photos, CV, Settings, Endorsements, LLM (PR #159)
 
-→ Rally 006: COMPLETE. All items shipped (PRs #132-150).
 → Sprint 13: Code complete. Ops + legal blocked on founder.
-→ Ghost Profiles W1: Shipped (PRs #133, #143, #148). Claim flow needs E2E verification.
-→ NOW: Rally 009 — Pre-MVP Polish (4 sessions, 18 items). Session 1 ready to launch.
-→ THEN: Rally 007 — Launch QA full checklist
-→ THEN: Ops config + legal sign-off (founder)
+→ Ghost Profiles W1: Shipped (PRs #133, #143, #148). ⚠️ Claim flow UNTESTED — launch blocker.
+→ NOW: Rally 009 Session 6 — Cert registry, reporting, experience transfer, Pro upsell (4 lanes building).
+→ NEXT: Rally 009 Session 7 — Desktop polish, roadmap/feedback, settings, cross-cutting.
+→ THEN: Rally 010 — Frontend UX, product tour, cold states, coaching.
+→ THEN: Rally 007 — Launch QA full checklist (⚠️ no spec yet — needs creating).
+→ THEN: Ops config + legal sign-off (founder).
 → THEN: 🚀 Invite mode
 ```
 
@@ -77,51 +82,51 @@ See `sprints/rallies/rally-006-prelaunch/README.md` for full spec.
 
 See `sprints/rallies/rally-009-premvp-polish/README.md` for full spec. **7 sessions, 30 items.**
 
-**Session 1 — Bugs + Tech Debt (no deps, start immediately):**
-- [ ] Tab bar padding — content hidden behind bottom nav on ALL app pages
-- [ ] Interests chips responsive — verify PR #150 fix, fix if still broken
-- [ ] CV preview ghost join — verify PR #148 fix, fix if still broken
-- [ ] SavedProfileCard wiring — seaTimeDays + yachtCount props
-- [ ] Yacht prefix null type — "M/Y Unknown yacht" for null type
-- [ ] Ghost endorser card layout — asymmetry between ghost/non-ghost
-- [ ] Show home country on CV — wire toggle to CV output
-- [ ] Social platform config dedup — consolidate 2 configs
-- [ ] Social icons dedup — extract shared TikTok/X icons
-- [ ] formatSeaTime collision — consolidate 2 exports
-- [ ] EndorsementsSection dead code — fix types, remove dead code
+**Session 1 — Bugs + Tech Debt:** ✅ Complete (PR #155 chain)
+- [x] Tab bar padding — content hidden behind bottom nav on ALL app pages
+- [x] Interests chips responsive — verified + fixed
+- [x] CV preview ghost join — verified + fixed
+- [x] SavedProfileCard wiring — seaTimeDays + yachtCount props
+- [x] Yacht prefix null type — "M/Y Unknown yacht" for null type
+- [x] Ghost endorser card layout — asymmetry between ghost/non-ghost
+- [x] Show home country on CV — wire toggle to CV output
+- [x] Social platform config dedup — consolidate 2 configs
+- [x] Social icons dedup — extract shared TikTok/X icons
+- [x] formatSeaTime collision — consolidate 2 exports
+- [x] EndorsementsSection dead code — fix types, remove dead code
 
-**Session 2 — Data Integrity (after Session 1):**
-- [ ] Non-yachting experience — new table, save parsed data, wizard step, profile section
-- [ ] Overlapping yacht dates — union-based sea time, CV import validation
-- [ ] More tab IA prep — reorganize into 6 groups, sand wayfinding
+**Session 2 — Data Integrity:** ✅ Complete (PRs #156-158)
+- [x] Non-yachting experience — land_experience table, save parsed data, wizard step, profile + public display
+- [x] Overlapping yacht dates — union-based sea time calc, overlap detection in CV import
+- [x] More tab IA prep — reorganized into groups, sand wayfinding
 
-**Session 3 — Tab Redesigns (needs /grill-me):**
-- [ ] Network tab Phase 1 — unified yacht-grouped view, endorsement summary, empty states
-- [ ] Profile page redesign (issues 1-4) — teal wayfinding, compact list, empty states, grouped IA
+**Session 3 — Tab Redesigns:** ✅ Complete (PR #159)
+- [x] Network tab Phase 1 — yacht-grouped accordion, navy wayfinding, endorsement badges, yacht search
+- [x] Profile page redesign — 4-group compact list, tap-to-edit hero, strength ring, teal wayfinding
 
-**Session 4 — Insights + Photo (needs /grill-me):**
-- [ ] Insights tab Layer 1 — real analytics dashboard, move cert manager + subscription out
-- [ ] Photo management unification — merge 3 pages, focal point 3-format preview
-- [ ] More tab completion — receive cert manager + subscription, finalize IA
+**Session 4 — Insights + Photo + CV + Settings:** ✅ Complete (PR #159)
+- [x] Insights tab Layer 1 — Pro analytics dashboard (metrics, sparklines, WhoViewedYou), free tier career snapshot + coaching, coral wayfinding
+- [x] Photo management unification — profile photo + gallery unified, 3-format preview, focal point
+- [x] CV tab output-only — removed CvDetailsCard, education card → Profile, re-parse dialog, "Sharing" label
+- [x] More tab / Settings — 5-group IA (Account, Plan, App, Community, Legal), sand wayfinding, cert docs link
 
-**Session 5 — Endorsement Flow + LLM (needs /grill-me):**
-- [ ] Endorsement writing assist — LLM draft generation from both-sides context
-- [ ] LLM prompt injection defense — sanitize inputs, validate outputs, harden prompts
-- [ ] Endorsement request redesign — yacht-grouped, external-first, ghost suggestions
+**Session 5 — Endorsement Flow + LLM:** ✅ Complete (PR #159)
+- [x] Endorsement writing assist — gpt-4o-mini draft generation, "Help me start/finish writing"
+- [x] LLM prompt injection defense — sanitize.ts + prompt-guard.ts, hardened system prompts
+- [x] Endorsement request redesign — yacht-grouped, ghost suggestions inline, per-yacht invite, reminder logic
 
-**Session 6 — Data Quality + Safety (needs /grill-me):**
-- [ ] CV cert matching registry — 60 seed certs, fuzzy match, green/amber/blue tiers
-- [ ] Reporting/flagging foundation — report button on profiles, yachts, endorsements
-- [ ] Bug reporter form — in-app bug report page in More tab
-- [ ] Pro upsell consistency — standard component, retrofit across app
+**Session 6 — Data Quality + Safety + Transfer:** 🔧 In progress (4 lanes building)
+- [ ] CV cert matching registry — 60 seed certs, fuzzy match, green/amber/blue tiers (Lane 1 — review passed)
+- [ ] Reporting/flagging + bug reporter — report button, email alerts, bug report form (Lane 2 — testing)
+- [ ] Experience transfer + endorsement visibility — transfer API, dormant endorsements, colleague rebuild (Lane 3 — testing)
+- [ ] Pro upsell consistency — standard component, retrofit across app (Lane 4 — testing)
 
-**Session 7 — Polish + Feedback + Settings (needs /grill-me):**
+**Session 7 — Polish + Feedback + Settings (after Session 6):**
 - [ ] Desktop responsiveness audit — fix all pages at 1024-1920px
-- [ ] Roadmap + feedback mechanism — enhance roadmap, add Canny or voting
-- [ ] Visibility toggle clarity — sublabels explaining what each toggle controls
-- [ ] Display settings cleanup — remove scrim/accent/template pickers
-- [ ] Phone/WhatsApp split — separate fields for phone and WhatsApp
-- [ ] Attachment transfer — "Wrong yacht?" correction flow
+- [ ] Roadmap + feedback — in-app 3-tab (Roadmap / Feature Requests / Released)
+- [ ] Visibility toggle sublabels — explain what each toggle controls
+- [ ] Back navigation platform-wide — "← Network" not "← Back"
+- [ ] Skeleton loading for new Session 3-6 components
 
 **Grill-me:** One 60-min browser session covers ALL topics. See `rally-009-premvp-polish/GRILL-ME-AGENT-PROMPT.md` for the agent prompt. Run during Sessions 1-2 build time.
 

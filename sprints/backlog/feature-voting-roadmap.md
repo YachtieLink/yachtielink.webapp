@@ -1,6 +1,6 @@
 # Feature Voting & Public Roadmap
 
-**Status:** idea
+**Status:** covered by Rally 009 Session 7 Lane 2 (`session-7-polish-feedback.md` — in-app 3-tab roadmap + voting)
 **Priority guess:** P2 (community engagement + product signal — tells you what to build next)
 **Date captured:** 2026-04-02
 
