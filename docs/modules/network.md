@@ -1,6 +1,6 @@
 ---
 module: network
-updated: 2026-04-03
+updated: 2026-04-04
 status: shipped
 phase: 1A
 ---
@@ -104,6 +104,8 @@ Then fetches colleague profiles and yacht names in a second parallel batch. All 
 **2026-02-05** — D-028: Graph edges are created only by shared employment (colleagues) or verified in-person encounters (IRL connections). The graph must represent real-world overlap. — Ari
 
 ## Recent Activity
+
+**2026-04-04** — Rally 009 Session 7, Lane 3 (fix/settings-cross-cutting): `SavedProfilesClient.tsx` — back navigation changed from `/app/more` to `/app/network`. `app/(protected)/app/network/loading.tsx` — loading skeleton updated to navy-200 accordion-shaped pulse animation matching actual Network page layout. Known debt: `app/(protected)/app/network/saved/loading.tsx` still uses generic skeleton (captured in backlog: `saved-profiles-loading-skeleton`).
 
 **2026-04-03** — Rally 009 Session 6, Lane 3 (feat/experience-transfer): Network page and colleagues page updated to filter dormant endorsements. `.or('is_dormant.is.null,is_dormant.eq.false')` appended to queries in `app/(protected)/app/network/page.tsx` and `app/(protected)/app/network/colleagues/page.tsx`. Multiple `.or()` calls are ANDed in PostgREST (produces expected SQL: `WHERE (...) AND (is_dormant IS NULL OR is_dormant = false)`).
 

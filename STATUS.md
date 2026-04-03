@@ -2,13 +2,13 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-03 (Session 6 complete — 4 lanes built, reviewed, QA passed. Logged. Ready for commit/push/PRs.)
+**Last updated:** 2026-04-04 (Session 7 complete — 3 lanes built, reviewed, QA passed. Logged. Rally 009 fully complete. Ready for commit/push/PRs.)
 
 ---
 
 ## Current Phase
 
-**Phase 1B — final stretch.** All sprints (10-13) and Rally 006 complete. Ghost Profiles merged. Rally 009 Sessions 1-5 shipped. Session 6 in progress.
+**Phase 1B — final stretch.** All sprints (10-13) and Rally 006 complete. Ghost Profiles merged. Rally 009 all 7 sessions complete. Ready for Rally 010.
 
 ---
 
@@ -16,10 +16,11 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Sprint | Phase | Status | Focus |
 |--------|-------|--------|-------|
+| Rally 009 Session 7 | 1B | ✅ Logged — pending commit/push | Desktop responsiveness, in-app roadmap + feature requests, settings polish + cross-cutting. All 3 lanes built + reviewed + QA passed. |
 | Rally 009 Session 6 | 1B | ✅ Logged — pending commit/push | Cert registry, reporting/flagging, experience transfer, Pro upsell. All 4 lanes built + reviewed + QA passed. |
 | Sprint 13 | 1B | 🔧 Code Complete | SEO/sitemap/OG/cookie/robots merged (PR #130). Ops + legal blocked on founder. |
 
-**Next action:** Commit + push each lane branch → create PRs → Session 7.
+**Next action:** Commit + push all lane branches (S6 + S7) → create PRs → Rally 010.
 
 ---
 
@@ -27,6 +28,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | Details |
 |------|------|---------|
+| Rally 009 Session 7 — logged | 2026-04-04 | Desktop responsiveness (BottomSheet desktop card, UpgradeCTA pointer-events, public profile layout), in-app roadmap + feature requests (migration live), visibility sublabels + back nav + loading skeletons. 22 review fixes. 3 PRs pending. |
 | Rally 009 Session 6 — logged | 2026-04-03 | Cert matching (green/amber/blue), trust infra (report + bug report APIs + ReportButton), experience transfer + endorsement dormancy system, ProUpsellCard consistency. 26 review fixes. 4 PRs pending. |
 | Rally 009 Sessions 2-5 — merged | 2026-04-03 | Land experience, Network tab, Profile redesign, Insights, Photos, CV, Settings, LLM defense, Endorsement flow. 21 review fixes + 9 tester fixes. PR #159 merged. |
 | Rally 009 Session 2 — land experience + sea time overlap | 2026-04-03 | Land experience end-to-end (DB + wizard + profile + public), sea time union-based calc + overlap detection, 19 review fixes, 3 QA fixes |
@@ -41,8 +43,8 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Up Next (ordered)
 
-1. **Rally 009 Session 6** — commit/push each branch, create 4 PRs (ready)
-2. **Rally 009 Session 7** — desktop responsiveness, roadmap/feedback, settings polish, cross-cutting
+1. **Rally 009 Session 7** — commit/push 3 branches (fix/desktop-responsiveness, feat/roadmap-feedback, fix/settings-cross-cutting), create PRs (ready)
+2. **Rally 009 Session 6** — commit/push 4 branches (pending alongside S7)
 3. **Rally 010 — Frontend UX & Guidance** — product tour (Onborda), cold states, StickyBottomBar, tooltips, coaching nudges
 4. **Ghost Profile claim flow E2E verification** — ⚠️ untested launch blocker
 5. **Rally 007 — Launch QA** — full checklist (⚠️ spec doesn't exist yet — needs creating)
@@ -66,10 +68,13 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | PR | Branch | Status | Notes |
 |----|--------|--------|-------|
-| pending | feat/cert-registry | 🔧 Ready to push | Lane 1: cert matching registry, StepQualifications 3-state cards, alias learning, WizardCert types |
-| pending | feat/reporting-bugs | 🔧 Ready to push | Lane 2: report API, bug-report API, ReportButton, /more/report-bug page |
-| pending | feat/experience-transfer | 🔧 Ready to push | Lane 3: experience transfer, endorsement dormancy, is_dormant filter on 12 queries |
-| pending | chore/pro-upsell-consistency | 🔧 Ready to push | Lane 4: ProUpsellCard, 4 retrofits, design system docs |
+| pending | fix/desktop-responsiveness | 🔧 Ready to push | S7 L1: BottomSheet desktop card, UpgradeCTA pointer-events, public profile layout fixes |
+| pending | feat/roadmap-feedback | 🔧 Ready to push | S7 L2: in-app roadmap, feature request system, migration live |
+| pending | fix/settings-cross-cutting | 🔧 Ready to push | S7 L3: visibility sublabels, back nav, loading skeletons |
+| pending | feat/cert-registry | 🔧 Ready to push | S6 L1: cert matching registry, StepQualifications 3-state cards, alias learning, WizardCert types |
+| pending | feat/reporting-bugs | 🔧 Ready to push | S6 L2: report API, bug-report API, ReportButton, /more/report-bug page |
+| pending | feat/experience-transfer | 🔧 Ready to push | S6 L3: experience transfer, endorsement dormancy, is_dormant filter on 12 queries |
+| pending | chore/pro-upsell-consistency | 🔧 Ready to push | S6 L4: ProUpsellCard, 4 retrofits, design system docs |
 | #159 | chain/rally-009 | ✅ Merged | Sessions 2-5: land exp, network, profile, insights, photos, CV, settings, LLM, endorsements. 30 fixes applied. |
 | #152 | chore/rally009-session1-context | ✅ Merged | Session 1 context |
 | #153 | fix/mobile-ux-fixes | ✅ Merged | Tab-bar padding + CV preview query |
