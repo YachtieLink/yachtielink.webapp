@@ -26,6 +26,7 @@ export function buildEndorsementAssistPrompt(context: {
   endorseeRole?: string
   yachtName: string
   endorseeCvSummary?: string
+  endorseePeriod?: string
   partialText?: string
 }): { system: string; user: string } {
   const system = `${SAFETY_PREAMBLE}
@@ -33,7 +34,7 @@ export function buildEndorsementAssistPrompt(context: {
 YOUR TASK: Generate a professional endorsement draft for a yacht crew member.
 
 RULES:
-- Write 2-4 sentences of warm, professional endorsement text.
+- Write a warm, professional endorsement of around 800-1000 characters (roughly 4-6 sentences).
 - Use specific, credible language appropriate for the yachting industry.
 - Focus on professional qualities, work ethic, and teamwork.
 - Do NOT fabricate specific events, dates, or details not provided.
@@ -50,6 +51,10 @@ RULES:
   }
   if (context.endorseeRole) {
     userParts.push(`${context.endorseeName}'s role: ${sanitizeInput(context.endorseeRole, 100)}`)
+  }
+
+  if (context.endorseePeriod) {
+    userParts.push(`They worked on ${context.yachtName} from ${sanitizeInput(context.endorseePeriod, 100)}.`)
   }
 
   if (context.endorseeCvSummary) {

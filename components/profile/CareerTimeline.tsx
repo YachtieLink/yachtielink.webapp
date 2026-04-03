@@ -92,17 +92,7 @@ export function CareerTimeline({ attachments, landExperience }: CareerTimelinePr
 
   return (
     <>
-      <div className="flex items-center justify-between mt-4 mb-1">
-        <h3 className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Career</h3>
-        <Link
-          href="/app/attachment/new"
-          className="text-xs text-[var(--color-interactive)] hover:underline"
-        >
-          Add
-        </Link>
-      </div>
-
-      <ul className="flex flex-col gap-0.5">
+      <ul className="flex flex-col gap-0.5 mt-2">
         {visibleEntries.map((entry) => {
           const id = entry.data.id
           const isExpanded = expandedId === id

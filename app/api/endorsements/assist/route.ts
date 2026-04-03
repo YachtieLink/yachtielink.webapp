@@ -45,8 +45,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'You must have worked on this yacht to use writing assist' }, { status: 403 })
   }
 
-  // Fetch endorsee info + yacht + endorser attachment in parallel
-  const [endorseeRes, yachtRes, endorserAttachmentRes] = await Promise.all([
+  // Fetch endorsee info + yacht + both attachments in parallel
+  const [endorseeRes, yachtRes, endorserAttachmentRes, endorseeAttachmentRes] = await Promise.all([
     supabase
       .from('users')
       .select('full_name, primary_role, bio')
@@ -59,11 +59,20 @@ export async function POST(req: NextRequest) {
       .single(),
     supabase
       .from('attachments')
-      .select('role_title')
+      .select('role_label')
       .eq('user_id', user.id)
       .eq('yacht_id', yacht_id)
       .is('deleted_at', null)
-      .order('start_date', { ascending: false })
+      .order('started_at', { ascending: false })
+      .limit(1)
+      .single(),
+    supabase
+      .from('attachments')
+      .select('role_label, started_at, ended_at')
+      .eq('user_id', recipient_id)
+      .eq('yacht_id', yacht_id)
+      .is('deleted_at', null)
+      .order('started_at', { ascending: false })
       .limit(1)
       .single(),
   ])
@@ -75,15 +84,23 @@ export async function POST(req: NextRequest) {
 
   const yacht = yachtRes.data
   const endorserAttachment = endorserAttachmentRes.data
+  const endorseeAttachment = endorseeAttachmentRes.data
   const endorseeCvSummary = endorsee.bio ?? undefined
+
+  // Use endorsee's role on this specific yacht only — never their current role
+  const endorseeRoleOnYacht = endorseeAttachment?.role_label ?? undefined
+  const endorseePeriod = endorseeAttachment?.started_at
+    ? `${endorseeAttachment.started_at}${endorseeAttachment.ended_at ? ` to ${endorseeAttachment.ended_at}` : ' to present'}`
+    : undefined
 
   // Build prompt
   const { system, user: userMessage } = buildEndorsementAssistPrompt({
-    endorserRole: endorserAttachment?.role_title ?? undefined,
+    endorserRole: endorserAttachment?.role_label ?? undefined,
     endorseeName: endorsee.full_name ?? 'this crew member',
-    endorseeRole: endorsee.primary_role ?? undefined,
+    endorseeRole: endorseeRoleOnYacht,
     yachtName: yacht?.name ?? 'the yacht',
     endorseeCvSummary,
+    endorseePeriod,
     partialText: partial_text,
   })
 
@@ -113,8 +130,7 @@ export async function POST(req: NextRequest) {
 
     // Validate output
     const validation = validateOutput(draft, {
-      maxLength: 1000,
-      maxSentences: 5,
+      maxLength: 2000,
       plainTextOnly: true,
     })
 

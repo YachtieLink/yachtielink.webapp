@@ -16,7 +16,7 @@ import { formatSeaTime } from '@/lib/sea-time'
 import { formatDate } from '@/lib/format-date'
 import type {
   PublicAttachment, PublicCertification, PublicEndorsement,
-  GalleryItem, Hobby, Education, Skill,
+  GalleryItem, Hobby, Education, Skill, LandExperienceEntry,
 } from '@/lib/queries/types'
 
 interface PortfolioLayoutProps {
@@ -53,6 +53,7 @@ interface PortfolioLayoutProps {
   seaTimeTotalDays?: number
   seaTimeYachtCount?: number
   colleagueCount?: number
+  landExperience?: LandExperienceEntry[]
   savedStatus?: { id: string; folder_id: string | null } | null
 }
 
@@ -129,6 +130,7 @@ export function PortfolioLayout({
   seaTimeTotalDays = 0,
   seaTimeYachtCount = 0,
   colleagueCount = 0,
+  landExperience = [],
   savedStatus,
 }: PortfolioLayoutProps) {
   const [activeModal, setActiveModal] = useState<string | null>(null)
@@ -191,7 +193,7 @@ export function PortfolioLayout({
       )}
 
       {/* My Experience */}
-      {sectionVisible(sectionVisibility, 'experience', attachments.length > 0) && (
+      {sectionVisible(sectionVisibility, 'experience', attachments.length > 0 || landExperience.length > 0) && (
         <SectionCard title="My Experience" icon={<Anchor size={16} />} index={sectionIndex++}>
           <div className="flex flex-col gap-3">
             {attachments.slice(0, 3).map((att) => (
@@ -211,12 +213,12 @@ export function PortfolioLayout({
               </div>
             ))}
           </div>
-          {attachments.length > 3 && (
+          {(attachments.length + landExperience.length) > 3 && (
             <Link
               href={`/u/${handle}/experience`}
               className="mt-3 block text-xs font-medium text-[var(--accent-500,var(--color-interactive))] hover:underline"
             >
-              See all {attachments.length} positions &rarr;
+              See all {attachments.length + landExperience.length} positions &rarr;
             </Link>
           )}
         </SectionCard>

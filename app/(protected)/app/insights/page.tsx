@@ -156,7 +156,7 @@ export default async function InsightsPage({ searchParams }: Props) {
           </div>
 
           {/* Who Viewed You */}
-          <WhoViewedYou viewers={[]} totalCount={0} />
+          <WhoViewedYou viewers={[]} totalCount={0} range={range} />
         </>
       ) : (
         <>
@@ -228,7 +228,7 @@ export default async function InsightsPage({ searchParams }: Props) {
           </div>
 
           {/* Blurred Who Viewed You */}
-          <WhoViewedYou viewers={[]} totalCount={0} blurred />
+          <WhoViewedYou viewers={[]} totalCount={0} blurred range={range} />
 
           {/* Upgrade CTA */}
           <div className="card-soft rounded-2xl p-4 text-center">

@@ -178,7 +178,7 @@ export default async function ProfilePage() {
     {
       key: 'experience',
       label: 'Experience',
-      summary: experienceSummary(attachments ?? []) + (landExperience.length > 0 ? ` + ${landExperience.length} shore-side` : ''),
+      summary: (seaTimeTotalDays > 0 ? `${formatSeaTime(seaTimeTotalDays).displayShort} sea time · ` : '') + `${seaTimeYachtCount} yacht${seaTimeYachtCount === 1 ? '' : 's'}` + (landExperience.length > 0 ? ` + ${landExperience.length} shore-side` : ''),
       count: (attachments?.length ?? 0) + landExperience.length,
       icon: <Anchor size={18} />,
       editHref: '/app/attachment',

@@ -38,9 +38,9 @@ interface GhostProfile {
 interface Attachment {
   id: string
   yacht_id: string
-  start_date: string | null
-  end_date: string | null
-  role_title: string | null
+  started_at: string | null
+  ended_at: string | null
+  role_label: string | null
   yachts: { id: string; name: string; yacht_type: string | null; cover_photo_url: string | null } | null
 }
 
@@ -69,10 +69,10 @@ export default async function RequestEndorsementPage() {
   ] = await Promise.all([
     supabase
       .from('attachments')
-      .select('id, yacht_id, start_date, end_date, role_title, yachts ( id, name, yacht_type, cover_photo_url )')
+      .select('id, yacht_id, started_at, ended_at, role_label, yachts ( id, name, yacht_type, cover_photo_url )')
       .eq('user_id', user.id)
       .is('deleted_at', null)
-      .order('start_date', { ascending: false }),
+      .order('started_at', { ascending: false }),
     supabase.rpc('get_colleagues', { p_user_id: user.id }),
     supabase
       .from('endorsement_requests')
@@ -121,9 +121,9 @@ export default async function RequestEndorsementPage() {
         name: att.yachts.name,
         yachtType: att.yachts.yacht_type,
         coverPhotoUrl: att.yachts.cover_photo_url,
-        startDate: att.start_date,
-        endDate: att.end_date,
-        userRole: att.role_title,
+        startDate: att.started_at,
+        endDate: att.ended_at,
+        userRole: att.role_label,
       })
     }
   }

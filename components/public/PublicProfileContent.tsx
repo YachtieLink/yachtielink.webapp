@@ -244,6 +244,7 @@ export function PublicProfileContent({
             skills={skills}
             hobbies={hobbies}
             gallery={gallery}
+            landExperience={landExperience}
             seaTimeTotalDays={seaTimeTotalDays}
             colleagueCount={colleagueCount}
             accentColor={resolvedAccent[500]}
@@ -266,6 +267,7 @@ export function PublicProfileContent({
             skills={skills}
             hobbies={hobbies}
             gallery={gallery}
+            landExperience={landExperience}
             accentColor={resolvedAccent[500]}
             handle={user.handle}
             displayName={displayName}

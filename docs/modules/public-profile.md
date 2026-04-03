@@ -1,6 +1,6 @@
 ---
 module: public-profile
-updated: 2026-03-28
+updated: 2026-04-03
 status: shipped
 phase: 1B
 ---
@@ -85,6 +85,8 @@ One-line: Server-rendered public profile page at `/u/{handle}` with SEO metadata
 **2025-11-20** — D-007: Identity is free infrastructure; presentation is paid and cosmetic only. Free identity removes barriers to graph formation. — Ari
 
 ## Recent Activity
+
+**2026-04-03** — Rally 009 QA: Added `landExperience` prop through `PortfolioLayout` → `RichPortfolioLayout` → `ExperienceTile` → `PublicProfileContent`. "See all N positions" count now includes land experience entries. Land entries render with Briefcase icon in ExperienceTile.
 
 **2026-04-02** — Worktree lanes 2+3 (pending push): Yacht type prefix (M/Y, S/Y) applied via `prefixedYachtName` helper across `ExperienceSection.tsx`, `ExperienceTile.tsx`. Interests chip responsive bug fixed in `HobbiesTile.tsx` (`content-start` prevents chip rows from stretching at wide viewports). Ghost endorser path in `EndorsementCard.tsx` still uses old layout format — follow-up needed.
 **2026-04-02** — Quick wins (PR #142): `CountryFlag` component added — on-demand SVG from flagcdn.com, `onError` hides on CDN failure. Nationality flag rendered in `HeroSection` next to user name when `show_nationality_flag = true` and `home_country` is set. SVG flag takes precedence over emoji flag when both toggles enabled. `show_nationality_flag` added to `getUserByHandle` SELECT.

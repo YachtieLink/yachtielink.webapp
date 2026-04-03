@@ -6,7 +6,7 @@
 
 **How to add new entries:** When the founder gives a correction that should persist across sessions, add it here. When you observe a pattern being repeated in CHANGELOG flags or corrections, capture it. Place new entries at the top. Keep the format consistent.
 
-**Current count:** 50 rules
+**Current count:** 51 rules
 
 **Also update when writing here:**
 - `CHANGELOG.md` — note the correction in your session's Flags section
@@ -14,6 +14,11 @@
 - `docs/ops/lessons-learned.md` — if the correction revealed a non-obvious gotcha
 
 ---
+
+## Overnight Chain Must Execute Full Workflow, Not Just Write Code
+**Rule:** When running `/yl-chain` overnight, execute the complete autonomous workflow for every session: build → self-review → type-check → drift-check → /yl-review (Sonnet+Opus) → fix all findings → build QA checklists → /yl-shipslog docs. Build ALL spec'd features — do not defer items that are within scope. The overnight chain must deliver a branch that only needs founder merge + optional browser QA.
+**Origin:** 2026-04-03. Overnight chain for Rally 009 Sessions 3-5 only wrote code. Skipped all reviews, testing, docs, and deferred 3 in-scope items (reminder endpoint, photo context assignment, OPENAI_API_KEY wiring). Founder spent entire next day driving reviews, finding 21+ issues, directing fixes, running tests — work the chain should have done autonomously.
+**How to apply:** After building each session in the chain, run the full review pipeline before moving to the next session. Fix all findings. Build ALL spec'd features. Run shipslog for doc updates. The chain delivers a branch ready for merge, not a branch that needs hours of daytime rework.
 
 ## Reviewer Must Fix Everything, Not Recommend "Merge As-Is"
 **Rule:** Every finding from a code review is a mandatory fix. No "merge as-is with follow-up." No WARNING verdict. PASS (zero findings) or BLOCK (fix list). The reviewer's job is to find every problem and send the worker back with a clear numbered fix list.

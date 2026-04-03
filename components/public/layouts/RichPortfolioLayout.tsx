@@ -28,7 +28,7 @@ import { formatDate } from '@/lib/format-date'
 import type { BentoTile, BentoTemplateSlot } from '@/lib/bento/types'
 import type {
   PublicAttachment, PublicCertification, PublicEndorsement,
-  GalleryItem, Hobby, Education, Skill,
+  GalleryItem, Hobby, Education, Skill, LandExperienceEntry,
 } from '@/lib/queries/types'
 
 const PhotoLightbox = dynamic(() => import('../PhotoLightbox').then(m => ({ default: m.PhotoLightbox })), { ssr: false })
@@ -66,6 +66,7 @@ interface RichPortfolioLayoutProps {
   templateId?: string
   isLoggedIn?: boolean
   isOwnProfile?: boolean
+  landExperience?: LandExperienceEntry[]
   savedStatus?: { id: string; folder_id: string | null } | null
 }
 
@@ -86,6 +87,7 @@ export function RichPortfolioLayout({
   templateId = 'classic',
   isLoggedIn,
   isOwnProfile,
+  landExperience = [],
   savedStatus,
 }: RichPortfolioLayoutProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
@@ -166,12 +168,12 @@ export function RichPortfolioLayout({
           content: <AboutTile bio={aboutText} accentColor={accentColor} />,
         }
       case 'experience':
-        if (attachments.length === 0) return null
+        if (attachments.length === 0 && landExperience.length === 0) return null
         return {
           areaName: slot.areaName,
           type: 'experience',
           onClick: () => setActiveModal('experience'),
-          content: <ExperienceTile attachments={attachments} handle={handle} />,
+          content: <ExperienceTile attachments={attachments} landExperience={landExperience} handle={handle} />,
         }
       case 'endorsements':
         if (endorsements.length === 0) return null

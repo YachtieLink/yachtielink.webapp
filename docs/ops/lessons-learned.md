@@ -6,13 +6,33 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 80 lessons
-<!-- Note: was 79, added 1 entry on 2026-04-02 (worktree artifacts committed to two branches) -->
+**Current count:** 82 lessons
+<!-- Note: was 80, added 2 entries on 2026-04-03 (column name mismatch, Set RSC serialization) -->
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## TypeScript Interfaces Must Match Supabase Column Names Exactly
+
+**What happened:** Endorsement request page and assist API used `start_date`/`end_date`/`role_title` in TypeScript interfaces and Supabase `.select()` queries. The actual columns are `started_at`/`ended_at`/`role_label`. Supabase silently returns `null` for mismatched column names — no runtime error. The request page got empty results and redirected to the fallback route. The assist API generated endorsements with no yacht-specific context.
+**Root cause:** Column names were guessed from convention rather than verified against the schema. Supabase `.select()` does not error on non-existent columns — it silently returns null.
+**Fix applied:** Fixed all 6 column references across 2 files. Cross-checked against actual DB schema.
+**Lesson:** Always verify column names against the migration SQL or `supabase/migrations/` before writing `.select()` queries. Supabase's silent null on bad column names is a recurring trap — treat any query returning unexpected nulls as a possible column name mismatch.
+**Sprint:** Rally 009 QA | **Caught by:** /yl-tester | **Date:** 2026-04-03
+
+---
+
+## Set<string> Cannot Cross Next.js Server→Client Boundary
+
+**What happened:** Network page passed `endorsedColleagueIds` as `Set<string>` from server component to client component. On the client, the Set arrived as `{}` (empty object). All endorsement status badges showed "Request" instead of "Endorsed" or "Pending".
+**Root cause:** Next.js RSC serialization only supports plain JSON types (arrays, objects, strings, numbers, booleans, null). `Set` and `Map` are not serializable — they silently degrade to empty objects with no error or warning.
+**Fix applied:** Converted to `Array.from(set)` before passing as prop. Client uses `.includes()` instead of `.has()`.
+**Lesson:** Never pass `Set`, `Map`, `Date`, or other non-JSON types as RSC props. Convert at the server→client boundary. The failure is silent — no error, just wrong data.
+**Sprint:** Rally 009 Review | **Caught by:** 3-agent review | **Date:** 2026-04-03
 
 ---
 

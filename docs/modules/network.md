@@ -1,6 +1,6 @@
 ---
 module: network
-updated: 2026-04-02
+updated: 2026-04-03
 status: shipped
 phase: 1A
 ---
@@ -32,6 +32,11 @@ One-line: The Network tab — colleague graph from shared yacht attachments, end
 | What | Where |
 |------|-------|
 | Network page (server) | `app/(protected)/app/network/page.tsx` |
+| Network unified view (client) | `components/network/NetworkUnifiedView.tsx` |
+| Yacht accordion | `components/network/YachtAccordion.tsx` |
+| Colleague row | `components/network/ColleagueRow.tsx` |
+| Endorsement summary card | `components/network/EndorsementSummaryCard.tsx` |
+| Endorsement CTA card | `components/network/EndorsementCTACard.tsx` |
 | Network loading skeleton | `app/(protected)/app/network/loading.tsx` |
 | AudienceTabs (client component) | `components/audience/AudienceTabs.tsx` |
 | RequestActions (cancel/resend) | `components/audience/RequestActions.tsx` |
@@ -99,6 +104,10 @@ Then fetches colleague profiles and yacht names in a second parallel batch. All 
 **2026-02-05** — D-028: Graph edges are created only by shared employment (colleagues) or verified in-person encounters (IRL connections). The graph must represent real-world overlap. — Ari
 
 ## Recent Activity
+
+**2026-04-03** — Rally 009 Session 3: Full Network tab redesign. Replaced tabbed interface with yacht-grouped accordion view (`NetworkUnifiedView` orchestrator). New components: `YachtAccordion` (navy wayfinding, easeGentle animation), `ColleagueRow` (endorsement status indicators), `EndorsementSummaryCard`, `EndorsementCTACard`. Server component fetches colleagues RPC, endorsements, ghost profiles in parallel. Navy section color wayfinding throughout.
+
+**2026-04-03** — Rally 009 Review: Fixed `Set<string>` RSC serialization bug — `endorsedColleagueIds` and `pendingColleagueIds` converted from `Set` to `string[]` before crossing server→client boundary. `NetworkUnifiedView` props updated to match.
 
 **2026-04-02** — Rally 009 Session 1 Lane 2 (`fix/p2-bug-fixes`): `SavedProfileCard` sea time fully wired — `page.tsx` computes `seaTimeDays`/`yachtCount` from attachment dates (mirrors `get_sea_time()` SQL), passed through `SavedProfilesClient.tsx`, rendered as "1y 6mo at sea · 2 yachts" detail line. `Math.max(0, ...)` guard prevents negative-days edge case.
 **2026-04-01** — Lane 2 (PR #137): Colleague display names updated to show full `"First Last"` throughout. Nickname pattern `"Charlotte 'Charlie' Beaumont"` when display_name differs from first name. Applied to colleagues page and endorsement request page. `get_colleagues` RPC confirmed to deduplicate correctly — multi-accordion is intentional UX.

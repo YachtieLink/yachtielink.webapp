@@ -15,6 +15,7 @@ interface WhoViewedYouProps {
   viewers: Viewer[]
   totalCount: number
   blurred?: boolean
+  range?: '7' | '30' | 'all'
 }
 
 function ViewerRow({ viewer }: { viewer: Viewer }) {
@@ -43,7 +44,7 @@ function ViewerRow({ viewer }: { viewer: Viewer }) {
   )
 }
 
-export function WhoViewedYou({ viewers, totalCount, blurred = false }: WhoViewedYouProps) {
+export function WhoViewedYou({ viewers, totalCount, blurred = false, range = '30' }: WhoViewedYouProps) {
   return (
     <div className={`card-soft rounded-2xl p-4 ${blurred ? 'relative overflow-hidden' : ''}`}>
       <div className="flex items-center justify-between mb-2">
@@ -73,7 +74,7 @@ export function WhoViewedYou({ viewers, totalCount, blurred = false }: WhoViewed
       ) : (
         <>
           {viewers.length === 0 ? (
-            <p className="text-sm text-[var(--color-text-secondary)] py-2">No profile viewers in the last 30 days</p>
+            <p className="text-sm text-[var(--color-text-secondary)] py-2">No profile viewers in the last {range === 'all' ? '12 months' : `${range} days`}</p>
           ) : (
             <div className="divide-y divide-[var(--color-border)]">
               {viewers.map((v) => <ViewerRow key={v.id} viewer={v} />)}
