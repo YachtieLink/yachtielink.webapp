@@ -1,6 +1,6 @@
 ---
 module: profile
-updated: 2026-04-03
+updated: 2026-04-04
 status: shipped
 phase: 1B
 ---
@@ -10,6 +10,8 @@ phase: 1B
 One-line: Private profile hub with photo upload, identity card, strength meter, section grid, AI summary, contact settings, social links, section visibility controls, and saved profiles with folders.
 
 ## Recent Activity (most recent first)
+
+**2026-04-04** — Rally 009 Session 7, Lane 3 (fix/settings-cross-cutting): `ProfileSectionList.tsx` gains optional `visibilityLabel` field on section config. `app/(protected)/app/profile/page.tsx` — 7 sections now supply descriptive sublabels on their toggle rows: About Me ("Shown on your public profile"), Experience ("Your career history, sea time and yacht count"), Certifications ("Tickets and qualifications"), Extra Skills ("Specialist skills beyond your primary role"), Education ("Courses, degrees and training"), Hobbies ("Personal interests shown on your profile"), Work Gallery ("Photos from your time on the water"). Known debt: Endorsements section has `section_visibility.endorsements` in DB but no toggle row in profile UI (captured in backlog: `profile-endorsements-visibility-ui`). `ProfileSectionGrid.tsx` and `SectionManager.tsx` confirmed dead code — no importers found (captured in backlog: `profile-section-grid-dead-code`).
 
 **2026-04-03** — Rally 009 Session 6, Lane 4 (chore/pro-upsell-consistency): Created `ProUpsellCard` — shared upgrade CTA component with 3 variants (`inline`/`banner`/`card`), respects section color wayfinding via `context` prop (`getSectionTokens`), enforces "Upgrade to Crew Pro" copy. Retrofitted photos page (×2), certs page, CvActions. Insights `UpgradeCTA` intentionally left as-is (handles Stripe checkout). Barrel export added to `components/ui/index.ts`. Design system `page-layout.md` appended with Pro Upsell Pattern section.
 

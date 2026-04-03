@@ -1,6 +1,6 @@
 # Desktop Responsiveness Audit
 
-**Status:** idea
+**Status:** promoted
 **Priority guess:** P2 (important)
 **Date captured:** 2026-03-29
 
@@ -14,5 +14,4 @@ Review and fix desktop responsiveness across the app before MVP launch. Developm
 - Public profile pages (subdomain experience) must look polished on desktop
 
 ## Notes
-- Should be done after Sprint 13 wraps, before MVP launch
-- Mobile-first has been the priority — this is the catch-up pass for desktop
+- Shipped in Rally 009 Session 7 Lane 1 (fix/desktop-responsiveness). Core issues fixed: BottomSheet desktop card, UpgradeCTA pointer-events, public profile layout (HeroSection, ContactRow, CertsTile, EducationTile, bento stagger). Remaining desktop polish deferred: BottomSheet exit animation, sidebar-aware fixed positioning pattern (see `sidebar-fixed-positioning.md`), sub-page section color extension.

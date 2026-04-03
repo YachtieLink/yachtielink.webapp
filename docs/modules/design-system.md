@@ -1,6 +1,6 @@
 ---
 module: design-system
-updated: 2026-04-02
+updated: 2026-04-04
 status: shipped
 phase: 1A
 ---
@@ -167,6 +167,8 @@ Dialog, Badge, Separator, Avatar, Tabs, Tooltip, Sheet, Skeleton, DropdownMenu
 **2026-03-16** — Two-pass rally pattern (R1 + challengers) for design reviews. Single-pass analysis is too shallow; challenger agents find structural issues that first-pass rationalises away.
 
 ## Recent Activity
+
+**2026-04-04** — Rally 009 Session 7, Lane 1 (fix/desktop-responsiveness): `BottomSheet.tsx` — desktop floating card treatment: `md:left-[calc(50%_-_248px)] md:w-[560px] md:rounded-2xl md:bottom-4 md:right-auto`, `pb-6` replaces `pb-tab-bar` (which collapsed to 0 at md). `UpgradeCTA.tsx` — `pointer-events-none` on outer wrapper, `pointer-events-auto` on inner div, `md:max-w-2xl md:mx-auto md:rounded-t-2xl md:border-x md:shadow-lg`. `globals.css` — `--tab-bar-height: 0rem` at md breakpoint. BottomSheet exit animation on desktop still slides down (mobile feel) — deferred to Rally 010. Discovered: no systematic sidebar-aware positioning pattern for fixed elements; captured in backlog (`sidebar-fixed-positioning`).
 
 **2026-04-02** — Inner-page-header (PR #144): `PageHeader` full rewrite — two-part layout: sticky back bar (section-color 2px bottom border, 44px touch target, auto-derived from `backHref` using canonical `lib/section-colors.ts`) + standalone title row (scrolls with content, optional count/subtitle/actions). `onBack` callback for multi-step flows. `BackButton.tsx` deleted (orphaned). New `CountryFlag` component added (`components/ui/CountryFlag.tsx`) — loads individual SVG flags from flagcdn.com on demand, zero bundle impact.
 

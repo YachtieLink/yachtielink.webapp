@@ -26,6 +26,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-04 | Rally 009 Session 7 | 3-lane worktree: desktop responsiveness (BottomSheet/UpgradeCTA/public profile CSS), in-app roadmap + feature request system (migration live), settings polish + cross-cutting (visibility sublabels, back nav, loading skeletons). 22 review fixes. 4 backlog items. |
 | 2026-04-03 | Rally 009 Session 6 | 4-lane worktree: cert matching registry (green/amber/blue), reporting/flagging/bug-reporter (trust infra), experience transfer + endorsement dormancy, ProUpsellCard consistency. 1 extra migration (RLS update policy). 26 review fixes. 6 backlog items. |
 | 2026-04-03 | Rally 009 Review + QA | Review fixes (21 total): RSC serialization, LLM safety, Pro gate, clipboard, dead code. Tester QA (9 fixes): column mismatches, land exp on public profile, WhoViewedYou dynamic range, assist quality. 5 backlog items. |
 | 2026-04-03 | Rally 009 Session 5 | LLM defense layer (sanitize + prompt-guard). Endorsement writing assist (gpt-4o-mini). Endorsement request redesign (yacht-grouped, ghost inline, reminders). |
@@ -36,6 +37,37 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 | 2026-04-02 | Rally 009 /grill-me | Design interview: 42 Qs resolved, 5-tab UX audit, 9 additional fixes confirmed. All sessions unblocked. |
 | 2026-04-02 | Rally 009 Session 1 | 3-lane: mobile UX tab-bar padding + CV preview canonical query, P2 bugs (saved sea time, yacht prefix null guard, PDF home-country toggle), tech debt sweep (social icons dedup, formatSeaTime, EndorsementsSection) |
 | 2026-04-02 | Rally 009 planning | Full pre-MVP backlog triage: 30 items across 7 sessions specced into lane-ready build plans. 42 /grill-me questions prepped. 7 backlog items closed as resolved. Junior sprints updated. |
+
+## 2026-04-04 — Rally 009 Session 7 (Opus 4.6) — Worktree
+
+### Done
+- **Lane 1 (fix/desktop-responsiveness):** CSS/layout-only desktop pass. `globals.css`: `--tab-bar-height: 0rem` at `md:` breakpoint. `BottomSheet.tsx`: desktop floating card — `md:left-[calc(50%_-_248px)] md:w-[560px] md:rounded-2xl md:bottom-4 md:right-auto`, `pb-6` replaces `pb-tab-bar`. `UpgradeCTA.tsx`: `pointer-events-none` on outer wrapper, `pointer-events-auto` on inner div, `md:max-w-2xl md:mx-auto md:rounded-t-2xl md:border-x md:shadow-lg`. `more/page.tsx`: `sand-50` → `sand-100`. Public profile: `HeroSection` center-top object-position + responsive desktop height, `PublicProfileContent` `md:max-w-3xl md:mx-auto`, `ContactRow` text labels on md+, bento `CertsTile` maxShow 6 + overflow link, `EducationTile` limit raised to 4, `classic.ts` staggered L-R grid-template-areas. 3 reviewer fixes (HIGH/MEDIUM/MEDIUM). QA: 15 test cases all pass. (branch: fix/desktop-responsiveness)
+- **Lane 2 (feat/roadmap-feedback):** In-app roadmap + feature request system. Replaced static roadmap page with 3-tab interactive page: Roadmap (curated stages), Feature Requests (user suggestions with upvote/downvote), Released (shipped items). `/app/more/roadmap/suggest` new page with submission form, category pill selector, auto-vote on submit, 5/hour client-side rate limit. Optimistic UI with revert on error. Sort controls (Most Voted / Newest). Deep-link via `?tab=requests`. Migration `20260403200001_feature_suggestions_votes.sql` applied — tables live in Supabase. 1 CRITICAL fix (SECURITY DEFINER missing `SET search_path`), 6 HIGH, 7 MEDIUM, 4 LOW — all resolved. QA: PASS. (branch: feat/roadmap-feedback)
+- **Lane 3 (fix/settings-cross-cutting):** Visibility sublabels: `ProfileSectionList` gains `visibilityLabel` field; 7 profile sections now show descriptive sublabels on toggle rows. Back navigation: saved profiles → `/app/network`, yacht detail → `/app/network`, all `/app/more/*` sub-pages → "← Settings" (via `pathToLabel.more` in `PageHeader.tsx`). Loading skeletons: Network (navy-200 accordion), Insights (coral-200 metric cards), More/Settings (sand-300 rows) updated; new endorsement request `loading.tsx` (navy-200 yacht accordion). Reviewer direct PASS — zero findings from diff. (branch: fix/settings-cross-cutting)
+
+### Context
+- 3 lanes, 3 worktrees. L1 and L3: no migrations. L2 migration live in Supabase before code deploys.
+- Lane 3 passively updates all `/app/more/*` back labels to "← Settings" including Lane 2's roadmap page — intentional.
+- Rally 009 now fully complete (all 7 sessions built, reviewed, and QA passed).
+
+### Next
+1. Master commits + pushes each lane branch → creates 3 PRs
+2. Rally 010 — Frontend UX & Guidance (Onborda product tour, cold states, StickyBottomBar, tooltips)
+3. Ghost Profile claim flow E2E verification (⚠️ launch blocker, untested)
+
+### Flags
+- ⚠️ `BottomSheet.tsx` exit animation slides down on desktop (mobile feel) — deferred per reviewer, note for Rally 010 polish
+- ⚠️ `ProfileSectionGrid.tsx` + `SectionManager.tsx` confirmed dead code — safe to delete in a cleanup pass
+- ⚠️ Endorsements visibility has DB support (`section_visibility.endorsements`) but no toggle row in profile UI
+- ⚠️ Founder visual checklist in lane-1-qa-report.md and lane-2-qa-report.md — 10 + 12 items that need eyes on a real screen
+
+### Backlog captured
+- sidebar-fixed-positioning: `--sidebar-width` custom property + utility class for sidebar-aware fixed elements on desktop (Lane 1 reviewer)
+- profile-endorsements-visibility-ui: Endorsements section visibility has DB support but no toggle in profile UI (Lane 3 reviewer)
+- profile-section-grid-dead-code: `ProfileSectionGrid.tsx` + `SectionManager.tsx` are unused — safe to delete (Lane 3 worker)
+- saved-profiles-loading-skeleton: `network/saved/loading.tsx` uses generic skeleton — should match new navy-200 pattern (Lane 3)
+
+---
 
 ## 2026-04-03 — Rally 009 Session 6 (Opus 4.6) — Worktree
 
