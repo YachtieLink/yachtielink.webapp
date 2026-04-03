@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
 import type { ParsedCvData, ConfirmedImportData, SaveStats } from '@/lib/cv/types'
+import type { Database } from '@/lib/database.types'
 import { normalizeCountry } from '@/lib/constants/country-normalize'
 import { resolveOrCreateBuilder } from '@/lib/yacht/resolve-builder'
 
@@ -17,30 +18,32 @@ function normalizeDateToISO(dateStr: string): string {
 /** Maritime certification alias map — normalizes common variants to canonical names */
 const CERT_ALIASES: Record<string, string> = {
   // STCW variants
-  'stcw': 'STCW Basic Safety',
-  'stcw95': 'STCW Basic Safety',
-  'stcw 95': 'STCW Basic Safety',
-  'stcw10': 'STCW Basic Safety',
-  'stcw 2010': 'STCW Basic Safety',
-  'stcw basic safety': 'STCW Basic Safety',
-  'stcw basic safety training': 'STCW Basic Safety',
-  'basic safety training': 'STCW Basic Safety',
-  'bst': 'STCW Basic Safety',
+  'stcw': 'STCW Basic Safety Training',
+  'stcw95': 'STCW Basic Safety Training',
+  'stcw 95': 'STCW Basic Safety Training',
+  'stcw10': 'STCW Basic Safety Training',
+  'stcw 2010': 'STCW Basic Safety Training',
+  'stcw basic safety': 'STCW Basic Safety Training',
+  'stcw basic safety training': 'STCW Basic Safety Training',
+  'basic safety training': 'STCW Basic Safety Training',
+  'bst': 'STCW Basic Safety Training',
   // Medical
-  'eng1': 'ENG1 Medical',
-  'eng 1': 'ENG1 Medical',
-  'eng1 medical': 'ENG1 Medical',
-  'mca medical': 'ENG1 Medical',
-  'maritime medical': 'ENG1 Medical',
-  'seafarer medical': 'ENG1 Medical',
+  'eng1': 'ENG1 (UK Seafarer Medical)',
+  'eng 1': 'ENG1 (UK Seafarer Medical)',
+  'eng1 medical': 'ENG1 (UK Seafarer Medical)',
+  'eng1 medical certificate': 'ENG1 (UK Seafarer Medical)',
+  'mca medical': 'ENG1 (UK Seafarer Medical)',
+  'maritime medical': 'ENG1 (UK Seafarer Medical)',
+  'maritime medical certificate': 'ENG1 (UK Seafarer Medical)',
+  'seafarer medical': 'ENG1 (UK Seafarer Medical)',
   // GMDSS
-  'gmdss': 'GMDSS GOC',
-  'gmdss goc': 'GMDSS GOC',
-  'goc': 'GMDSS GOC',
-  'general operators certificate': 'GMDSS GOC',
-  'gmdss sroc': 'GMDSS SRC',
-  'src': 'GMDSS SRC',
-  'short range certificate': 'GMDSS SRC',
+  'gmdss': 'GMDSS General Operator Certificate',
+  'gmdss goc': 'GMDSS General Operator Certificate',
+  'goc': 'GMDSS General Operator Certificate',
+  'general operators certificate': 'GMDSS General Operator Certificate',
+  'gmdss sroc': 'GMDSS Restricted Operator Certificate',
+  'src': 'GMDSS Restricted Operator Certificate',
+  'short range certificate': 'GMDSS Restricted Operator Certificate',
   // Proficiency in Survival Craft
   'psc': 'Proficiency in Survival Craft',
   'pscrb': 'Proficiency in Survival Craft',
@@ -110,6 +113,56 @@ function certNamesMatch(a: string, b: string): boolean {
   if (maxLen > 0 && (1 - dist / maxLen) >= 0.85) return true
 
   return false
+}
+
+type RegistryRow = Pick<
+  Database['public']['Tables']['certifications_registry']['Row'],
+  'id' | 'aliases' | 'name' | 'review_status'
+>
+
+interface CertImportMatchMetadata {
+  registry_id?: string | null
+  source_name?: string | null
+  match_tier?: 'green' | 'amber' | 'blue'
+}
+
+async function learnCertificationAlias(
+  supabase: SupabaseClient,
+  cert: CertImportMatchMetadata & { name: string },
+  registryById: Map<string, RegistryRow>,
+): Promise<void> {
+  const registryId = cert.registry_id
+  const sourceName = cert.source_name?.trim()
+  const canonicalName = cert.name.trim()
+
+  if (!registryId || cert.match_tier !== 'green' || !sourceName || !canonicalName) return
+  if (sourceName.toLowerCase() === canonicalName.toLowerCase()) return
+
+  const registryEntry = registryById.get(registryId)
+  if (!registryEntry) return
+
+  const aliases = registryEntry.aliases ?? []
+  const aliasExists = aliases.some((alias) => alias.toLowerCase().trim() === sourceName.toLowerCase())
+  if (aliasExists) return
+
+  const nextAliases = [...aliases, sourceName]
+  const { error } = await supabase
+    .from('certifications_registry')
+    .update({
+      aliases: nextAliases,
+      // The current schema only has row-level review_status.
+      // Flipping it to "pending" would hide the whole certification from search,
+      // so preserve the existing row approval while still learning the alias.
+      review_status: registryEntry.review_status ?? 'approved',
+    })
+    .eq('id', registryId)
+
+  if (error) {
+    console.error(`[saveConfirmedImport] alias update error for "${sourceName}" -> "${registryEntry.name}":`, error.message)
+    return
+  }
+
+  registryEntry.aliases = nextAliases
 }
 
 // ── D2: Date overlap helpers ────────────────────────────────────────────────
@@ -383,10 +436,21 @@ export async function saveConfirmedImport(
 
   // 3. Certifications (D1: dedup via alias map + fuzzy match)
   try {
-    const [{ data: certTypes }, { data: existingCerts }] = await Promise.all([
+    const certifications = data.certifications as Array<
+      ConfirmedImportData['certifications'][number] & CertImportMatchMetadata
+    >
+    const registryIds = Array.from(
+      new Set(certifications.map((cert) => cert.registry_id).filter((value): value is string => Boolean(value))),
+    )
+
+    const [{ data: certTypes }, { data: existingCerts }, registryResponse] = await Promise.all([
       supabase.from('certification_types').select('id, name, short_name'),
       supabase.from('certifications').select('id, certification_type_id, custom_cert_name, certification_types(name)').eq('user_id', userId),
+      registryIds.length > 0
+        ? supabase.from('certifications_registry').select('id, aliases, name, review_status').in('id', registryIds)
+        : Promise.resolve({ data: [] as RegistryRow[], error: null }),
     ])
+    const registryById = new Map((registryResponse.data ?? []).map((row) => [row.id, row]))
 
     // Build list of existing cert names for dedup
     const existingCertNames: string[] = (existingCerts ?? []).map(ec => {
@@ -395,9 +459,12 @@ export async function saveConfirmedImport(
       return typeName ?? ec.custom_cert_name ?? ''
     }).filter(Boolean)
 
-    for (const cert of data.certifications) {
+    for (const cert of certifications) {
+      const certName = cert.name.trim()
+      const normalizedName = normalizeCertName(certName)
+
       // Check if this cert already exists (D1: normalize + fuzzy)
-      const isDuplicate = existingCertNames.some(existing => certNamesMatch(existing, cert.name))
+      const isDuplicate = existingCertNames.some(existing => certNamesMatch(existing, certName))
       if (isDuplicate) {
         stats.certsSkippedDuplicate++
         continue
@@ -405,11 +472,9 @@ export async function saveConfirmedImport(
 
       let certTypeId: string | null = null
       if (certTypes) {
-        // Also try alias-normalized name for type matching
-        const normalizedName = normalizeCertName(cert.name)
         const match = certTypes.find(ct =>
-          ct.name.toLowerCase() === cert.name.toLowerCase() ||
-          ct.short_name?.toLowerCase() === cert.name.toLowerCase() ||
+          ct.name.toLowerCase() === certName.toLowerCase() ||
+          ct.short_name?.toLowerCase() === certName.toLowerCase() ||
           ct.name.toLowerCase() === normalizedName.toLowerCase() ||
           ct.short_name?.toLowerCase() === normalizedName.toLowerCase()
         )
@@ -419,16 +484,17 @@ export async function saveConfirmedImport(
       const { error } = await supabase.from('certifications').insert({
         user_id: userId,
         certification_type_id: certTypeId,
-        custom_cert_name: certTypeId ? null : cert.name,
+        custom_cert_name: certTypeId ? null : certName,
         issued_at: cert.issued_date ? normalizeDateToISO(cert.issued_date) : null,
         expires_at: cert.expiry_date ? normalizeDateToISO(cert.expiry_date) : null,
         issuing_body: cert.issuing_body,
       })
       if (!error) {
         stats.certsCreated++
-        existingCertNames.push(normalizeCertName(cert.name)) // prevent dups within same import batch
+        existingCertNames.push(normalizedName) // prevent dups within same import batch
+        await learnCertificationAlias(supabase, { ...cert, name: certName }, registryById)
       } else {
-        console.error(`[saveConfirmedImport] cert insert error for "${cert.name}":`, error.message)
+        console.error(`[saveConfirmedImport] cert insert error for "${certName}":`, error.message)
       }
     }
   } catch (err) { console.error('[saveConfirmedImport] certifications section error:', err) }
