@@ -113,7 +113,7 @@ export default async function InsightsPage({ searchParams }: Props) {
     <PageTransition className="flex flex-col gap-4 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-coral-50)]">
       {upgraded && <InsightsUpgradedToast isPro={proStatus.isPro} />}
 
-      <div className="flex items-center justify-between pt-2">
+      <div className="flex items-center justify-between pt-2" data-tour="insights-page">
         <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">
           Career Insights
         </h1>

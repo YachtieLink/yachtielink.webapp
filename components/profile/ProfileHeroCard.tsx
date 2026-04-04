@@ -277,7 +277,9 @@ export function ProfileHeroCard({
         </div>
         {/* Compact strength ring */}
         {strengthScore !== undefined && (
-          <CompactStrengthRing score={strengthScore} />
+          <div data-tour="strength-ring">
+            <CompactStrengthRing score={strengthScore} />
+          </div>
         )}
       </div>
 

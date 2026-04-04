@@ -247,6 +247,7 @@ export default async function ProfilePage() {
       </div>
 
       {/* Hero Card — identity + tap-to-edit + embedded strength ring */}
+      <div data-tour="profile-hero">
       <ProfileHeroCard
         displayName={displayName}
         handle={profile.handle}
@@ -264,6 +265,7 @@ export default async function ProfilePage() {
         strengthCtaHref={strengthCta?.href}
         strengthCtaLabel={strengthCta?.label}
       />
+      </div>
 
       {/* ── ABOUT ME ──────────────────────────────────────────── */}
       <ProfileSectionGroup title="About Me" icon={<User size={16} />}>

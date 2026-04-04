@@ -140,7 +140,7 @@ export default async function NetworkPage() {
   return (
     <PageTransition className="flex flex-col gap-4">
       {/* Header with bookmark icon */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" data-tour="network-page">
         <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">
           My Network
         </h1>

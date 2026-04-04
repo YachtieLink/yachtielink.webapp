@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { BottomTabBar } from "@/components/nav/BottomTabBar";
 import { SidebarNav } from "@/components/nav/SidebarNav";
 import { AuthStateListener } from "@/components/providers/AuthStateListener";
+import { TourProvider } from "@/components/tour/TourProvider";
 
 export default async function AppLayout({
   children,
@@ -49,7 +50,9 @@ export default async function AppLayout({
       {/* Page content — padded so it clears the tab bar on mobile, sidebar on desktop */}
       <main className="flex-1 pb-20 md:pb-0 md:pl-16">
         <div className="mx-auto max-w-2xl px-4 md:px-6">
-          {children}
+          <TourProvider>
+            {children}
+          </TourProvider>
         </div>
       </main>
 

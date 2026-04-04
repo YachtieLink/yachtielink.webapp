@@ -34,7 +34,7 @@ export default async function CvPage() {
   if (isCold) {
     return (
       <PageTransition className="flex flex-col gap-4 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-amber-50)] pb-24">
-        <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">My CV</h1>
+        <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]" data-tour="cv-page">My CV</h1>
 
         {/* Centered cold state */}
         <div className="flex-1 flex flex-col items-center justify-center text-center py-12">
