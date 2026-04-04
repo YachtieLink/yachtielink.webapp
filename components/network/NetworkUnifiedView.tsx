@@ -9,8 +9,6 @@ import { EndorsementSummaryCard } from './EndorsementSummaryCard'
 import { EndorsementCTACard } from './EndorsementCTACard'
 import { YachtAccordion } from './YachtAccordion'
 import { ColleagueRow } from './ColleagueRow'
-import { EmptyState } from '@/components/ui/EmptyState'
-import { Button } from '@/components/ui/Button'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -176,19 +174,35 @@ export function NetworkUnifiedView({
     yachtGhostMap.set(ghost.yacht_id, existing)
   }
 
-  // Zero yachts — show empty state
+  // Zero yachts — centered empty state (suppress endorsement cards — meaningless without colleagues)
   if (userYachts.length === 0) {
     return (
-      <div className="flex flex-col gap-4">
-        <EndorsementCTACard endorsementCount={endorsementsReceivedCount} />
-        <EmptyState
-          icon="⚓"
-          title="Add your first yacht to start building your network"
-          description="Your yacht graph connects you with colleagues you've actually worked with. Endorsements from real crewmates carry weight."
-          actionLabel="Add Yacht"
-          actionHref="/app/attachment/new"
-          accentColor="navy"
-        />
+      <div className="flex flex-col items-center text-center py-8 gap-4">
+        <div className="h-16 w-16 rounded-full bg-[var(--color-navy-100)] flex items-center justify-center">
+          <span className="text-2xl">⚓</span>
+        </div>
+        <div>
+          <h2 className="text-lg font-serif tracking-tight text-[var(--color-text-primary)] mb-1">
+            Add your first yacht to start building your network
+          </h2>
+          <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed max-w-[280px] mx-auto">
+            We&apos;ll connect you with crew you&apos;ve worked with and make endorsements easy.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 w-full max-w-[240px]">
+          <Link
+            href="/app/attachment/new"
+            className="w-full px-4 py-2.5 rounded-xl text-sm font-medium bg-[var(--color-interactive)] text-white text-center hover:opacity-90 transition-opacity"
+          >
+            Add a Yacht
+          </Link>
+          <Link
+            href="/app/cv/upload"
+            className="w-full px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--color-interactive)] text-center border border-[var(--color-border)] hover:bg-[var(--color-surface-raised)] transition-colors"
+          >
+            Upload a CV instead
+          </Link>
+        </div>
         <YachtSearch />
       </div>
     )
@@ -300,6 +314,21 @@ export function NetworkUnifiedView({
           </motion.div>
         )
       })}
+
+      {/* Add another yacht — shown when 1-3 yachts */}
+      {userYachts.length <= 3 && (
+        <motion.div variants={fadeUp}>
+          <Link
+            href="/app/attachment/new"
+            className="flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[var(--color-navy-200)] py-4 text-sm font-medium text-[var(--color-navy-500)] hover:border-[var(--color-navy-300)] hover:bg-[var(--color-navy-50)] transition-colors"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Add another yacht
+          </Link>
+        </motion.div>
+      )}
 
       {/* Yacht search at bottom */}
       <YachtSearch />
