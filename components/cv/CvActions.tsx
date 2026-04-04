@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { ProUpsellCard } from '@/components/ui/ProUpsellCard'
 import { Download, Eye, EyeOff, Upload, FileText, Sparkles, RefreshCw, ChevronDown } from 'lucide-react'
+import { InfoTooltip } from '@/components/ui/InfoTooltip'
 
 interface CvActionsProps {
   hasGeneratedPdf: boolean
@@ -169,6 +170,9 @@ export function CvActions({
           <div className="flex items-center gap-2">
             <Sparkles size={14} className="text-[var(--color-amber-500)] shrink-0" />
             <p className="text-sm font-medium text-[var(--color-text-primary)]">YachtieLink CV</p>
+            {pdfStale && hasGeneratedPdf && (
+              <InfoTooltip text="Your profile has changed since this CV was generated. Regenerate to include updates." />
+            )}
           </div>
           {pdfStale && hasGeneratedPdf ? (
             <div className="rounded-lg bg-[var(--color-amber-50)] border border-[var(--color-amber-200)] p-2.5 flex items-start gap-2">

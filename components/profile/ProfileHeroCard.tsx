@@ -11,6 +11,7 @@ import { formatSeaTime } from '@/lib/sea-time'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
 import { popIn } from '@/lib/motion'
+import { InfoTooltip } from '@/components/ui/InfoTooltip'
 
 interface ProfileHeroCardProps {
   displayName: string
@@ -270,15 +271,20 @@ export function ProfileHeroCard({
             </p>
           )}
           {(seaTimeTotalDays ?? 0) > 0 && (
-            <p className="text-xs text-[var(--color-text-tertiary)]">
+            <p className="text-xs text-[var(--color-text-tertiary)] flex items-center gap-1">
               {formatSeaTime(seaTimeTotalDays!).displayShort} · {seaTimeYachtCount} yacht{seaTimeYachtCount === 1 ? '' : 's'}
+              <InfoTooltip text="Total time at sea, calculated from your yacht history. Overlapping dates are counted once." />
             </p>
           )}
         </div>
         {/* Compact strength ring */}
         {strengthScore !== undefined && (
           <div data-tour="strength-ring">
-            <CompactStrengthRing score={strengthScore} />
+            <InfoTooltip text="Your profile completeness. Higher scores get more visibility.">
+              <div>
+                <CompactStrengthRing score={strengthScore} />
+              </div>
+            </InfoTooltip>
           </div>
         )}
       </div>

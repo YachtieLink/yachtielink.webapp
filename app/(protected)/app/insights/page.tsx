@@ -177,21 +177,25 @@ export default async function InsightsPage({ searchParams }: Props) {
                     value={summaryMap['profile_view'] ?? 0}
                     data={viewsData}
                     variant="hero"
+                    tooltip="People who visited your public profile"
                   />
                   <MetricCard
                     title="Downloads"
                     value={summaryMap['pdf_download'] ?? 0}
                     data={downloadsData}
+                    tooltip="Times your CV was downloaded"
                   />
                   <MetricCard
                     title="Shares"
                     value={summaryMap['link_share'] ?? 0}
                     data={sharesData}
+                    tooltip="Times you shared your profile link"
                   />
                   <MetricCard
                     title="Saves"
                     value={summaryMap['profile_save'] ?? 0}
                     data={savesData}
+                    tooltip="Times someone saved your profile"
                   />
                 </div>
 
