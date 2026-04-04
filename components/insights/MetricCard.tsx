@@ -1,6 +1,7 @@
 'use client'
 
 import { AnalyticsChart } from './AnalyticsChart'
+import { InfoTooltip } from '@/components/ui/InfoTooltip'
 
 interface MetricCardProps {
   title: string
@@ -10,6 +11,8 @@ interface MetricCardProps {
   data?: { day: string; count: number }[]
   /** Hero variant = full-width, large number */
   variant?: 'hero' | 'compact'
+  /** Optional tooltip text for the metric title */
+  tooltip?: string
 }
 
 function TrendIndicator({ current, previous }: { current: number; previous: number }) {
@@ -31,13 +34,17 @@ export function MetricCard({
   previousValue,
   data,
   variant = 'compact',
+  tooltip,
 }: MetricCardProps) {
   const isHero = variant === 'hero'
 
   return (
     <div className={`card-soft rounded-2xl p-4 ${isHero ? 'col-span-2' : ''}`}>
       <div className="flex items-baseline justify-between mb-2">
-        <p className="text-sm font-semibold text-[var(--color-text-primary)]">{title}</p>
+        <p className="text-sm font-semibold text-[var(--color-text-primary)] flex items-center gap-1">
+          {title}
+          {tooltip && <InfoTooltip text={tooltip} />}
+        </p>
         <div className="flex items-baseline gap-2">
           {previousValue !== undefined && (
             <TrendIndicator current={value} previous={previousValue} />

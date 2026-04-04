@@ -14,6 +14,8 @@ import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { CareerTimeline } from '@/components/profile/CareerTimeline'
 import { formatSeaTime } from '@/lib/sea-time'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { ProfileCoachingBar } from '@/components/profile/ProfileCoachingBar'
+import { ProfileCoachingNudge } from '@/components/coaching/ProfileCoachingNudge'
 import {
   aboutSummary,
   experienceSummary,
@@ -238,7 +240,7 @@ export default async function ProfilePage() {
   ]
 
   return (
-    <PageTransition className="flex flex-col gap-2 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-teal-50)]">
+    <PageTransition className={`flex flex-col gap-2 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-teal-50)] ${score < 80 ? 'pb-36' : 'pb-24'}`}>
 
       {/* Page title */}
       <div className="flex items-center justify-between px-1 pt-4">
@@ -246,6 +248,7 @@ export default async function ProfilePage() {
       </div>
 
       {/* Hero Card — identity + tap-to-edit + embedded strength ring */}
+      <div data-tour="profile-hero">
       <ProfileHeroCard
         displayName={displayName}
         handle={profile.handle}
@@ -262,6 +265,15 @@ export default async function ProfilePage() {
         strengthNextPrompt={nextPrompt}
         strengthCtaHref={strengthCta?.href}
         strengthCtaLabel={strengthCta?.label}
+      />
+      </div>
+
+      {/* Coaching nudge — context-aware, dismissible */}
+      <ProfileCoachingNudge
+        hasPhoto={!!profile.profile_photo_url}
+        hasBio={!!profile.bio}
+        hasYacht={(attachments?.length ?? 0) > 0}
+        hasCert={(certs?.length ?? 0) > 0}
       />
 
       {/* ── ABOUT ME ──────────────────────────────────────────── */}
@@ -323,6 +335,14 @@ export default async function ProfilePage() {
           </div>
         )}
       </ProfileSectionGroup>
+
+      {/* Sticky coaching bar — shows when profile strength < 80% */}
+      <ProfileCoachingBar
+        score={score}
+        nextPrompt={nextPrompt}
+        ctaLabel={strengthCta?.label}
+        ctaHref={strengthCta?.href}
+      />
 
     </PageTransition>
   )

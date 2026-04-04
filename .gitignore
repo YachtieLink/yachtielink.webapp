@@ -40,6 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# supabase local
+.supabase
+
 # claude code worktrees
 .claude/worktrees/
 

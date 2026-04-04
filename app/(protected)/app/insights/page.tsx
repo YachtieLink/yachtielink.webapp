@@ -16,6 +16,7 @@ import { WhoViewedYou } from '@/components/insights/WhoViewedYou'
 import { UpgradeCTA } from '@/components/insights/UpgradeCTA'
 import { InsightsUpgradedToast } from '@/components/insights/InsightsUpgradedToast'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { FirstVisitCard } from '@/components/ui/FirstVisitCard'
 type TimeRange = '7' | '30' | 'all'
 
 interface Props {
@@ -113,7 +114,7 @@ export default async function InsightsPage({ searchParams }: Props) {
     <PageTransition className="flex flex-col gap-4 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-coral-50)]">
       {upgraded && <InsightsUpgradedToast isPro={proStatus.isPro} />}
 
-      <div className="flex items-center justify-between pt-2">
+      <div className="flex items-center justify-between pt-2" data-tour="insights-page">
         <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">
           Career Insights
         </h1>
@@ -126,46 +127,118 @@ export default async function InsightsPage({ searchParams }: Props) {
 
       {proStatus.isPro ? (
         <>
+          <FirstVisitCard
+            storageKey="yl_first_visit_insights_pro"
+            accentColor="coral"
+            icon="📊"
+            title="Your analytics dashboard"
+            description="Views, downloads, shares, and saves — track how your profile performs over time."
+          />
+
           {/* Time range selector */}
           <TimeRangeSelector currentRange={range} />
 
-          {/* Metric cards grid */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* Hero metric — Profile Views */}
-            <MetricCard
-              title="Profile Views"
-              value={summaryMap['profile_view'] ?? 0}
-              data={viewsData}
-              variant="hero"
-            />
-            <MetricCard
-              title="Downloads"
-              value={summaryMap['pdf_download'] ?? 0}
-              data={downloadsData}
-            />
-            <MetricCard
-              title="Shares"
-              value={summaryMap['link_share'] ?? 0}
-              data={sharesData}
-            />
-            <MetricCard
-              title="Saves"
-              value={summaryMap['profile_save'] ?? 0}
-              data={savesData}
-            />
-          </div>
+          {(() => {
+            const totalEvents = (summaryMap['profile_view'] ?? 0) + (summaryMap['pdf_download'] ?? 0) + (summaryMap['link_share'] ?? 0) + (summaryMap['profile_save'] ?? 0)
 
-          {/* Who Viewed You */}
-          <WhoViewedYou viewers={[]} totalCount={0} range={range} />
+            // Pro empty analytics state — no activity yet
+            if (totalEvents === 0) {
+              return (
+                <div className="flex flex-col items-center text-center py-8 gap-4">
+                  <div className="h-16 w-16 rounded-full bg-[var(--color-coral-100)] flex items-center justify-center">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-coral-500)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 20V10" /><path d="M12 20V4" /><path d="M6 20v-6" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-serif tracking-tight text-[var(--color-text-primary)] mb-1">
+                      Share your profile to start seeing analytics
+                    </h2>
+                    <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed max-w-[280px] mx-auto">
+                      Views, downloads, and shares will appear here once people discover your profile.
+                    </p>
+                  </div>
+                  <Link
+                    href="/app/profile"
+                    className="px-4 py-2.5 rounded-xl text-sm font-medium bg-[var(--color-interactive)] text-white text-center hover:opacity-90 transition-opacity"
+                  >
+                    View Profile
+                  </Link>
+                </div>
+              )
+            }
+
+            // Pro warm state — has analytics
+            return (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <MetricCard
+                    title="Profile Views"
+                    value={summaryMap['profile_view'] ?? 0}
+                    data={viewsData}
+                    variant="hero"
+                    tooltip="People who visited your public profile"
+                  />
+                  <MetricCard
+                    title="Downloads"
+                    value={summaryMap['pdf_download'] ?? 0}
+                    data={downloadsData}
+                    tooltip="Times your CV was downloaded"
+                  />
+                  <MetricCard
+                    title="Shares"
+                    value={summaryMap['link_share'] ?? 0}
+                    data={sharesData}
+                    tooltip="Times you shared your profile link"
+                  />
+                  <MetricCard
+                    title="Saves"
+                    value={summaryMap['profile_save'] ?? 0}
+                    data={savesData}
+                    tooltip="Times someone saved your profile"
+                  />
+                </div>
+
+                <WhoViewedYou viewers={[]} totalCount={0} range={range} />
+              </>
+            )
+          })()}
         </>
       ) : (
         <>
-          {/* Career snapshot — always valuable */}
-          <CareerSnapshot
-            seaTimeDays={seaTimeDays}
-            yachtCount={yachtCount}
-            certCount={certCount}
+          <FirstVisitCard
+            storageKey="yl_first_visit_insights_free"
+            accentColor="coral"
+            icon="📊"
+            title="Career Insights"
+            description="See how your profile performs. Upgrade to Pro to see who's viewing you and track downloads."
           />
+
+          {/* Career snapshot — coaching state when all zeros */}
+          {seaTimeDays === 0 && yachtCount === 0 && certCount === 0 ? (
+            <div className="card-soft rounded-2xl p-4 flex flex-col items-center text-center gap-3">
+              <div className="h-12 w-12 rounded-full bg-[var(--color-coral-100)] flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-coral-500)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                </svg>
+              </div>
+              <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed max-w-[260px]">
+                Upload your CV or add experience to see your career snapshot
+              </p>
+              <Link
+                href="/app/cv/upload"
+                className="px-4 py-2 rounded-xl text-xs font-medium bg-[var(--color-interactive)] text-white hover:opacity-90 transition-opacity"
+              >
+                Upload CV
+              </Link>
+            </div>
+          ) : (
+            <CareerSnapshot
+              seaTimeDays={seaTimeDays}
+              yachtCount={yachtCount}
+              certCount={certCount}
+            />
+          )}
 
           {/* Profile Strength coaching */}
           <div className="card-soft rounded-2xl p-4">

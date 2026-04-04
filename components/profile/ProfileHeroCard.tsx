@@ -11,6 +11,7 @@ import { formatSeaTime } from '@/lib/sea-time'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
 import { popIn } from '@/lib/motion'
+import { InfoTooltip } from '@/components/ui/InfoTooltip'
 
 interface ProfileHeroCardProps {
   displayName: string
@@ -270,14 +271,21 @@ export function ProfileHeroCard({
             </p>
           )}
           {(seaTimeTotalDays ?? 0) > 0 && (
-            <p className="text-xs text-[var(--color-text-tertiary)]">
+            <p className="text-xs text-[var(--color-text-tertiary)] flex items-center gap-1">
               {formatSeaTime(seaTimeTotalDays!).displayShort} · {seaTimeYachtCount} yacht{seaTimeYachtCount === 1 ? '' : 's'}
+              <InfoTooltip text="Total time at sea, calculated from your yacht history. Overlapping dates are counted once." />
             </p>
           )}
         </div>
         {/* Compact strength ring */}
         {strengthScore !== undefined && (
-          <CompactStrengthRing score={strengthScore} />
+          <div data-tour="strength-ring">
+            <InfoTooltip text="Your profile completeness. Higher scores get more visibility.">
+              <div>
+                <CompactStrengthRing score={strengthScore} />
+              </div>
+            </InfoTooltip>
+          </div>
         )}
       </div>
 
@@ -343,17 +351,23 @@ export function ProfileHeroCard({
         </div>
       )}
 
-      {/* Action buttons */}
-      <div className="flex gap-2">
-        {handle && (
-          <Link href={`/u/${handle}`} className="flex-1">
-            <Button variant="outline" className="w-full">Preview</Button>
-          </Link>
-        )}
-        <Button onClick={shareProfile} className="flex-1">
-          Share Profile
-        </Button>
-      </div>
+      {/* Action buttons — hidden when profile is too incomplete */}
+      {(strengthScore ?? 100) >= 40 ? (
+        <div className="flex gap-2">
+          {handle && (
+            <Link href={`/u/${handle}`} className="flex-1">
+              <Button variant="outline" className="w-full">Preview</Button>
+            </Link>
+          )}
+          <Button onClick={shareProfile} className="flex-1">
+            Share Profile
+          </Button>
+        </div>
+      ) : (
+        <p className="text-xs text-[var(--color-text-tertiary)] text-center py-1">
+          Complete your profile to unlock sharing and preview
+        </p>
+      )}
     </div>
   )
 }

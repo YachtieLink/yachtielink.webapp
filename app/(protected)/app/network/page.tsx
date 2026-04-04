@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { NetworkUnifiedView } from '@/components/network/NetworkUnifiedView'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { EndorsementRequestBar } from '@/components/network/EndorsementRequestBar'
+import { FirstVisitCard } from '@/components/ui/FirstVisitCard'
 
 interface ColleagueRow {
   colleague_id: string
@@ -139,7 +141,7 @@ export default async function NetworkPage() {
   return (
     <PageTransition className="flex flex-col gap-4">
       {/* Header with bookmark icon */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" data-tour="network-page">
         <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">
           My Network
         </h1>
@@ -154,8 +156,16 @@ export default async function NetworkPage() {
         </Link>
       </div>
 
+      <FirstVisitCard
+        storageKey="yl_first_visit_network"
+        accentColor="navy"
+        icon="🤝"
+        title="How your network works"
+        description="We connect you with crew through shared yacht history. Add a yacht, see colleagues, and request endorsements."
+      />
+
       {/* Navy wayfinding background */}
-      <div className="min-h-screen bg-[var(--color-navy-50)] -mx-4 px-4 md:-mx-6 md:px-6 pt-4 pb-24 -mt-2">
+      <div className={`min-h-screen bg-[var(--color-navy-50)] -mx-4 px-4 md:-mx-6 md:px-6 pt-4 -mt-2 ${endorsementsReceived.length < 5 && colleagues.length >= 1 ? 'pb-36' : 'pb-24'}`}>
         <NetworkUnifiedView
           colleagues={colleagues}
           userYachts={userYachts}
@@ -167,6 +177,12 @@ export default async function NetworkPage() {
           ghostSuggestions={ghostSuggestions}
         />
       </div>
+
+      {/* Sticky endorsement request bar — shows when < 5 endorsements and has colleagues */}
+      <EndorsementRequestBar
+        endorsementCount={endorsementsReceived.length}
+        colleagueCount={colleagues.length}
+      />
     </PageTransition>
   )
 }
