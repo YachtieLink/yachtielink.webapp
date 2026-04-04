@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/Input'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { SectionVisibilityToggle } from '@/components/profile/SectionVisibilityToggle'
 import { suggestEmoji } from '@/lib/hobby-emojis'
 
 interface Hobby {
@@ -184,6 +185,8 @@ export default function HobbiesEditPage() {
                 )}
               </div>
             )}
+
+            <SectionVisibilityToggle sectionKey="hobbies" label="Hobbies" />
 
             <Button
               onClick={save}

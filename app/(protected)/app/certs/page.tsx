@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getProStatus } from '@/lib/stripe/pro';
 import { CertsClient } from '@/components/certs/CertsClient';
 import { ProUpsellCard } from '@/components/ui/ProUpsellCard';
+import { SectionVisibilityToggle } from '@/components/profile/SectionVisibilityToggle';
 
 export default async function CertsPage() {
   const supabase = await createClient();
@@ -60,6 +61,8 @@ export default async function CertsPage() {
         certs={(certs ?? []) as any}
         isPro={proStatus.isPro}
       />
+
+      <SectionVisibilityToggle sectionKey="certifications" label="Certifications" />
     </div>
   );
 }

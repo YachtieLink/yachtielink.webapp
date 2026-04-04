@@ -2,7 +2,7 @@
 
 **Skill to run:** /yl-chain (re-read this after every compaction)
 **Chain branch:** chain/rally-010
-**Chain tip:** 25461a7 (all 4 sessions merged)
+**Chain tip:** 27d5f79 (all 4 sessions merged + review fixes + QA)
 **Rally spec:** sprints/rallies/rally-010-frontend-ux-guidance/README.md
 **Sessions in scope:** 1 through 4
 **Started:** 2026-04-04 ~22:00
@@ -11,7 +11,7 @@
 
 ## Current Position
 
-**Status:** COMPLETE — all 4 sessions built, reviewed, QA'd, merged, pushed, PR created.
+**Status:** COMPLETE — all 4 sessions built, reviewed (via /yl-review Skill), QA'd (via /yl-tester Skill), review fixes committed, pushed, PR #170 updated.
 
 ## Progress
 | Session | Lanes | Build | /yl-review | /yl-tester | Merged |

@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/Textarea'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { SectionVisibilityToggle } from '@/components/profile/SectionVisibilityToggle'
 
 const MAX_CHARS = 500
 
@@ -101,6 +102,8 @@ export default function AboutEditPage() {
                 {remaining}
               </p>
             </div>
+
+            <SectionVisibilityToggle sectionKey="about" label="Bio" />
 
             <div className="flex gap-3">
               <Button

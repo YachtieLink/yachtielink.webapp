@@ -16,7 +16,7 @@ import { RESERVED_HANDLES } from '@/lib/constants/reserved-handles'
 import { isProFromRecord } from '@/lib/stripe/pro-shared'
 import { User, Phone, Mail, MapPin, Calendar, Globe, LayoutGrid, Link2, Plus, X } from 'lucide-react'
 import { getPlatformIcon } from '@/components/ui/social-icons'
-import { ALL_PLATFORMS, SOCIAL_PLATFORM_META } from '@/lib/social-platforms'
+import { ALL_PLATFORMS, SOCIAL_PLATFORM_META, extractHandle, buildUrl, getPlatformPrefix } from '@/lib/social-platforms'
 import type { SocialPlatform } from '@/lib/social-platforms'
 
 const DEPARTMENTS = [
@@ -129,8 +129,8 @@ export default function ProfileSettingsPage() {
 
   // Social links
   const [socialLinks, setSocialLinks] = useState<SocialLinkItem[]>([])
-  const [addingPlatform, setAddingPlatform] = useState<SocialPlatform | null>(null)
-  const [addingUrl, setAddingUrl] = useState('')
+  const [editingPlatform, setEditingPlatform] = useState<SocialPlatform | null>(null)
+  const [editingUrl, setEditingUrl] = useState('')
 
   // View mode
   const [profileViewMode, setProfileViewMode] = useState<'profile' | 'portfolio' | 'rich_portfolio'>('portfolio')
@@ -437,13 +437,59 @@ export default function ProfileSettingsPage() {
             {socialLinks.map((link) => {
               const meta = SOCIAL_PLATFORM_META[link.platform]
               if (!meta) return null
+              const isEditing = editingPlatform === link.platform
               return (
                 <div key={link.platform} className="flex items-center gap-2 min-h-[44px]">
                   <span className="text-[var(--color-text-secondary)] shrink-0">{getPlatformIcon(link.platform, 16)}</span>
-                  <span className="flex-1 text-sm text-[var(--color-text-primary)] truncate">{link.url}</span>
+                  {isEditing ? (
+                    <div className="flex-1 flex items-center h-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] overflow-hidden focus-within:ring-2 focus-within:ring-[var(--color-interactive)]/20 focus-within:border-[var(--color-interactive)]">
+                      {getPlatformPrefix(link.platform) && (
+                        <span className="text-xs text-[var(--color-text-tertiary)] pl-3 pr-2 shrink-0 h-full flex items-center bg-[var(--color-surface-raised)] border-r border-[var(--color-border)]">{getPlatformPrefix(link.platform)}</span>
+                      )}
+                      <input
+                        value={editingUrl}
+                        onChange={(e) => setEditingUrl(e.target.value)}
+                        placeholder={getPlatformPrefix(link.platform) ? 'yourhandle' : 'https://yourwebsite.com'}
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            const handle = editingUrl.trim()
+                            if (handle) {
+                              setSocialLinks(socialLinks.map(l => l.platform === link.platform ? { ...l, url: buildUrl(link.platform, handle) } : l))
+                            } else {
+                              setSocialLinks(socialLinks.filter(l => l.platform !== link.platform))
+                            }
+                            setEditingPlatform(null)
+                          }
+                          if (e.key === 'Escape') {
+                            if (!link.url) setSocialLinks(socialLinks.filter(l => l.platform !== link.platform))
+                            setEditingPlatform(null)
+                          }
+                        }}
+                        onBlur={() => {
+                          const handle = editingUrl.trim()
+                          if (handle) {
+                            setSocialLinks(socialLinks.map(l => l.platform === link.platform ? { ...l, url: buildUrl(link.platform, handle) } : l))
+                          } else if (!link.url) {
+                            setSocialLinks(socialLinks.filter(l => l.platform !== link.platform))
+                          }
+                          setEditingPlatform(null)
+                        }}
+                        className="flex-1 h-full px-2 text-sm bg-transparent outline-none"
+                      />
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => { setEditingPlatform(link.platform); setEditingUrl(extractHandle(link.platform, link.url)) }}
+                      className="flex-1 text-sm text-[var(--color-text-primary)] truncate text-left hover:text-[var(--color-interactive)] transition-colors"
+                    >
+                      {link.url}
+                    </button>
+                  )}
                   <button
                     type="button"
-                    onClick={() => setSocialLinks(socialLinks.filter(l => l.platform !== link.platform))}
+                    onClick={() => { setSocialLinks(socialLinks.filter(l => l.platform !== link.platform)); setEditingPlatform(null) }}
                     aria-label={`Remove ${meta.label}`}
                     className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--color-text-tertiary)] hover:bg-[var(--color-surface-raised)] hover:text-[var(--color-error)] transition-colors shrink-0"
                   >
@@ -455,8 +501,8 @@ export default function ProfileSettingsPage() {
           </div>
         )}
 
-        {/* Add more prompt — shown when there are still platforms to add */}
-        {socialLinks.length < ALL_PLATFORMS.length && (
+        {/* Add more — dashed buttons for unused platforms */}
+        {ALL_PLATFORMS.filter(p => !socialLinks.some(l => l.platform === p)).length > 0 && (
           <div className="flex flex-col gap-2">
             {socialLinks.length === 0 && (
               <p className="text-xs text-[var(--color-text-tertiary)]">
@@ -464,80 +510,29 @@ export default function ProfileSettingsPage() {
               </p>
             )}
 
-            {/* Platform suggestion chips */}
-            {addingPlatform === null && (
-              <div className="flex flex-wrap gap-2">
-                {ALL_PLATFORMS
-                  .filter(p => !socialLinks.some(l => l.platform === p))
-                  .slice(0, 5)
-                  .map((p) => {
-                    const meta = SOCIAL_PLATFORM_META[p]
-                    return (
-                      <button
-                        key={p}
-                        type="button"
-                        onClick={() => { setAddingPlatform(p); setAddingUrl('') }}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-dashed border-[var(--color-interactive)]/40 text-xs font-medium text-[var(--color-interactive)] hover:bg-[var(--color-interactive)]/5 transition-colors min-h-[36px]"
-                      >
-                        {getPlatformIcon(p, 16)}
-                        <span>{meta.label}</span>
-                        <Plus size={10} />
-                      </button>
-                    )
-                  })}
-              </div>
-            )}
-
-            {/* Inline URL entry for the chosen platform */}
-            {addingPlatform !== null && (
-              <div className="flex items-center gap-2">
-                <span className="text-[var(--color-text-secondary)] shrink-0">
-                  {getPlatformIcon(addingPlatform, 16)}
-                </span>
-                <input
-                  value={addingUrl}
-                  onChange={(e) => setAddingUrl(e.target.value)}
-                  placeholder={SOCIAL_PLATFORM_META[addingPlatform].placeholder}
-                  autoFocus
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      const url = addingUrl.trim()
-                      if (url) {
-                        setSocialLinks([...socialLinks, { platform: addingPlatform, url: url.startsWith('http') ? url : `https://${url}` }])
-                      }
-                      setAddingPlatform(null)
-                      setAddingUrl('')
-                    }
-                    if (e.key === 'Escape') {
-                      setAddingPlatform(null)
-                      setAddingUrl('')
-                    }
-                  }}
-                  className="flex-1 h-10 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-interactive)]/20 focus:border-[var(--color-interactive)]"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const url = addingUrl.trim()
-                    if (url) {
-                      setSocialLinks([...socialLinks, { platform: addingPlatform, url: url.startsWith('http') ? url : `https://${url}` }])
-                    }
-                    setAddingPlatform(null)
-                    setAddingUrl('')
-                  }}
-                  className="text-sm text-[var(--color-interactive)] font-medium px-2 min-h-[44px]"
-                >
-                  Add
-                </button>
-                <button
-                  type="button"
-                  onClick={() => { setAddingPlatform(null); setAddingUrl('') }}
-                  className="text-sm text-[var(--color-text-tertiary)] px-1 min-h-[44px]"
-                >
-                  ×
-                </button>
-              </div>
-            )}
+            <div className="flex flex-wrap gap-2">
+              {ALL_PLATFORMS
+                .filter(p => !socialLinks.some(l => l.platform === p))
+                .map((p) => {
+                  const meta = SOCIAL_PLATFORM_META[p]
+                  return (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => {
+                        setSocialLinks([...socialLinks, { platform: p, url: '' }])
+                        setEditingPlatform(p)
+                        setEditingUrl('')
+                      }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-dashed border-[var(--color-interactive)]/40 text-xs font-medium text-[var(--color-interactive)] hover:bg-[var(--color-interactive)]/5 transition-colors min-h-[36px]"
+                    >
+                      {getPlatformIcon(p, 16)}
+                      <span>{meta.label}</span>
+                      <Plus size={10} />
+                    </button>
+                  )
+                })}
+            </div>
           </div>
         )}
       </div>

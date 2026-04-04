@@ -82,6 +82,7 @@ Self-contained, ship-in-a-session improvements. Good candidates for a polish ral
 | `cv-parse-pro-upsell.md` | S | Upsell to Pro when free user hits CV parse rate limit |
 | `settings-preview-ux.md` | S | Settings cosmetics — show live preview of visibility toggles |
 | `visibility-toggle-clarity.md` | S | Clarify what each visibility toggle controls (label copy + tooltip) |
+| `info-tooltips-platform-wide.md` | M | InfoTooltip component rollout across all tabs + section color wayfinding + infrastructure for future features |
 | `ghost-endorser-card-layout.md` | S | EndorsementCard ghost path uses old layout — visual asymmetry with non-ghost cards |
 | `saved-profile-card-wiring.md` | S | Wire seaTimeDays/yachtCount props from SavedProfilesClient to SavedProfileCard |
 | `yacht-prefix-null-type.md` | S | prefixedYachtName returns "M/Y Unknown yacht" when yacht_type is null — misleading fallback |
