@@ -16,6 +16,7 @@ import { WhoViewedYou } from '@/components/insights/WhoViewedYou'
 import { UpgradeCTA } from '@/components/insights/UpgradeCTA'
 import { InsightsUpgradedToast } from '@/components/insights/InsightsUpgradedToast'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { FirstVisitCard } from '@/components/ui/FirstVisitCard'
 type TimeRange = '7' | '30' | 'all'
 
 interface Props {
@@ -126,6 +127,14 @@ export default async function InsightsPage({ searchParams }: Props) {
 
       {proStatus.isPro ? (
         <>
+          <FirstVisitCard
+            storageKey="yl_first_visit_insights_pro"
+            accentColor="coral"
+            icon="📊"
+            title="Your analytics dashboard"
+            description="Views, downloads, shares, and saves — track how your profile performs over time."
+          />
+
           {/* Time range selector */}
           <TimeRangeSelector currentRange={range} />
 
@@ -193,6 +202,14 @@ export default async function InsightsPage({ searchParams }: Props) {
         </>
       ) : (
         <>
+          <FirstVisitCard
+            storageKey="yl_first_visit_insights_free"
+            accentColor="coral"
+            icon="📊"
+            title="Career Insights"
+            description="See how your profile performs. Upgrade to Pro to see who's viewing you and track downloads."
+          />
+
           {/* Career snapshot — coaching state when all zeros */}
           {seaTimeDays === 0 && yachtCount === 0 && certCount === 0 ? (
             <div className="card-soft rounded-2xl p-4 flex flex-col items-center text-center gap-3">

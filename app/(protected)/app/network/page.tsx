@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { NetworkUnifiedView } from '@/components/network/NetworkUnifiedView'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { EndorsementRequestBar } from '@/components/network/EndorsementRequestBar'
+import { FirstVisitCard } from '@/components/ui/FirstVisitCard'
 
 interface ColleagueRow {
   colleague_id: string
@@ -154,6 +155,14 @@ export default async function NetworkPage() {
           </svg>
         </Link>
       </div>
+
+      <FirstVisitCard
+        storageKey="yl_first_visit_network"
+        accentColor="navy"
+        icon="🤝"
+        title="How your network works"
+        description="We connect you with crew through shared yacht history. Add a yacht, see colleagues, and request endorsements."
+      />
 
       {/* Navy wayfinding background */}
       <div className={`min-h-screen bg-[var(--color-navy-50)] -mx-4 px-4 md:-mx-6 md:px-6 pt-4 -mt-2 ${endorsementsReceived.length < 5 && colleagues.length >= 1 ? 'pb-36' : 'pb-24'}`}>
