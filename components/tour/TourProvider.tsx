@@ -1,23 +1,9 @@
 'use client'
 
-import { useSyncExternalStore } from 'react'
+import { useEffect } from 'react'
 import { Onborda, OnbordaProvider, useOnborda } from 'onborda'
 import type { CardComponentProps } from 'onborda'
 import { allTours, TOUR_STORAGE_KEY } from './tour-steps'
-
-function getIsTourComplete() {
-  return !!localStorage.getItem(TOUR_STORAGE_KEY)
-}
-
-const serverSnapshot = true // don't show tour during SSR
-
-function subscribeTourStorage(callback: () => void) {
-  const handler = (e: StorageEvent) => {
-    if (e.key === TOUR_STORAGE_KEY) callback()
-  }
-  window.addEventListener('storage', handler)
-  return () => window.removeEventListener('storage', handler)
-}
 
 /** Custom card component for tour steps */
 function TourCard({ step, currentStep, totalSteps, nextStep, prevStep, arrow }: CardComponentProps) {
@@ -82,24 +68,36 @@ function TourCard({ step, currentStep, totalSteps, nextStep, prevStep, arrow }: 
   )
 }
 
-export function TourProvider({ children }: { children: React.ReactNode }) {
-  const tourComplete = useSyncExternalStore(
-    subscribeTourStorage,
-    getIsTourComplete,
-    () => serverSnapshot,
-  )
+/**
+ * Inner component that has access to OnbordaProvider context.
+ * Triggers the tour on mount if the user hasn't completed it.
+ */
+function TourTrigger({ children }: { children: React.ReactNode }) {
+  const { startOnborda } = useOnborda()
 
+  useEffect(() => {
+    const completed = localStorage.getItem(TOUR_STORAGE_KEY)
+    if (!completed) {
+      startOnborda('welcome')
+    }
+  }, [startOnborda])
+
+  return <>{children}</>
+}
+
+export function TourProvider({ children }: { children: React.ReactNode }) {
   return (
     <OnbordaProvider>
       <Onborda
         steps={allTours}
-        showOnborda={!tourComplete}
         shadowRgb="0,0,0"
         shadowOpacity="0.6"
         cardComponent={TourCard}
         cardTransition={{ type: 'spring', stiffness: 300, damping: 25 }}
       >
-        {children}
+        <TourTrigger>
+          {children}
+        </TourTrigger>
       </Onborda>
     </OnbordaProvider>
   )
