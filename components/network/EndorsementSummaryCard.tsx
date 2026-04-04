@@ -1,5 +1,7 @@
 'use client'
 
+import { InfoTooltip } from '@/components/ui/InfoTooltip'
+
 interface EndorsementSummaryCardProps {
   received: number
   given: number
@@ -15,6 +17,7 @@ export function EndorsementSummaryCard({ received, given, pending }: Endorsement
         <span className="text-lg">⚓</span>
         <span className="text-sm font-semibold">{received}</span>
         <span className="text-xs text-[var(--color-text-secondary)]">received</span>
+        <InfoTooltip text="Profiles with 5+ endorsements get noticed by captains." />
       </div>
       <span className="text-[var(--color-border)]">·</span>
       <div className="flex items-center gap-1.5">
