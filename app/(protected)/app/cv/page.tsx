@@ -6,6 +6,7 @@ import { CvActions } from '@/components/cv/CvActions'
 import { CvImportCard } from '@/components/cv/CvImportCard'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { CvDocumentBar } from '@/components/cv/CvDocumentBar'
+import { FirstVisitCard } from '@/components/ui/FirstVisitCard'
 
 export default async function CvPage() {
   const supabase = await createClient()
@@ -97,6 +98,14 @@ export default async function CvPage() {
           </Link>
         </div>
       </div>
+
+      <FirstVisitCard
+        storageKey="yl_first_visit_cv"
+        accentColor="amber"
+        icon="📄"
+        title="How your CV works"
+        description="Your YachtieLink CV is built from your profile. Edit your experience on the Profile tab — the CV updates automatically."
+      />
 
       <CvActions
         hasGeneratedPdf={hasGeneratedPdf}
