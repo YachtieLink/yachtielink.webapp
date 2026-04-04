@@ -15,6 +15,7 @@ import { CareerTimeline } from '@/components/profile/CareerTimeline'
 import { formatSeaTime } from '@/lib/sea-time'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { ProfileCoachingBar } from '@/components/profile/ProfileCoachingBar'
+import { ProfileCoachingNudge } from '@/components/coaching/ProfileCoachingNudge'
 import {
   aboutSummary,
   experienceSummary,
@@ -266,6 +267,15 @@ export default async function ProfilePage() {
         strengthCtaLabel={strengthCta?.label}
       />
       </div>
+
+      {/* Coaching nudge — context-aware, dismissible */}
+      <ProfileCoachingNudge
+        hasPhoto={!!profile.profile_photo_url}
+        hasRole={!!profile.primary_role}
+        hasBio={!!profile.bio}
+        hasYacht={(attachments?.length ?? 0) > 0}
+        hasCert={(certs?.length ?? 0) > 0}
+      />
 
       {/* ── ABOUT ME ──────────────────────────────────────────── */}
       <ProfileSectionGroup title="About Me" icon={<User size={16} />}>
