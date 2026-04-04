@@ -25,6 +25,8 @@ export default async function CvPage() {
     redirect('/app/profile/settings')
   }
 
+  const pdfStale = !!(profile.latest_pdf_generated_at && profile.updated_at && new Date(profile.updated_at) > new Date(profile.latest_pdf_generated_at))
+
   return (
     <PageTransition className={`flex flex-col gap-4 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-amber-50)] ${profile.latest_pdf_path ? 'pb-36' : 'pb-24'}`}>
       <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">My CV</h1>
@@ -57,7 +59,7 @@ export default async function CvPage() {
       <CvActions
         hasGeneratedPdf={!!profile.latest_pdf_path}
         pdfGeneratedAt={profile.latest_pdf_generated_at as string | null}
-        pdfStale={!!(profile.latest_pdf_generated_at && profile.updated_at && new Date(profile.updated_at) > new Date(profile.latest_pdf_generated_at))}
+        pdfStale={pdfStale}
         hasUploadedCv={!!profile.cv_storage_path}
         cvPublic={profile.cv_public ?? true}
         cvPublicSource={(profile.cv_public_source as 'generated' | 'uploaded') ?? 'generated'}
@@ -67,7 +69,7 @@ export default async function CvPage() {
       {/* Sticky document action bar — shows when generated PDF exists */}
       <CvDocumentBar
         hasGeneratedPdf={!!profile.latest_pdf_path}
-        pdfStale={!!(profile.latest_pdf_generated_at && profile.updated_at && new Date(profile.updated_at) > new Date(profile.latest_pdf_generated_at))}
+        pdfStale={pdfStale}
       />
     </PageTransition>
   )
