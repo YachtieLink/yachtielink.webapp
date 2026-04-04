@@ -7,6 +7,7 @@ import { CvImportCard } from '@/components/cv/CvImportCard'
 import { PageTransition } from '@/components/ui/PageTransition'
 import { CvDocumentBar } from '@/components/cv/CvDocumentBar'
 import { FirstVisitCard } from '@/components/ui/FirstVisitCard'
+import { CvFreshnessNudge } from '@/components/coaching/CvFreshnessNudge'
 
 export default async function CvPage() {
   const supabase = await createClient()
@@ -105,6 +106,11 @@ export default async function CvPage() {
         icon="📄"
         title="How your CV works"
         description="Your YachtieLink CV is built from your profile. Edit your experience on the Profile tab — the CV updates automatically."
+      />
+
+      <CvFreshnessNudge
+        profileUpdatedAt={profile.updated_at as string | null}
+        pdfGeneratedAt={profile.latest_pdf_generated_at as string | null}
       />
 
       <CvActions
