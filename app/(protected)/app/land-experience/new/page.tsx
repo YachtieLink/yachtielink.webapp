@@ -27,7 +27,11 @@ export default function NewLandExperiencePage() {
     setSaving(true)
 
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { setSaving(false); return }
+    if (!user) {
+      setSaving(false)
+      toast('Session expired. Please refresh and try again.', 'error')
+      return
+    }
 
     const { error } = await supabase.from('land_experience').insert({
       user_id: user.id,
@@ -59,6 +63,7 @@ export default function NewLandExperiencePage() {
             value={company}
             onChange={(e) => setCompany(e.target.value)}
             placeholder="e.g. The Ritz-Carlton, Nobu"
+            maxLength={200}
           />
 
           <Input
@@ -66,6 +71,7 @@ export default function NewLandExperiencePage() {
             value={role}
             onChange={(e) => setRole(e.target.value)}
             placeholder="e.g. Head Chef, Restaurant Manager"
+            maxLength={200}
           />
 
           <DatePicker
@@ -102,6 +108,7 @@ export default function NewLandExperiencePage() {
             value={industry}
             onChange={(e) => setIndustry(e.target.value)}
             placeholder="e.g. Hospitality, Maritime services"
+            maxLength={200}
           />
 
           <div className="flex flex-col gap-1.5">

@@ -1,6 +1,6 @@
 ---
 module: public-profile
-updated: 2026-04-03
+updated: 2026-04-04
 status: shipped
 phase: 1B
 ---
@@ -27,7 +27,9 @@ One-line: Server-rendered public profile page at `/u/{handle}` with SEO metadata
 - Dual-layout system: `PublicProfileContent` (now client component) branches between Profile mode (editorial layout) and Portfolio mode (card-based `PortfolioLayout`). View mode toggle rendered in hero identity block. Default mode stored in `profile_view_mode` column.
 - Scrim preset system: 4 presets (dark/light/teal/warm) from `lib/scrim-presets.ts` control hero gradients, text colors, text shadows, badge backgrounds. Applied in `HeroSection`.
 - Accent color system: 5 palettes (teal/coral/navy/amber/sand) from `lib/accent-colors.ts`. CSS custom properties (`--accent-500`, `--accent-600`, `--accent-100`) injected on wrapper div.
-- Photo focal points: `focal_x`/`focal_y` from `user_photos` applied via `objectPosition` in hero and gallery components.
+- Photo focal points: `focal_x`/`focal_y` from `user_photos` applied via `objectPosition` in hero. Per-context focal points (`hero_focal_x/y`, `avatar_focal_x/y`, `cv_focal_x/y`) and zoom (`hero_zoom`, `avatar_zoom`, `cv_zoom`) stored in DB and exposed via PATCH `/api/user-photos/[id]` (Pro-gated).
+- Hero zoom: `HeroSection` accepts `heroZoom` prop (default 1), applies `transform: scale(heroZoom)` to the hero image. `PublicProfileContent` resolves `heroPhoto?.hero_zoom ?? 1` and passes it. Avatar and CV zoom/focal not yet consumed by their display components.
+- `getExtendedProfileSections` selects all 17 user_photos fields: id, photo_url, sort_order, focal_x/y, is_avatar/hero/cv, avatar/hero/cv focal_x/y, avatar/hero/cv zoom.
 - Mini bento gallery: `MiniBentoGallery` — 3 layout variants (1/2/3+ photos) with asymmetric grid and lazy-loaded `PhotoLightbox` (full-screen viewer with keyboard/touch navigation).
 - Endorsement pinning: recipients can pin up to 3 endorsements. Pin API at `/api/endorsements/[id]/pin`, RLS policy for recipient updates, `EndorsementsPageClient` with optimistic updates and rollback.
 - Public profile components: `PublicProfileContent` (dual-layout, ~500 LOC), `HeroSection`, `ViewModeToggle`, `PortfolioLayout`, `MiniBentoGallery`, `PhotoLightbox`, section components (`ExperienceSection`, `EndorsementsSection`, `CertificationsSection`, `SkillsSection`, `GallerySection`), `EndorsementCard` (with pin support), `ShareButton`, `ShowMoreButton`
@@ -85,6 +87,8 @@ One-line: Server-rendered public profile page at `/u/{handle}` with SEO metadata
 **2025-11-20** — D-007: Identity is free infrastructure; presentation is paid and cosmetic only. Free identity removes barriers to graph formation. — Ari
 
 ## Recent Activity
+
+**2026-04-04** — feat/per-context-focal-zoom: `HeroSection.tsx` gains `heroZoom?: number` prop — `transform: scale(heroZoom)` applied to `<Image>`. `PublicProfileContent.tsx` reads `heroPhoto?.hero_zoom ?? 1` and passes `heroZoom` to `<HeroSection>`. `lib/queries/profile.ts` `getExtendedProfileSections` now selects all 17 `user_photos` fields (was missing zoom + per-context focal columns).
 
 **2026-04-03** — Rally 009 QA: Added `landExperience` prop through `PortfolioLayout` → `RichPortfolioLayout` → `ExperienceTile` → `PublicProfileContent`. "See all N positions" count now includes land experience entries. Land entries render with Briefcase icon in ExperienceTile.
 

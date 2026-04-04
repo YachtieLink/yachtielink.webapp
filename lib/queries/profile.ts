@@ -157,7 +157,7 @@ export async function getExtendedProfileSections(userId: string) {
       .order('sort_order'),
     supabase
       .from('user_photos')
-      .select('id, photo_url, sort_order, focal_x, focal_y')
+      .select('id, photo_url, sort_order, focal_x, focal_y, is_avatar, is_hero, is_cv, avatar_focal_x, avatar_focal_y, hero_focal_x, hero_focal_y, cv_focal_x, cv_focal_y, avatar_zoom, hero_zoom, cv_zoom')
       .eq('user_id', userId)
       .order('sort_order'),
     supabase

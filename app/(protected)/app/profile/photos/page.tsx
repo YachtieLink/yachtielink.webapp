@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
+import { isProFromRecord } from '@/lib/stripe/pro-shared'
 import { uploadUserPhoto } from '@/lib/storage/upload'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
@@ -143,6 +144,7 @@ export default function ProfilePhotosPage() {
   const [savingContext, setSavingContext] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const galleryInputRef = useRef<HTMLInputElement>(null)
+  const confirmDeleteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const maxPhotos = isPro ? MAX_PHOTOS_PRO : MAX_PHOTOS_FREE
   const profilePhoto = photos.length > 0 ? photos[0] : null
@@ -162,11 +164,11 @@ export default function ProfilePhotosPage() {
         if (user) {
           const { data: profile, error } = await supabase
             .from('users')
-            .select('subscription_status')
+            .select('subscription_status, subscription_ends_at')
             .eq('id', user.id)
             .single()
           if (!error && profile) {
-            setIsPro(profile.subscription_status === 'pro')
+            setIsPro(isProFromRecord({ subscription_status: profile.subscription_status, subscription_ends_at: profile.subscription_ends_at }))
           }
         }
         const res = await fetch('/api/user-photos')
@@ -262,11 +264,18 @@ export default function ProfilePhotosPage() {
   const [showContextFocals, setShowContextFocals] = useState(false)
   const [showExtraPhotos, setShowExtraPhotos] = useState(false)
 
+  useEffect(() => {
+    return () => {
+      if (confirmDeleteTimeoutRef.current) clearTimeout(confirmDeleteTimeoutRef.current)
+    }
+  }, [])
+
   async function deletePhoto(photo: Photo) {
     if (confirmDeleteId !== photo.id) {
       setConfirmDeleteId(photo.id)
       // Auto-clear after 3 seconds
-      setTimeout(() => setConfirmDeleteId((prev) => prev === photo.id ? null : prev), 3000)
+      if (confirmDeleteTimeoutRef.current) clearTimeout(confirmDeleteTimeoutRef.current)
+      confirmDeleteTimeoutRef.current = setTimeout(() => setConfirmDeleteId((prev) => prev === photo.id ? null : prev), 3000)
       return
     }
     setConfirmDeleteId(null)
@@ -327,8 +336,8 @@ export default function ProfilePhotosPage() {
       setFocalX(photo.cv_focal_x)
       setFocalY(photo.cv_focal_y ?? 50)
     } else {
-      setFocalX(Number(photo.focal_x) || 50)
-      setFocalY(Number(photo.focal_y) || 50)
+      setFocalX(photo.focal_x ?? 50)
+      setFocalY(photo.focal_y ?? 50)
     }
     // Load zoom for this context
     const zoomKey = `${context}_zoom` as keyof Photo
@@ -340,8 +349,8 @@ export default function ProfilePhotosPage() {
     const ctxX = photo[`${context}_focal_x` as keyof Photo] as number | null | undefined
     const ctxY = photo[`${context}_focal_y` as keyof Photo] as number | null | undefined
     return {
-      x: ctxX ?? (Number(photo.focal_x) || 50),
-      y: ctxY ?? (Number(photo.focal_y) || 50),
+      x: ctxX ?? (photo.focal_x ?? 50),
+      y: ctxY ?? (photo.focal_y ?? 50),
     }
   }
 
@@ -415,8 +424,8 @@ export default function ProfilePhotosPage() {
               <p className="text-xs text-[var(--color-text-tertiary)] mb-2">Preview</p>
               <PhotoFormatPreview
                 photoUrl={profilePhoto.photo_url}
-                focalX={Number(profilePhoto.focal_x) || 50}
-                focalY={Number(profilePhoto.focal_y) || 50}
+                focalX={profilePhoto.focal_x ?? 50}
+                focalY={profilePhoto.focal_y ?? 50}
               />
             </div>
 
@@ -437,7 +446,7 @@ export default function ProfilePhotosPage() {
                     <p className="text-xs text-[var(--color-text-secondary)]">
                       Set a different crop center for each use of your photo.
                     </p>
-                    <div className="flex items-end gap-3">
+                    <div className="flex items-end justify-center gap-3">
                       {/* Avatar */}
                       {(() => {
                         const photo = photos.find(p => p.is_avatar) ?? profilePhoto
@@ -445,7 +454,7 @@ export default function ProfilePhotosPage() {
                         return (
                           <div className="flex flex-col items-center gap-1.5">
                             <button type="button" onClick={() => openFocalPicker(photo, 'avatar')} className="w-16 h-16 rounded-full overflow-hidden bg-[var(--color-surface-raised)] ring-2 ring-[var(--color-teal-200)] hover:ring-[var(--color-teal-500)] transition-all">
-                              <img src={photo.photo_url} alt="Avatar" className="w-full h-full object-cover" style={{ objectPosition: `${focal.x}% ${focal.y}%` }} />
+                              <img src={photo.photo_url} alt="Avatar" className="w-full h-full object-cover" style={{ objectPosition: `${focal.x}% ${focal.y}%`, transform: `scale(${photo.avatar_zoom ?? 1})`, transformOrigin: `${focal.x}% ${focal.y}%` }} />
                             </button>
                             <span className="text-[10px] font-medium text-[var(--color-text-secondary)]">Avatar</span>
                             <span className="text-[9px] text-[var(--color-text-tertiary)]">Profile card</span>
@@ -458,9 +467,9 @@ export default function ProfilePhotosPage() {
                         const photo = photos.find(p => p.is_hero) ?? profilePhoto
                         const focal = resolvedFocal(photo, 'hero')
                         return (
-                          <div className="flex flex-col items-center gap-1.5 flex-1">
-                            <button type="button" onClick={() => openFocalPicker(photo, 'hero')} className="w-full h-[56px] rounded-lg overflow-hidden bg-[var(--color-surface-raised)] ring-2 ring-[var(--color-teal-200)] hover:ring-[var(--color-teal-500)] transition-all">
-                              <img src={photo.photo_url} alt="Hero" className="w-full h-full object-cover" style={{ objectPosition: `${focal.x}% ${focal.y}%` }} />
+                          <div className="flex flex-col items-center gap-1.5 flex-1 min-w-0 max-w-[160px]">
+                            <button type="button" onClick={() => openFocalPicker(photo, 'hero')} className="w-full aspect-[2/1] rounded-lg overflow-hidden bg-[var(--color-surface-raised)] ring-2 ring-[var(--color-teal-200)] hover:ring-[var(--color-teal-500)] transition-all">
+                              <img src={photo.photo_url} alt="Hero" className="w-full h-full object-cover" style={{ objectPosition: `${focal.x}% ${focal.y}%`, transform: `scale(${photo.hero_zoom ?? 1})`, transformOrigin: `${focal.x}% ${focal.y}%` }} />
                             </button>
                             <span className="text-[10px] font-medium text-[var(--color-text-secondary)]">Hero</span>
                             <span className="text-[9px] text-[var(--color-text-tertiary)]">Public page banner</span>
@@ -475,7 +484,7 @@ export default function ProfilePhotosPage() {
                         return (
                           <div className="flex flex-col items-center gap-1.5">
                             <button type="button" onClick={() => openFocalPicker(photo, 'cv')} className="w-16 h-16 rounded-lg overflow-hidden bg-[var(--color-surface-raised)] ring-2 ring-[var(--color-teal-200)] hover:ring-[var(--color-teal-500)] transition-all">
-                              <img src={photo.photo_url} alt="CV" className="w-full h-full object-cover" style={{ objectPosition: `${focal.x}% ${focal.y}%` }} />
+                              <img src={photo.photo_url} alt="CV" className="w-full h-full object-cover" style={{ objectPosition: `${focal.x}% ${focal.y}%`, transform: `scale(${photo.cv_zoom ?? 1})`, transformOrigin: `${focal.x}% ${focal.y}%` }} />
                             </button>
                             <span className="text-[10px] font-medium text-[var(--color-text-secondary)]">CV</span>
                             <span className="text-[9px] text-[var(--color-text-tertiary)]">Generated PDF</span>
@@ -726,16 +735,16 @@ export default function ProfilePhotosPage() {
                         setFocalContext(ctx)
                         // Load focal point for selected context
                         if (ctx === 'base') {
-                          setFocalX(Number(focalPhoto.focal_x) || 50)
-                          setFocalY(Number(focalPhoto.focal_y) || 50)
+                          setFocalX(focalPhoto.focal_x ?? 50)
+                          setFocalY(focalPhoto.focal_y ?? 50)
                           setZoom(1)
                         } else {
                           const xKey = `${ctx}_focal_x` as keyof Photo
                           const yKey = `${ctx}_focal_y` as keyof Photo
                           const ctxX = focalPhoto[xKey] as number | null | undefined
                           const ctxY = focalPhoto[yKey] as number | null | undefined
-                          setFocalX(ctxX ?? (Number(focalPhoto.focal_x) || 50))
-                          setFocalY(ctxY ?? (Number(focalPhoto.focal_y) || 50))
+                          setFocalX(ctxX ?? (focalPhoto.focal_x ?? 50))
+                          setFocalY(ctxY ?? (focalPhoto.focal_y ?? 50))
                           const zoomKey = `${ctx}_zoom` as keyof Photo
                           setZoom(Number(focalPhoto[zoomKey]) || 1)
                         }

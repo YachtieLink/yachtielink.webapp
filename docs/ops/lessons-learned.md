@@ -6,13 +6,33 @@
 
 **How to add new entries:** When you hit a problem that took more than a few minutes to diagnose, or that would trip up the next agent, add an entry here in the format below. Place new entries at the top (reverse chronological). Update the count in the summary line below.
 
-**Current count:** 82 lessons
-<!-- Note: was 80, added 2 entries on 2026-04-03 (column name mismatch, Set RSC serialization) -->
+**Current count:** 84 lessons
+<!-- Note: was 82, added 2 entries on 2026-04-04 (falsy-zero focal fallback, context-clear before ownership check) -->
 
 **Also update when writing here:**
 - `CHANGELOG.md` — log the discovery in your session's Flags or Done section
 - `sessions/YYYY-MM-DD-<slug>.md` — note the gotcha in your working log
 - `docs/ops/feedback.md` — if the lesson came from a founder correction (append-only)
+
+---
+
+## Side-Effect Writes Before Ownership Check Corrupt Other Users' Data
+
+**What happened:** The PATCH handler for `user_photos/[id]` cleared context flags (`is_avatar`, `is_hero`, `is_cv`) from OTHER photos belonging to the user BEFORE verifying the requested photo ID actually existed and belonged to this user. A phantom/stale photo ID could trigger the context-clear on all other photos without the target update ever succeeding.
+**Root cause:** The "clear exclusive context from other photos" ops were placed before the ownership-verified `.update()` call, to keep the code in logical order. But Supabase `.update()` returns empty results for non-existent or unauthorised rows rather than an error — so the guard check came after the side effects had already fired.
+**Fix applied:** Moved all context-clear ops to AFTER the ownership-verified update and 404 guard. Ownership is now confirmed before any secondary writes.
+**Lesson:** In any PATCH handler that clears or modifies OTHER rows as a side effect of writing ONE row, defer all secondary writes until AFTER you have confirmed the primary write succeeded (and the target row is owned by this user). The pattern: update primary → check for 404 → then clear siblings.
+**Sprint:** feat/per-context-focal-zoom | **Caught by:** /yl-review Opus | **Date:** 2026-04-04
+
+---
+
+## Falsy-Zero Trap: Use `??` Not `||` for Numeric Fallbacks
+
+**What happened:** Focal point values (`focal_x`, `focal_y`, etc.) default to `0` as a valid coordinate (meaning top-left corner). Eight places in `photos/page.tsx` used `Number(x) || 50` to fall back to center (50). When the actual stored value was `0`, `0 || 50` evaluates to `50` — silently overriding the user's explicit top-left focal point with center.
+**Root cause:** `||` treats `0` as falsy. Valid numeric zeros at boundaries (0%, 100%) are common in geometry-based UIs. Using `||` for "no value" fallbacks breaks this.
+**Fix applied:** Replaced all 8 instances of `|| 50` with `?? 50`. Nullish coalescing only triggers on `null`/`undefined`, not on `0`.
+**Lesson:** For numeric props where `0` is a meaningful value (coordinates, percentages, counts), always use `?? default` never `|| default`. This is especially dangerous for focal points, opacity values, sort orders, and indices.
+**Sprint:** feat/per-context-focal-zoom | **Caught by:** /yl-review Opus | **Date:** 2026-04-04
 
 ---
 

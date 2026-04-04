@@ -38,6 +38,7 @@ interface HeroSectionProps {
   scrimPreset?: ScrimPreset
   focalX?: number
   focalY?: number
+  heroZoom?: number
 }
 
 export function HeroSection({
@@ -67,7 +68,8 @@ export function HeroSection({
   viewModeToggle,
   scrimPreset: scrimPresetKey,
   focalX = 50,
-  focalY = 15,
+  focalY = 50,
+  heroZoom = 1,
 }: HeroSectionProps) {
   const scrim = scrimPresets[scrimPresetKey ?? 'dark']
   const { scrollY } = useScroll()
@@ -98,7 +100,7 @@ export function HeroSection({
             priority
             sizes="100vw"
             className="object-cover"
-            style={{ objectPosition: `${focalX}% ${focalY}%` }}
+            style={{ objectPosition: `${focalX}% ${focalY}%`, transform: heroZoom !== 1 ? `scale(${heroZoom})` : undefined }}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-500" />

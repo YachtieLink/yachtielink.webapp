@@ -42,9 +42,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     // Context assignment, per-context focal points, and zoom are Pro-only
     if (hasContextUpdate || hasContextFocal || hasContextZoom) {
-      const proStatus = await getProStatus(user.id)
-      if (!proStatus.isPro) {
-        return NextResponse.json({ error: 'Context features require Pro' }, { status: 403 })
+      try {
+        const proStatus = await getProStatus(user.id)
+        if (!proStatus.isPro) {
+          return NextResponse.json({ error: 'Context features require Pro' }, { status: 403 })
+        }
+      } catch {
+        // Fail-open on transient Pro status check errors — Pro gating is a UX convenience,
+        // not a hard security boundary. Don't block paying users on Stripe outages.
+        console.warn('getProStatus failed, failing open for context focal/zoom update')
       }
     }
 
@@ -61,33 +67,45 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (heroZoom !== undefined) update.hero_zoom = heroZoom
     if (cvZoom !== undefined) update.cv_zoom = cvZoom
 
-    // When assigning a context to this photo, clear it from all others first
+    // Build context flags in update object
     if (isAvatar === true) {
-      await supabase.from('user_photos').update({ is_avatar: false }).eq('user_id', user.id).neq('id', id)
       update.is_avatar = true
     } else if (isAvatar === false) {
       update.is_avatar = false
     }
     if (isHero === true) {
-      await supabase.from('user_photos').update({ is_hero: false }).eq('user_id', user.id).neq('id', id)
       update.is_hero = true
     } else if (isHero === false) {
       update.is_hero = false
     }
     if (isCv === true) {
-      await supabase.from('user_photos').update({ is_cv: false }).eq('user_id', user.id).neq('id', id)
       update.is_cv = true
     } else if (isCv === false) {
       update.is_cv = false
     }
 
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from('user_photos')
       .update(update)
       .eq('id', id)
       .eq('user_id', user.id)
+      .select('id')
 
     if (error) throw error
+    if (!updated || updated.length === 0) {
+      return NextResponse.json({ error: 'Photo not found' }, { status: 404 })
+    }
+
+    // Ownership confirmed — now clear this context from other photos
+    if (isAvatar === true) {
+      await supabase.from('user_photos').update({ is_avatar: false }).eq('user_id', user.id).neq('id', id)
+    }
+    if (isHero === true) {
+      await supabase.from('user_photos').update({ is_hero: false }).eq('user_id', user.id).neq('id', id)
+    }
+    if (isCv === true) {
+      await supabase.from('user_photos').update({ is_cv: false }).eq('user_id', user.id).neq('id', id)
+    }
 
     return NextResponse.json({ ok: true })
   } catch (e) {

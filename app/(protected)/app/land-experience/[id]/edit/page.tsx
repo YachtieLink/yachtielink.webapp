@@ -17,6 +17,7 @@ export default function EditLandExperiencePage() {
   const supabase = createClient()
   const prefersReducedMotion = useReducedMotion()
 
+  const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [found, setFound] = useState(false)
   const [company, setCompany] = useState('')
@@ -31,28 +32,39 @@ export default function EditLandExperiencePage() {
   const [confirmDelete, setConfirmDelete] = useState(false)
 
   useEffect(() => {
-    supabase
-      .from('land_experience')
-      .select('id, company, role, start_date, end_date, industry, description')
-      .eq('id', params.id)
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          setFound(true)
-          setCompany(data.company ?? '')
-          setRole(data.role ?? '')
-          setStartDate(data.start_date ?? '')
-          setEndDate(data.end_date ?? '')
-          setIsCurrent(!data.end_date)
-          setIndustry(data.industry ?? '')
-          setDescription(data.description ?? '')
-        }
-        setLoading(false)
-      })
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setLoading(false); return }
+      setUserId(user.id)
+
+      const { data } = await supabase
+        .from('land_experience')
+        .select('id, company, role, start_date, end_date, industry, description')
+        .eq('id', params.id)
+        .eq('user_id', user.id)
+        .single()
+
+      if (data) {
+        setFound(true)
+        setCompany(data.company ?? '')
+        setRole(data.role ?? '')
+        setStartDate(data.start_date ?? '')
+        setEndDate(data.end_date ?? '')
+        setIsCurrent(!data.end_date)
+        setIndustry(data.industry ?? '')
+        setDescription(data.description ?? '')
+      }
+      setLoading(false)
+    }
+    load()
   }, [params.id])
 
   async function handleSave() {
     if (!company.trim() || !role.trim()) return
+    if (!userId) {
+      toast('Session expired. Please refresh and try again.', 'error')
+      return
+    }
     setSaving(true)
 
     const { error } = await supabase
@@ -66,6 +78,7 @@ export default function EditLandExperiencePage() {
         description: description.trim() || '',
       })
       .eq('id', params.id)
+      .eq('user_id', userId)
 
     setSaving(false)
     if (error) {
@@ -78,12 +91,17 @@ export default function EditLandExperiencePage() {
 
   async function handleDelete() {
     if (!confirmDelete) { setConfirmDelete(true); return }
+    if (!userId) {
+      toast('Session expired. Please refresh and try again.', 'error')
+      return
+    }
     setDeleting(true)
 
     const { error } = await supabase
       .from('land_experience')
       .delete()
       .eq('id', params.id)
+      .eq('user_id', userId)
 
     setDeleting(false)
     if (error) {
@@ -133,6 +151,7 @@ export default function EditLandExperiencePage() {
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
                     placeholder="e.g. The Ritz-Carlton, Nobu"
+                    maxLength={200}
                   />
 
                   <Input
@@ -140,6 +159,7 @@ export default function EditLandExperiencePage() {
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
                     placeholder="e.g. Head Chef, Restaurant Manager"
+                    maxLength={200}
                   />
 
                   <DatePicker
@@ -176,6 +196,7 @@ export default function EditLandExperiencePage() {
                     value={industry}
                     onChange={(e) => setIndustry(e.target.value)}
                     placeholder="e.g. Hospitality, Maritime services"
+                    maxLength={200}
                   />
 
                   <div className="flex flex-col gap-1.5">

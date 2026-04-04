@@ -169,10 +169,11 @@ export function PublicProfileContent({
     />
   ) : null
 
-  // Hero photo focal point
+  // Hero photo focal point — use hero-specific focal if set, fall back to base focal
   const heroPhoto = profilePhotos.find((p) => p.sort_order === 0) ?? profilePhotos[0]
-  const heroFocalX = heroPhoto?.focal_x ?? 50
-  const heroFocalY = heroPhoto?.focal_y ?? 50
+  const heroFocalX = heroPhoto?.hero_focal_x ?? heroPhoto?.focal_x ?? 50
+  const heroFocalY = heroPhoto?.hero_focal_y ?? heroPhoto?.focal_y ?? 50
+  const heroZoom = heroPhoto?.hero_zoom ?? 1
 
   // Hero stat parts: age (server-computed) + sea time
   const heroStats: string[] = []
@@ -222,6 +223,7 @@ export function PublicProfileContent({
         scrimPreset={user.scrim_preset as ScrimPreset}
         focalX={heroFocalX}
         focalY={heroFocalY}
+        heroZoom={heroZoom}
       />
 
       {/* ── Mutual Colleagues (2nd-degree social proof) ─────────────── */}

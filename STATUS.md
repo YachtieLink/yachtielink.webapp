@@ -2,13 +2,13 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-04 (All code work merged through PR #170. Rally 009 + Rally 010 complete. Pre-launch founder tasks remain.)
+**Last updated:** 2026-04-04 (feat/per-context-focal-zoom branch ready to push — 10 bug fixes, not yet PRed.)
 
 ---
 
 ## Current Phase
 
-**Phase 1B — pre-launch.** All code work complete and merged. Rally 009 (7 sessions, PRs #152-169), Rally 010 (4 sessions, PR #170) all on main. What remains is founder-only: ops config, legal, QA testing, and deploy.
+**Phase 1B — pre-launch.** Rally 009 (7 sessions, PRs #152-169) and Rally 010 (4 sessions, PR #170) all on main. One post-rally bug fix branch pending PR (`feat/per-context-focal-zoom` — 10 fixes, ready to push). What remains is founder-only: ops config, legal, QA testing, and deploy.
 
 ---
 
@@ -26,6 +26,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | PR(s) | Details |
 |------|------|-------|---------|
+| feat/per-context-focal-zoom fixes | 2026-04-04 | pending | 10 bugs fixed: IDOR on land-experience, hero_zoom consumed, context-clear ordering, Pro expiry check, hero thumbnail responsive. Branch ready to push. |
 | Rally 010 — Frontend UX & Guidance | 2026-04-04 | #170 | 4 sessions: cold states, product tour (Onborda), tooltips, coaching nudges, StickyBottomBar, FirstVisitCards, InfoTooltips. |
 | Rally 009 Session 7 | 2026-04-04 | #166-169 | Desktop responsiveness, in-app roadmap + feature requests, visibility sublabels + back nav + loading skeletons. 22 review fixes. |
 | Rally 009 Session 6 | 2026-04-03 | #160-165 | Cert matching registry, trust infra (report + bug report APIs), experience transfer + endorsement dormancy, ProUpsellCard. 26 review fixes. |
@@ -57,7 +58,9 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 ## Open PRs
 
-None — all PRs through #170 merged.
+| Branch | Status | Summary |
+|--------|--------|---------|
+| feat/per-context-focal-zoom | Ready to push | 10 bug fixes: IDOR, hero_zoom, falsy-zero focal, context-clear order, Pro expiry, thumbnail responsive |
 
 ---
 
