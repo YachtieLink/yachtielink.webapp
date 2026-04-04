@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { NetworkUnifiedView } from '@/components/network/NetworkUnifiedView'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { EndorsementRequestBar } from '@/components/network/EndorsementRequestBar'
 
 interface ColleagueRow {
   colleague_id: string
@@ -155,7 +156,7 @@ export default async function NetworkPage() {
       </div>
 
       {/* Navy wayfinding background */}
-      <div className="min-h-screen bg-[var(--color-navy-50)] -mx-4 px-4 md:-mx-6 md:px-6 pt-4 pb-24 -mt-2">
+      <div className={`min-h-screen bg-[var(--color-navy-50)] -mx-4 px-4 md:-mx-6 md:px-6 pt-4 -mt-2 ${endorsementsReceived.length < 5 && colleagues.length >= 1 ? 'pb-36' : 'pb-24'}`}>
         <NetworkUnifiedView
           colleagues={colleagues}
           userYachts={userYachts}
@@ -167,6 +168,12 @@ export default async function NetworkPage() {
           ghostSuggestions={ghostSuggestions}
         />
       </div>
+
+      {/* Sticky endorsement request bar — shows when < 5 endorsements and has colleagues */}
+      <EndorsementRequestBar
+        endorsementCount={endorsementsReceived.length}
+        colleagueCount={colleagues.length}
+      />
     </PageTransition>
   )
 }

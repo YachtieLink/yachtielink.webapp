@@ -14,6 +14,7 @@ import { SocialLinksRow } from '@/components/profile/SocialLinksRow'
 import { CareerTimeline } from '@/components/profile/CareerTimeline'
 import { formatSeaTime } from '@/lib/sea-time'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { ProfileCoachingBar } from '@/components/profile/ProfileCoachingBar'
 import {
   aboutSummary,
   experienceSummary,
@@ -238,7 +239,7 @@ export default async function ProfilePage() {
   ]
 
   return (
-    <PageTransition className="flex flex-col gap-2 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-teal-50)]">
+    <PageTransition className={`flex flex-col gap-2 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-teal-50)] ${score < 80 ? 'pb-36' : 'pb-24'}`}>
 
       {/* Page title */}
       <div className="flex items-center justify-between px-1 pt-4">
@@ -323,6 +324,14 @@ export default async function ProfilePage() {
           </div>
         )}
       </ProfileSectionGroup>
+
+      {/* Sticky coaching bar — shows when profile strength < 80% */}
+      <ProfileCoachingBar
+        score={score}
+        nextPrompt={nextPrompt}
+        ctaLabel={strengthCta?.label}
+        ctaHref={strengthCta?.href}
+      />
 
     </PageTransition>
   )

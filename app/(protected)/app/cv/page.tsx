@@ -5,6 +5,7 @@ import { isProFromRecord } from '@/lib/stripe/pro-shared'
 import { CvActions } from '@/components/cv/CvActions'
 import { CvImportCard } from '@/components/cv/CvImportCard'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { CvDocumentBar } from '@/components/cv/CvDocumentBar'
 
 export default async function CvPage() {
   const supabase = await createClient()
@@ -25,7 +26,7 @@ export default async function CvPage() {
   }
 
   return (
-    <PageTransition className="flex flex-col gap-4 pb-24 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-amber-50)]">
+    <PageTransition className={`flex flex-col gap-4 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-amber-50)] ${profile.latest_pdf_path ? 'pb-36' : 'pb-24'}`}>
       <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">My CV</h1>
 
       {/* Education card — CV is output-only, data lives on Profile */}
@@ -61,6 +62,12 @@ export default async function CvPage() {
         cvPublic={profile.cv_public ?? true}
         cvPublicSource={(profile.cv_public_source as 'generated' | 'uploaded') ?? 'generated'}
         isPro={isProFromRecord(profile)}
+      />
+
+      {/* Sticky document action bar — shows when generated PDF exists */}
+      <CvDocumentBar
+        hasGeneratedPdf={!!profile.latest_pdf_path}
+        pdfStale={!!(profile.latest_pdf_generated_at && profile.updated_at && new Date(profile.updated_at) > new Date(profile.latest_pdf_generated_at))}
       />
     </PageTransition>
   )
