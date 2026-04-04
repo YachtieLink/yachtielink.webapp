@@ -12,6 +12,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { PhotoFormatPreview } from '@/components/profile/PhotoFormatPreview'
 import { FocalPointPicker } from '@/components/profile/FocalPointPicker'
 import { ProUpsellCard } from '@/components/ui/ProUpsellCard'
+import { SectionVisibilityToggle } from '@/components/profile/SectionVisibilityToggle'
 import {
   DndContext,
   closestCenter,
@@ -701,6 +702,10 @@ export default function ProfilePhotosPage() {
           onChange={(e) => handleUpload(e, false)}
         />
       </div>
+
+      {/* Visibility controls */}
+      <SectionVisibilityToggle sectionKey="photos" label="Profile Photo" />
+      <SectionVisibilityToggle sectionKey="gallery" label="Work Gallery" />
 
       {/* ── Focal Point Modal ──────────────────────────────────────── */}
       {focalPhoto && (

@@ -19,7 +19,7 @@ No share button exists in the app. Crew have no quick way to show their profile 
 | # | Question | Decision |
 |---|----------|----------|
 | 1 | Where does share live? | Two places: **(1)** My Profile — compact URL row that expands to QR + share options. **(2)** CV tab — QR in context of CV output (future: customizable colors/sizes). |
-| 2 | My Profile placement | **(b)** Slim row below the hero card showing the user's yachtie.link URL as preview text. Tap to expand QR + share options. Not hidden behind an icon, not a big card. |
+| 2 | My Profile placement | ~~(b) Slim row below hero card~~ **UPDATED 2026-04-04:** "Share your link" button in hero card opens a **full-screen share sheet** — QR code hero, native share (WhatsApp etc.) on mobile, elegant desktop fallback. Not an expand-in-place row. |
 | 3 | QR code URL | **(c)** Tracking redirect: `yachtie.link/qr/{handle}`. Resolves to subdomain (Pro) or `/u/{handle}` (free). Enables scan analytics for Insights dashboard. |
 | 4 | Share channels | **(a)** on mobile: Copy + Native Share (Web Share API handles WhatsApp/Email/SMS). **(b)** fallback on desktop: Copy + explicit WhatsApp/Email/SMS buttons. Detect with `navigator.canShare`. |
 
@@ -37,48 +37,55 @@ No share button exists in the app. Crew have no quick way to show their profile 
   - Or increment a counter on the user row (simpler, less granular)
 - Fast — redirect must be instant, analytics is fire-and-forget
 
-### Task 2: Share row on My Profile
+### Task 2: Full-Screen Share Sheet
 
-**File:** `components/profile/ShareRow.tsx` (new)
+**Trigger:** "Share your link" button in ProfileHeroCard opens a full-screen overlay/modal.
 
-**Collapsed state (default):**
+**File:** `components/profile/ShareSheet.tsx` (new)
+
+**Full-screen share sheet layout:**
 ```
 ┌─────────────────────────────────────────┐
-│ 🔗  charlotte.yachtie.link          ▾  │
-└─────────────────────────────────────────┘
-```
-- Slim row, teal section color (profile)
-- Shows the user's URL: subdomain if Pro, `yachtie.link/u/{handle}` if free
-- Chevron or expand affordance on the right
-- Sits between hero card and profile sections
-
-**Expanded state (tap to toggle):**
-```
-┌─────────────────────────────────────────┐
-│ 🔗  charlotte.yachtie.link          ▴  │
+│                                    ✕    │
+│         Share your YachtieLink          │
 │                                         │
 │         ┌───────────────┐               │
+│         │               │               │
 │         │   QR CODE     │               │
-│         │   (large)     │               │
+│         │   (LARGE)     │               │
+│         │               │               │
 │         └───────────────┘               │
 │                                         │
-│   [Copy Link]  [Share]                  │
-│   (or on desktop: Copy / WhatsApp /     │
-│    Email / SMS)                         │
+│    charlotte.yachtie.link               │
+│                                         │
+│   ┌──────────┐  ┌──────────┐           │
+│   │ WhatsApp │  │  Email   │           │
+│   └──────────┘  └──────────┘           │
+│   ┌──────────┐  ┌──────────┐           │
+│   │   SMS    │  │  Copy    │           │
+│   └──────────┘  └──────────┘           │
+│                                         │
 └─────────────────────────────────────────┘
 ```
 
+**Key concept (from founder, 2026-04-04):**
+> "Imagine someone jumps on the app, taps Share your link. They get a full screen with options to send it to WhatsApp, send it wherever, but they also get the QR code — so if they're talking to someone in real life, they can show them the QR code and share their link right there."
+
+**Behaviour:**
+- Full-screen overlay (not a small modal — feels like a dedicated share experience)
+- QR code is the hero — large, centred, immediately scannable from another phone
+- Below QR: the user's URL displayed as text
+- **Mobile** (`navigator.canShare`): show native share button (OS handles WhatsApp/Email/SMS routing) + "Copy Link" button
+- **Desktop fallback**: explicit buttons for WhatsApp, Email, SMS, Copy Link — elegant grid layout
+- QR encodes `yachtie.link/qr/{handle}` (tracking redirect from Task 1)
 - QR code generated client-side — `qrcode.react` or `next-qrcode` package
-- QR encodes `yachtie.link/qr/{handle}` (the tracking redirect)
-- QR code is the hero — large, centered, easily scannable
-- Share buttons below:
-  - Mobile (`navigator.canShare`): "Copy Link" + "Share" (native OS sheet)
-  - Desktop fallback: "Copy Link" + "WhatsApp" + "Email" + "SMS"
 - Copy Link: copies the direct profile URL (not the /qr/ redirect) with toast confirmation
-- Same-page expand/collapse animation
+- Close via X button or swipe down
+- Track share event via `record_profile_event` RPC
 
 **Wire into profile page:**
-**File:** `app/(protected)/app/profile/page.tsx` — add `ShareRow` between hero and sections
+- `ProfileHeroCard.tsx` — "Share your link" button opens `ShareSheet` instead of current `shareProfile()` function
+- The existing `shareProfile()` logic (clipboard copy + native share) moves into the sheet
 
 ### Task 3: QR context on CV tab
 

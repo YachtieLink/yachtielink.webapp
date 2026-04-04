@@ -4,6 +4,7 @@ import { Ship } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { SectionVisibilityToggle } from '@/components/profile/SectionVisibilityToggle'
 import { formatSeaTime } from '@/lib/sea-time'
 
 export default async function AttachmentListPage() {
@@ -96,6 +97,7 @@ export default async function AttachmentListPage() {
           })}
         </div>
       )}
+      <SectionVisibilityToggle sectionKey="experience" label="Experience" />
     </PageTransition>
   )
 }

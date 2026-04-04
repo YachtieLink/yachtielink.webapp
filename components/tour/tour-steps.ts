@@ -12,9 +12,9 @@ export const productTour: Tour = {
   tour: 'welcome',
   steps: [
     {
-      icon: '👤',
-      title: 'This is your profile',
-      content: 'Tap your name or role to edit them anytime.',
+      icon: '🔗',
+      title: 'Your YachtieLink',
+      content: 'This is your personal link — copy it, share it, put it in your CV. It\'s yours wherever you go.',
       selector: '[data-tour="profile-hero"]',
       side: 'bottom',
       showControls: true,
@@ -26,7 +26,7 @@ export const productTour: Tour = {
       title: 'Track your progress',
       content: 'Follow the suggestions to stand out to captains.',
       selector: '[data-tour="strength-ring"]',
-      side: 'bottom',
+      side: 'left',
       showControls: true,
       pointerPadding: 4,
       pointerRadius: 12,

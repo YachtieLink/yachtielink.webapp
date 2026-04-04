@@ -6,8 +6,6 @@ import Link from 'next/link'
 import { Copy, Share2, Check, Pencil } from 'lucide-react'
 import { Button, IconButton } from '@/components/ui'
 import { useToast } from '@/components/ui/Toast'
-import { countryToFlag } from '@/lib/constants/country-iso'
-import { formatSeaTime } from '@/lib/sea-time'
 import { createClient } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
 import { popIn } from '@/lib/motion'
@@ -20,9 +18,6 @@ interface ProfileHeroCardProps {
   primaryRole: string | null
   departments: string[]
   profilePhotoUrl: string | null
-  home_country?: string | null
-  seaTimeTotalDays?: number
-  seaTimeYachtCount?: number
   isPro?: boolean
   /** Profile Strength data for embedded ring */
   strengthScore?: number
@@ -163,9 +158,6 @@ export function ProfileHeroCard({
   primaryRole,
   departments,
   profilePhotoUrl,
-  home_country,
-  seaTimeTotalDays,
-  seaTimeYachtCount,
   isPro = false,
   strengthScore,
   strengthLabel,
@@ -262,18 +254,9 @@ export function ProfileHeroCard({
             placeholder="Your role"
             className="text-sm text-[var(--color-text-secondary)]"
           />
-          {home_country && (
-            <span className="text-sm text-[var(--color-text-secondary)]"> · {countryToFlag(home_country)}</span>
-          )}
           {departments.length > 0 && (
             <p className="text-xs text-[var(--color-text-tertiary)]">
               {departments.join(' · ')}
-            </p>
-          )}
-          {(seaTimeTotalDays ?? 0) > 0 && (
-            <p className="text-xs text-[var(--color-text-tertiary)] flex items-center gap-1">
-              {formatSeaTime(seaTimeTotalDays!).displayShort} · {seaTimeYachtCount} yacht{seaTimeYachtCount === 1 ? '' : 's'}
-              <InfoTooltip text="Total time at sea, calculated from your yacht history. Overlapping dates are counted once." />
             </p>
           )}
         </div>
@@ -289,34 +272,10 @@ export function ProfileHeroCard({
         )}
       </div>
 
-      {/* Profile Strength coaching prompt */}
-      {strengthNextPrompt && (
-        <div className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[var(--color-surface-raised)]">
-          <p className="text-xs text-[var(--color-text-secondary)] flex-1">{strengthNextPrompt}</p>
-          {strengthCtaHref && (
-            <Link
-              href={strengthCtaHref}
-              className="shrink-0 text-xs font-medium text-[var(--color-interactive)] hover:underline"
-            >
-              {strengthCtaLabel ?? 'Go →'}
-            </Link>
-          )}
-        </div>
-      )}
-
       {/* Profile URLs */}
       {profileUrl && (
         <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-2">
-            <span className="shrink-0 w-8" />
-            <p className="text-sm text-[var(--color-interactive)] truncate flex-1">{profileUrl}</p>
-            <button
-              onClick={copyUrl}
-              className="shrink-0 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors p-1"
-            >
-              {copied ? <Check size={14} /> : <Copy size={14} />}
-            </button>
-          </div>
+          {/* Pro link — first */}
           {proUrl && (
             <div className="flex items-center gap-2">
               <Link href="/app/settings/plan" className="shrink-0 w-8 flex items-center justify-center">
@@ -328,16 +287,11 @@ export function ProfileHeroCard({
                 href={`https://${proUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`text-sm truncate flex-1 ${isPro ? 'text-[var(--color-interactive)] hover:underline' : 'text-[var(--color-text-tertiary)]'}`}
+                className={`text-sm truncate flex-1 min-w-0 ${isPro ? 'text-[var(--color-interactive)] hover:underline' : 'text-[var(--color-text-tertiary)]'}`}
               >
                 {proUrl}
               </a>
-              <button
-                onClick={copyProUrl}
-                className="shrink-0 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors p-1"
-              >
-                {copiedPro ? <Check size={14} /> : <Copy size={14} />}
-              </button>
+              <InfoTooltip text="Your custom Pro link — a cleaner, more professional URL for CVs and business cards." />
               {!isPro && (
                 <Link
                   href="/app/settings/plan"
@@ -346,8 +300,26 @@ export function ProfileHeroCard({
                   Upgrade
                 </Link>
               )}
+              <button
+                onClick={copyProUrl}
+                className="shrink-0 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors p-1"
+              >
+                {copiedPro ? <Check size={14} /> : <Copy size={14} />}
+              </button>
             </div>
           )}
+          {/* Standard YachtieLink */}
+          <div className="flex items-center gap-2">
+            <span className="shrink-0 w-8" />
+            <p className="text-sm text-[var(--color-interactive)] truncate flex-1 min-w-0">{profileUrl}</p>
+            <InfoTooltip text="Your free YachtieLink — available to everyone. Share it anywhere." />
+            <button
+              onClick={copyUrl}
+              className="shrink-0 text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] transition-colors p-1"
+            >
+              {copied ? <Check size={14} /> : <Copy size={14} />}
+            </button>
+          </div>
         </div>
       )}
 
@@ -356,16 +328,16 @@ export function ProfileHeroCard({
         <div className="flex gap-2">
           {handle && (
             <Link href={`/u/${handle}`} className="flex-1">
-              <Button variant="outline" className="w-full">Preview</Button>
+              <Button variant="outline" size="sm" className="w-full">My public profile</Button>
             </Link>
           )}
-          <Button onClick={shareProfile} className="flex-1">
-            Share Profile
+          <Button onClick={shareProfile} size="sm" className="flex-1">
+            Share my link
           </Button>
         </div>
       ) : (
         <p className="text-xs text-[var(--color-text-tertiary)] text-center py-1">
-          Complete your profile to unlock sharing and preview
+          Complete your profile to start sharing your link
         </p>
       )}
     </div>

@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import Image from 'next/image'
 import {
   User, Briefcase, Award, Anchor, Heart, Wrench, Camera, Globe,
-  FileText, Phone, Shield, Clock, ImageIcon
+  FileText, Phone, Shield, ImageIcon
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { getUserById, getProfileSections, getExtendedProfileSections, getLandExperience } from '@/lib/queries/profile'
@@ -58,11 +58,6 @@ export default async function ProfilePage() {
     redirect('/onboarding')
   }
 
-  const sectionVisibility = (profile.section_visibility ?? {
-    about: true, experience: true, endorsements: true, certifications: true,
-    hobbies: true, education: true, skills: true, photos: true, gallery: true,
-  }) as Record<string, boolean>
-
   const expiringCount = countExpiringCerts(certs ?? [])
 
   const { score, label, nextPrompt } = computeProfileStrength({
@@ -110,8 +105,6 @@ export default async function ProfilePage() {
       count: profile.bio ? 1 : 0,
       icon: <User size={18} />,
       editHref: '/app/about/edit',
-      visibilityKey: 'about',
-      visibilityLabel: 'Your biography and summary on your public profile',
       emptyPrompt: 'Tell your story — captains want to know who you are',
     },
     {
@@ -121,8 +114,6 @@ export default async function ProfilePage() {
       count: extended.skills.length,
       icon: <Wrench size={18} />,
       editHref: '/app/skills/edit',
-      visibilityKey: 'skills',
-      visibilityLabel: 'Your skill tags on your public profile',
       emptyPrompt: 'Add skills that set you apart from the crew',
     },
     {
@@ -132,8 +123,6 @@ export default async function ProfilePage() {
       count: extended.hobbies.length,
       icon: <Heart size={18} />,
       editHref: '/app/hobbies/edit',
-      visibilityKey: 'hobbies',
-      visibilityLabel: 'Your interests and hobbies on your public profile',
       emptyPrompt: 'Show your personality beyond the deck',
     },
     {
@@ -181,36 +170,22 @@ export default async function ProfilePage() {
 
   const careerSections: SectionRowItem[] = [
     {
-      key: 'experience',
-      label: 'Experience',
-      summary: (seaTimeTotalDays > 0 ? `${formatSeaTime(seaTimeTotalDays).displayShort} sea time · ` : '') + `${seaTimeYachtCount} yacht${seaTimeYachtCount === 1 ? '' : 's'}` + (landExperience.length > 0 ? ` + ${landExperience.length} shore-side` : ''),
-      count: (attachments?.length ?? 0) + landExperience.length,
-      icon: <Anchor size={18} />,
-      editHref: '/app/attachment',
-      visibilityKey: 'experience',
-      visibilityLabel: 'Your yacht positions and date ranges on your public profile',
-      emptyPrompt: 'Add a yacht to start building your graph',
-    },
-    {
       key: 'certifications',
       label: 'Certifications',
       summary: certificationsSummary(certs?.length ?? 0, expiringCount),
       count: certs?.length ?? 0,
       icon: <Award size={18} />,
       editHref: '/app/certification/new',
-      visibilityKey: 'certifications',
-      visibilityLabel: 'Your qualifications and expiry dates on your public profile',
       emptyPrompt: 'Add certifications — captains search by certs first',
     },
     {
-      key: 'sea_time',
-      label: 'Sea Time',
-      summary: seaTimeTotalDays > 0
-        ? `${formatSeaTime(seaTimeTotalDays).displayShort} across ${seaTimeYachtCount} yacht${seaTimeYachtCount === 1 ? '' : 's'}`
-        : 'No sea time recorded',
-      count: seaTimeTotalDays > 0 ? 1 : 0,
-      icon: <Clock size={18} />,
-      editHref: '/app/profile/sea-time',
+      key: 'experience',
+      label: 'Experience',
+      summary: (seaTimeTotalDays > 0 ? `${formatSeaTime(seaTimeTotalDays).displayShort} sea time · ` : '') + `${seaTimeYachtCount} yacht${seaTimeYachtCount === 1 ? '' : 's'}` + (landExperience.length > 0 ? ` + ${landExperience.length} shore-side` : ''),
+      count: (attachments?.length ?? 0) + landExperience.length,
+      icon: <Anchor size={18} />,
+      editHref: '/app/attachment',
+      emptyPrompt: 'Add a yacht to start building your graph',
     },
   ]
 
@@ -222,8 +197,6 @@ export default async function ProfilePage() {
       count: profilePhotos?.length ?? 0,
       icon: <Camera size={18} />,
       editHref: '/app/profile/photos',
-      visibilityKey: 'photos',
-      visibilityLabel: 'Your profile photo visible to public visitors',
       emptyPrompt: 'Add a photo to make it yours',
     },
     {
@@ -233,8 +206,6 @@ export default async function ProfilePage() {
       count: extended.gallery.length,
       icon: <ImageIcon size={18} />,
       editHref: '/app/profile/photos',
-      visibilityKey: 'gallery',
-      visibilityLabel: 'Your work photos on your public profile',
       emptyPrompt: 'Show your work environment',
     },
   ]
@@ -256,9 +227,6 @@ export default async function ProfilePage() {
         primaryRole={profile.primary_role}
         departments={departments}
         profilePhotoUrl={profile.profile_photo_url}
-        home_country={profile.show_home_country !== false ? profile.home_country : null}
-        seaTimeTotalDays={seaTimeTotalDays}
-        seaTimeYachtCount={seaTimeYachtCount}
         isPro={proStatus.isPro}
         strengthScore={score}
         strengthLabel={label}
@@ -276,26 +244,24 @@ export default async function ProfilePage() {
         hasCert={(certs?.length ?? 0) > 0}
       />
 
+      {/* Social links inline */}
+      {Array.isArray(profile.social_links) && (profile.social_links as any[]).length > 0 && (
+        <div className="bg-[var(--color-surface)] rounded-2xl p-4">
+          <SocialLinksRow links={profile.social_links as any} editable />
+        </div>
+      )}
+
       {/* ── ABOUT ME ──────────────────────────────────────────── */}
       <ProfileSectionGroup title="About Me" icon={<User size={16} />}>
         <ProfileSectionList
           sections={aboutMeSections}
-          initialVisibility={sectionVisibility}
         />
       </ProfileSectionGroup>
-
-      {/* Social links inline */}
-      {Array.isArray(profile.social_links) && (profile.social_links as any[]).length > 0 && (
-        <div className="bg-[var(--color-surface)] rounded-2xl p-4">
-          <SocialLinksRow links={profile.social_links as any} />
-        </div>
-      )}
 
       {/* ── PERSONAL DETAILS ──────────────────────────────────── */}
       <ProfileSectionGroup title="Personal Details" icon={<Shield size={16} />}>
         <ProfileSectionList
           sections={personalDetailsSections}
-          initialVisibility={sectionVisibility}
         />
       </ProfileSectionGroup>
 
@@ -303,7 +269,6 @@ export default async function ProfilePage() {
       <ProfileSectionGroup title="Career" icon={<Anchor size={16} />}>
         <ProfileSectionList
           sections={careerSections}
-          initialVisibility={sectionVisibility}
         />
         {/* Integrated career timeline */}
         {((attachments?.length ?? 0) > 0 || landExperience.length > 0) && (
@@ -317,7 +282,6 @@ export default async function ProfilePage() {
       <ProfileSectionGroup title="Media" icon={<Camera size={16} />}>
         <ProfileSectionList
           sections={mediaSections}
-          initialVisibility={sectionVisibility}
         />
         {/* Photo strip preview */}
         {(profilePhotos?.length ?? 0) > 0 && (

@@ -10,6 +10,7 @@ import { Select } from '@/components/ui/Select'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PageTransition } from '@/components/ui/PageTransition'
+import { SectionVisibilityToggle } from '@/components/profile/SectionVisibilityToggle'
 
 const CATEGORIES = ['technical', 'certifiable', 'language', 'software', 'other'] as const
 type Category = typeof CATEGORIES[number]
@@ -206,6 +207,8 @@ export default function SkillsEditPage() {
                 </div>
               </div>
             )}
+
+            <SectionVisibilityToggle sectionKey="skills" label="Skills" />
 
             <Button
               onClick={save}
