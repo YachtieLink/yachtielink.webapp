@@ -153,7 +153,7 @@ export default async function InsightsPage({ searchParams }: Props) {
                     href="/app/profile"
                     className="px-4 py-2.5 rounded-xl text-sm font-medium bg-[var(--color-interactive)] text-white text-center hover:opacity-90 transition-opacity"
                   >
-                    Share Profile Link
+                    View Profile
                   </Link>
                 </div>
               )
