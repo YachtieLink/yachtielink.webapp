@@ -12,29 +12,54 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
     const body = await req.json()
-    const focalX = typeof body.focal_x === 'number' ? Math.min(100, Math.max(0, body.focal_x)) : undefined
-    const focalY = typeof body.focal_y === 'number' ? Math.min(100, Math.max(0, body.focal_y)) : undefined
+    const clamp = (v: unknown) => typeof v === 'number' ? Math.min(100, Math.max(0, v)) : undefined
+    const focalX = clamp(body.focal_x)
+    const focalY = clamp(body.focal_y)
+    const avatarFocalX = clamp(body.avatar_focal_x)
+    const avatarFocalY = clamp(body.avatar_focal_y)
+    const heroFocalX = clamp(body.hero_focal_x)
+    const heroFocalY = clamp(body.hero_focal_y)
+    const cvFocalX = clamp(body.cv_focal_x)
+    const cvFocalY = clamp(body.cv_focal_y)
+    const clampZoom = (v: unknown) => typeof v === 'number' ? Math.min(5, Math.max(1, v)) : undefined
+    const avatarZoom = clampZoom(body.avatar_zoom)
+    const heroZoom = clampZoom(body.hero_zoom)
+    const cvZoom = clampZoom(body.cv_zoom)
     const isAvatar = typeof body.is_avatar === 'boolean' ? body.is_avatar : undefined
     const isHero = typeof body.is_hero === 'boolean' ? body.is_hero : undefined
     const isCv = typeof body.is_cv === 'boolean' ? body.is_cv : undefined
 
     const hasContextUpdate = isAvatar !== undefined || isHero !== undefined || isCv !== undefined
+    const hasContextFocal = avatarFocalX !== undefined || avatarFocalY !== undefined ||
+      heroFocalX !== undefined || heroFocalY !== undefined ||
+      cvFocalX !== undefined || cvFocalY !== undefined
+    const hasContextZoom = avatarZoom !== undefined || heroZoom !== undefined || cvZoom !== undefined
+    const hasBaseFocal = focalX !== undefined || focalY !== undefined
 
-    if (focalX === undefined && focalY === undefined && !hasContextUpdate) {
+    if (!hasBaseFocal && !hasContextUpdate && !hasContextFocal && !hasContextZoom) {
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
     }
 
-    // Context assignment is Pro-only
-    if (hasContextUpdate) {
+    // Context assignment, per-context focal points, and zoom are Pro-only
+    if (hasContextUpdate || hasContextFocal || hasContextZoom) {
       const proStatus = await getProStatus(user.id)
       if (!proStatus.isPro) {
-        return NextResponse.json({ error: 'Context assignment requires Pro' }, { status: 403 })
+        return NextResponse.json({ error: 'Context features require Pro' }, { status: 403 })
       }
     }
 
-    const update: Record<string, number | boolean> = {}
+    const update: Record<string, number | boolean | null> = {}
     if (focalX !== undefined) update.focal_x = focalX
     if (focalY !== undefined) update.focal_y = focalY
+    if (avatarFocalX !== undefined) update.avatar_focal_x = avatarFocalX
+    if (avatarFocalY !== undefined) update.avatar_focal_y = avatarFocalY
+    if (heroFocalX !== undefined) update.hero_focal_x = heroFocalX
+    if (heroFocalY !== undefined) update.hero_focal_y = heroFocalY
+    if (cvFocalX !== undefined) update.cv_focal_x = cvFocalX
+    if (cvFocalY !== undefined) update.cv_focal_y = cvFocalY
+    if (avatarZoom !== undefined) update.avatar_zoom = avatarZoom
+    if (heroZoom !== undefined) update.hero_zoom = heroZoom
+    if (cvZoom !== undefined) update.cv_zoom = cvZoom
 
     // When assigning a context to this photo, clear it from all others first
     if (isAvatar === true) {

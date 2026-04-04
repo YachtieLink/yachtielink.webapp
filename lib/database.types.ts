@@ -1047,9 +1047,18 @@ export type Database = {
       }
       user_photos: {
         Row: {
+          avatar_focal_x: number | null
+          avatar_focal_y: number | null
+          avatar_zoom: number
           created_at: string
+          cv_focal_x: number | null
+          cv_focal_y: number | null
+          cv_zoom: number
           focal_x: number
           focal_y: number
+          hero_focal_x: number | null
+          hero_focal_y: number | null
+          hero_zoom: number
           id: string
           is_avatar: boolean
           is_cv: boolean
@@ -1059,9 +1068,18 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          avatar_focal_x?: number | null
+          avatar_focal_y?: number | null
+          avatar_zoom?: number
           created_at?: string
+          cv_focal_x?: number | null
+          cv_focal_y?: number | null
+          cv_zoom?: number
           focal_x?: number
           focal_y?: number
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_zoom?: number
           id?: string
           is_avatar?: boolean
           is_cv?: boolean
@@ -1071,9 +1089,18 @@ export type Database = {
           user_id: string
         }
         Update: {
+          avatar_focal_x?: number | null
+          avatar_focal_y?: number | null
+          avatar_zoom?: number
           created_at?: string
+          cv_focal_x?: number | null
+          cv_focal_y?: number | null
+          cv_zoom?: number
           focal_x?: number
           focal_y?: number
+          hero_focal_x?: number | null
+          hero_focal_y?: number | null
+          hero_zoom?: number
           id?: string
           is_avatar?: boolean
           is_cv?: boolean

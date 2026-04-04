@@ -98,7 +98,7 @@ export function HeroSection({
             priority
             sizes="100vw"
             className="object-cover"
-            style={{ objectPosition: 'center top' }}
+            style={{ objectPosition: `${focalX}% ${focalY}%` }}
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-500" />

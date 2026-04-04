@@ -26,7 +26,7 @@ Phase 1B execution runs sequentially through these 4 sprints. See [PHASE1-CLOSEO
 
 **All major sprints complete.** Sprint 13 code-complete, ops/legal blocked on founder.
 
-**Active rally:** [Rally 009 — Pre-MVP Polish](./rallies/rally-009-premvp-polish/) — 4 sessions, 18 items. Session 1 ready to launch.
+**All rallies complete.** Rally 009 (7 sessions, PRs #152-169) and Rally 010 (4 sessions, PR #170) merged. All code work done — remaining work is founder-only (ops, legal, QA, deploy).
 
 > Junior sprints in flight → see [junior/README.md](./junior/README.md)
 
@@ -64,6 +64,8 @@ Intensive audit sessions — not building, but investigating. Multiple agents re
 
 | Rally | Date | Scope |
 |-------|------|-------|
+| [Rally 010 — Frontend UX & Guidance](./rallies/rally-010-frontend-ux-guidance/) | 2026-04-04 | 4 sessions: cold states, product tour, tooltips, coaching nudges (PR #170) |
+| [Rally 009 — Pre-MVP Polish](./rallies/rally-009-premvp-polish/) | 2026-04-02–04 | 7 sessions, 30 items: tabs, data integrity, endorsements, LLM, certs, trust, desktop, roadmap (PRs #152-169) |
 | [Rally 008 — Doc & Skill Redesign](./rallies/rally-008-doc-skill-redesign/) | 2026-04-01 | 11 module docs collapsed, 5 new skills, 7 archived |
 | [Rally 006 — Pre-Launch Polish](./rallies/rally-006-prelaunch/) | 2026-04-02 | Bug sweep + polish — 18 items, all complete |
 | [Rally 005 — Auth Resilience](./rallies/rally-005-auth-resilience/) | 2026-03-29 | Auth incident response — 12 fixes |

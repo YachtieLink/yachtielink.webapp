@@ -61,6 +61,18 @@ export type ProfilePhoto = {
   sort_order: number
   focal_x: number
   focal_y: number
+  is_avatar?: boolean
+  is_hero?: boolean
+  is_cv?: boolean
+  avatar_focal_x?: number | null
+  avatar_focal_y?: number | null
+  hero_focal_x?: number | null
+  hero_focal_y?: number | null
+  cv_focal_x?: number | null
+  cv_focal_y?: number | null
+  avatar_zoom?: number
+  hero_zoom?: number
+  cv_zoom?: number
 }
 
 export type Hobby = {
