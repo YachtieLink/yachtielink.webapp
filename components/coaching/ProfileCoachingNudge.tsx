@@ -14,7 +14,6 @@ interface NudgeMessage {
 
 interface ProfileCoachingNudgeProps {
   hasPhoto: boolean
-  hasRole: boolean
   hasBio: boolean
   hasYacht: boolean
   hasCert: boolean
@@ -50,7 +49,7 @@ export function ProfileCoachingNudge(props: ProfileCoachingNudgeProps) {
     sessionStorage.setItem(SESSION_KEY, 'true')
     setNudge(message)
     setVisible(true)
-  }, [props])
+  }, [props.hasPhoto, props.hasBio, props.hasYacht, props.hasCert])
 
   function dismiss() {
     if (nudge) localStorage.setItem(STORAGE_KEY, nudge.key)

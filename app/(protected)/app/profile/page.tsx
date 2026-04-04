@@ -271,7 +271,6 @@ export default async function ProfilePage() {
       {/* Coaching nudge — context-aware, dismissible */}
       <ProfileCoachingNudge
         hasPhoto={!!profile.profile_photo_url}
-        hasRole={!!profile.primary_role}
         hasBio={!!profile.bio}
         hasYacht={(attachments?.length ?? 0) > 0}
         hasCert={(certs?.length ?? 0) > 0}
