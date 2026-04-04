@@ -15,7 +15,7 @@ export function CvImportCard({ hasUploadedCv, cvParsedAt }: CvImportCardProps) {
   const hasParsed = !!cvParsedAt
   const [showConfirm, setShowConfirm] = useState(false)
 
-  // ── Already imported ──────────────────────────────────────────────
+  // ── Already imported — demoted to text link at page bottom ────────
   if (hasParsed) {
     const parsedDate = new Date(cvParsedAt!)
     const formattedDate = parsedDate.toLocaleDateString('en-GB', {
@@ -25,34 +25,22 @@ export function CvImportCard({ hasUploadedCv, cvParsedAt }: CvImportCardProps) {
     })
 
     return (
-      <div className="rounded-2xl border border-[var(--color-amber-200)] bg-[var(--color-amber-50)]/50 p-4">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 h-8 w-8 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-              <CheckCircle size={16} className="text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-[var(--color-text-primary)]">
-                CV uploaded
-              </p>
-              <p className="text-xs text-[var(--color-text-tertiary)] mt-0.5">
-                Your profile was built from your CV on {formattedDate}.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => setShowConfirm(true)}
-            className="flex items-center gap-1 text-xs text-[var(--color-interactive)] shrink-0 mt-1"
-          >
-            <RefreshCw size={12} />
-            Update from new CV
-          </button>
-        </div>
+      <div className="text-center pt-4 pb-2">
+        <p className="text-xs text-[var(--color-text-tertiary)] mb-1">
+          Profile built from CV uploaded on {formattedDate}
+        </p>
+        <button
+          type="button"
+          onClick={() => setShowConfirm(true)}
+          className="inline-flex items-center gap-1 text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+        >
+          <RefreshCw size={11} />
+          Update from new CV
+        </button>
 
-        {/* Re-parse confirmation dialog (UX5) */}
+        {/* Re-parse confirmation dialog */}
         {showConfirm && (
-          <div className="mt-3 rounded-xl border border-[var(--color-amber-300)] bg-[var(--color-amber-50)] p-3">
+          <div className="mt-3 mx-auto max-w-sm rounded-xl border border-[var(--color-amber-300)] bg-[var(--color-amber-50)] p-3 text-left">
             <div className="flex items-start gap-2 mb-3">
               <AlertTriangle size={16} className="text-[var(--color-amber-500)] shrink-0 mt-0.5" />
               <p className="text-sm text-[var(--color-text-primary)] leading-relaxed">
@@ -73,7 +61,7 @@ export function CvImportCard({ hasUploadedCv, cvParsedAt }: CvImportCardProps) {
                   setShowConfirm(false)
                   router.push('/app/cv/upload')
                 }}
-                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--color-amber-500)] text-white hover:bg-[var(--color-amber-600)] transition-colors"
+                className="px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--color-amber-500)] text-white hover:bg-[var(--color-amber-700)] transition-colors"
               >
                 Continue
               </button>

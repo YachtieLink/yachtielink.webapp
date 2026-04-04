@@ -343,17 +343,23 @@ export function ProfileHeroCard({
         </div>
       )}
 
-      {/* Action buttons */}
-      <div className="flex gap-2">
-        {handle && (
-          <Link href={`/u/${handle}`} className="flex-1">
-            <Button variant="outline" className="w-full">Preview</Button>
-          </Link>
-        )}
-        <Button onClick={shareProfile} className="flex-1">
-          Share Profile
-        </Button>
-      </div>
+      {/* Action buttons — hidden when profile is too incomplete */}
+      {(strengthScore ?? 100) >= 40 ? (
+        <div className="flex gap-2">
+          {handle && (
+            <Link href={`/u/${handle}`} className="flex-1">
+              <Button variant="outline" className="w-full">Preview</Button>
+            </Link>
+          )}
+          <Button onClick={shareProfile} className="flex-1">
+            Share Profile
+          </Button>
+        </div>
+      ) : (
+        <p className="text-xs text-[var(--color-text-tertiary)] text-center py-1">
+          Complete your profile to unlock sharing and preview
+        </p>
+      )}
     </div>
   )
 }
