@@ -37,6 +37,36 @@ Use both: the smoke checklist catches regressions, the test backlog catches whet
 
 ## Untested Changes
 
+### feat/per-context-focal-zoom — Per-Context Focal Points + Zoom Bug Fixes
+Date: 2026-04-04 (pending push)
+
+#### Photos page — context thumbnails + Pro gate
+- [ ] Log in as free user → Photos page → context thumbnail panel NOT shown (Pro gate working)
+- [ ] Log in as Pro user → Photos page → context thumbnail panel shown
+- [ ] Pro user: select a photo → set hero focal point to top-left (0,0) → save → reload → focal point persists at (0,0) not (50,50)
+- [ ] Pro user: set hero zoom to 2.5x → save → hero thumbnail preview shows tighter crop
+- [ ] Pro user: mark a photo as "Hero" → hero thumbnail updates to that photo
+- [ ] Pro user: mark a different photo as "Hero" → previous hero photo loses hero status (exclusive assignment)
+- [ ] Same for Avatar and CV contexts — exclusive assignment working
+
+#### Public profile hero — zoom applied
+- [ ] Visit a public profile where the hero photo has `hero_zoom > 1` → photo appears zoomed in (not 1:1)
+- [ ] Hero zoom with non-default focal point → both zoom and position apply correctly
+
+#### Land experience IDOR fix
+- [ ] Log in as User A → navigate to `/app/land-experience/[id]/edit` with an ID belonging to User B → page shows 404 or redirects (not User B's data)
+- [ ] Log in as User A → edit own land experience entry → saves correctly
+
+#### Input length limits
+- [ ] Land experience new page → company/role/industry fields capped at 200 chars (no overflow)
+- [ ] Land experience edit page → same
+
+#### General
+- [ ] `npm run build` passes
+- [ ] Type-check clean: `npx tsc --noEmit`
+
+---
+
 ### chain/rally-009 (PR #159) — Sessions 2-5 — QA PASSED by /yl-tester
 Date: 2026-04-03
 **28 test cases executed, all passing.** Full QA report in `worktrees/qa-report.md`.

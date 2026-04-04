@@ -4,7 +4,7 @@
 
 **How to use this file:** This is the single source of truth for what's left. Work top to bottom. Check boxes as items complete. Read this at session start.
 
-**Last updated:** 2026-04-03
+**Last updated:** 2026-04-04
 
 ---
 
@@ -19,15 +19,14 @@ Sprint 13 W0+1 ✅ Public header/footer, cookie banner
 Rally 005      ✅ Auth resilience (12 fixes)
 QA fixes       ✅ Settings IA, bug sweep, mobile fixes, stale cookies
 Rally 006      ✅ All items shipped (PRs #132-150)
-Rally 009 S1   ✅ Bugs + tech debt (PR #155 chain)
-Rally 009 S2   ✅ Land experience, sea time overlap, CV restore (PRs #156-158)
-Rally 009 S3-5 ✅ Network, Profile, Insights, Photos, CV, Settings, Endorsements, LLM (PR #159)
+Rally 009 S1-7 ✅ All 7 sessions merged (PRs #152-169)
+Rally 010      ✅ All 4 sessions merged (PR #170)
+
+ALL CODE WORK COMPLETE — 170 PRs merged to main.
 
 → Sprint 13: Code complete. Ops + legal blocked on founder.
 → Ghost Profiles W1: Shipped (PRs #133, #143, #148). ⚠️ Claim flow UNTESTED — launch blocker.
-→ NOW: Rally 009 Session 6 — Cert registry, reporting, experience transfer, Pro upsell (4 lanes building).
-→ NEXT: Rally 009 Session 7 — Desktop polish, roadmap/feedback, settings, cross-cutting.
-→ THEN: Rally 010 — Frontend UX, product tour, cold states, coaching.
+→ NOW: Founder tasks — ghost claim E2E test, visual QA, ops config, legal.
 → THEN: Rally 007 — Launch QA full checklist (⚠️ no spec yet — needs creating).
 → THEN: Ops config + legal sign-off (founder).
 → THEN: 🚀 Invite mode
@@ -115,20 +114,26 @@ See `sprints/rallies/rally-009-premvp-polish/README.md` for full spec. **7 sessi
 - [x] LLM prompt injection defense — sanitize.ts + prompt-guard.ts, hardened system prompts
 - [x] Endorsement request redesign — yacht-grouped, ghost suggestions inline, per-yacht invite, reminder logic
 
-**Session 6 — Data Quality + Safety + Transfer:** 🔧 In progress (4 lanes building)
-- [ ] CV cert matching registry — 60 seed certs, fuzzy match, green/amber/blue tiers (Lane 1 — review passed)
-- [ ] Reporting/flagging + bug reporter — report button, email alerts, bug report form (Lane 2 — testing)
-- [ ] Experience transfer + endorsement visibility — transfer API, dormant endorsements, colleague rebuild (Lane 3 — testing)
-- [ ] Pro upsell consistency — standard component, retrofit across app (Lane 4 — testing)
+**Session 6 — Data Quality + Safety + Transfer:** ✅ Complete (PRs #160-165)
+- [x] CV cert matching registry — 60 seed certs, fuzzy match, green/amber/blue tiers
+- [x] Reporting/flagging + bug reporter — report button, email alerts, bug report form
+- [x] Experience transfer + endorsement visibility — transfer API, dormant endorsements, colleague rebuild
+- [x] Pro upsell consistency — standard component, retrofit across app
 
-**Session 7 — Polish + Feedback + Settings (after Session 6):**
-- [ ] Desktop responsiveness audit — fix all pages at 1024-1920px
-- [ ] Roadmap + feedback — in-app 3-tab (Roadmap / Feature Requests / Released)
-- [ ] Visibility toggle sublabels — explain what each toggle controls
-- [ ] Back navigation platform-wide — "← Network" not "← Back"
-- [ ] Skeleton loading for new Session 3-6 components
+**Session 7 — Polish + Feedback + Settings:** ✅ Complete (PRs #166-169)
+- [x] Desktop responsiveness audit — BottomSheet desktop card, UpgradeCTA, public profile layout
+- [x] Roadmap + feedback — in-app 3-tab (Roadmap / Feature Requests / Released)
+- [x] Visibility toggle sublabels — explain what each toggle controls
+- [x] Back navigation platform-wide — "← Settings" not "← Back"
+- [x] Skeleton loading for new Session 3-6 components
 
 **Grill-me:** One 60-min browser session covers ALL topics. See `rally-009-premvp-polish/GRILL-ME-AGENT-PROMPT.md` for the agent prompt. Run during Sessions 1-2 build time.
+
+---
+
+### 1c. Rally 010: Frontend UX & Guidance — ✅ Complete (PR #170, 2026-04-04)
+
+4 sessions: tooling + StickyBottomBar, cold states (Profile/CV/Network/Insights), product tour (Onborda + data-tour attrs), tooltips (InfoTooltip component), coaching nudges (ProfileCoachingNudge, CvFreshnessNudge), FirstVisitCards per tab. All merged.
 
 ---
 

@@ -26,6 +26,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
+| 2026-04-04 | feat/per-context-focal-zoom | Per-context focal+zoom: 10 bug fixes incl. IDOR, hero_zoom consumed on public profile, thumbnail responsive fix. |
 | 2026-04-04 | Rally 009 Session 7 | 3-lane worktree: desktop responsiveness (BottomSheet/UpgradeCTA/public profile CSS), in-app roadmap + feature request system (migration live), settings polish + cross-cutting (visibility sublabels, back nav, loading skeletons). 22 review fixes. 4 backlog items. |
 | 2026-04-03 | Rally 009 Session 6 | 4-lane worktree: cert matching registry (green/amber/blue), reporting/flagging/bug-reporter (trust infra), experience transfer + endorsement dormancy, ProUpsellCard consistency. 1 extra migration (RLS update policy). 26 review fixes. 6 backlog items. |
 | 2026-04-03 | Rally 009 Review + QA | Review fixes (21 total): RSC serialization, LLM safety, Pro gate, clipboard, dead code. Tester QA (9 fixes): column mismatches, land exp on public profile, WhoViewedYou dynamic range, assist quality. 5 backlog items. |
@@ -37,6 +38,41 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 | 2026-04-02 | Rally 009 /grill-me | Design interview: 42 Qs resolved, 5-tab UX audit, 9 additional fixes confirmed. All sessions unblocked. |
 | 2026-04-02 | Rally 009 Session 1 | 3-lane: mobile UX tab-bar padding + CV preview canonical query, P2 bugs (saved sea time, yacht prefix null guard, PDF home-country toggle), tech debt sweep (social icons dedup, formatSeaTime, EndorsementsSection) |
 | 2026-04-02 | Rally 009 planning | Full pre-MVP backlog triage: 30 items across 7 sessions specced into lane-ready build plans. 42 /grill-me questions prepped. 7 backlog items closed as resolved. Junior sprints updated. |
+
+## 2026-04-04 — Sonnet 4.6 — feat/per-context-focal-zoom bug fix pass
+
+### Done
+- **10 bugs fixed** across the per-context focal+zoom feature (built mid-Rally 010 walkthrough, accumulated since previous session):
+- **IDOR on land-experience edit** (CRITICAL): `app/(protected)/app/land-experience/[id]/edit/page.tsx` — added `userId` state, `getUser()` in load(), `.eq('user_id', user.id)` on SELECT/UPDATE/DELETE. Also added maxLength=200 on inputs + session-expired toast guards.
+- **IDOR on land-experience new** (LOW): `app/(protected)/app/land-experience/new/page.tsx` — session-expired toast instead of silent bail, maxLength=200.
+- **Pro gate fail-open on Stripe outage** (HIGH): `app/api/user-photos/[id]/route.ts` — wrapped `getProStatus()` in try-catch, fail-open with console.warn (allows access on Stripe failure, not a hard security boundary).
+- **`|| 50` falsy-zero bug** (MEDIUM): `app/(protected)/app/profile/photos/page.tsx` — all 8 occurrences of `Number(x) || 50` changed to `x ?? 50`. Zero focal point now treated as valid.
+- **Context-clear before ownership check** (MEDIUM): same route — moved `is_avatar/hero/cv` context-clear updates to AFTER the ownership-verified `.select('id')` check. Phantom photo ID no longer corrupts other photos' context flags.
+- **`hero_zoom` never consumed on public profile** (HIGH): `components/public/HeroSection.tsx` — added `heroZoom?: number` prop (default 1), `transform: scale(heroZoom)` on `<Image>`. `components/public/PublicProfileContent.tsx` — reads `heroPhoto?.hero_zoom ?? 1`, passes `heroZoom` to `<HeroSection>`.
+- **ProfilePhoto type contract mismatch** (MEDIUM): `lib/queries/profile.ts` `getExtendedProfileSections` now selects all 17 user_photos fields to match the `ProfilePhoto` type in `lib/queries/types.ts`.
+- **Inaccurate fail-open comment** (LOW): corrected "enforcement happens at DB/payment level" → "not a hard security boundary".
+- **Pro expiry not checked** (MEDIUM): `photos/page.tsx` — imports `isProFromRecord()`, selects `subscription_ends_at`, uses `isProFromRecord()` instead of bare `=== 'pro'`.
+- **Hero thumbnail breaks responsive** (UX): Hero thumbnail in "Customize crop per context" used `flex-1 w-full h-[56px]` → ultra-wide strip on iPad+. Changed container to `flex-1 min-w-0 max-w-[160px]`, button to `aspect-[2/1]`. Added `justify-center` to thumbnail row.
+- All 5 fixes from second review pass verified in preview (mobile + tablet screenshots).
+
+### Context
+- Branch: `feat/per-context-focal-zoom` — 1 commit ahead of main (the original feature commit). All bug fixes are unstaged/uncommitted working tree changes.
+- DB migrations `20260404000001` and `20260404000002` already applied to remote Supabase before this session.
+- Type-check passes clean. No drift-check issues.
+
+### Next
+1. Commit + push `feat/per-context-focal-zoom` → create PR
+2. Resume Rally 010 walkthrough from Stop 2 (CV tab) — walkthrough paused mid-session after pivoting to build this feature
+3. Remaining consumer updates not in this branch: `ProfileHeroCard` avatar display (avatar_focal_x/y + avatar_zoom), base avatar component, CV PDF generation (cv_focal_x/y + cv_zoom)
+
+### Flags
+- ⚠️ Context-clear updates after ownership check still swallow errors silently — if a transient DB failure occurs, two photos could briefly share the same context flag. Acceptable for now; fix requires a DB transaction.
+- ⚠️ Avatar and CV zoom/focal NOT yet consumed by their display components (ProfileHeroCard, CV PDF) — captured in backlog
+
+### Backlog captured
+- `rich-portfolio-gallery-context.md` — framework for users to see which photos appear where in rich portfolio / arrange photos per context
+
+---
 
 ## 2026-04-04 — Rally 009 Session 7 (Opus 4.6) — Worktree
 
