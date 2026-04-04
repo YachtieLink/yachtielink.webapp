@@ -26,7 +26,7 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 
 | Date | Sprint | Summary |
 |------|--------|---------|
-| 2026-04-04 | feat/per-context-focal-zoom | Per-context focal+zoom: 10 bug fixes incl. IDOR, hero_zoom consumed on public profile, thumbnail responsive fix. |
+| 2026-04-04 | feat/per-context-focal-zoom | Per-context focal points + zoom for Pro profile photos. DB migrations, progressive disclosure UI, FocalPointPicker rewrite, HeroSection focal fix. Then 10 bug fixes (IDOR, hero_zoom, falsy-zero, Pro expiry). |
 | 2026-04-04 | Rally 009 Session 7 | 3-lane worktree: desktop responsiveness (BottomSheet/UpgradeCTA/public profile CSS), in-app roadmap + feature request system (migration live), settings polish + cross-cutting (visibility sublabels, back nav, loading skeletons). 22 review fixes. 4 backlog items. |
 | 2026-04-03 | Rally 009 Session 6 | 4-lane worktree: cert matching registry (green/amber/blue), reporting/flagging/bug-reporter (trust infra), experience transfer + endorsement dormancy, ProUpsellCard consistency. 1 extra migration (RLS update policy). 26 review fixes. 6 backlog items. |
 | 2026-04-03 | Rally 009 Review + QA | Review fixes (21 total): RSC serialization, LLM safety, Pro gate, clipboard, dead code. Tester QA (9 fixes): column mismatches, land exp on public profile, WhoViewedYou dynamic range, assist quality. 5 backlog items. |
@@ -38,6 +38,37 @@ All coding agents (Claude Code, Codex, etc.) must read this file at session star
 | 2026-04-02 | Rally 009 /grill-me | Design interview: 42 Qs resolved, 5-tab UX audit, 9 additional fixes confirmed. All sessions unblocked. |
 | 2026-04-02 | Rally 009 Session 1 | 3-lane: mobile UX tab-bar padding + CV preview canonical query, P2 bugs (saved sea time, yacht prefix null guard, PDF home-country toggle), tech debt sweep (social icons dedup, formatSeaTime, EndorsementsSection) |
 | 2026-04-02 | Rally 009 planning | Full pre-MVP backlog triage: 30 items across 7 sessions specced into lane-ready build plans. 42 /grill-me questions prepped. 7 backlog items closed as resolved. Junior sprints updated. |
+
+## 2026-04-04 — Opus 4.6 — feat/per-context-focal-zoom feature build
+
+### Done
+- **Per-context focal points + zoom** — built during Rally 010 walkthrough (Stop 1: Profile tab). Pro users can set independent focal points and zoom (1x–3x) for Avatar, Hero, and CV contexts.
+- **DB migrations** (applied to remote Supabase):
+  - `20260404000001_per_context_focal_points.sql` — 6 nullable columns: `avatar_focal_x/y`, `hero_focal_x/y`, `cv_focal_x/y` (0-100 CHECK)
+  - `20260404000002_per_context_zoom.sql` — 3 columns: `avatar_zoom`, `hero_zoom`, `cv_zoom` (default 1, range 1-5 CHECK)
+- **Photos page rewrite** (`app/(protected)/app/profile/photos/page.tsx`): progressive disclosure UI — Layer 1: single photo + base focal. Layer 2: "Customize crop per context" expandable with Avatar/Hero/CV focal pickers. Layer 3: "Use different photos per context" expandable with 3-photo grid + context assignment toggles. Free users see ProUpsellCard.
+- **Focal point modal**: full-screen mobile / centered desktop, context tab bar (Base/Avatar/Hero/CV), context-specific descriptions, zoom slider, Hero shows side-by-side Mobile (2:3) + Desktop (2:1) previews.
+- **FocalPointPicker rewrite** (`components/profile/FocalPointPicker.tsx`): `max-h-[40vh] w-auto` centered, shows full image at natural proportions, crosshair indicator, pointer capture for drag.
+- **HeroSection fix** (`components/public/HeroSection.tsx`): was ignoring `focalX`/`focalY` props entirely (hardcoded `center top`), now uses `objectPosition: focalX% focalY%`.
+- **API routes**: GET returns all 9 new columns. PATCH accepts 6 focal + 3 zoom fields, Pro-gated.
+- **Types**: `lib/database.types.ts` + `lib/queries/types.ts` updated with all new fields.
+- **Land experience CRUD pages**: `land-experience/new/page.tsx` and `land-experience/[id]/edit/page.tsx` for shore-side roles.
+- **5 backlog items captured**: `focal-point-responsive.md`, `pro-3-profile-photos.md`, `pro-photos-progressive-disclosure.md`, `resizable-crop-editor.md`, `sea-time-to-onboard-rename.md`
+
+### Context
+- Built mid-walkthrough when founder discovered focal points weren't working and requested per-context cropping + zoom.
+- Multiple iterations on FocalPointPicker — founder insisted on full image at actual proportions (not full-width object-cover).
+- Walkthrough paused after photo feature verified. Stops 2-6 (CV, Network, Insights, More, Tour) remain.
+
+### Next
+1. Bug fix pass (see below)
+2. Resume walkthrough from Stop 2
+
+### Flags
+- ⚠️ Consumer components not yet updated: ProfileHeroCard avatar, base avatar component, CV PDF generation
+- ⚠️ `getExtendedProfileSections` query needs new columns (fixed in bug fix pass below)
+
+---
 
 ## 2026-04-04 — Sonnet 4.6 — feat/per-context-focal-zoom bug fix pass
 

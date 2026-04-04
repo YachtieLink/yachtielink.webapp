@@ -2,13 +2,13 @@
 
 Quick-glance project dashboard. Read this at session start to know what's happening right now.
 
-**Last updated:** 2026-04-04 (feat/per-context-focal-zoom branch ready to push — 10 bug fixes, not yet PRed.)
+**Last updated:** 2026-04-04 (feat/per-context-focal-zoom pushed — per-context focal points + zoom for Pro photos, plus 10 bug fixes. PR pending.)
 
 ---
 
 ## Current Phase
 
-**Phase 1B — pre-launch.** Rally 009 (7 sessions, PRs #152-169) and Rally 010 (4 sessions, PR #170) all on main. One post-rally bug fix branch pending PR (`feat/per-context-focal-zoom` — 10 fixes, ready to push). What remains is founder-only: ops config, legal, QA testing, and deploy.
+**Phase 1B — pre-launch.** Rally 009 (7 sessions, PRs #152-169) and Rally 010 (4 sessions, PR #170) all on main. One feature branch pushed, pending PR: `feat/per-context-focal-zoom` — per-context focal points + zoom for Pro profile photos (2 DB migrations, progressive disclosure UI, FocalPointPicker rewrite, HeroSection fix) + 10 bug fixes. What remains is founder-only: ops config, legal, QA testing, and deploy.
 
 ---
 
@@ -26,7 +26,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | What | When | PR(s) | Details |
 |------|------|-------|---------|
-| feat/per-context-focal-zoom fixes | 2026-04-04 | pending | 10 bugs fixed: IDOR on land-experience, hero_zoom consumed, context-clear ordering, Pro expiry check, hero thumbnail responsive. Branch ready to push. |
+| feat/per-context-focal-zoom | 2026-04-04 | pushed | Per-context focal points + zoom for Pro photos. Progressive disclosure UI, FocalPointPicker rewrite, HeroSection focal fix, 2 DB migrations, land-experience CRUD, 5 backlog items. Plus 10 bug fixes (IDOR, hero_zoom, falsy-zero, Pro expiry). |
 | Rally 010 — Frontend UX & Guidance | 2026-04-04 | #170 | 4 sessions: cold states, product tour (Onborda), tooltips, coaching nudges, StickyBottomBar, FirstVisitCards, InfoTooltips. |
 | Rally 009 Session 7 | 2026-04-04 | #166-169 | Desktop responsiveness, in-app roadmap + feature requests, visibility sublabels + back nav + loading skeletons. 22 review fixes. |
 | Rally 009 Session 6 | 2026-04-03 | #160-165 | Cert matching registry, trust infra (report + bug report APIs), experience transfer + endorsement dormancy, ProUpsellCard. 26 review fixes. |
@@ -60,7 +60,7 @@ Quick-glance project dashboard. Read this at session start to know what's happen
 
 | Branch | Status | Summary |
 |--------|--------|---------|
-| feat/per-context-focal-zoom | Ready to push | 10 bug fixes: IDOR, hero_zoom, falsy-zero focal, context-clear order, Pro expiry, thumbnail responsive |
+| feat/per-context-focal-zoom | Pushed, PR pending | Per-context focal points + zoom for Pro photos (feature build + 10 bug fixes). 2 commits, +1063/-160 lines. |
 
 ---
 
