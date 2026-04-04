@@ -77,7 +77,7 @@ export default async function CvPage() {
   // ── Warm state: has uploaded CV or generated PDF ────────────────────
   return (
     <PageTransition className={`flex flex-col gap-4 -mx-4 px-4 md:-mx-6 md:px-6 bg-[var(--color-amber-50)] ${hasGeneratedPdf ? 'pb-36' : 'pb-24'}`}>
-      <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]">My CV</h1>
+      <h1 className="text-[28px] font-serif tracking-tight text-[var(--color-text-primary)]" data-tour="cv-page">My CV</h1>
 
       {/* Education card — CV is output-only, data lives on Profile */}
       <div className="rounded-2xl border border-[var(--color-amber-200)] bg-white/90 shadow-sm p-4 flex items-start gap-3">
@@ -113,6 +113,7 @@ export default async function CvPage() {
         pdfGeneratedAt={profile.latest_pdf_generated_at as string | null}
       />
 
+      <div id="cv-actions">
       <CvActions
         hasGeneratedPdf={hasGeneratedPdf}
         pdfGeneratedAt={profile.latest_pdf_generated_at as string | null}
@@ -122,6 +123,7 @@ export default async function CvPage() {
         cvPublicSource={(profile.cv_public_source as 'generated' | 'uploaded') ?? 'generated'}
         isPro={isProFromRecord(profile)}
       />
+      </div>
 
       {/* Demoted CV re-import — text link at bottom */}
       <CvImportCard

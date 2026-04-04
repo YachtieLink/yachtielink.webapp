@@ -6,17 +6,6 @@ interface Tour {
   steps: Step[]
 }
 
-/**
- * Product tour step configuration.
- * Steps are defined here for easy editing — Session 3 will populate these.
- * Selectors target DOM elements by data-tour attribute.
- *
- * IMPORTANT for Session 3:
- * - The `showOnborda` prop on <Onborda> is IGNORED by onborda v1.2.5.
- *   Tour activation requires calling `startOnborda('welcome')` from useOnborda().
- * - The TourProvider must be reworked to call startOnborda() via useEffect when
- *   localStorage key is not set, instead of relying on the showOnborda prop.
- */
 export const TOUR_STORAGE_KEY = 'yl_tour_complete'
 
 export const productTour: Tour = {
@@ -99,6 +88,7 @@ export const productTour: Tour = {
       showControls: true,
       pointerPadding: 8,
       pointerRadius: 16,
+      nextRoute: '/app/profile',
       prevRoute: '/app/more',
     },
   ],

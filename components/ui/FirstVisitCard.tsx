@@ -5,7 +5,7 @@ import { X } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { springSnappy } from '@/lib/motion'
 import type { SectionColor } from '@/lib/section-colors'
-import { getSectionTokens } from '@/lib/section-colors'
+import { colorMap } from '@/lib/section-colors'
 
 interface FirstVisitCardProps {
   storageKey: string
@@ -21,7 +21,7 @@ interface FirstVisitCardProps {
  */
 export function FirstVisitCard({ storageKey, accentColor, icon, title, description }: FirstVisitCardProps) {
   const [visible, setVisible] = useState(false)
-  const tokens = getSectionTokens(accentColor)
+  const tokens = colorMap[accentColor]
 
   useEffect(() => {
     const dismissed = localStorage.getItem(storageKey)

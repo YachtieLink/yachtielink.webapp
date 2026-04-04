@@ -55,8 +55,8 @@ export function CvDocumentBar({ hasGeneratedPdf, pdfStale }: CvDocumentBarProps)
           {downloading ? 'Loading...' : 'Download'}
         </button>
 
-        <Link
-          href="/app/cv#regenerate"
+        <a
+          href="#cv-actions"
           className={`flex items-center gap-1.5 text-sm font-medium ${
             pdfStale
               ? 'text-[var(--color-amber-700)] font-semibold'
@@ -65,7 +65,7 @@ export function CvDocumentBar({ hasGeneratedPdf, pdfStale }: CvDocumentBarProps)
         >
           <RefreshCw size={14} />
           {pdfStale ? 'Update CV' : 'Regenerate'}
-        </Link>
+        </a>
       </div>
     </StickyBottomBar>
   )

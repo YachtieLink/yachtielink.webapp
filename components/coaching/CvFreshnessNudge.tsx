@@ -60,6 +60,12 @@ export function CvFreshnessNudge({ profileUpdatedAt, pdfGeneratedAt }: CvFreshne
               <p className="text-sm text-[var(--color-text-primary)]">
                 Your profile changed on {changeDate}. Regenerate your CV to include updates.
               </p>
+              <a
+                href="#cv-actions"
+                className="inline-flex items-center gap-1 text-sm font-medium text-[var(--color-amber-700)] mt-1 hover:underline"
+              >
+                Regenerate now
+              </a>
             </div>
             <button
               onClick={dismiss}

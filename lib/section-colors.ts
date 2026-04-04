@@ -15,7 +15,7 @@ export interface SectionColorTokens {
   borderAccent: string;
 }
 
-const colorMap: Record<SectionColor, SectionColorTokens> = {
+export const colorMap: Record<SectionColor, SectionColorTokens> = {
   teal: {
     bg50: "var(--color-teal-50)",
     bg100: "var(--color-teal-100)",
